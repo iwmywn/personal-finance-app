@@ -172,11 +172,19 @@ export async function convertTransactionsToCurrency(
 ): Promise<Transaction[]> {
   if (transactions.length === 0) return transactions
 
-  const timestamps = transactions.map((t) =>
-    normalizeToUTCMidnight(new Date(t.date)).getTime()
-  )
-  const minDate = new Date(Math.min(...timestamps))
-  const maxDate = new Date(Math.max(...timestamps))
+  let minTimestamp = Infinity
+  let maxTimestamp = -Infinity
+  const timestamps = new Array<number>(transactions.length)
+  for (let i = 0; i < transactions.length; i++) {
+    const time = normalizeToUTCMidnight(
+      new Date(transactions[i].date)
+    ).getTime()
+    timestamps[i] = time
+    if (time < minTimestamp) minTimestamp = time
+    if (time > maxTimestamp) maxTimestamp = time
+  }
+  const minDate = new Date(minTimestamp)
+  const maxDate = new Date(maxTimestamp)
 
   const rates = await fetchCandidateExchangeRates(minDate, maxDate)
   if (rates.length === 0) return transactions

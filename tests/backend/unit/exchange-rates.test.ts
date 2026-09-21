@@ -495,4 +495,24 @@ describe("ensureExchangeRateForDate", () => {
       convertTransactionsToCurrency(transactions, "USD")
     ).resolves.not.toThrow()
   })
+
+  it("should handle large transaction arrays without RangeError call stack exceeded", async () => {
+    // Array of 100,000 transactions would exceed call stack if Math.min(...timestamps) is used
+    const count = 100_000
+    const tx = mockTransactions[0]
+    const largeTransactions: Transaction[] = Array.from(
+      { length: count },
+      (_, i) => ({
+        ...tx,
+        _id: `large-tx-${i}`,
+        currency: "USD",
+        amount: "10",
+        date: new Date("2024-01-01T00:00:00Z"),
+      })
+    )
+
+    await expect(
+      convertTransactionsToCurrency(largeTransactions, "USD")
+    ).resolves.not.toThrow()
+  })
 })

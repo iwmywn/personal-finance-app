@@ -139,30 +139,36 @@ export async function updateRecurringTransaction(
       }
     }
 
+    const setFields: Record<string, unknown> = {
+      type: parsedValues.data.type,
+      categoryKey: parsedValues.data.categoryKey,
+      amount: toDecimal128(parsedValues.data.amount),
+      currency: parsedValues.data.currency,
+      description: parsedValues.data.description,
+      frequency: parsedValues.data.frequency,
+      startDate: parsedValues.data.startDate,
+    }
+    const unsetFields: Record<string, true | ""> = {}
+
+    if (parsedValues.data.endDate) {
+      setFields.endDate = parsedValues.data.endDate
+    } else {
+      unsetFields.endDate = ""
+    }
+
+    if (parsedValues.data.randomEveryXDays) {
+      setFields.randomEveryXDays = parsedValues.data.randomEveryXDays
+    } else {
+      unsetFields.randomEveryXDays = ""
+    }
+
     await recurringCollection.updateOne(
       { _id: new ObjectId(recurringId), userId: new ObjectId(user.id) },
       {
-        $set: {
-          type: parsedValues.data.type,
-          categoryKey: parsedValues.data.categoryKey,
-          amount: toDecimal128(parsedValues.data.amount),
-          currency: parsedValues.data.currency,
-          description: parsedValues.data.description,
-          frequency: parsedValues.data.frequency,
-          randomEveryXDays: parsedValues.data.randomEveryXDays,
-          startDate: parsedValues.data.startDate,
-          endDate: parsedValues.data.endDate,
-        },
+        $set: setFields,
+        ...(Object.keys(unsetFields).length > 0 ? { $unset: unsetFields } : {}),
       }
     )
-
-    // if (result.matchedCount === 0) {
-    //   return {
-    //     error: t(
-    //       "Recurring transaction not found or you don't have permission to edit."
-    //     ),
-    //   }
-    // }
 
     updateTag(`recurringTransactions-${user.id}`)
     return {

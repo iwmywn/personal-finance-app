@@ -477,6 +477,73 @@ describe("Recurring Transactions", async () => {
       expect(result.error).toBeUndefined()
     })
 
+    it("should successfully unset endDate in database when updated with endDate: undefined", async () => {
+      await insertTestRecurringTransaction({
+        ...mockDBRecurringTransaction,
+        endDate: localDateToUTCMidnight(new Date("2024-12-31")),
+      })
+      mockAuthenticatedUser()
+
+      const result = await updateRecurringTransaction(
+        mockDBRecurringTransaction._id.toString(),
+        {
+          type: mockDBRecurringTransaction.type,
+          categoryKey: mockDBRecurringTransaction.categoryKey,
+          amount: mockDBRecurringTransaction.amount.toString(),
+          currency: mockDBRecurringTransaction.currency,
+          description: "Removing endDate",
+          frequency: "monthly",
+          startDate: mockDBRecurringTransaction.startDate,
+          endDate: undefined,
+        }
+      )
+
+      expect(result.success).toBe("Recurring transaction has been updated.")
+      expect(result.error).toBeUndefined()
+
+      const recurringCollection = await getRecurringTransactionsCollection()
+      const updatedRecurring = await recurringCollection.findOne({
+        _id: mockDBRecurringTransaction._id,
+      })
+
+      expect(updatedRecurring?.endDate).toBeUndefined()
+    })
+
+    it("should successfully unset randomEveryXDays in database when frequency is changed from random", async () => {
+      await insertTestRecurringTransaction({
+        ...mockDBRecurringTransaction,
+        frequency: "random",
+        randomEveryXDays: 5,
+      })
+      mockAuthenticatedUser()
+
+      const result = await updateRecurringTransaction(
+        mockDBRecurringTransaction._id.toString(),
+        {
+          type: mockDBRecurringTransaction.type,
+          categoryKey: mockDBRecurringTransaction.categoryKey,
+          amount: mockDBRecurringTransaction.amount.toString(),
+          currency: mockDBRecurringTransaction.currency,
+          description: "Changing from random to weekly",
+          frequency: "weekly",
+          startDate: mockDBRecurringTransaction.startDate,
+          endDate: undefined,
+          randomEveryXDays: undefined,
+        }
+      )
+
+      expect(result.success).toBe("Recurring transaction has been updated.")
+      expect(result.error).toBeUndefined()
+
+      const recurringCollection = await getRecurringTransactionsCollection()
+      const updatedRecurring = await recurringCollection.findOne({
+        _id: mockDBRecurringTransaction._id,
+      })
+
+      expect(updatedRecurring?.frequency).toBe("weekly")
+      expect(updatedRecurring?.randomEveryXDays).toBeUndefined()
+    })
+
     it("should return error when database operation throws error", async () => {
       mockAuthenticatedUser()
       mockRecurringTransactionCollectionError()

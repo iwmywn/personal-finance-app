@@ -1,6 +1,11 @@
 import { mockTransactions } from "@/tests/shared/data"
 import { sanitizeCSVField } from "@/components/transactions/export-button"
-import { formatCurrency, getSafeCallbackUrl, getUniqueYears } from "@/lib/utils"
+import {
+  convertAmountWithRates,
+  formatCurrency,
+  getSafeCallbackUrl,
+  getUniqueYears,
+} from "@/lib/utils"
 
 describe("Utils", () => {
   describe("formatCurrency", () => {
@@ -100,6 +105,86 @@ describe("Utils", () => {
       expect(sanitizeCSVField("@SUM")).toBe('"\'@SUM"')
       expect(sanitizeCSVField("\tCMD")).toBe('"\'\tCMD"')
       expect(sanitizeCSVField("\rCMD")).toBe('"\'\rCMD"')
+    })
+  })
+
+  describe("convertAmountWithRates", () => {
+    const mockRates = {
+      USD: "1",
+      VND: "25000",
+      EUR: "0.92",
+    }
+
+    it("should return original amount when from and to currencies are identical", () => {
+      const result = convertAmountWithRates(100, "USD", "USD", mockRates)
+      expect(result.toString()).toBe("100")
+    })
+
+    it("should return original amount when rates is undefined", () => {
+      const result = convertAmountWithRates(100, "USD", "VND", undefined)
+      expect(result.toString()).toBe("100")
+    })
+
+    it("should return original amount when currency is missing in rates", () => {
+      const result = convertAmountWithRates(
+        100,
+        "USD",
+        "JPY" as never,
+        mockRates as never
+      )
+      expect(result.toString()).toBe("100")
+    })
+
+    it("should convert currency correctly", () => {
+      // 100 USD to VND = 100 * 25000 = 2500000
+      const result = convertAmountWithRates(100, "USD", "VND", mockRates)
+      expect(result.toString()).toBe("2500000")
+
+      // 25000 VND to USD = 25000 / 25000 = 1
+      const resultUSD = convertAmountWithRates(25000, "VND", "USD", mockRates)
+      expect(resultUSD.toString()).toBe("1")
+    })
+
+    it("should handle zero or negative rate defensively without throwing Division by zero (DEF-09)", () => {
+      const zeroFromRates = {
+        USD: "1",
+        VND: "0",
+      }
+      expect(() =>
+        convertAmountWithRates(100, "VND", "USD", zeroFromRates)
+      ).not.toThrow()
+      const zeroFromResult = convertAmountWithRates(
+        100,
+        "VND",
+        "USD",
+        zeroFromRates
+      )
+      expect(zeroFromResult.toString()).toBe("100")
+
+      const zeroToRates = {
+        USD: "0",
+        VND: "25000",
+      }
+      expect(() =>
+        convertAmountWithRates(100, "VND", "USD", zeroToRates)
+      ).not.toThrow()
+      const zeroToResult = convertAmountWithRates(
+        100,
+        "VND",
+        "USD",
+        zeroToRates
+      )
+      expect(zeroToResult.toString()).toBe("100")
+
+      const negativeRates = {
+        USD: "1",
+        VND: "-25000",
+      }
+      expect(() =>
+        convertAmountWithRates(100, "VND", "USD", negativeRates)
+      ).not.toThrow()
+      const negResult = convertAmountWithRates(100, "VND", "USD", negativeRates)
+      expect(negResult.toString()).toBe("100")
     })
   })
 })

@@ -38,7 +38,7 @@ export function convertAmountWithRates(
   amount: Decimal | string | number,
   from: Currency,
   to: Currency,
-  rates?: Record<Currency, Decimal | string | number>
+  rates?: Partial<Record<Currency, Decimal | string | number>>
 ): Decimal {
   const decAmount = new Decimal(amount)
   if (from === to || !rates) return decAmount
@@ -49,6 +49,7 @@ export function convertAmountWithRates(
 
   const rateFrom = new Decimal(rateFromVal)
   const rateTo = new Decimal(rateToVal)
+  if (rateFrom.lte(0) || rateTo.lte(0)) return decAmount
 
   const amountInUSD = from === "USD" ? decAmount : decAmount.dividedBy(rateFrom)
   const result = to === "USD" ? amountInUSD : amountInUSD.mul(rateTo)

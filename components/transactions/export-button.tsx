@@ -74,11 +74,15 @@ export function ExportButton({ filteredTransactions }: ExportButtonProps) {
         if (filteredTransactions.length === 1) {
           dateStr = formatDate(filteredTransactions[0].date)
         } else if (filteredTransactions.length > 1) {
-          const timestamps = filteredTransactions.map((t) =>
-            new Date(t.date).getTime()
-          )
-          const minDate = new Date(Math.min(...timestamps))
-          const maxDate = new Date(Math.max(...timestamps))
+          let minTime = Infinity
+          let maxTime = -Infinity
+          for (const t of filteredTransactions) {
+            const time = new Date(t.date).getTime()
+            if (time < minTime) minTime = time
+            if (time > maxTime) maxTime = time
+          }
+          const minDate = new Date(minTime)
+          const maxDate = new Date(maxTime)
           const fromDateStr = formatDate(minDate)
           const toDateStr = formatDate(maxDate)
           dateStr = `${t("From")}_${fromDateStr}_${t("To")}_${toDateStr}`
