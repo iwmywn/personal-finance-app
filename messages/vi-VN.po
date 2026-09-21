@@ -2061,6 +2061,11 @@ msgid "Manage your active sessions."
 msgstr "Quản lý các phiên đang hoạt động của bạn."
 
 #: components/settings/active-sessions-dialog.tsx
+msgctxt "-E02To"
+msgid "Unknown Device"
+msgstr "Thiết bị không xác định"
+
+#: components/settings/active-sessions-dialog.tsx
 msgctxt "fF376U"
 msgid "Current"
 msgstr "Hiện tại"

@@ -2061,6 +2061,11 @@ msgid "Manage your active sessions."
 msgstr "管理您的活跃会话。"
 
 #: components/settings/active-sessions-dialog.tsx
+msgctxt "-E02To"
+msgid "Unknown Device"
+msgstr "未知设备"
+
+#: components/settings/active-sessions-dialog.tsx
 msgctxt "fF376U"
 msgid "Current"
 msgstr "当前"

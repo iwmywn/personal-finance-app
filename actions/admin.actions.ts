@@ -16,6 +16,7 @@ import {
 } from "@/lib/collections"
 import { connect, withTransaction } from "@/lib/db"
 import type { ActionResponse, User } from "@/lib/definitions"
+import { ADMIN_ROLE } from "@/lib/role"
 
 import { getSession } from "./session.actions"
 
@@ -51,9 +52,23 @@ export async function getAdminData(): Promise<{
       return { error: t("Failed to list users! Please try again later.") }
 
     const users = (result.users ?? []) as unknown as User[]
-    const totalUsers = result.total
-    const bannedUsers = users.filter((u) => Boolean(u.banned)).length
-    const adminUsers = users.filter((u) => u.role === "admin").length
+    const usersCollection = await getUsersCollection()
+    const dbTotal = await usersCollection.countDocuments()
+
+    let totalUsers = result.total
+    let bannedUsers = users.filter((u) => Boolean(u.banned)).length
+    let adminUsers = users.filter((u) => u.role === ADMIN_ROLE).length
+
+    if (dbTotal > 0) {
+      const [dbBanned, dbAdmins] = await Promise.all([
+        usersCollection.countDocuments({ banned: true }),
+        usersCollection.countDocuments({ role: ADMIN_ROLE }),
+      ])
+      totalUsers = dbTotal
+      bannedUsers = dbBanned
+      adminUsers = dbAdmins
+    }
+
     const activeUsers = Math.max(0, totalUsers - bannedUsers)
 
     const stats: AdminStats = {

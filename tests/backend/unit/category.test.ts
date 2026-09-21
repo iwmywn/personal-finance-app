@@ -26,9 +26,9 @@ import {
   createCustomCategory,
   deleteCustomCategory,
   getCustomCategories,
-  isValidUserCategory,
   updateCustomCategory,
 } from "@/actions/category.actions"
+import { isValidUserCategory } from "@/actions/category.server"
 import { getCategoriesCollection } from "@/lib/collections"
 
 describe("Categories", async () => {

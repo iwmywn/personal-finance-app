@@ -2061,6 +2061,11 @@ msgid "Manage your active sessions."
 msgstr "Manage your active sessions."
 
 #: components/settings/active-sessions-dialog.tsx
+msgctxt "-E02To"
+msgid "Unknown Device"
+msgstr "Unknown Device"
+
+#: components/settings/active-sessions-dialog.tsx
 msgctxt "fF376U"
 msgid "Current"
 msgstr "Current"

@@ -1,4 +1,4 @@
-"use server"
+import "server-only"
 
 import Decimal from "decimal.js"
 import type { Decimal128 } from "mongodb"
@@ -122,11 +122,18 @@ async function fetchCandidateExchangeRates(
     collection.findOne({ date: { $gte: maxDate } }, { sort: { date: 1 } }),
   ])
 
-  const rawRates: DBExchangeRate[] = [
+  let rawRates: DBExchangeRate[] = [
     ...(priorRate ? [priorRate] : []),
     ...inRangeRates,
     ...(afterRate ? [afterRate] : []),
   ]
+
+  if (rawRates.length === 0) {
+    const latestDoc = await collection.findOne({}, { sort: { date: -1 } })
+    if (latestDoc) {
+      rawRates = [latestDoc]
+    }
+  }
 
   const uniqueDocs = Array.from(
     new Map(rawRates.map((doc) => [doc.date.getTime(), doc])).values()
@@ -190,15 +197,16 @@ export async function convertTransactionsToCurrency(
   if (rates.length === 0) return transactions
 
   return transactions.map((transaction, idx) => {
-    const nearestRate = findNearestRate(rates, timestamps[idx])
-    const stringifiedRates = Object.fromEntries(
-      Object.entries(nearestRate.rates ?? {}).map(([curr, dec]) => [
-        curr,
-        dec.toString(),
-      ])
-    ) as Record<Currency, string>
+    let nearestRate = findNearestRate(rates, timestamps[idx])
 
     if (transaction.currency === targetCurrency) {
+      const stringifiedRates = Object.fromEntries(
+        Object.entries(nearestRate.rates ?? {}).map(([curr, dec]) => [
+          curr,
+          dec.toString(),
+        ])
+      ) as Record<Currency, string>
+
       return {
         ...transaction,
         originalAmount: transaction.originalAmount ?? transaction.amount,
@@ -207,8 +215,26 @@ export async function convertTransactionsToCurrency(
       }
     }
 
-    const rateFromVal = nearestRate.rates?.[transaction.currency]
-    const rateToVal = nearestRate.rates?.[targetCurrency]
+    let rateFromVal = nearestRate.rates?.[transaction.currency]
+    let rateToVal = nearestRate.rates?.[targetCurrency]
+
+    if ((!rateFromVal || !rateToVal) && rates.length > 1) {
+      const fallbackRate = rates.find(
+        (r) => r.rates?.[transaction.currency] && r.rates?.[targetCurrency]
+      )
+      if (fallbackRate) {
+        nearestRate = fallbackRate
+        rateFromVal = fallbackRate.rates?.[transaction.currency]
+        rateToVal = fallbackRate.rates?.[targetCurrency]
+      }
+    }
+
+    const stringifiedRates = Object.fromEntries(
+      Object.entries(nearestRate.rates ?? {}).map(([curr, dec]) => [
+        curr,
+        dec.toString(),
+      ])
+    ) as Record<Currency, string>
 
     if (!rateFromVal || !rateToVal) {
       return {

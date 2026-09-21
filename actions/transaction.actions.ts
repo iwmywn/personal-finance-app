@@ -11,7 +11,7 @@ import type { ActionResponse, Transaction } from "@/lib/definitions"
 import { getSchemas } from "@/schemas/server"
 import type { TransactionFormValues } from "@/schemas/types"
 
-import { isValidUserCategory } from "./category.actions"
+import { isValidUserCategory } from "./category.server"
 import {
   convertTransactionsToCurrency,
   enqueueMissingExchangeRateDate,

@@ -11,7 +11,7 @@ import { isDuplicateKeyError } from "@/lib/indexes"
 import { getSchemas } from "@/schemas/server"
 import type { RecurringTransactionFormValues } from "@/schemas/types"
 
-import { isValidUserCategory } from "./category.actions"
+import { isValidUserCategory } from "./category.server"
 import { getSession } from "./session.actions"
 import { toDecimal128 } from "./utils"
 

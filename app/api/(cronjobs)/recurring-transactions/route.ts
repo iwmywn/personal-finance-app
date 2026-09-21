@@ -11,6 +11,7 @@ import {
   getTransactionsCollection,
 } from "@/lib/collections"
 import { normalizeToUTCMidnight } from "@/lib/date"
+import type { DBRecurringTransaction } from "@/lib/definitions"
 import { isDuplicateKeyError } from "@/lib/indexes"
 
 import { getDueDates } from "./utils"
@@ -34,15 +35,13 @@ export async function GET(request: NextRequest) {
 
     const todayUTC = normalizeToUTCMidnight(new Date())
 
-    const activeRecurringTransactions = await recurringCollection
-      .find({
-        $or: [
-          { endDate: { $exists: false } },
-          { endDate: null as unknown as Date },
-          { endDate: { $gte: todayUTC } },
-        ],
-      })
-      .toArray()
+    const cursor = recurringCollection.find({
+      $or: [
+        { endDate: { $exists: false } },
+        { endDate: null as unknown as Date },
+        { endDate: { $gte: todayUTC } },
+      ],
+    })
 
     let createdCount = 0
     const createdIds: string[] = []
@@ -50,9 +49,9 @@ export async function GET(request: NextRequest) {
     const affectedUserIds = new Set<string>()
     const datesToEnsure = new Set<number>()
 
-    for (let i = 0; i < activeRecurringTransactions.length; i += BATCH_SIZE) {
-      const batch = activeRecurringTransactions.slice(i, i + BATCH_SIZE)
+    let currentBatch: DBRecurringTransaction[] = []
 
+    const processBatch = async (batch: DBRecurringTransaction[]) => {
       await Promise.all(
         batch.map(async (rec) => {
           const dueDates = getDueDates(rec, todayUTC)
@@ -114,6 +113,18 @@ export async function GET(request: NextRequest) {
           )
         })
       )
+    }
+
+    for await (const rec of cursor) {
+      currentBatch.push(rec)
+      if (currentBatch.length >= BATCH_SIZE) {
+        await processBatch(currentBatch)
+        currentBatch = []
+      }
+    }
+
+    if (currentBatch.length > 0) {
+      await processBatch(currentBatch)
     }
 
     if (datesToEnsure.size > 0) {

@@ -2061,6 +2061,11 @@ msgid "Manage your active sessions."
 msgstr "활성 세션을 관리하세요."
 
 #: components/settings/active-sessions-dialog.tsx
+msgctxt "-E02To"
+msgid "Unknown Device"
+msgstr "알 수 없는 기기"
+
+#: components/settings/active-sessions-dialog.tsx
 msgctxt "fF376U"
 msgid "Current"
 msgstr "현재"

@@ -4,8 +4,6 @@ import { cacheTag, updateTag } from "next/cache"
 import { ObjectId } from "mongodb"
 import { getExtracted } from "next-intl/server"
 
-import { getCategoryType, isPredefinedCategoryKey } from "@/lib/category"
-import type { CategoryType } from "@/lib/category"
 import {
   getBudgetsCollection,
   getCategoriesCollection,
@@ -20,39 +18,6 @@ import { getSchemas } from "@/schemas/server"
 import type { CategoryFormValues } from "@/schemas/types"
 
 import { getSession } from "./session.actions"
-
-export async function isValidUserCategory(
-  userId: string,
-  categoryKey: string,
-  expectedType?: CategoryType
-): Promise<boolean> {
-  if (isPredefinedCategoryKey(categoryKey)) {
-    if (expectedType && getCategoryType(categoryKey) !== expectedType) {
-      return false
-    }
-    return true
-  }
-
-  if (!ObjectId.isValid(categoryKey)) {
-    return false
-  }
-
-  const categoriesCollection = await getCategoriesCollection()
-  const customCategory = await categoriesCollection.findOne({
-    _id: new ObjectId(categoryKey),
-    userId: new ObjectId(userId),
-  })
-
-  if (!customCategory) {
-    return false
-  }
-
-  if (expectedType && customCategory.type !== expectedType) {
-    return false
-  }
-
-  return true
-}
 
 export async function createCustomCategory(
   values: CategoryFormValues

@@ -1,5 +1,5 @@
 export const USER_ROLE = "user"
-const ADMIN_ROLE = "admin"
+export const ADMIN_ROLE = "admin"
 
 export const ROLES = [USER_ROLE, ADMIN_ROLE] as const
 export type UserRole = (typeof ROLES)[number]

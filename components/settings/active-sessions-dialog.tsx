@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
@@ -44,14 +44,12 @@ export function ActiveSessionsDialog() {
       ? activeSessions
       : [currentSession, ...activeSessions]
 
-    return allSessions
-      .filter((s) => s.userAgent)
-      .sort((a, b) => {
-        const aIsCurrent = a.id === currentSession.id
-        const bIsCurrent = b.id === currentSession.id
-        if (aIsCurrent === bIsCurrent) return 0
-        return aIsCurrent ? -1 : 1
-      })
+    return [...allSessions].sort((a, b) => {
+      const aIsCurrent = a.id === currentSession.id
+      const bIsCurrent = b.id === currentSession.id
+      if (aIsCurrent === bIsCurrent) return 0
+      return aIsCurrent ? -1 : 1
+    })
   }, [activeSessions, currentSession])
 
   useEffect(() => {
@@ -218,7 +216,7 @@ export function ActiveSessionsDialog() {
                 <ItemContent>
                   <ItemTitle>
                     <div>
-                      {os.name || s.userAgent}
+                      {os.name || s.userAgent || t("Unknown Device")}
                       {browser.name && `, ${browser.name}`}
                     </div>
                     {isCurrentSession && (
