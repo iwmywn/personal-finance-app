@@ -1,1 +1,1 @@
-npx commitlint@21.2.0 --color false --edit "$1"
+npx commitlint@21.2.3 --color false --edit "$1"
