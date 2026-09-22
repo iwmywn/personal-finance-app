@@ -280,27 +280,6 @@ msgid "Invalid recurring transaction ID!"
 msgstr "Invalid recurring transaction ID!"
 
 #: actions/recurring.actions.ts
-msgctxt "oyoqPq"
-msgid "Recurring transaction not found or you don't have permission to edit."
-msgstr "Recurring transaction not found or you don't have permission to edit."
-
-#: actions/recurring.actions.ts
-msgctxt "P9U28O"
-msgid "Cannot edit an expired recurring transaction. Please create a new one or duplicate."
-msgstr "Cannot edit an expired recurring transaction. Please create a new one or duplicate."
-
-#: actions/recurring.actions.ts
-msgctxt "FgrcGc"
-msgid "Recurring transaction has been updated."
-msgstr "Recurring transaction has been updated."
-
-#: actions/recurring.actions.ts
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-msgctxt "qlYMTi"
-msgid "Failed to update recurring transaction! Please try again later."
-msgstr "Failed to update recurring transaction! Please try again later."
-
-#: actions/recurring.actions.ts
 msgctxt "TJXAsr"
 msgid "Recurring transaction not found or you don't have permission to delete!"
 msgstr "Recurring transaction not found or you don't have permission to delete!"
@@ -1172,7 +1151,6 @@ msgstr "End Date"
 #: components/budgets/budget-dialog.tsx
 #: components/categories/category-dialog.tsx
 #: components/goals/goal-dialog.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
 #: components/transactions/transaction-dialog.tsx
 msgctxt "BWpuKl"
 msgid "Update"
@@ -1351,7 +1329,6 @@ msgstr "View"
 #: components/budgets/budgets-table.tsx
 #: components/categories/categories-table.tsx
 #: components/goals/goals-table.tsx
-#: components/recurring-transactions/recurring-transactions-table.tsx
 #: components/transactions/transactions-table.tsx
 msgctxt "wEQDC6"
 msgid "Edit"
@@ -1884,11 +1861,6 @@ msgid "Duplicate Recurring Transaction"
 msgstr "Duplicate Recurring Transaction"
 
 #: components/recurring-transactions/recurring-transaction-dialog.tsx
-msgctxt "5nuO2v"
-msgid "Edit Recurring Transaction"
-msgstr "Edit Recurring Transaction"
-
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
 msgctxt "sYXY5N"
 msgid "Add Recurring Transaction"
 msgstr "Add Recurring Transaction"
@@ -1897,11 +1869,6 @@ msgstr "Add Recurring Transaction"
 msgctxt "SfZLFQ"
 msgid "Create a new recurring transaction based on the selected one."
 msgstr "Create a new recurring transaction based on the selected one."
-
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-msgctxt "gKA6Xf"
-msgid "Update recurring transaction information."
-msgstr "Update recurring transaction information."
 
 #: components/recurring-transactions/recurring-transaction-dialog.tsx
 msgctxt "adePxB"
@@ -1976,6 +1943,12 @@ msgctxt "mpcI7I"
 msgid "No End Date"
 msgstr "No End Date"
 
+#: components/recurring-transactions/recurring-transaction-dialog.tsx
+#: components/recurring-transactions/recurring-transactions-table.tsx
+msgctxt "4fHiNl"
+msgid "Duplicate"
+msgstr "Duplicate"
+
 #: components/recurring-transactions/recurring-transactions-filters.tsx
 msgctxt "jZimtU"
 msgid "Search recurring transactions..."
@@ -2027,11 +2000,6 @@ msgstr "Every {days} days"
 msgctxt "b-8NFf"
 msgid "Next: {date}"
 msgstr "Next: {date}"
-
-#: components/recurring-transactions/recurring-transactions-table.tsx
-msgctxt "4fHiNl"
-msgid "Duplicate"
-msgstr "Duplicate"
 
 #: components/settings/active-sessions-dialog.tsx
 msgctxt "HuQudj"

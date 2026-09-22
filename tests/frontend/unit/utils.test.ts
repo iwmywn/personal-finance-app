@@ -145,7 +145,7 @@ describe("Utils", () => {
       expect(resultUSD.toString()).toBe("1")
     })
 
-    it("should handle zero or negative rate defensively without throwing Division by zero (DEF-09)", () => {
+    it("should handle zero or negative rate defensively without throwing Division by zero", () => {
       const zeroFromRates = {
         USD: "1",
         VND: "0",

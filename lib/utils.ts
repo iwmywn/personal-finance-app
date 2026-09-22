@@ -19,7 +19,7 @@ export function formatCurrency(
 
 export function getUniqueYears(transactions: Transaction[]): number[] {
   return Array.from(
-    new Set(transactions.map((t) => new Date(t.date).getUTCFullYear()))
+    new Set(transactions.map((t) => new Date(t.date).getFullYear()))
   ).sort((a, b) => b - a)
 }
 

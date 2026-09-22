@@ -51,11 +51,6 @@ export const insertTestRecurringTransaction = async (
   await collection.insertOne(recurringTransaction)
 }
 
-export const insertTestExchangeRate = async (exchangeRate: DBExchangeRate) => {
-  const collection = await getExchangeRatesCollection()
-  await collection.insertOne(exchangeRate)
-}
-
 export const insertTestExchangeRates = async (
   exchangeRates: DBExchangeRate[]
 ) => {

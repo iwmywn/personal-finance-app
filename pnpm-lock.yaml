@@ -257,9 +257,6 @@ importers:
       '@iwmywn/release':
         specifier: 2.0.0
         version: 2.0.0
-      '@next/eslint-plugin-next':
-        specifier: 16.3.5
-        version: 16.3.5(eslint@9.39.5(jiti@2.7.0)(supports-color@7.2.0))
       '@tailwindcss/postcss':
         specifier: 4.3.3
         version: 4.3.3

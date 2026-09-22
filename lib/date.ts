@@ -2,7 +2,7 @@ import { createParser } from "nuqs/server"
 
 import type { Locale } from "@/i18n/config"
 
-export type DateParts = {
+type DateParts = {
   year: number
   month: number // 1-indexed (1-12)
   day: number // 1-indexed (1-31)

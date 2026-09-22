@@ -7,6 +7,7 @@ import { useExtracted } from "next-intl"
 import { toast } from "sonner"
 import { UAParser } from "ua-parser-js"
 
+import { signInRoute } from "@/routes"
 import { getLocationFromIP } from "@/actions/location.actions"
 import { revokeSessionById } from "@/actions/session.actions"
 import { Button } from "@/components/ui/button"
@@ -170,6 +171,7 @@ export function ActiveSessionsDialog() {
           },
           onSuccess: () => {
             toast.success(t("All sessions terminated."))
+            router.push(signInRoute)
             router.refresh()
           },
         },

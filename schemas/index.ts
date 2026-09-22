@@ -298,13 +298,6 @@ export function buildSchemas(messages: SchemaMessages) {
       }),
     })
 
-  const createAdminRoleSchema = () =>
-    z.object({
-      role: z.enum(ASSIGNABLE_ROLES, {
-        message: messages.roleRequired,
-      }),
-    })
-
   const createAdminPasswordSchema = createTwoFactorPasswordSchema
 
   const createAdminBanSchema = () =>
@@ -330,7 +323,6 @@ export function buildSchemas(messages: SchemaMessages) {
     createGoalSchema,
     createRecurringTransactionSchema,
     createAdminUserSchema,
-    createAdminRoleSchema,
     createAdminPasswordSchema,
     createAdminBanSchema,
   }

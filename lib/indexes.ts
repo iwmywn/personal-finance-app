@@ -116,6 +116,19 @@ async function ensureIndexes(db: Db) {
     db
       .collection("missingExchangeRates")
       .createIndex({ date: 1 }, { unique: true, name: "date" }),
+
+    createIndexSafely(
+      db,
+      "users",
+      { username: 1 },
+      {
+        unique: true,
+        name: "username_unique",
+        partialFilterExpression: {
+          username: { $type: "string" },
+        },
+      }
+    ),
   ])
 }
 

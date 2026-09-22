@@ -25,12 +25,12 @@ export type DBRatesMap = Partial<Record<Exclude<Currency, "USD">, Decimal128>> &
 export type RatesMap = Partial<Record<Currency, Decimal>> &
   Record<string, Decimal>
 
-export type CurrencyApiRateItem = {
+type CurrencyApiRateItem = {
   code: string
   value: number
 }
 
-export type CurrencyApiResponse = {
+type CurrencyApiResponse = {
   meta: {
     last_updated_at: string
   }

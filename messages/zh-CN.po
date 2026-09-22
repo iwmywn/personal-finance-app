@@ -280,27 +280,6 @@ msgid "Invalid recurring transaction ID!"
 msgstr "无效的定期交易 ID！"
 
 #: actions/recurring.actions.ts
-msgctxt "oyoqPq"
-msgid "Recurring transaction not found or you don't have permission to edit."
-msgstr "未找到定期交易或您没有权限编辑。"
-
-#: actions/recurring.actions.ts
-msgctxt "P9U28O"
-msgid "Cannot edit an expired recurring transaction. Please create a new one or duplicate."
-msgstr "无法编辑已过期的定期交易。请创建新交易或复制。"
-
-#: actions/recurring.actions.ts
-msgctxt "FgrcGc"
-msgid "Recurring transaction has been updated."
-msgstr "定期交易已更新。"
-
-#: actions/recurring.actions.ts
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-msgctxt "qlYMTi"
-msgid "Failed to update recurring transaction! Please try again later."
-msgstr "更新定期交易失败！请稍后再试。"
-
-#: actions/recurring.actions.ts
 msgctxt "TJXAsr"
 msgid "Recurring transaction not found or you don't have permission to delete!"
 msgstr "未找到定期交易或您没有权限删除！"
@@ -1172,7 +1151,6 @@ msgstr "结束日期"
 #: components/budgets/budget-dialog.tsx
 #: components/categories/category-dialog.tsx
 #: components/goals/goal-dialog.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
 #: components/transactions/transaction-dialog.tsx
 msgctxt "BWpuKl"
 msgid "Update"
@@ -1351,7 +1329,6 @@ msgstr "查看"
 #: components/budgets/budgets-table.tsx
 #: components/categories/categories-table.tsx
 #: components/goals/goals-table.tsx
-#: components/recurring-transactions/recurring-transactions-table.tsx
 #: components/transactions/transactions-table.tsx
 msgctxt "wEQDC6"
 msgid "Edit"
@@ -1884,11 +1861,6 @@ msgid "Duplicate Recurring Transaction"
 msgstr "复制定期交易"
 
 #: components/recurring-transactions/recurring-transaction-dialog.tsx
-msgctxt "5nuO2v"
-msgid "Edit Recurring Transaction"
-msgstr "编辑定期交易"
-
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
 msgctxt "sYXY5N"
 msgid "Add Recurring Transaction"
 msgstr "添加定期交易"
@@ -1897,11 +1869,6 @@ msgstr "添加定期交易"
 msgctxt "SfZLFQ"
 msgid "Create a new recurring transaction based on the selected one."
 msgstr "基于所选定期交易创建新的定期交易。"
-
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-msgctxt "gKA6Xf"
-msgid "Update recurring transaction information."
-msgstr "更新定期交易信息。"
 
 #: components/recurring-transactions/recurring-transaction-dialog.tsx
 msgctxt "adePxB"
@@ -1976,6 +1943,12 @@ msgctxt "mpcI7I"
 msgid "No End Date"
 msgstr "无结束日期"
 
+#: components/recurring-transactions/recurring-transaction-dialog.tsx
+#: components/recurring-transactions/recurring-transactions-table.tsx
+msgctxt "4fHiNl"
+msgid "Duplicate"
+msgstr "复制"
+
 #: components/recurring-transactions/recurring-transactions-filters.tsx
 msgctxt "jZimtU"
 msgid "Search recurring transactions..."
@@ -2027,11 +2000,6 @@ msgstr "每 {days} 天"
 msgctxt "b-8NFf"
 msgid "Next: {date}"
 msgstr "下次：{date}"
-
-#: components/recurring-transactions/recurring-transactions-table.tsx
-msgctxt "4fHiNl"
-msgid "Duplicate"
-msgstr "复制"
 
 #: components/settings/active-sessions-dialog.tsx
 msgctxt "HuQudj"

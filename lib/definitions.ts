@@ -133,4 +133,3 @@ export type DBExchangeRate = BaseExchangeRate<ObjectId, DBRatesMap>
 export type ExchangeRate = BaseExchangeRate<string, RatesMap>
 
 export type DBMissingExchangeRate = BaseMissingExchangeRate<ObjectId>
-export type MissingExchangeRate = BaseMissingExchangeRate<string>

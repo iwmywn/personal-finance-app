@@ -280,27 +280,6 @@ msgid "Invalid recurring transaction ID!"
 msgstr "잘못된 반복 거래 ID입니다!"
 
 #: actions/recurring.actions.ts
-msgctxt "oyoqPq"
-msgid "Recurring transaction not found or you don't have permission to edit."
-msgstr "반복 거래를 찾을 수 없거나 편집 권한이 없습니다."
-
-#: actions/recurring.actions.ts
-msgctxt "P9U28O"
-msgid "Cannot edit an expired recurring transaction. Please create a new one or duplicate."
-msgstr "만료된 반복 거래는 편집할 수 없습니다. 새로 만들거나 복제해 주세요."
-
-#: actions/recurring.actions.ts
-msgctxt "FgrcGc"
-msgid "Recurring transaction has been updated."
-msgstr "반복 거래가 업데이트되었습니다."
-
-#: actions/recurring.actions.ts
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-msgctxt "qlYMTi"
-msgid "Failed to update recurring transaction! Please try again later."
-msgstr "반복 거래 업데이트에 실패했습니다! 나중에 다시 시도해주세요."
-
-#: actions/recurring.actions.ts
 msgctxt "TJXAsr"
 msgid "Recurring transaction not found or you don't have permission to delete!"
 msgstr "반복 거래를 찾을 수 없거나 삭제 권한이 없습니다!"
@@ -1172,7 +1151,6 @@ msgstr "종료일"
 #: components/budgets/budget-dialog.tsx
 #: components/categories/category-dialog.tsx
 #: components/goals/goal-dialog.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
 #: components/transactions/transaction-dialog.tsx
 msgctxt "BWpuKl"
 msgid "Update"
@@ -1351,7 +1329,6 @@ msgstr "보기"
 #: components/budgets/budgets-table.tsx
 #: components/categories/categories-table.tsx
 #: components/goals/goals-table.tsx
-#: components/recurring-transactions/recurring-transactions-table.tsx
 #: components/transactions/transactions-table.tsx
 msgctxt "wEQDC6"
 msgid "Edit"
@@ -1884,11 +1861,6 @@ msgid "Duplicate Recurring Transaction"
 msgstr "반복 거래 복제"
 
 #: components/recurring-transactions/recurring-transaction-dialog.tsx
-msgctxt "5nuO2v"
-msgid "Edit Recurring Transaction"
-msgstr "반복 거래 편집"
-
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
 msgctxt "sYXY5N"
 msgid "Add Recurring Transaction"
 msgstr "반복 거래 추가"
@@ -1897,11 +1869,6 @@ msgstr "반복 거래 추가"
 msgctxt "SfZLFQ"
 msgid "Create a new recurring transaction based on the selected one."
 msgstr "선택한 항목을 기반으로 새 반복 거래를 만드세요."
-
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-msgctxt "gKA6Xf"
-msgid "Update recurring transaction information."
-msgstr "반복 거래 정보를 업데이트하세요."
 
 #: components/recurring-transactions/recurring-transaction-dialog.tsx
 msgctxt "adePxB"
@@ -1976,6 +1943,12 @@ msgctxt "mpcI7I"
 msgid "No End Date"
 msgstr "종료일 없음"
 
+#: components/recurring-transactions/recurring-transaction-dialog.tsx
+#: components/recurring-transactions/recurring-transactions-table.tsx
+msgctxt "4fHiNl"
+msgid "Duplicate"
+msgstr "복제"
+
 #: components/recurring-transactions/recurring-transactions-filters.tsx
 msgctxt "jZimtU"
 msgid "Search recurring transactions..."
@@ -2027,11 +2000,6 @@ msgstr "{days}일마다"
 msgctxt "b-8NFf"
 msgid "Next: {date}"
 msgstr "다음: {date}"
-
-#: components/recurring-transactions/recurring-transactions-table.tsx
-msgctxt "4fHiNl"
-msgid "Duplicate"
-msgstr "복제"
 
 #: components/settings/active-sessions-dialog.tsx
 msgctxt "HuQudj"

@@ -7,6 +7,7 @@ import { LogOutIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 import { toast } from "sonner"
 
+import { signInRoute } from "@/routes"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -55,7 +56,7 @@ export function SecondaryNav() {
             onSuccess: () => {
               setIsOpen(false)
               toast.success(t("Signed out."))
-              router.push("/signin")
+              router.push(signInRoute)
               router.refresh()
             },
           },

@@ -280,27 +280,6 @@ msgid "Invalid recurring transaction ID!"
 msgstr "ID giao dịch định kỳ không hợp lệ!"
 
 #: actions/recurring.actions.ts
-msgctxt "oyoqPq"
-msgid "Recurring transaction not found or you don't have permission to edit."
-msgstr "Không tìm thấy giao dịch định kỳ hoặc bạn không có quyền chỉnh sửa."
-
-#: actions/recurring.actions.ts
-msgctxt "P9U28O"
-msgid "Cannot edit an expired recurring transaction. Please create a new one or duplicate."
-msgstr "Không thể chỉnh sửa giao dịch định kỳ đã hết hạn. Vui lòng tạo mới hoặc nhân bản."
-
-#: actions/recurring.actions.ts
-msgctxt "FgrcGc"
-msgid "Recurring transaction has been updated."
-msgstr "Giao dịch định kỳ đã được cập nhật."
-
-#: actions/recurring.actions.ts
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-msgctxt "qlYMTi"
-msgid "Failed to update recurring transaction! Please try again later."
-msgstr "Cập nhật giao dịch định kỳ thất bại! Vui lòng thử lại sau."
-
-#: actions/recurring.actions.ts
 msgctxt "TJXAsr"
 msgid "Recurring transaction not found or you don't have permission to delete!"
 msgstr "Không tìm thấy giao dịch định kỳ hoặc bạn không có quyền xóa!"
@@ -1172,7 +1151,6 @@ msgstr "Ngày kết thúc"
 #: components/budgets/budget-dialog.tsx
 #: components/categories/category-dialog.tsx
 #: components/goals/goal-dialog.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
 #: components/transactions/transaction-dialog.tsx
 msgctxt "BWpuKl"
 msgid "Update"
@@ -1351,7 +1329,6 @@ msgstr "Xem"
 #: components/budgets/budgets-table.tsx
 #: components/categories/categories-table.tsx
 #: components/goals/goals-table.tsx
-#: components/recurring-transactions/recurring-transactions-table.tsx
 #: components/transactions/transactions-table.tsx
 msgctxt "wEQDC6"
 msgid "Edit"
@@ -1884,11 +1861,6 @@ msgid "Duplicate Recurring Transaction"
 msgstr "Nhân bản giao dịch định kỳ"
 
 #: components/recurring-transactions/recurring-transaction-dialog.tsx
-msgctxt "5nuO2v"
-msgid "Edit Recurring Transaction"
-msgstr "Chỉnh sửa giao dịch định kỳ"
-
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
 msgctxt "sYXY5N"
 msgid "Add Recurring Transaction"
 msgstr "Thêm giao dịch định kỳ"
@@ -1897,11 +1869,6 @@ msgstr "Thêm giao dịch định kỳ"
 msgctxt "SfZLFQ"
 msgid "Create a new recurring transaction based on the selected one."
 msgstr "Tạo giao dịch định kỳ mới dựa trên giao dịch đã chọn."
-
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-msgctxt "gKA6Xf"
-msgid "Update recurring transaction information."
-msgstr "Cập nhật thông tin giao dịch định kỳ."
 
 #: components/recurring-transactions/recurring-transaction-dialog.tsx
 msgctxt "adePxB"
@@ -1976,6 +1943,12 @@ msgctxt "mpcI7I"
 msgid "No End Date"
 msgstr "Không có ngày kết thúc"
 
+#: components/recurring-transactions/recurring-transaction-dialog.tsx
+#: components/recurring-transactions/recurring-transactions-table.tsx
+msgctxt "4fHiNl"
+msgid "Duplicate"
+msgstr "Nhân bản"
+
 #: components/recurring-transactions/recurring-transactions-filters.tsx
 msgctxt "jZimtU"
 msgid "Search recurring transactions..."
@@ -2027,11 +2000,6 @@ msgstr "Mỗi {days} ngày"
 msgctxt "b-8NFf"
 msgid "Next: {date}"
 msgstr "Tiếp theo: {date}"
-
-#: components/recurring-transactions/recurring-transactions-table.tsx
-msgctxt "4fHiNl"
-msgid "Duplicate"
-msgstr "Nhân bản"
 
 #: components/settings/active-sessions-dialog.tsx
 msgctxt "HuQudj"

@@ -2,6 +2,7 @@
 import { redirect } from "next/navigation"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
 
+import { signInRoute } from "@/routes"
 import { getSession, getSessions } from "@/actions/session.actions"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { TooltipProvider } from "@/components/ui/tooltip"
@@ -25,7 +26,7 @@ export default async function DashboardLayout({
   const { sessions } = sessionsResult
 
   if (!user || !session || !sessions) {
-    redirect("/signin")
+    redirect(signInRoute)
   }
 
   return (

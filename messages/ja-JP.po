@@ -280,27 +280,6 @@ msgid "Invalid recurring transaction ID!"
 msgstr "定期取引IDが無効です！"
 
 #: actions/recurring.actions.ts
-msgctxt "oyoqPq"
-msgid "Recurring transaction not found or you don't have permission to edit."
-msgstr "定期取引が見つからないか、編集権限がありません。"
-
-#: actions/recurring.actions.ts
-msgctxt "P9U28O"
-msgid "Cannot edit an expired recurring transaction. Please create a new one or duplicate."
-msgstr "期限切れの定期取引は編集できません。新しく作成するか、複製してください。"
-
-#: actions/recurring.actions.ts
-msgctxt "FgrcGc"
-msgid "Recurring transaction has been updated."
-msgstr "定期取引が更新されました。"
-
-#: actions/recurring.actions.ts
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-msgctxt "qlYMTi"
-msgid "Failed to update recurring transaction! Please try again later."
-msgstr "定期取引の更新に失敗しました！後でもう一度お試しください。"
-
-#: actions/recurring.actions.ts
 msgctxt "TJXAsr"
 msgid "Recurring transaction not found or you don't have permission to delete!"
 msgstr "定期取引が見つからないか、削除権限がありません！"
@@ -1172,7 +1151,6 @@ msgstr "終了日"
 #: components/budgets/budget-dialog.tsx
 #: components/categories/category-dialog.tsx
 #: components/goals/goal-dialog.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
 #: components/transactions/transaction-dialog.tsx
 msgctxt "BWpuKl"
 msgid "Update"
@@ -1351,7 +1329,6 @@ msgstr "表示"
 #: components/budgets/budgets-table.tsx
 #: components/categories/categories-table.tsx
 #: components/goals/goals-table.tsx
-#: components/recurring-transactions/recurring-transactions-table.tsx
 #: components/transactions/transactions-table.tsx
 msgctxt "wEQDC6"
 msgid "Edit"
@@ -1884,11 +1861,6 @@ msgid "Duplicate Recurring Transaction"
 msgstr "定期取引を複製"
 
 #: components/recurring-transactions/recurring-transaction-dialog.tsx
-msgctxt "5nuO2v"
-msgid "Edit Recurring Transaction"
-msgstr "定期取引を編集"
-
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
 msgctxt "sYXY5N"
 msgid "Add Recurring Transaction"
 msgstr "定期取引を追加"
@@ -1897,11 +1869,6 @@ msgstr "定期取引を追加"
 msgctxt "SfZLFQ"
 msgid "Create a new recurring transaction based on the selected one."
 msgstr "選択した定期取引に基づいて新しい定期取引を作成します。"
-
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-msgctxt "gKA6Xf"
-msgid "Update recurring transaction information."
-msgstr "定期取引情報を更新します。"
 
 #: components/recurring-transactions/recurring-transaction-dialog.tsx
 msgctxt "adePxB"
@@ -1976,6 +1943,12 @@ msgctxt "mpcI7I"
 msgid "No End Date"
 msgstr "終了日なし"
 
+#: components/recurring-transactions/recurring-transaction-dialog.tsx
+#: components/recurring-transactions/recurring-transactions-table.tsx
+msgctxt "4fHiNl"
+msgid "Duplicate"
+msgstr "複製"
+
 #: components/recurring-transactions/recurring-transactions-filters.tsx
 msgctxt "jZimtU"
 msgid "Search recurring transactions..."
@@ -2027,11 +2000,6 @@ msgstr "{days}日ごと"
 msgctxt "b-8NFf"
 msgid "Next: {date}"
 msgstr "次回：{date}"
-
-#: components/recurring-transactions/recurring-transactions-table.tsx
-msgctxt "4fHiNl"
-msgid "Duplicate"
-msgstr "複製"
 
 #: components/settings/active-sessions-dialog.tsx
 msgctxt "HuQudj"

@@ -1,4 +1,4 @@
-﻿import { getExtracted } from "next-intl/server"
+import { getExtracted } from "next-intl/server"
 
 import { getBudgets } from "@/actions/budget.actions"
 import { getCustomCategories } from "@/actions/category.actions"
@@ -12,7 +12,7 @@ import { GoalsContext } from "@/contexts/goals-context"
 import { RecurringContext } from "@/contexts/recurring-context"
 import { TransactionsContext } from "@/contexts/transactions-context"
 
-export type PageDataProviderProps = {
+type PageDataProviderProps = {
   children: React.ReactNode
   transactions?: boolean
   categories?: boolean

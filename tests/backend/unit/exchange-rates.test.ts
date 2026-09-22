@@ -473,7 +473,7 @@ describe("ensureExchangeRateForDate", () => {
     )
   })
 
-  it("should handle exchange rate documents with null or undefined rates defensively (DEF-03)", async () => {
+  it("should handle exchange rate documents with null or undefined rates defensively", async () => {
     const collection = await getExchangeRatesCollection()
     // Insert document with null rates
     await collection.insertOne({

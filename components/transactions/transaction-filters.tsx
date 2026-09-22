@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useMemo, useState } from "react"
 import { ChevronDownIcon, SearchIcon, XIcon } from "lucide-react"
@@ -156,6 +156,16 @@ export function TransactionFilters() {
       setSelectedDateIso(null)
       setDateRangeFromIso(null)
       setDateRangeToIso(null)
+    }
+  }
+
+  const handleTypeChange = (type: "all" | "inflow" | "outflow") => {
+    setFilterType(type)
+    if (type !== "all" && filterCategoryKey !== "all") {
+      const allowedCategories = getCategoriesByType(type)
+      if (!allowedCategories.some((c) => c.key === filterCategoryKey)) {
+        setFilterCategoryKey("all")
+      }
     }
   }
 
@@ -338,12 +348,7 @@ export function TransactionFilters() {
               </SelectContent>
             </Select>
 
-            <Select
-              value={filterType}
-              onValueChange={(value: "all" | "inflow" | "outflow") =>
-                setFilterType(value)
-              }
-            >
+            <Select value={filterType} onValueChange={handleTypeChange}>
               <SelectTrigger
                 className={`w-full md:row-start-4 lg:row-start-3 2xl:row-start-2 ${filterType !== "all" && "border-primary"}`}
               >
@@ -371,20 +376,42 @@ export function TransactionFilters() {
               <SelectContent>
                 <SelectGroup>
                   <SelectItem value="all">{t("All Categories")}</SelectItem>
-                  <SelectSeparator />
-                  <SelectLabel>{t("Inflow")}</SelectLabel>
-                  {getCategoriesByType("inflow").map((category) => (
-                    <SelectItem key={category.key} value={category.key}>
-                      {category.label}
-                    </SelectItem>
-                  ))}
-                  <SelectSeparator />
-                  <SelectLabel>{t("Outflow")}</SelectLabel>
-                  {getCategoriesByType("outflow").map((category) => (
-                    <SelectItem key={category.key} value={category.key}>
-                      {category.label}
-                    </SelectItem>
-                  ))}
+                  {filterType === "inflow" ? (
+                    <>
+                      <SelectSeparator />
+                      {getCategoriesByType("inflow").map((category) => (
+                        <SelectItem key={category.key} value={category.key}>
+                          {category.label}
+                        </SelectItem>
+                      ))}
+                    </>
+                  ) : filterType === "outflow" ? (
+                    <>
+                      <SelectSeparator />
+                      {getCategoriesByType("outflow").map((category) => (
+                        <SelectItem key={category.key} value={category.key}>
+                          {category.label}
+                        </SelectItem>
+                      ))}
+                    </>
+                  ) : (
+                    <>
+                      <SelectSeparator />
+                      <SelectLabel>{t("Inflow")}</SelectLabel>
+                      {getCategoriesByType("inflow").map((category) => (
+                        <SelectItem key={category.key} value={category.key}>
+                          {category.label}
+                        </SelectItem>
+                      ))}
+                      <SelectSeparator />
+                      <SelectLabel>{t("Outflow")}</SelectLabel>
+                      {getCategoriesByType("outflow").map((category) => (
+                        <SelectItem key={category.key} value={category.key}>
+                          {category.label}
+                        </SelectItem>
+                      ))}
+                    </>
+                  )}
                 </SelectGroup>
               </SelectContent>
             </Select>

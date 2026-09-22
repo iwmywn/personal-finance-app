@@ -788,7 +788,7 @@ describe("Statistics", () => {
       expect(result.status).toBe("upcoming")
     })
 
-    it("should correctly convert transaction amount to budget currency when transaction has rates (DEF-01)", () => {
+    it("should correctly convert transaction amount to budget currency when transaction has rates", () => {
       vi.setSystemTime(new Date("2026-03-10T00:00:00.000Z"))
       const budget = {
         ...mockBudgets[0],

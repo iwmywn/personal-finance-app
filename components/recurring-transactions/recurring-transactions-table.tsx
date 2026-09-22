@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useMemo, useState } from "react"
 import { MoreVerticalIcon, RepeatIcon } from "lucide-react"
@@ -53,7 +53,6 @@ export function RecurringTransactionsTable({
   const { recurringTransactions } = useRecurring()
   const [selectedRecurring, setSelectedRecurring] =
     useState<RecurringTransaction | null>(null)
-  const [isEditOpen, setIsEditOpen] = useState<boolean>(false)
   const [isDuplicateOpen, setIsDuplicateOpen] = useState<boolean>(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false)
   const t = useExtracted()
@@ -211,17 +210,6 @@ export function RecurringTransactionsTable({
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
-                              {!isEnded ? (
-                                <DropdownMenuItem
-                                  className="cursor-pointer"
-                                  onClick={() => {
-                                    setSelectedRecurring(recurring)
-                                    setIsEditOpen(true)
-                                  }}
-                                >
-                                  {t("Edit")}
-                                </DropdownMenuItem>
-                              ) : null}
                               <DropdownMenuItem
                                 className="cursor-pointer"
                                 onClick={() => {
@@ -257,16 +245,8 @@ export function RecurringTransactionsTable({
       {selectedRecurring && (
         <>
           <RecurringTransactionDialog
-            key={selectedRecurring._id + "EditRecurringDialog"}
-            recurring={selectedRecurring}
-            mode="edit"
-            isOpen={isEditOpen}
-            setIsOpen={setIsEditOpen}
-          />
-          <RecurringTransactionDialog
             key={selectedRecurring._id + "DuplicateRecurringDialog"}
             recurring={selectedRecurring}
-            mode="duplicate"
             isOpen={isDuplicateOpen}
             setIsOpen={setIsDuplicateOpen}
           />

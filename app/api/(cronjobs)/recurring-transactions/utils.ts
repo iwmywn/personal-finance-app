@@ -75,28 +75,14 @@ export function getNextDate(
   todayUTC: Date
 ): Date {
   const startDate = new Date(rec.startDate)
-
-  // if no last generated date, step forward from start date until >= todayUTC
-  if (!rec.lastGeneratedDate) {
-    let candidate = startDate
-    while (candidate < todayUTC && !isSameUTCDate(candidate, todayUTC)) {
-      candidate = stepNextDate(
-        candidate,
+  let candidate = rec.lastGeneratedDate
+    ? stepNextDate(
+        new Date(rec.lastGeneratedDate),
         rec.frequency,
         startDate,
         rec.randomEveryXDays
       )
-    }
-    return candidate
-  }
-
-  const lastGeneratedDateUTC = new Date(rec.lastGeneratedDate)
-  let candidate = stepNextDate(
-    lastGeneratedDateUTC,
-    rec.frequency,
-    startDate,
-    rec.randomEveryXDays
-  )
+    : startDate
 
   while (candidate < todayUTC && !isSameUTCDate(candidate, todayUTC)) {
     candidate = stepNextDate(
@@ -108,29 +94,6 @@ export function getNextDate(
   }
 
   return candidate
-}
-
-export function shouldGenerateToday(
-  rec: DBRecurringTransaction,
-  todayUTC: Date
-): boolean {
-  const startUTC = new Date(rec.startDate)
-  const endUTC = rec.endDate ? new Date(rec.endDate) : null
-
-  if (todayUTC < startUTC || (endUTC && todayUTC > endUTC)) {
-    return false
-  }
-
-  if (
-    rec.lastGeneratedDate &&
-    isSameUTCDate(new Date(rec.lastGeneratedDate), todayUTC)
-  ) {
-    return false
-  }
-
-  const nextDate = getNextDate(rec, todayUTC)
-
-  return isSameUTCDate(nextDate, todayUTC)
 }
 
 export function getDueDates(

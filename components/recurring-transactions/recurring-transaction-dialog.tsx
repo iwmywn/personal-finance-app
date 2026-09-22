@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -9,10 +9,7 @@ import { useExtracted } from "next-intl"
 import { useForm, useWatch } from "react-hook-form"
 import { toast } from "sonner"
 
-import {
-  createRecurringTransaction,
-  updateRecurringTransaction,
-} from "@/actions/recurring.actions"
+import { createRecurringTransaction } from "@/actions/recurring.actions"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -61,25 +58,21 @@ import { useSchemas } from "@/hooks/use-schemas"
 import type { CategoryType } from "@/lib/category"
 import { CURRENCIES, CURRENCY_CONFIG } from "@/lib/currency"
 import type { Currency } from "@/lib/currency"
-import { parseToLocalDate } from "@/lib/date"
 import type { RecurringTransaction } from "@/lib/definitions"
 import type { RecurringTransactionFormValues } from "@/schemas/types"
 
 interface RecurringDialogProps {
   recurring?: RecurringTransaction
-  mode?: "edit" | "duplicate"
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
 }
 
 export function RecurringTransactionDialog({
   recurring,
-  mode = "edit",
   isOpen,
   setIsOpen,
 }: RecurringDialogProps) {
-  const isDuplicate = mode === "duplicate"
-  const isEdit = Boolean(recurring && !isDuplicate)
+  const isDuplicate = Boolean(recurring)
   const [startCalendarOpen, setStartCalendarOpen] = useState<boolean>(false)
   const [endCalendarOpen, setEndCalendarOpen] = useState<boolean>(false)
   const [type, setType] = useState<CategoryType>(recurring?.type || "inflow")
@@ -98,10 +91,8 @@ export function RecurringTransactionDialog({
       description: recurring?.description || "",
       frequency: recurring?.frequency || "monthly",
       randomEveryXDays: recurring?.randomEveryXDays || undefined,
-      startDate: isDuplicate
-        ? new Date()
-        : parseToLocalDate(recurring?.startDate),
-      endDate: isDuplicate ? undefined : parseToLocalDate(recurring?.endDate),
+      startDate: new Date(),
+      endDate: undefined,
       lastGeneratedDate: undefined,
     },
   })
@@ -122,45 +113,24 @@ export function RecurringTransactionDialog({
   })
 
   async function onSubmit(values: RecurringTransactionFormValues) {
-    if (isEdit && recurring) {
-      try {
-        const { error, success } = await updateRecurringTransaction(
-          recurring._id,
-          values
-        )
+    try {
+      const { error, success } = await createRecurringTransaction(values)
 
-        if (success === undefined) {
-          toast.error(error)
-        } else {
-          setIsOpen(false)
-          toast.success(success)
-          router.refresh()
-        }
-      } catch {
-        toast.error(
-          t("Failed to update recurring transaction! Please try again later.")
-        )
+      if (success === undefined) {
+        toast.error(error)
+      } else {
+        setIsOpen(false)
+        toast.success(success)
+        router.refresh()
+        form.reset({
+          ...form.formState.defaultValues,
+          type,
+        })
       }
-    } else {
-      try {
-        const { error, success } = await createRecurringTransaction(values)
-
-        if (success === undefined) {
-          toast.error(error)
-        } else {
-          setIsOpen(false)
-          toast.success(success)
-          router.refresh()
-          form.reset({
-            ...form.formState.defaultValues,
-            type,
-          })
-        }
-      } catch {
-        toast.error(
-          t("Failed to create recurring transaction! Please try again later.")
-        )
-      }
+    } catch {
+      toast.error(
+        t("Failed to create recurring transaction! Please try again later.")
+      )
     }
   }
 
@@ -177,18 +147,14 @@ export function RecurringTransactionDialog({
           <DialogTitle>
             {isDuplicate
               ? t("Duplicate Recurring Transaction")
-              : isEdit
-                ? t("Edit Recurring Transaction")
-                : t("Add Recurring Transaction")}
+              : t("Add Recurring Transaction")}
           </DialogTitle>
           <DialogDescription>
             {isDuplicate
               ? t(
                   "Create a new recurring transaction based on the selected one."
                 )
-              : isEdit
-                ? t("Update recurring transaction information.")
-                : t("Create a recurring transaction.")}
+              : t("Create a recurring transaction.")}
           </DialogDescription>
         </DialogHeader>
 
@@ -486,7 +452,7 @@ export function RecurringTransactionDialog({
               </DialogClose>
 
               <FormButton isSubmitting={form.formState.isSubmitting}>
-                {recurring ? t("Update") : t("Add")}
+                {isDuplicate ? t("Duplicate") : t("Add")}
               </FormButton>
             </DialogFooter>
           </form>

@@ -30,8 +30,7 @@ const ALL_PREDEFINED_CATEGORIES_KEY = [
   ...INFLOW_CATEGORIES_KEY,
   ...OUTFLOW_CATEGORIES_KEY,
 ] as const
-export type PredefinedCategoryKey =
-  (typeof ALL_PREDEFINED_CATEGORIES_KEY)[number]
+type PredefinedCategoryKey = (typeof ALL_PREDEFINED_CATEGORIES_KEY)[number]
 export type CategoryKey = PredefinedCategoryKey | string
 
 export type CategoryConfig = {
