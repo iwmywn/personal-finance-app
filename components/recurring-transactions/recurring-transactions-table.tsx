@@ -165,7 +165,7 @@ export function RecurringTransactionsTable({
                           </Tooltip>
                         </TableCell>
                         <TableCell>
-                          {formatCurrency(recurring.amount)}
+                          {formatCurrency(recurring.amount, recurring.currency)}
                         </TableCell>
                         <TableCell>
                           <div className="flex flex-col gap-1">

@@ -359,6 +359,11 @@ msgid "Transaction has been updated."
 msgstr "Giao dịch đã được cập nhật."
 
 #: actions/transaction.actions.ts
+msgctxt "0JEV07"
+msgid "A transaction for this recurring schedule already exists on this date!"
+msgstr "Giao dịch cho lịch định kỳ này vào ngày này đã tồn tại!"
+
+#: actions/transaction.actions.ts
 #: components/transactions/transaction-form.tsx
 msgctxt "A9rBEo"
 msgid "Failed to update transaction! Please try again later."

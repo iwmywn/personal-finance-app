@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -72,28 +72,33 @@ export function AdminTable({
   async function handleImpersonate(targetUser: User) {
     setImpersonatingId(targetUser.id)
 
-    authClient.admin.impersonateUser({
-      userId: targetUser.id,
-      fetchOptions: {
-        onError: (ctx) => {
-          switch (ctx.error.code as AuthErrorCode) {
-            case "BANNED_USER":
-              toast.error(t("This user has been banned."))
-              break
-            default:
-              toast.error(
-                t("Failed to impersonate user! Please try again later.")
-              )
-              break
-          }
+    try {
+      await authClient.admin.impersonateUser({
+        userId: targetUser.id,
+        fetchOptions: {
+          onError: (ctx) => {
+            switch (ctx.error.code as AuthErrorCode) {
+              case "BANNED_USER":
+                toast.error(t("This user has been banned."))
+                break
+              default:
+                toast.error(
+                  t("Failed to impersonate user! Please try again later.")
+                )
+                break
+            }
+          },
+          onSuccess: () => {
+            router.push("/home")
+            router.refresh()
+            toast.success(t("Now impersonating") + ` ${targetUser.name}`)
+          },
         },
-        onSuccess: () => {
-          router.push("/home")
-          router.refresh()
-          toast.success(t("Now impersonating") + ` ${targetUser.name}`)
-        },
-      },
-    })
+      })
+    } catch {
+      toast.error(t("Failed to impersonate user! Please try again later."))
+      setImpersonatingId(null)
+    }
 
     setImpersonatingId(null)
   }

@@ -8,6 +8,7 @@ import { getExtracted } from "next-intl/server"
 import { getTransactionsCollection } from "@/lib/collections"
 import type { Currency } from "@/lib/currency"
 import type { ActionResponse, Transaction } from "@/lib/definitions"
+import { isDuplicateKeyError } from "@/lib/indexes"
 import { getSchemas } from "@/schemas/server"
 import type { TransactionFormValues } from "@/schemas/types"
 
@@ -161,6 +162,13 @@ export async function updateTransaction(
       success: t("Transaction has been updated."),
     }
   } catch (error) {
+    if (isDuplicateKeyError(error)) {
+      return {
+        error: t(
+          "A transaction for this recurring schedule already exists on this date!"
+        ),
+      }
+    }
     console.error("Error updating transaction:", error)
     return { error: t("Failed to update transaction! Please try again later.") }
   }

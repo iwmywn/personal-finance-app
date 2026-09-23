@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -86,6 +86,11 @@ export function BudgetForm({ budget, isOpen, setIsOpen }: BudgetFormProps) {
   const endDate = useWatch({
     control: form.control,
     name: "endDate",
+  })
+
+  const currency = useWatch({
+    control: form.control,
+    name: "currency",
   })
 
   async function onSubmit(values: BudgetFormValues) {
@@ -181,7 +186,7 @@ export function BudgetForm({ budget, isOpen, setIsOpen }: BudgetFormProps) {
                       id="form-amount"
                       value={field.value}
                       onValueChange={field.onChange}
-                      currency={form.getValues("currency")}
+                      currency={currency}
                     />
                   </FormControl>
                   <FormMessage />

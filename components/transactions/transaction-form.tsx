@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -100,6 +100,11 @@ export function TransactionForm({
   const selectedDate = useWatch({
     control: form.control,
     name: "date",
+  })
+
+  const currency = useWatch({
+    control: form.control,
+    name: "currency",
   })
 
   async function onSubmit(values: TransactionFormValues) {
@@ -233,7 +238,7 @@ export function TransactionForm({
                       id="form-amount"
                       value={field.value}
                       onValueChange={field.onChange}
-                      currency={form.getValues("currency")}
+                      currency={currency}
                     />
                   </FormControl>
                   <FormMessage />

@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -90,6 +90,11 @@ export function GoalForm({ goal, isOpen, setIsOpen }: GoalFormProps) {
     name: "endDate",
   })
 
+  const currency = useWatch({
+    control: form.control,
+    name: "currency",
+  })
+
   async function onSubmit(values: GoalFormValues) {
     if (goal) {
       try {
@@ -141,6 +146,26 @@ export function GoalForm({ goal, isOpen, setIsOpen }: GoalFormProps) {
 
             <FormField
               control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="form-goal-name">
+                    {t("Goal Name")}
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      id="form-goal-name"
+                      placeholder={t("e.g. Save for vacation")}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name="currency"
               render={({ field }) => (
                 <FormItem>
@@ -172,26 +197,6 @@ export function GoalForm({ goal, isOpen, setIsOpen }: GoalFormProps) {
 
             <FormField
               control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel htmlFor="form-goal-name">
-                    {t("Goal Name")}
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      id="form-goal-name"
-                      placeholder={t("e.g. Save for vacation")}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
               name="targetAmount"
               render={({ field }) => (
                 <FormItem>
@@ -203,7 +208,7 @@ export function GoalForm({ goal, isOpen, setIsOpen }: GoalFormProps) {
                       id="form-target-amount"
                       value={field.value}
                       onValueChange={field.onChange}
-                      currency={form.getValues("currency")}
+                      currency={currency}
                     />
                   </FormControl>
                   <FormMessage />

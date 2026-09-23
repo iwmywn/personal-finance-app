@@ -359,6 +359,11 @@ msgid "Transaction has been updated."
 msgstr "거래가 업데이트되었습니다."
 
 #: actions/transaction.actions.ts
+msgctxt "0JEV07"
+msgid "A transaction for this recurring schedule already exists on this date!"
+msgstr "이 반복 일정에 대한 거래가 해당 날짜에 이미 존재합니다!"
+
+#: actions/transaction.actions.ts
 #: components/transactions/transaction-form.tsx
 msgctxt "A9rBEo"
 msgid "Failed to update transaction! Please try again later."

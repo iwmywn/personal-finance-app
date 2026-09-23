@@ -30,7 +30,8 @@ const ALL_PREDEFINED_CATEGORIES_KEY = [
   ...INFLOW_CATEGORIES_KEY,
   ...OUTFLOW_CATEGORIES_KEY,
 ] as const
-type PredefinedCategoryKey = (typeof ALL_PREDEFINED_CATEGORIES_KEY)[number]
+export type PredefinedCategoryKey =
+  (typeof ALL_PREDEFINED_CATEGORIES_KEY)[number]
 export type CategoryKey = PredefinedCategoryKey | string
 
 export type CategoryConfig = {
@@ -40,12 +41,20 @@ export type CategoryConfig = {
   }
 }
 
-export function isPredefinedCategoryKey(key: string): boolean {
+export function isPredefinedCategoryKey(
+  key: string
+): key is PredefinedCategoryKey {
   return (ALL_PREDEFINED_CATEGORIES_KEY as readonly string[]).includes(key)
 }
 
-export function getCategoryType(key: CategoryKey): CategoryType {
-  return (INFLOW_CATEGORIES_KEY as readonly string[]).includes(key)
-    ? "inflow"
-    : "outflow"
+export function getCategoryType(key: PredefinedCategoryKey): CategoryType
+export function getCategoryType(key: CategoryKey): CategoryType | undefined
+export function getCategoryType(key: CategoryKey): CategoryType | undefined {
+  if ((INFLOW_CATEGORIES_KEY as readonly string[]).includes(key)) {
+    return "inflow"
+  }
+  if ((OUTFLOW_CATEGORIES_KEY as readonly string[]).includes(key)) {
+    return "outflow"
+  }
+  return undefined
 }

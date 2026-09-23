@@ -112,6 +112,11 @@ export function RecurringTransactionForm({
     name: "frequency",
   })
 
+  const currency = useWatch({
+    control: form.control,
+    name: "currency",
+  })
+
   async function onSubmit(values: RecurringTransactionFormValues) {
     try {
       const { error, success } = await createRecurringTransaction(values)
@@ -228,7 +233,7 @@ export function RecurringTransactionForm({
                       id="form-amount"
                       value={field.value}
                       onValueChange={field.onChange}
-                      currency={form.getValues("currency")}
+                      currency={currency}
                     />
                   </FormControl>
                   <FormMessage />

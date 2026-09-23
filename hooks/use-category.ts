@@ -1,10 +1,15 @@
-﻿"use client"
+"use client"
 
 import { useExtracted } from "next-intl"
 
 import { useCategories } from "@/contexts/categories-context"
 import { getCategoryType } from "@/lib/category"
-import type { CategoryConfig, CategoryKey, CategoryType } from "@/lib/category"
+import type {
+  CategoryConfig,
+  CategoryKey,
+  CategoryType,
+  PredefinedCategoryKey,
+} from "@/lib/category"
 
 export function useCategory() {
   const t = useExtracted()
@@ -129,7 +134,7 @@ export function useCategory() {
     ...Object.entries(CATEGORY_CONFIG).map(([key, value]) => ({
       key,
       ...value,
-      type: getCategoryType(key as CategoryKey),
+      type: getCategoryType(key as PredefinedCategoryKey),
     })),
   ]
 

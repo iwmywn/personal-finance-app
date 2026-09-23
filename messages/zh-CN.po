@@ -359,6 +359,11 @@ msgid "Transaction has been updated."
 msgstr "交易已更新。"
 
 #: actions/transaction.actions.ts
+msgctxt "0JEV07"
+msgid "A transaction for this recurring schedule already exists on this date!"
+msgstr "此定期计划在此日期的交易已存在！"
+
+#: actions/transaction.actions.ts
 #: components/transactions/transaction-form.tsx
 msgctxt "A9rBEo"
 msgid "Failed to update transaction! Please try again later."
