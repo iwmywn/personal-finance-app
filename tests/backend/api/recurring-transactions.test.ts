@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server"
-import { ObjectId } from "mongodb"
+import { Decimal128, ObjectId } from "mongodb"
 
 import {
   insertTestRecurringTransaction,
@@ -7,7 +7,10 @@ import {
 } from "@/tests/backend/helpers/database"
 import { mockDBRecurringTransaction } from "@/tests/shared/data"
 import { GET } from "@/app/api/(cronjobs)/recurring-transactions/route"
-import { getDueDates } from "@/app/api/(cronjobs)/recurring-transactions/utils"
+import {
+  getDueDates,
+  getNextDate,
+} from "@/app/api/(cronjobs)/recurring-transactions/utils"
 import {
   getRecurringTransactionsCollection,
   getTransactionsCollection,
@@ -572,7 +575,9 @@ describe("Recurring Transactions Cron Job", () => {
         vi.useRealTimers()
       })
     })
+  })
 
+  describe("Utils", () => {
     describe("getDueDates", () => {
       it("should return empty array when today is before start date", () => {
         const rec: DBRecurringTransaction = {
@@ -655,6 +660,89 @@ describe("Recurring Transactions Cron Job", () => {
           localDateToUTCMidnight(new Date("2024-02-03")),
           localDateToUTCMidnight(new Date("2024-02-04")),
         ])
+      })
+    })
+
+    describe("getNextDate", () => {
+      const baseRecurring: DBRecurringTransaction = {
+        _id: new ObjectId(),
+        userId: new ObjectId(),
+        type: "outflow",
+        categoryKey: "food_beverage",
+        amount: Decimal128.fromString("100"),
+        currency: "USD",
+        description: "Subscription",
+        frequency: "monthly",
+        startDate: new Date("2026-01-10T00:00:00.000Z"),
+      }
+
+      it("should return start date if lastGeneratedDate is undefined and candidate >= todayUTC", () => {
+        const todayUTC = new Date("2026-01-05T00:00:00.000Z")
+        const result = getNextDate(baseRecurring, todayUTC)
+        expect(result).toEqual(new Date("2026-01-10T00:00:00.000Z"))
+      })
+
+      it("should advance candidate until candidate >= todayUTC", () => {
+        const todayUTC = new Date("2026-03-05T00:00:00.000Z")
+        const result = getNextDate(baseRecurring, todayUTC)
+        // Jan 10 -> Feb 10 -> Mar 10
+        expect(result).toEqual(new Date("2026-03-10T00:00:00.000Z"))
+      })
+
+      it("should return next occurrence when within endDate", () => {
+        const recWithEnd: DBRecurringTransaction = {
+          ...baseRecurring,
+          lastGeneratedDate: new Date("2026-02-10T00:00:00.000Z"),
+          endDate: new Date("2026-04-15T00:00:00.000Z"),
+        }
+        const todayUTC = new Date("2026-02-15T00:00:00.000Z")
+        const result = getNextDate(recWithEnd, todayUTC)
+        expect(result).toEqual(new Date("2026-03-10T00:00:00.000Z"))
+      })
+
+      it("should return null when next candidate exceeds endDate", () => {
+        const recEndingSoon: DBRecurringTransaction = {
+          ...baseRecurring,
+          lastGeneratedDate: new Date("2026-02-10T00:00:00.000Z"),
+          endDate: new Date("2026-03-05T00:00:00.000Z"),
+        }
+        const todayUTC = new Date("2026-02-20T00:00:00.000Z")
+        // Next candidate would be 2026-03-10, but endDate is 2026-03-05
+        const result = getNextDate(recEndingSoon, todayUTC)
+        expect(result).toBeNull()
+      })
+
+      it("should return null when todayUTC has already passed endDate", () => {
+        const expiredRec: DBRecurringTransaction = {
+          ...baseRecurring,
+          lastGeneratedDate: new Date("2026-01-10T00:00:00.000Z"),
+          endDate: new Date("2026-02-01T00:00:00.000Z"),
+        }
+        const todayUTC = new Date("2026-03-01T00:00:00.000Z")
+        const result = getNextDate(expiredRec, todayUTC)
+        expect(result).toBeNull()
+      })
+
+      it("should handle daily frequency with endDate", () => {
+        const dailyRec: DBRecurringTransaction = {
+          ...baseRecurring,
+          frequency: "daily",
+          startDate: new Date("2026-03-20T00:00:00.000Z"),
+          lastGeneratedDate: new Date("2026-03-22T00:00:00.000Z"),
+          endDate: new Date("2026-03-23T00:00:00.000Z"),
+        }
+        const todayUTC = new Date("2026-03-22T00:00:00.000Z")
+        // Next is 2026-03-23, which equals endDate -> valid
+        expect(getNextDate(dailyRec, todayUTC)).toEqual(
+          new Date("2026-03-23T00:00:00.000Z")
+        )
+
+        // After 2026-03-23 is generated, next is 2026-03-24 which exceeds endDate -> null
+        const afterGenerated: DBRecurringTransaction = {
+          ...dailyRec,
+          lastGeneratedDate: new Date("2026-03-23T00:00:00.000Z"),
+        }
+        expect(getNextDate(afterGenerated, todayUTC)).toBeNull()
       })
     })
   })

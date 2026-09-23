@@ -73,24 +73,32 @@ function stepNextDate(
 export function getNextDate(
   rec: DBRecurringTransaction | RecurringTransaction,
   todayUTC: Date
-): Date {
-  const startDate = new Date(rec.startDate)
+): Date | null {
+  const startUTC = normalizeToUTCMidnight(new Date(rec.startDate))
+  const endUTC = rec.endDate
+    ? normalizeToUTCMidnight(new Date(rec.endDate))
+    : null
+
   let candidate = rec.lastGeneratedDate
     ? stepNextDate(
-        new Date(rec.lastGeneratedDate),
+        normalizeToUTCMidnight(new Date(rec.lastGeneratedDate)),
         rec.frequency,
-        startDate,
+        startUTC,
         rec.randomEveryXDays
       )
-    : startDate
+    : startUTC
 
   while (candidate < todayUTC && !isSameUTCDate(candidate, todayUTC)) {
     candidate = stepNextDate(
       candidate,
       rec.frequency,
-      startDate,
+      startUTC,
       rec.randomEveryXDays
     )
+  }
+
+  if (endUTC && candidate.getTime() > endUTC.getTime()) {
+    return null
   }
 
   return candidate

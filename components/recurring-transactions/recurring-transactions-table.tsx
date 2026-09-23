@@ -125,6 +125,8 @@ export function RecurringTransactionsTable({
                       todayUTC > new Date(recurring.endDate)
                     )
 
+                    const nextDate = getNextDate(recurring, todayUTC)
+
                     return (
                       <TableRow
                         key={recurring._id}
@@ -177,12 +179,10 @@ export function RecurringTransactionsTable({
                                 })}
                               </span>
                             ) : null}
-                            {!isEnded ? (
+                            {!isEnded && nextDate ? (
                               <span className="text-muted-foreground text-xs">
                                 {t("Next: {date}", {
-                                  date: formatDate(
-                                    getNextDate(recurring, todayUTC)
-                                  ),
+                                  date: formatDate(nextDate),
                                 })}
                               </span>
                             ) : null}
