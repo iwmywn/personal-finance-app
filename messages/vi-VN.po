@@ -2404,6 +2404,57 @@ msgctxt "MBywHq"
 msgid "Manage cash inflows and outflows to track your personal finances."
 msgstr "Quản lý dòng tiền vào và ra để theo dõi tài chính cá nhân của bạn."
 
+#: components/ui/breadcrumb.tsx
+msgctxt "I5NMJ8"
+msgid "More"
+msgstr "Thêm"
+
+#: components/ui/dialog.tsx
+#: components/ui/sheet.tsx
+msgctxt "rbrahO"
+msgid "Close"
+msgstr "Đóng"
+
+#: components/ui/pagination.tsx
+msgctxt "NYErt1"
+msgid "Go to previous page"
+msgstr "Đến trang trước"
+
+#: components/ui/pagination.tsx
+msgctxt "JJNc3c"
+msgid "Previous"
+msgstr "Trước"
+
+#: components/ui/pagination.tsx
+msgctxt "nkDaFL"
+msgid "Go to next page"
+msgstr "Đến trang sau"
+
+#: components/ui/pagination.tsx
+msgctxt "9-Ddtu"
+msgid "Next"
+msgstr "Sau"
+
+#: components/ui/pagination.tsx
+msgctxt "shDN4n"
+msgid "More pages"
+msgstr "Nhiều trang hơn"
+
+#: components/ui/sidebar.tsx
+msgctxt "JZy6jo"
+msgid "Sidebar"
+msgstr "Thanh bên"
+
+#: components/ui/sidebar.tsx
+msgctxt "O8JL7S"
+msgid "Displays the mobile sidebar."
+msgstr "Hiển thị thanh bên trên thiết bị di động."
+
+#: components/ui/sidebar.tsx
+msgctxt "kh4wt0"
+msgid "Toggle Sidebar"
+msgstr "Chuyển đổi thanh bên"
+
 #: hooks/use-category.ts
 msgctxt "7MY_4L"
 msgid "Salary & Bonus"

@@ -35,7 +35,7 @@ function Calendar({
       locale={LOCALE_CONFIG[locale].dateLocale}
       showOutsideDays={showOutsideDays}
       className={cn(
-        "group/calendar bg-background p-3 [--cell-size:--spacing(8)] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
+        "group/calendar bg-background p-3 [--cell-size:--spacing(8)] in-data-[slot=card-content]:bg-transparent in-data-[slot=popover-content]:bg-transparent",
         "rtl:**:[.rdp-button\\_next>svg]:rotate-180",
         "rtl:**:[.rdp-button\\_previous>svg]:rotate-180",
         className

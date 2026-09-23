@@ -2404,6 +2404,57 @@ msgctxt "MBywHq"
 msgid "Manage cash inflows and outflows to track your personal finances."
 msgstr "Manage cash inflows and outflows to track your personal finances."
 
+#: components/ui/breadcrumb.tsx
+msgctxt "I5NMJ8"
+msgid "More"
+msgstr "More"
+
+#: components/ui/dialog.tsx
+#: components/ui/sheet.tsx
+msgctxt "rbrahO"
+msgid "Close"
+msgstr "Close"
+
+#: components/ui/pagination.tsx
+msgctxt "NYErt1"
+msgid "Go to previous page"
+msgstr "Go to previous page"
+
+#: components/ui/pagination.tsx
+msgctxt "JJNc3c"
+msgid "Previous"
+msgstr "Previous"
+
+#: components/ui/pagination.tsx
+msgctxt "nkDaFL"
+msgid "Go to next page"
+msgstr "Go to next page"
+
+#: components/ui/pagination.tsx
+msgctxt "9-Ddtu"
+msgid "Next"
+msgstr "Next"
+
+#: components/ui/pagination.tsx
+msgctxt "shDN4n"
+msgid "More pages"
+msgstr "More pages"
+
+#: components/ui/sidebar.tsx
+msgctxt "JZy6jo"
+msgid "Sidebar"
+msgstr "Sidebar"
+
+#: components/ui/sidebar.tsx
+msgctxt "O8JL7S"
+msgid "Displays the mobile sidebar."
+msgstr "Displays the mobile sidebar."
+
+#: components/ui/sidebar.tsx
+msgctxt "kh4wt0"
+msgid "Toggle Sidebar"
+msgstr "Toggle Sidebar"
+
 #: hooks/use-category.ts
 msgctxt "7MY_4L"
 msgid "Salary & Bonus"

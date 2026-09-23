@@ -2404,6 +2404,57 @@ msgctxt "MBywHq"
 msgid "Manage cash inflows and outflows to track your personal finances."
 msgstr "개인 재정을 추적하기 위해 현금 유입 및 유출을 관리하세요."
 
+#: components/ui/breadcrumb.tsx
+msgctxt "I5NMJ8"
+msgid "More"
+msgstr "더 보기"
+
+#: components/ui/dialog.tsx
+#: components/ui/sheet.tsx
+msgctxt "rbrahO"
+msgid "Close"
+msgstr "닫기"
+
+#: components/ui/pagination.tsx
+msgctxt "NYErt1"
+msgid "Go to previous page"
+msgstr "이전 페이지로 이동"
+
+#: components/ui/pagination.tsx
+msgctxt "JJNc3c"
+msgid "Previous"
+msgstr "이전"
+
+#: components/ui/pagination.tsx
+msgctxt "nkDaFL"
+msgid "Go to next page"
+msgstr "다음 페이지로 이동"
+
+#: components/ui/pagination.tsx
+msgctxt "9-Ddtu"
+msgid "Next"
+msgstr "다음"
+
+#: components/ui/pagination.tsx
+msgctxt "shDN4n"
+msgid "More pages"
+msgstr "더 많은 페이지"
+
+#: components/ui/sidebar.tsx
+msgctxt "JZy6jo"
+msgid "Sidebar"
+msgstr "사이드바"
+
+#: components/ui/sidebar.tsx
+msgctxt "O8JL7S"
+msgid "Displays the mobile sidebar."
+msgstr "모바일 사이드바를 표시합니다."
+
+#: components/ui/sidebar.tsx
+msgctxt "kh4wt0"
+msgid "Toggle Sidebar"
+msgstr "사이드바 전환"
+
 #: hooks/use-category.ts
 msgctxt "7MY_4L"
 msgid "Salary & Bonus"

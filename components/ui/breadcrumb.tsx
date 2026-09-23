@@ -1,6 +1,7 @@
 import * as React from "react"
 import { cn } from "cn"
 import { ChevronRight, MoreHorizontal } from "lucide-react"
+import { useExtracted } from "next-intl"
 import { Slot } from "radix-ui"
 
 function Breadcrumb({ ...props }: React.ComponentProps<"nav">) {
@@ -12,7 +13,7 @@ function BreadcrumbList({ className, ...props }: React.ComponentProps<"ol">) {
     <ol
       data-slot="breadcrumb-list"
       className={cn(
-        "text-muted-foreground flex flex-wrap items-center gap-1.5 text-sm break-words sm:gap-2.5",
+        "text-muted-foreground flex flex-wrap items-center gap-1.5 text-sm wrap-break-word sm:gap-2.5",
         className
       )}
       {...props}
@@ -83,6 +84,8 @@ function BreadcrumbEllipsis({
   className,
   ...props
 }: React.ComponentProps<"span">) {
+  const t = useExtracted()
+
   return (
     <span
       data-slot="breadcrumb-ellipsis"
@@ -92,7 +95,7 @@ function BreadcrumbEllipsis({
       {...props}
     >
       <MoreHorizontal className="size-4" />
-      <span className="sr-only">More</span>
+      <span className="sr-only">{t("More")}</span>
     </span>
   )
 }

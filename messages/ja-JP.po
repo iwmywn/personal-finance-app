@@ -2404,6 +2404,57 @@ msgctxt "MBywHq"
 msgid "Manage cash inflows and outflows to track your personal finances."
 msgstr "個人の財務を追跡するために現金の流入と流出を管理します。"
 
+#: components/ui/breadcrumb.tsx
+msgctxt "I5NMJ8"
+msgid "More"
+msgstr "その他"
+
+#: components/ui/dialog.tsx
+#: components/ui/sheet.tsx
+msgctxt "rbrahO"
+msgid "Close"
+msgstr "閉じる"
+
+#: components/ui/pagination.tsx
+msgctxt "NYErt1"
+msgid "Go to previous page"
+msgstr "前のページへ"
+
+#: components/ui/pagination.tsx
+msgctxt "JJNc3c"
+msgid "Previous"
+msgstr "前へ"
+
+#: components/ui/pagination.tsx
+msgctxt "nkDaFL"
+msgid "Go to next page"
+msgstr "次のページへ"
+
+#: components/ui/pagination.tsx
+msgctxt "9-Ddtu"
+msgid "Next"
+msgstr "次へ"
+
+#: components/ui/pagination.tsx
+msgctxt "shDN4n"
+msgid "More pages"
+msgstr "その他のページ"
+
+#: components/ui/sidebar.tsx
+msgctxt "JZy6jo"
+msgid "Sidebar"
+msgstr "サイドバー"
+
+#: components/ui/sidebar.tsx
+msgctxt "O8JL7S"
+msgid "Displays the mobile sidebar."
+msgstr "モバイルサイドバーを表示します。"
+
+#: components/ui/sidebar.tsx
+msgctxt "kh4wt0"
+msgid "Toggle Sidebar"
+msgstr "サイドバーを切り替え"
+
 #: hooks/use-category.ts
 msgctxt "7MY_4L"
 msgid "Salary & Bonus"
