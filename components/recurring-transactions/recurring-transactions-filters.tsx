@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState } from "react"
 import { SearchIcon, XIcon } from "lucide-react"
@@ -24,15 +24,13 @@ import {
 } from "@/components/ui/select"
 import { RecurringTransactionsTable } from "@/components/recurring-transactions/recurring-transactions-table"
 import { useRecurring } from "@/contexts/recurring-context"
-import { useTransactions } from "@/contexts/transactions-context"
 import { useCategory } from "@/hooks/use-category"
 import { useMonths } from "@/hooks/use-months"
 import { filterRecurringTransactions } from "@/lib/filters"
-import { getUniqueYears } from "@/lib/utils"
+import { getUniqueDateRangeYears } from "@/lib/utils"
 
 export function RecurringTransactionsFilters() {
   const { recurringTransactions } = useRecurring()
-  const { transactions } = useTransactions()
   const [searchTerm, setSearchTerm] = useState<string>("")
   const [filterMonth, setFilterMonth] = useState<string>("all")
   const [filterYear, setFilterYear] = useState<string>("all")
@@ -45,7 +43,7 @@ export function RecurringTransactionsFilters() {
   const { getCategoriesByType } = useCategory()
 
   const allMonths = useMonths()
-  const allYears = getUniqueYears(transactions)
+  const allYears = getUniqueDateRangeYears(recurringTransactions)
 
   const hasActiveFilters =
     searchTerm !== "" ||

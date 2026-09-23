@@ -23,6 +23,30 @@ export function getUniqueYears(transactions: Transaction[]): number[] {
   ).sort((a, b) => b - a)
 }
 
+export type DateRangeItem = {
+  startDate: Date | string
+  endDate?: Date | string | null
+}
+
+export function getUniqueDateRangeYears(items: DateRangeItem[]): number[] {
+  return Array.from(
+    new Set(
+      items.flatMap((item) => {
+        const years: number[] = []
+        if (item.startDate) {
+          const startYear = new Date(item.startDate).getUTCFullYear()
+          if (!isNaN(startYear)) years.push(startYear)
+        }
+        if (item.endDate) {
+          const endYear = new Date(item.endDate).getUTCFullYear()
+          if (!isNaN(endYear)) years.push(endYear)
+        }
+        return years
+      })
+    )
+  ).sort((a, b) => b - a)
+}
+
 export const progressColorClass = {
   gray: "[&>[data-slot=progress-indicator]]:bg-gray-600",
   green: "[&>[data-slot=progress-indicator]]:bg-green-600",

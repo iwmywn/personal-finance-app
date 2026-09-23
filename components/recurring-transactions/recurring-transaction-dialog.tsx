@@ -91,7 +91,7 @@ export function RecurringTransactionDialog({
       description: recurring?.description || "",
       frequency: recurring?.frequency || "monthly",
       randomEveryXDays: recurring?.randomEveryXDays || undefined,
-      startDate: new Date(),
+      startDate: undefined,
       endDate: undefined,
       lastGeneratedDate: undefined,
     },

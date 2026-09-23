@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState } from "react"
 import { useExtracted } from "next-intl"
@@ -20,7 +20,7 @@ import { useTransactions } from "@/contexts/transactions-context"
 import { useCategory } from "@/hooks/use-category"
 import { useMonths } from "@/hooks/use-months"
 import { filterBudgets } from "@/lib/filters"
-import { getUniqueYears } from "@/lib/utils"
+import { getUniqueDateRangeYears } from "@/lib/utils"
 
 export function BudgetFilters() {
   const { budgets } = useBudgets()
@@ -38,7 +38,7 @@ export function BudgetFilters() {
   const { getCategoriesByType } = useCategory()
 
   const allMonths = useMonths()
-  const allYears = getUniqueYears(transactions)
+  const allYears = getUniqueDateRangeYears(budgets)
 
   const hasActiveFilters =
     filterMonth !== "all" ||

@@ -4,6 +4,7 @@ import {
   convertAmountWithRates,
   formatCurrency,
   getSafeCallbackUrl,
+  getUniqueDateRangeYears,
   getUniqueYears,
 } from "@/lib/utils"
 
@@ -55,6 +56,50 @@ describe("Utils", () => {
       const singleYear = mockTransactions.slice(1, 3)
       const result = getUniqueYears(singleYear)
       expect(result).toEqual([2024])
+    })
+  })
+
+  describe("getUniqueDateRangeYears", () => {
+    it("should return unique years from date ranges sorted descending", () => {
+      const items = [
+        {
+          startDate: "2024-01-01T00:00:00.000Z",
+          endDate: "2025-12-31T00:00:00.000Z",
+        },
+        {
+          startDate: new Date("2026-05-01T00:00:00.000Z"),
+          endDate: new Date("2026-10-01T00:00:00.000Z"),
+        },
+        {
+          startDate: "2025-01-01T00:00:00.000Z",
+          endDate: "2025-06-01T00:00:00.000Z",
+        },
+      ]
+      const result = getUniqueDateRangeYears(items)
+      expect(result).toEqual([2026, 2025, 2024])
+    })
+
+    it("should handle items with undefined or null endDate", () => {
+      const items = [
+        { startDate: "2026-01-01T00:00:00.000Z", endDate: undefined },
+        { startDate: "2023-01-01T00:00:00.000Z", endDate: null },
+      ]
+      const result = getUniqueDateRangeYears(items)
+      expect(result).toEqual([2026, 2023])
+    })
+
+    it("should return empty array for empty items", () => {
+      const result = getUniqueDateRangeYears([])
+      expect(result).toEqual([])
+    })
+
+    it("should ignore invalid dates", () => {
+      const items = [
+        { startDate: "invalid-date", endDate: "another-invalid-date" },
+        { startDate: "2025-01-01T00:00:00.000Z", endDate: "invalid" },
+      ]
+      const result = getUniqueDateRangeYears(items)
+      expect(result).toEqual([2025])
     })
   })
 

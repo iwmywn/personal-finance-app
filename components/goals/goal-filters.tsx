@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState } from "react"
 import { SearchIcon, XIcon } from "lucide-react"
@@ -27,7 +27,7 @@ import { useTransactions } from "@/contexts/transactions-context"
 import { useCategory } from "@/hooks/use-category"
 import { useMonths } from "@/hooks/use-months"
 import { filterGoals } from "@/lib/filters"
-import { getUniqueYears } from "@/lib/utils"
+import { getUniqueDateRangeYears } from "@/lib/utils"
 
 export function GoalFilters() {
   const { goals } = useGoals()
@@ -46,7 +46,7 @@ export function GoalFilters() {
   const { getCategoriesByType } = useCategory()
 
   const allMonths = useMonths()
-  const allYears = getUniqueYears(transactions)
+  const allYears = getUniqueDateRangeYears(goals)
 
   const hasActiveFilters =
     searchTerm !== "" ||
