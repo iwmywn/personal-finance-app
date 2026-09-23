@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { useExtracted } from "next-intl"
 import { toast } from "sonner"
 
-import { deleteGoal } from "@/actions/goal.actions"
+import { deleteCustomCategory } from "@/actions/category.actions"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,17 +18,17 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Spinner } from "@/components/ui/spinner"
 
-interface DeleteGoalDialogProps {
-  goalId: string
+interface DeleteCategoryProps {
+  categoryId: string
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
 }
 
-export function DeleteGoalDialog({
-  goalId,
+export function DeleteCategory({
+  categoryId,
   isOpen,
   setIsOpen,
-}: DeleteGoalDialogProps) {
+}: DeleteCategoryProps) {
   const t = useExtracted()
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
@@ -38,7 +38,7 @@ export function DeleteGoalDialog({
 
     startTransition(async () => {
       try {
-        const { error, success } = await deleteGoal(goalId)
+        const { error, success } = await deleteCustomCategory(categoryId)
 
         if (success === undefined) {
           toast.error(error)
@@ -48,7 +48,7 @@ export function DeleteGoalDialog({
           router.refresh()
         }
       } catch {
-        toast.error(t("Failed to delete goal! Please try again later."))
+        toast.error(t("Failed to delete category! Please try again later."))
       }
     })
   }
@@ -57,10 +57,10 @@ export function DeleteGoalDialog({
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{t("Delete Goal")}</AlertDialogTitle>
+          <AlertDialogTitle>{t("Delete Category")}</AlertDialogTitle>
           <AlertDialogDescription>
             {t(
-              "Are you sure you want to delete this goal? This action cannot be undone."
+              "Are you sure you want to delete this category? This action cannot be undone."
             )}
           </AlertDialogDescription>
         </AlertDialogHeader>

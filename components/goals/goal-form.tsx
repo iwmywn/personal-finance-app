@@ -9,10 +9,7 @@ import { useExtracted } from "next-intl"
 import { useForm, useWatch } from "react-hook-form"
 import { toast } from "sonner"
 
-import {
-  createTransaction,
-  updateTransaction,
-} from "@/actions/transaction.actions"
+import { createGoal, updateGoal } from "@/actions/goal.actions"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -33,12 +30,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
-  InputGroupTextarea,
-} from "@/components/ui/input-group"
+import { Input } from "@/components/ui/input"
 import {
   Popover,
   PopoverContent,
@@ -51,64 +43,57 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CategoryFormSelect } from "@/components/category-form-select"
 import { CurrencyInput } from "@/components/currency-input"
 import { useUser } from "@/contexts/user-context"
 import { useFormatDate } from "@/hooks/use-format-date"
 import { useSchemas } from "@/hooks/use-schemas"
-import type { CategoryType } from "@/lib/category"
 import { CURRENCIES, CURRENCY_CONFIG } from "@/lib/currency"
 import type { Currency } from "@/lib/currency"
 import { parseToLocalDate } from "@/lib/date"
-import type { Transaction } from "@/lib/definitions"
-import type { TransactionFormValues } from "@/schemas/types"
+import type { Goal } from "@/lib/definitions"
+import type { GoalFormValues } from "@/schemas/types"
 
-interface TransactionDialogProps {
-  transaction?: Transaction
+interface GoalFormProps {
+  goal?: Goal
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
 }
 
-export function TransactionDialog({
-  transaction,
-  isOpen,
-  setIsOpen,
-}: TransactionDialogProps) {
-  const [type, setType] = useState<CategoryType>(transaction?.type || "inflow")
-  const [calendarOpen, setCalendarOpen] = useState<boolean>(false)
+export function GoalForm({ goal, isOpen, setIsOpen }: GoalFormProps) {
+  const [startCalendarOpen, setStartCalendarOpen] = useState<boolean>(false)
+  const [endCalendarOpen, setEndCalendarOpen] = useState<boolean>(false)
   const t = useExtracted()
   const { user } = useUser()
   const formatDate = useFormatDate()
   const router = useRouter()
-  const { createTransactionSchema } = useSchemas()
-  const form = useForm<TransactionFormValues>({
-    resolver: zodResolver(createTransactionSchema()),
+  const { createGoalSchema } = useSchemas()
+  const form = useForm<GoalFormValues>({
+    resolver: zodResolver(createGoalSchema()),
     defaultValues: {
-      type: transaction?.type || "inflow",
-      currency:
-        transaction?.originalCurrency ??
-        transaction?.currency ??
-        (user.currency as Currency),
-      amount: transaction?.originalAmount ?? transaction?.amount ?? "",
-      description: transaction?.description || "",
-      categoryKey: transaction?.categoryKey || "",
-      date: parseToLocalDate(transaction?.date),
+      categoryKey: goal?.categoryKey || "",
+      name: goal?.name || "",
+      currency: goal?.currency ?? (user.currency as Currency),
+      targetAmount: goal?.targetAmount ?? "",
+      startDate: parseToLocalDate(goal?.startDate),
+      endDate: parseToLocalDate(goal?.endDate),
     },
   })
 
-  const selectedDate = useWatch({
+  const startDate = useWatch({
     control: form.control,
-    name: "date",
+    name: "startDate",
   })
 
-  async function onSubmit(values: TransactionFormValues) {
-    if (transaction) {
+  const endDate = useWatch({
+    control: form.control,
+    name: "endDate",
+  })
+
+  async function onSubmit(values: GoalFormValues) {
+    if (goal) {
       try {
-        const { error, success } = await updateTransaction(
-          transaction._id,
-          values
-        )
+        const { error, success } = await updateGoal(goal._id, values)
 
         if (success === undefined) {
           toast.error(error)
@@ -118,11 +103,11 @@ export function TransactionDialog({
           router.refresh()
         }
       } catch {
-        toast.error(t("Failed to update transaction! Please try again later."))
+        toast.error(t("Failed to update goal! Please try again later."))
       }
     } else {
       try {
-        const { error, success } = await createTransaction(values)
+        const { error, success } = await createGoal(values)
 
         if (success === undefined) {
           toast.error(error)
@@ -130,66 +115,29 @@ export function TransactionDialog({
           setIsOpen(false)
           toast.success(success)
           router.refresh()
-          form.reset({
-            ...form.formState.defaultValues,
-            type,
-          })
+          form.reset()
         }
       } catch {
-        toast.error(t("Failed to create transaction! Please try again later."))
+        toast.error(t("Failed to create goal! Please try again later."))
       }
     }
   }
 
-  const handleTypeChange = (type: CategoryType) => {
-    setType(type)
-    form.setValue("type", type)
-    form.resetField("categoryKey", { defaultValue: "" })
-  }
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent>
+      <DialogContent className="max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            {transaction ? t("Edit Transaction") : t("Add Transaction")}
-          </DialogTitle>
+          <DialogTitle>{goal ? t("Edit Goal") : t("Add Goal")}</DialogTitle>
           <DialogDescription>
-            {transaction
-              ? t("Update transaction information.")
-              : t(
-                  "Add your inflow or outflow to track your personal finances."
-                )}
+            {goal
+              ? t("Update goal information.")
+              : t("Create a new financial goal.")}
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <Tabs
-              value={type}
-              onValueChange={(value) => handleTypeChange(value as CategoryType)}
-            >
-              <TabsList className="w-full">
-                <TabsTrigger value="inflow">{t("Inflow")}</TabsTrigger>
-                <TabsTrigger value="outflow">{t("Outflow")}</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="inflow" className="space-y-4">
-                <CategoryFormSelect
-                  control={form.control}
-                  type="inflow"
-                  showDescription
-                />
-              </TabsContent>
-
-              <TabsContent value="outflow" className="space-y-4">
-                <CategoryFormSelect
-                  control={form.control}
-                  type="outflow"
-                  showDescription
-                />
-              </TabsContent>
-            </Tabs>
+            <CategoryFormSelect control={form.control} type="inflow" />
 
             <FormField
               control={form.control}
@@ -200,7 +148,7 @@ export function TransactionDialog({
                   <Select
                     onValueChange={(value) => {
                       field.onChange(value)
-                      form.setValue("amount", "")
+                      form.setValue("targetAmount", "")
                     }}
                     value={field.value}
                   >
@@ -224,13 +172,35 @@ export function TransactionDialog({
 
             <FormField
               control={form.control}
-              name="amount"
+              name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel htmlFor="form-amount">{t("Amount")}</FormLabel>
+                  <FormLabel htmlFor="form-goal-name">
+                    {t("Goal Name")}
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      id="form-goal-name"
+                      placeholder={t("e.g. Save for vacation")}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="targetAmount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="form-target-amount">
+                    {t("Target Amount")}
+                  </FormLabel>
                   <FormControl>
                     <CurrencyInput
-                      id="form-amount"
+                      id="form-target-amount"
                       value={field.value}
                       onValueChange={field.onChange}
                       currency={form.getValues("currency")}
@@ -243,52 +213,27 @@ export function TransactionDialog({
 
             <FormField
               control={form.control}
-              name="description"
+              name="startDate"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel htmlFor="form-description">
-                    {t("Description")}
+                  <FormLabel htmlFor="form-start-date">
+                    {t("Start Date")}
                   </FormLabel>
-                  <FormControl>
-                    <InputGroup>
-                      <InputGroupTextarea
-                        id="form-description"
-                        placeholder={t(
-                          "Enter a description for the transaction..."
-                        )}
-                        maxLength={200}
-                        {...field}
-                      />
-                      <InputGroupAddon align="block-end">
-                        <InputGroupText className="text-muted-foreground text-xs">
-                          {field.value?.length || 0}/200
-                        </InputGroupText>
-                      </InputGroupAddon>
-                    </InputGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="date"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel htmlFor="form-date">{t("Date")}</FormLabel>
-                  <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+                  <Popover
+                    open={startCalendarOpen}
+                    onOpenChange={setStartCalendarOpen}
+                  >
                     <FormControl>
-                      <PopoverTrigger id="form-date" asChild>
+                      <PopoverTrigger id="form-start-date" asChild>
                         <Button
                           variant="outline"
                           className={cn(
                             "w-full justify-between font-normal",
-                            !selectedDate && "text-muted-foreground"
+                            !startDate && "text-muted-foreground"
                           )}
                         >
-                          {selectedDate ? (
-                            formatDate(selectedDate)
+                          {startDate ? (
+                            formatDate(startDate)
                           ) : (
                             <span>{t("Select Date")}</span>
                           )}
@@ -303,13 +248,63 @@ export function TransactionDialog({
                       <Calendar
                         autoFocus
                         mode="single"
-                        selected={selectedDate}
+                        selected={startDate}
                         captionLayout="dropdown"
                         onSelect={(date) => {
                           field.onChange(date)
-                          setCalendarOpen(false)
+                          setStartCalendarOpen(false)
                         }}
-                        disabled={(date) => date > new Date()}
+                        disabled={(date) => endDate && date > endDate}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="endDate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="form-end-date">{t("End Date")}</FormLabel>
+                  <Popover
+                    open={endCalendarOpen}
+                    onOpenChange={setEndCalendarOpen}
+                  >
+                    <FormControl>
+                      <PopoverTrigger id="form-end-date" asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-between font-normal",
+                            !endDate && "text-muted-foreground"
+                          )}
+                        >
+                          {endDate ? (
+                            formatDate(endDate)
+                          ) : (
+                            <span>{t("Select Date")}</span>
+                          )}
+                          <CalendarIcon />
+                        </Button>
+                      </PopoverTrigger>
+                    </FormControl>
+                    <PopoverContent
+                      className="w-auto overflow-hidden p-0"
+                      align="start"
+                    >
+                      <Calendar
+                        autoFocus
+                        mode="single"
+                        selected={endDate}
+                        captionLayout="dropdown"
+                        onSelect={(date) => {
+                          field.onChange(date)
+                          setEndCalendarOpen(false)
+                        }}
+                        disabled={(date) => startDate && date <= startDate}
                       />
                     </PopoverContent>
                   </Popover>
@@ -323,7 +318,7 @@ export function TransactionDialog({
                 <Button variant="outline">{t("Cancel")}</Button>
               </DialogClose>
               <FormButton isSubmitting={form.formState.isSubmitting}>
-                {transaction ? t("Update") : t("Add")}
+                {goal ? t("Update") : t("Add")}
               </FormButton>
             </DialogFooter>
           </form>

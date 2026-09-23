@@ -3,7 +3,7 @@ import type { Metadata } from "next"
 import { connection } from "next/server"
 import { getExtracted } from "next-intl/server"
 
-import { SignInPage } from "@/components/auth/signin-page"
+import { SignInForm } from "@/components/auth/signin-form"
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getExtracted()
@@ -19,7 +19,7 @@ async function DynamicMarker() {
 export default function page() {
   return (
     <>
-      <SignInPage />
+      <SignInForm />
       <Suspense>
         <DynamicMarker />
       </Suspense>

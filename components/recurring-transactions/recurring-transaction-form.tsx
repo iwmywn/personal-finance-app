@@ -61,17 +61,17 @@ import type { Currency } from "@/lib/currency"
 import type { RecurringTransaction } from "@/lib/definitions"
 import type { RecurringTransactionFormValues } from "@/schemas/types"
 
-interface RecurringDialogProps {
+interface RecurringTransactionFormProps {
   recurring?: RecurringTransaction
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
 }
 
-export function RecurringTransactionDialog({
+export function RecurringTransactionForm({
   recurring,
   isOpen,
   setIsOpen,
-}: RecurringDialogProps) {
+}: RecurringTransactionFormProps) {
   const isDuplicate = Boolean(recurring)
   const [startCalendarOpen, setStartCalendarOpen] = useState<boolean>(false)
   const [endCalendarOpen, setEndCalendarOpen] = useState<boolean>(false)

@@ -28,8 +28,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { CategoryDialog } from "@/components/categories/category-dialog"
-import { DeleteCategoryDialog } from "@/components/categories/delete-category-dialog"
+import { CategoryForm } from "@/components/categories/category-form"
+import { DeleteCategory } from "@/components/categories/delete-category"
 import { useCategories } from "@/contexts/categories-context"
 import type { Category } from "@/lib/definitions"
 
@@ -143,14 +143,14 @@ export function CategoriesTable({ filteredCategories }: CategoriesTableProps) {
 
       {selectedCategory && (
         <>
-          <CategoryDialog
-            key={selectedCategory._id + "CategoryDialog"}
+          <CategoryForm
+            key={selectedCategory._id + "CategoryForm"}
             category={selectedCategory}
             isOpen={isEditOpen}
             setIsOpen={setIsEditOpen}
           />
-          <DeleteCategoryDialog
-            key={selectedCategory._id + "DeleteCategoryDialog"}
+          <DeleteCategory
+            key={selectedCategory._id + "DeleteCategory"}
             categoryId={selectedCategory._id}
             isOpen={isDeleteOpen}
             setIsOpen={setIsDeleteOpen}

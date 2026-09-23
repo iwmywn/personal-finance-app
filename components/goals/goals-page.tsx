@@ -4,8 +4,8 @@ import { useState } from "react"
 import { useExtracted } from "next-intl"
 
 import { Button } from "@/components/ui/button"
-import { GoalDialog } from "@/components/goals/goal-dialog"
 import { GoalFilters } from "@/components/goals/goal-filters"
+import { GoalForm } from "@/components/goals/goal-form"
 
 export default function GoalsPage() {
   const [isOpen, setIsOpen] = useState<boolean>(false)
@@ -27,7 +27,7 @@ export default function GoalsPage() {
         <GoalFilters />
       </div>
 
-      <GoalDialog isOpen={isOpen} setIsOpen={setIsOpen} />
+      <GoalForm isOpen={isOpen} setIsOpen={setIsOpen} />
     </>
   )
 }

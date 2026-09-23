@@ -53,13 +53,13 @@ import { parseToLocalDate } from "@/lib/date"
 import type { Budget } from "@/lib/definitions"
 import type { BudgetFormValues } from "@/schemas/types"
 
-interface BudgetDialogProps {
+interface BudgetFormProps {
   budget?: Budget
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
 }
 
-export function BudgetDialog({ budget, isOpen, setIsOpen }: BudgetDialogProps) {
+export function BudgetForm({ budget, isOpen, setIsOpen }: BudgetFormProps) {
   const [startCalendarOpen, setStartCalendarOpen] = useState<boolean>(false)
   const [endCalendarOpen, setEndCalendarOpen] = useState<boolean>(false)
   const t = useExtracted()

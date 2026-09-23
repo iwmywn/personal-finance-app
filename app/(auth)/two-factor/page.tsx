@@ -3,7 +3,7 @@ import type { Metadata } from "next"
 import { connection } from "next/server"
 import { getExtracted } from "next-intl/server"
 
-import { TwoFactorPage } from "@/components/auth/two-factor-page"
+import { TwoFactorVerificationForm } from "@/components/auth/two-factor-form"
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getExtracted()
@@ -19,7 +19,7 @@ async function DynamicMarker() {
 export default function page() {
   return (
     <>
-      <TwoFactorPage />
+      <TwoFactorVerificationForm />
       <Suspense>
         <DynamicMarker />
       </Suspense>

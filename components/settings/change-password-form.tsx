@@ -34,7 +34,7 @@ import { authClient } from "@/lib/auth-client"
 import type { AuthErrorCode } from "@/lib/definitions"
 import type { PasswordFormValues } from "@/schemas/types"
 
-export function ChangePasswordDialog() {
+export function ChangePasswordForm() {
   const t = useExtracted()
   const router = useRouter()
   const [isOpen, setIsOpen] = useState<boolean>(false)

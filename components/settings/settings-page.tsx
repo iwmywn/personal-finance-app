@@ -10,14 +10,14 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ActiveSessionsDialog } from "@/components/settings/active-sessions-dialog"
-import { ChangeNameDialog } from "@/components/settings/change-name-dialog"
-import { ChangePasswordDialog } from "@/components/settings/change-password-dialog"
-import { ChangeUsernameDialog } from "@/components/settings/change-username-dialog"
+import { ActiveSessionsManager } from "@/components/settings/active-sessions-manager"
+import { ChangeNameForm } from "@/components/settings/change-name-form"
+import { ChangePasswordForm } from "@/components/settings/change-password-form"
+import { ChangeUsernameForm } from "@/components/settings/change-username-form"
 import { CurrencySelector } from "@/components/settings/currency-selector"
 import { LanguageSelector } from "@/components/settings/language-selector"
 import { ThemeSelector } from "@/components/settings/theme-selector"
-import { TwoFactorManagerDialog } from "@/components/settings/two-factor-manager-dialog"
+import { TwoFactorManager } from "@/components/settings/two-factor-manager"
 
 export default function SettingsPage() {
   const t = useExtracted()
@@ -73,7 +73,7 @@ export default function SettingsPage() {
             <CardTitle>{t("Change Name")}</CardTitle>
             <CardDescription>{t("Update your display name.")}</CardDescription>
             <CardAction>
-              <ChangeNameDialog />
+              <ChangeNameForm />
             </CardAction>
           </CardHeader>
         </Card>
@@ -85,7 +85,7 @@ export default function SettingsPage() {
               {t("Update your unique username.")}
             </CardDescription>
             <CardAction>
-              <ChangeUsernameDialog />
+              <ChangeUsernameForm />
             </CardAction>
           </CardHeader>
         </Card>
@@ -95,7 +95,7 @@ export default function SettingsPage() {
             <CardTitle>{t("Change Password")}</CardTitle>
             <CardDescription>{t("Update your password.")}</CardDescription>
             <CardAction>
-              <ChangePasswordDialog />
+              <ChangePasswordForm />
             </CardAction>
           </CardHeader>
         </Card>
@@ -107,7 +107,7 @@ export default function SettingsPage() {
               {t("Add an extra layer of security to your account.")}
             </CardDescription>
             <CardAction>
-              <TwoFactorManagerDialog />
+              <TwoFactorManager />
             </CardAction>
           </CardHeader>
         </Card>
@@ -119,7 +119,7 @@ export default function SettingsPage() {
               {t("Manage your active sessions.")}
             </CardDescription>
             <CardAction>
-              <ActiveSessionsDialog />
+              <ActiveSessionsManager />
             </CardAction>
           </CardHeader>
         </Card>

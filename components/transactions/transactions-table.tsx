@@ -40,9 +40,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { DeleteTransactionDialog } from "@/components/transactions/delete-transaction-dialog"
+import { DeleteTransaction } from "@/components/transactions/delete-transaction"
 import { ExportButton } from "@/components/transactions/export-button"
-import { TransactionDialog } from "@/components/transactions/transaction-dialog"
+import { TransactionForm } from "@/components/transactions/transaction-form"
 import { useTransactions } from "@/contexts/transactions-context"
 import { useCategory } from "@/hooks/use-category"
 import { useFormatCurrency } from "@/hooks/use-format-currency"
@@ -252,14 +252,14 @@ export function TransactionsTable({
 
       {selectedTransaction && (
         <>
-          <TransactionDialog
-            key={selectedTransaction._id + "TransactionDialog"}
+          <TransactionForm
+            key={selectedTransaction._id + "TransactionForm"}
             transaction={selectedTransaction}
             isOpen={isEditOpen}
             setIsOpen={setIsEditOpen}
           />
-          <DeleteTransactionDialog
-            key={selectedTransaction._id + "DeleteTransactionDialog"}
+          <DeleteTransaction
+            key={selectedTransaction._id + "DeleteTransaction"}
             transactionId={selectedTransaction._id}
             isOpen={isDeleteOpen}
             setIsOpen={setIsDeleteOpen}

@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useExtracted } from "next-intl"
 
 import { Button } from "@/components/ui/button"
-import { RecurringTransactionDialog } from "@/components/recurring-transactions/recurring-transaction-dialog"
+import { RecurringTransactionForm } from "@/components/recurring-transactions/recurring-transaction-form"
 import { RecurringTransactionsFilters } from "@/components/recurring-transactions/recurring-transactions-filters"
 
 export default function RecurringTransactionsPage() {
@@ -27,7 +27,7 @@ export default function RecurringTransactionsPage() {
         <RecurringTransactionsFilters />
       </div>
 
-      <RecurringTransactionDialog isOpen={isOpen} setIsOpen={setIsOpen} />
+      <RecurringTransactionForm isOpen={isOpen} setIsOpen={setIsOpen} />
     </>
   )
 }

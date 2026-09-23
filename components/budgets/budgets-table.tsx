@@ -35,8 +35,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { BudgetDialog } from "@/components/budgets/budget-dialog"
-import { DeleteBudgetDialog } from "@/components/budgets/delete-budget-dialog"
+import { BudgetForm } from "@/components/budgets/budget-form"
+import { DeleteBudget } from "@/components/budgets/delete-budget"
 import { useBudgets } from "@/contexts/budgets-context"
 import { useTransactions } from "@/contexts/transactions-context"
 import { useCategory } from "@/hooks/use-category"
@@ -216,14 +216,14 @@ export function BudgetsTable({ filteredBudgets }: BudgetsTableProps) {
 
       {selectedBudget && (
         <>
-          <BudgetDialog
-            key={selectedBudget._id + "BudgetDialog"}
+          <BudgetForm
+            key={selectedBudget._id + "BudgetForm"}
             budget={selectedBudget}
             isOpen={isEditOpen}
             setIsOpen={setIsEditOpen}
           />
-          <DeleteBudgetDialog
-            key={selectedBudget._id + "DeleteBudgetDialog"}
+          <DeleteBudget
+            key={selectedBudget._id + "DeleteBudget"}
             budgetId={selectedBudget._id}
             isOpen={isDeleteOpen}
             setIsOpen={setIsDeleteOpen}

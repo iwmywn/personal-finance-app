@@ -37,7 +37,7 @@ msgid "User has been deleted."
 msgstr "Người dùng đã bị xóa."
 
 #: actions/admin.actions.ts
-#: components/admin/delete-user-dialog.tsx
+#: components/admin/delete-user.tsx
 msgctxt "xkkfdF"
 msgid "Failed to delete user! Please try again later."
 msgstr "Xóa người dùng thất bại! Vui lòng thử lại sau."
@@ -70,7 +70,7 @@ msgid "This budget already exists!"
 msgstr "Ngân sách này đã tồn tại!"
 
 #: actions/budget.actions.ts
-#: components/budgets/budget-dialog.tsx
+#: components/budgets/budget-form.tsx
 msgctxt "LiEvhU"
 msgid "Failed to create budget! Please try again later."
 msgstr "Tạo ngân sách thất bại! Vui lòng thử lại sau."
@@ -91,7 +91,7 @@ msgid "Budget has been updated."
 msgstr "Ngân sách đã được cập nhật."
 
 #: actions/budget.actions.ts
-#: components/budgets/budget-dialog.tsx
+#: components/budgets/budget-form.tsx
 msgctxt "ZUfwUz"
 msgid "Failed to update budget! Please try again later."
 msgstr "Cập nhật ngân sách thất bại! Vui lòng thử lại sau."
@@ -107,7 +107,7 @@ msgid "Budget has been deleted."
 msgstr "Ngân sách đã được xóa."
 
 #: actions/budget.actions.ts
-#: components/budgets/delete-budget-dialog.tsx
+#: components/budgets/delete-budget.tsx
 msgctxt "niO8qC"
 msgid "Failed to delete budget! Please try again later."
 msgstr "Xóa ngân sách thất bại! Vui lòng thử lại sau."
@@ -128,7 +128,7 @@ msgid "This category already exists!"
 msgstr "Danh mục này đã tồn tại!"
 
 #: actions/category.actions.ts
-#: components/categories/category-dialog.tsx
+#: components/categories/category-form.tsx
 msgctxt "mFVjx4"
 msgid "Failed to create category! Please try again later."
 msgstr "Tạo danh mục thất bại! Vui lòng thử lại sau."
@@ -154,7 +154,7 @@ msgid "Category has been updated."
 msgstr "Danh mục đã được cập nhật."
 
 #: actions/category.actions.ts
-#: components/categories/category-dialog.tsx
+#: components/categories/category-form.tsx
 msgctxt "PoUgbk"
 msgid "Failed to update category! Please try again later."
 msgstr "Cập nhật danh mục thất bại! Vui lòng thử lại sau."
@@ -190,7 +190,7 @@ msgid "Category has been deleted."
 msgstr "Danh mục đã được xóa."
 
 #: actions/category.actions.ts
-#: components/categories/delete-category-dialog.tsx
+#: components/categories/delete-category.tsx
 msgctxt "XWfgXI"
 msgid "Failed to delete category! Please try again later."
 msgstr "Xóa danh mục thất bại! Vui lòng thử lại sau."
@@ -211,7 +211,7 @@ msgid "This goal already exists!"
 msgstr "Mục tiêu này đã tồn tại!"
 
 #: actions/goal.actions.ts
-#: components/goals/goal-dialog.tsx
+#: components/goals/goal-form.tsx
 msgctxt "2Csc1b"
 msgid "Failed to create goal! Please try again later."
 msgstr "Tạo mục tiêu thất bại! Vui lòng thử lại sau."
@@ -232,7 +232,7 @@ msgid "Goal has been updated."
 msgstr "Mục tiêu đã được cập nhật."
 
 #: actions/goal.actions.ts
-#: components/goals/goal-dialog.tsx
+#: components/goals/goal-form.tsx
 msgctxt "Lmu8yS"
 msgid "Failed to update goal! Please try again later."
 msgstr "Cập nhật mục tiêu thất bại! Vui lòng thử lại sau."
@@ -248,7 +248,7 @@ msgid "Goal has been deleted."
 msgstr "Mục tiêu đã được xóa."
 
 #: actions/goal.actions.ts
-#: components/goals/delete-goal-dialog.tsx
+#: components/goals/delete-goal.tsx
 msgctxt "uwewg6"
 msgid "Failed to delete goal! Please try again later."
 msgstr "Xóa mục tiêu thất bại! Vui lòng thử lại sau."
@@ -269,7 +269,7 @@ msgid "This recurring transaction already exists!"
 msgstr "Giao dịch định kỳ này đã tồn tại!"
 
 #: actions/recurring.actions.ts
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
 msgctxt "zQczG6"
 msgid "Failed to create recurring transaction! Please try again later."
 msgstr "Tạo giao dịch định kỳ thất bại! Vui lòng thử lại sau."
@@ -290,7 +290,7 @@ msgid "Recurring transaction has been deleted."
 msgstr "Giao dịch định kỳ đã được xóa."
 
 #: actions/recurring.actions.ts
-#: components/recurring-transactions/delete-recurring-transaction-dialog.tsx
+#: components/recurring-transactions/delete-recurring-transaction.tsx
 msgctxt "9p5fYg"
 msgid "Failed to delete recurring transaction! Please try again later."
 msgstr "Xóa giao dịch định kỳ thất bại! Vui lòng thử lại sau."
@@ -321,13 +321,13 @@ msgid "Session not found."
 msgstr "Không tìm thấy phiên."
 
 #: actions/session.actions.ts
-#: components/settings/active-sessions-dialog.tsx
+#: components/settings/active-sessions-manager.tsx
 msgctxt "tNzaek"
 msgid "Session terminated."
 msgstr "Phiên đã bị chấm dứt."
 
 #: actions/session.actions.ts
-#: components/settings/active-sessions-dialog.tsx
+#: components/settings/active-sessions-manager.tsx
 msgctxt "M3ZAZv"
 msgid "Failed to terminate session! Please try again later."
 msgstr "Chấm dứt phiên thất bại! Vui lòng thử lại sau."
@@ -338,7 +338,7 @@ msgid "Transaction has been created."
 msgstr "Giao dịch đã được tạo."
 
 #: actions/transaction.actions.ts
-#: components/transactions/transaction-dialog.tsx
+#: components/transactions/transaction-form.tsx
 msgctxt "8rBc81"
 msgid "Failed to create transaction! Please try again later."
 msgstr "Tạo giao dịch thất bại! Vui lòng thử lại sau."
@@ -359,7 +359,7 @@ msgid "Transaction has been updated."
 msgstr "Giao dịch đã được cập nhật."
 
 #: actions/transaction.actions.ts
-#: components/transactions/transaction-dialog.tsx
+#: components/transactions/transaction-form.tsx
 msgctxt "A9rBEo"
 msgid "Failed to update transaction! Please try again later."
 msgstr "Cập nhật giao dịch thất bại! Vui lòng thử lại sau."
@@ -375,7 +375,7 @@ msgid "Transaction has been deleted."
 msgstr "Giao dịch đã được xóa."
 
 #: actions/transaction.actions.ts
-#: components/transactions/delete-transaction-dialog.tsx
+#: components/transactions/delete-transaction.tsx
 msgctxt "DcqDur"
 msgid "Failed to delete transaction! Please try again later."
 msgstr "Xóa giao dịch thất bại! Vui lòng thử lại sau."
@@ -387,13 +387,12 @@ msgstr "Tải danh sách giao dịch thất bại! Vui lòng thử lại sau."
 
 #: app/(auth)/signin/page.tsx
 #: components/auth/signin-form.tsx
-#: components/auth/signin-page.tsx
 msgctxt "Ub-AGc"
 msgid "Sign In"
 msgstr "Đăng nhập"
 
 #: app/(auth)/two-factor/page.tsx
-#: components/auth/two-factor-page.tsx
+#: components/auth/two-factor-form.tsx
 #: components/settings/settings-page.tsx
 msgctxt "AJyYQz"
 msgid "Two-Factor Authentication"
@@ -567,7 +566,7 @@ msgid "Manage application users, system roles, bans, sessions, and security."
 msgstr "Quản lý người dùng ứng dụng, vai trò hệ thống, lệnh cấm, phiên đăng nhập và bảo mật."
 
 #: components/admin/admin-page.tsx
-#: components/admin/create-user-dialog.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "VzzYJk"
 msgid "Create"
 msgstr "Tạo"
@@ -643,7 +642,7 @@ msgid "No users match the selected search query or filters."
 msgstr "Không có người dùng nào khớp với tìm kiếm hoặc bộ lọc đã chọn."
 
 #: components/admin/admin-table.tsx
-#: components/admin/create-user-dialog.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "sy-pv5"
 msgid "Email"
 msgstr "Email"
@@ -705,267 +704,297 @@ msgid "Reset Password"
 msgstr "Đặt lại mật khẩu"
 
 #: components/admin/admin-table.tsx
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "6U4eIn"
 msgid "Unban"
 msgstr "Gỡ cấm"
 
 #: components/admin/admin-table.tsx
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "XtUrMc"
 msgid "Ban"
 msgstr "Cấm"
 
 #: components/admin/admin-table.tsx
-#: components/admin/delete-user-dialog.tsx
+#: components/admin/delete-user.tsx
 #: components/budgets/budgets-table.tsx
-#: components/budgets/delete-budget-dialog.tsx
+#: components/budgets/delete-budget.tsx
 #: components/categories/categories-table.tsx
-#: components/categories/delete-category-dialog.tsx
-#: components/goals/delete-goal-dialog.tsx
+#: components/categories/delete-category.tsx
+#: components/goals/delete-goal.tsx
 #: components/goals/goals-table.tsx
-#: components/recurring-transactions/delete-recurring-transaction-dialog.tsx
+#: components/recurring-transactions/delete-recurring-transaction.tsx
 #: components/recurring-transactions/recurring-transactions-table.tsx
-#: components/transactions/delete-transaction-dialog.tsx
+#: components/transactions/delete-transaction.tsx
 #: components/transactions/transactions-table.tsx
 msgctxt "K3r6DQ"
 msgid "Delete"
 msgstr "Xóa"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "aRQh8u"
 msgid "Failed to update ban status! Please try again later."
 msgstr "Cập nhật trạng thái cấm thất bại! Vui lòng thử lại sau."
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "tLY3l1"
 msgid "User has been unbanned."
 msgstr "Người dùng đã được gỡ cấm."
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "ViifPP"
 msgid "Failed to ban user! Please try again later."
 msgstr "Cấm người dùng thất bại! Vui lòng thử lại sau."
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "bcm8Ks"
 msgid "User has been banned."
 msgstr "Người dùng đã bị cấm."
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "aFpb8P"
 msgid "Unban User"
 msgstr "Gỡ cấm người dùng"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "Ro3EXO"
 msgid "Ban User"
 msgstr "Cấm người dùng"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "bZ5A9F"
 msgid "Restore access for"
 msgstr "Khôi phục quyền truy cập cho"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "fJtO6z"
 msgid "Prevent this user from signing in and revoke all active sessions."
 msgstr "Ngăn người dùng này đăng nhập và thu hồi tất cả các phiên đang hoạt động."
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "4pV2cx"
 msgid "Current ban reason"
 msgstr "Lý do cấm hiện tại"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "09AU_2"
 msgid "No reason specified"
 msgstr "Không có lý do cụ thể"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "0t4WRs"
 msgid "Expires on"
 msgstr "Hết hạn vào"
 
-#: components/admin/ban-user-dialog.tsx
-#: components/admin/create-user-dialog.tsx
-#: components/admin/delete-user-dialog.tsx
-#: components/admin/set-user-password-dialog.tsx
-#: components/budgets/budget-dialog.tsx
-#: components/budgets/delete-budget-dialog.tsx
-#: components/categories/category-dialog.tsx
-#: components/categories/delete-category-dialog.tsx
-#: components/goals/delete-goal-dialog.tsx
-#: components/goals/goal-dialog.tsx
+#: components/admin/ban-user-form.tsx
+#: components/admin/create-user-form.tsx
+#: components/admin/delete-user.tsx
+#: components/admin/set-user-password-form.tsx
+#: components/admin/stop-impersonation.tsx
+#: components/budgets/budget-form.tsx
+#: components/budgets/delete-budget.tsx
+#: components/categories/category-form.tsx
+#: components/categories/delete-category.tsx
+#: components/goals/delete-goal.tsx
+#: components/goals/goal-form.tsx
 #: components/layout/secondary-nav.tsx
-#: components/layout/stop-impersonation-dialog.tsx
-#: components/recurring-transactions/delete-recurring-transaction-dialog.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-#: components/settings/change-name-dialog.tsx
-#: components/settings/change-password-dialog.tsx
-#: components/settings/change-username-dialog.tsx
-#: components/transactions/delete-transaction-dialog.tsx
-#: components/transactions/transaction-dialog.tsx
+#: components/recurring-transactions/delete-recurring-transaction.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/settings/change-name-form.tsx
+#: components/settings/change-password-form.tsx
+#: components/settings/change-username-form.tsx
+#: components/transactions/delete-transaction.tsx
+#: components/transactions/transaction-form.tsx
 msgctxt "47FYwb"
 msgid "Cancel"
 msgstr "Hủy"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "VGVk-h"
 msgid "Ban Reason"
 msgstr "Lý do cấm"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "8ob5gg"
 msgid "e.g. Violation of terms of service"
 msgstr "ví dụ: Vi phạm điều khoản dịch vụ"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "IuFETn"
 msgid "Duration"
 msgstr "Thời hạn"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "StRQjB"
 msgid "Select ban duration"
 msgstr "Chọn thời hạn cấm"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "o2jbDD"
 msgid "Permanent"
 msgstr "Vĩnh viễn"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "Jw7b8T"
 msgid "24 Hours"
 msgstr "24 giờ"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "WhQqi2"
 msgid "7 Days"
 msgstr "7 ngày"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "vgJsLx"
 msgid "30 Days"
 msgstr "30 ngày"
 
-#: components/admin/create-user-dialog.tsx
-#: components/settings/change-username-dialog.tsx
+#: components/admin/create-user-form.tsx
+#: components/settings/change-username-form.tsx
 msgctxt "K3OKU5"
 msgid "Failed to check username availability! Please try again later."
 msgstr "Kiểm tra tính khả dụng của tên đăng nhập thất bại! Vui lòng thử lại sau."
 
-#: components/admin/create-user-dialog.tsx
-#: components/settings/change-username-dialog.tsx
+#: components/admin/create-user-form.tsx
+#: components/settings/change-username-form.tsx
 msgctxt "wb3MSp"
 msgid "This username is already taken."
 msgstr "Tên đăng nhập này đã được sử dụng."
 
-#: components/admin/create-user-dialog.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "-OyBM6"
 msgid "This email is already in use."
 msgstr "Email này đã được sử dụng."
 
-#: components/admin/create-user-dialog.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "74JxeG"
 msgid "Failed to create user! Please try again later."
 msgstr "Tạo người dùng thất bại! Vui lòng thử lại sau."
 
-#: components/admin/create-user-dialog.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "wUmmPh"
 msgid "User has been created."
 msgstr "Người dùng đã được tạo."
 
-#: components/admin/create-user-dialog.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "xWI3D2"
 msgid "Create New User"
 msgstr "Tạo người dùng mới"
 
-#: components/admin/create-user-dialog.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "k30S3R"
 msgid "Add a new user account with credentials."
 msgstr "Thêm tài khoản người dùng mới với thông tin đăng nhập."
 
-#: components/admin/create-user-dialog.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "TemVby"
 msgid "Full Name"
 msgstr "Họ và tên"
 
-#: components/admin/create-user-dialog.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "zUQhAm"
 msgid "e.g. John Doe"
 msgstr "ví dụ: John Doe"
 
-#: components/admin/create-user-dialog.tsx
+#: components/admin/create-user-form.tsx
 #: components/auth/signin-form.tsx
-#: components/settings/change-username-dialog.tsx
+#: components/settings/change-username-form.tsx
 msgctxt "JCIgkj"
 msgid "Username"
 msgstr "Tên đăng nhập"
 
-#: components/admin/create-user-dialog.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "c3e6FL"
 msgid "e.g. johndoe"
 msgstr "ví dụ: johndoe"
 
-#: components/admin/create-user-dialog.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "8EHM66"
 msgid "e.g. john@example.com"
 msgstr "ví dụ: john@example.com"
 
-#: components/admin/create-user-dialog.tsx
+#: components/admin/create-user-form.tsx
 #: components/auth/signin-form.tsx
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "5sg7KC"
 msgid "Password"
 msgstr "Mật khẩu"
 
-#: components/admin/delete-user-dialog.tsx
+#: components/admin/delete-user.tsx
 msgctxt "6z5Ebr"
 msgid "Delete User Account"
 msgstr "Xóa tài khoản người dùng"
 
-#: components/admin/delete-user-dialog.tsx
+#: components/admin/delete-user.tsx
 msgctxt "ZzCNg8"
 msgid "Are you sure you want to permanently delete this user account?"
 msgstr "Bạn có chắc chắn muốn xóa vĩnh viễn tài khoản người dùng này không?"
 
-#: components/admin/delete-user-dialog.tsx
+#: components/admin/delete-user.tsx
 msgctxt "qSy-Lo"
 msgid "All associated data will be permanently deleted. This action cannot be undone."
 msgstr "Tất cả dữ liệu liên quan sẽ bị xóa vĩnh viễn. Hành động này không thể hoàn tác."
 
-#: components/admin/set-user-password-dialog.tsx
+#: components/admin/set-user-password-form.tsx
 msgctxt "VvoQv7"
 msgid "Failed to set user password! Please try again later."
 msgstr "Đặt mật khẩu người dùng thất bại! Vui lòng thử lại sau."
 
-#: components/admin/set-user-password-dialog.tsx
+#: components/admin/set-user-password-form.tsx
 msgctxt "ygB8SA"
 msgid "Password has been updated."
 msgstr "Mật khẩu đã được cập nhật."
 
-#: components/admin/set-user-password-dialog.tsx
+#: components/admin/set-user-password-form.tsx
 msgctxt "ArEJTr"
 msgid "Reset User Password"
 msgstr "Đặt lại mật khẩu người dùng"
 
-#: components/admin/set-user-password-dialog.tsx
+#: components/admin/set-user-password-form.tsx
 msgctxt "SxSUYZ"
 msgid "Set a new password for"
 msgstr "Đặt mật khẩu mới cho"
 
-#: components/admin/set-user-password-dialog.tsx
-#: components/settings/change-password-dialog.tsx
+#: components/admin/set-user-password-form.tsx
+#: components/settings/change-password-form.tsx
 msgctxt "Ev6SEF"
 msgid "New Password"
 msgstr "Mật khẩu mới"
 
-#: components/admin/set-user-password-dialog.tsx
+#: components/admin/set-user-password-form.tsx
 msgctxt "ZTYUJe"
 msgid "Update Password"
 msgstr "Cập nhật mật khẩu"
+
+#: components/admin/stop-impersonation.tsx
+msgctxt "H1m7wl"
+msgid "Failed to stop impersonating! Please try again later."
+msgstr "Dừng đóng vai thất bại! Vui lòng thử lại sau."
+
+#: components/admin/stop-impersonation.tsx
+msgctxt "LKxCOb"
+msgid "Impersonating"
+msgstr "Đang đóng vai"
+
+#: components/admin/stop-impersonation.tsx
+msgctxt "fA8c13"
+msgid "Stop impersonating this user?"
+msgstr "Dừng đóng vai người dùng này?"
+
+#: components/admin/stop-impersonation.tsx
+msgctxt "AB6aDn"
+msgid "You are currently impersonating"
+msgstr "Bạn hiện đang đóng vai"
+
+#: components/admin/stop-impersonation.tsx
+msgctxt "eybH_m"
+msgid "Stopping will restore your admin session and redirect you back to the admin panel."
+msgstr "Việc dừng lại sẽ khôi phục phiên quản trị viên của bạn và chuyển hướng bạn trở lại bảng quản trị."
+
+#: components/admin/stop-impersonation.tsx
+msgctxt "d0A6B0"
+msgid "Stop Impersonating"
+msgstr "Dừng đóng vai"
 
 #: components/auth/language-selector.tsx
 #: components/settings/language-selector.tsx
@@ -1006,8 +1035,8 @@ msgid "Your account has been banned. Please contact support if you believe this 
 msgstr "Tài khoản của bạn đã bị cấm. Vui lòng liên hệ với bộ phận hỗ trợ nếu bạn cho rằng đây là một sự nhầm lẫn."
 
 #: components/auth/signin-form.tsx
-#: components/settings/change-password-dialog.tsx
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/change-password-form.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "zR1TB7"
 msgid "Rate limit exceeded! Retry after {seconds} seconds."
 msgstr "Quá giới hạn tần suất yêu cầu! Vui lòng thử lại sau {seconds} giây."
@@ -1017,13 +1046,13 @@ msgctxt "b8-mgZ"
 msgid "Failed to sign in! Please try again later."
 msgstr "Đăng nhập thất bại! Vui lòng thử lại sau."
 
-#: components/auth/signin-page.tsx
+#: components/auth/signin-form.tsx
 msgctxt "gvGdmL"
 msgid "Enter your username and password to sign in to your account."
 msgstr "Nhập tên đăng nhập và mật khẩu để đăng nhập vào tài khoản của bạn."
 
 #: components/auth/two-factor-form.tsx
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "FCVHwe"
 msgid "Invalid authentication code!"
 msgstr "Mã xác thực không hợp lệ!"
@@ -1044,13 +1073,18 @@ msgid "Your account is temporarily locked due to too many failed attempts. Pleas
 msgstr "Tài khoản của bạn tạm thời bị khóa do có quá nhiều lần thử thất bại. Vui lòng thử lại sau."
 
 #: components/auth/two-factor-form.tsx
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "02Huvd"
 msgid "Failed to verify 2FA code! Please try again later."
 msgstr "Xác minh mã 2FA thất bại! Vui lòng thử lại sau."
 
 #: components/auth/two-factor-form.tsx
-#: components/settings/two-factor-manager-dialog.tsx
+msgctxt "PsYaj1"
+msgid "Enter the code from your authenticator app."
+msgstr "Nhập mã từ ứng dụng xác thực của bạn."
+
+#: components/auth/two-factor-form.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "Tjv3UC"
 msgid "Verification Code"
 msgstr "Mã xác minh"
@@ -1066,110 +1100,10 @@ msgid "Don't ask for 2FA code on this device for 30 days."
 msgstr "Không hỏi mã 2FA trên thiết bị này trong 30 ngày."
 
 #: components/auth/two-factor-form.tsx
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "q5Xl0M"
 msgid "Verify"
 msgstr "Xác minh"
-
-#: components/auth/two-factor-page.tsx
-msgctxt "PsYaj1"
-msgid "Enter the code from your authenticator app."
-msgstr "Nhập mã từ ứng dụng xác thực của bạn."
-
-#: components/budgets/budget-dialog.tsx
-msgctxt "2g82CP"
-msgid "Edit Budget"
-msgstr "Chỉnh sửa ngân sách"
-
-#: components/budgets/budget-dialog.tsx
-msgctxt "zMoeFN"
-msgid "Add Budget"
-msgstr "Thêm ngân sách"
-
-#: components/budgets/budget-dialog.tsx
-msgctxt "zSiCkT"
-msgid "Update budget information."
-msgstr "Cập nhật thông tin ngân sách."
-
-#: components/budgets/budget-dialog.tsx
-msgctxt "PVSBse"
-msgid "Create a budget for a category to track your spending."
-msgstr "Tạo ngân sách cho một danh mục để theo dõi chi tiêu của bạn."
-
-#: components/budgets/budget-dialog.tsx
-#: components/goals/goal-dialog.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-#: components/settings/currency-selector.tsx
-#: components/settings/settings-page.tsx
-#: components/transactions/export-button.tsx
-#: components/transactions/transaction-dialog.tsx
-msgctxt "55hdQy"
-msgid "Currency"
-msgstr "Tiền tệ"
-
-#: components/budgets/budget-dialog.tsx
-#: components/budgets/budgets-table.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-#: components/recurring-transactions/recurring-transactions-table.tsx
-#: components/transactions/export-button.tsx
-#: components/transactions/transaction-dialog.tsx
-#: components/transactions/transactions-table.tsx
-msgctxt "_0TOL5"
-msgid "Amount"
-msgstr "Số tiền"
-
-#: components/budgets/budget-dialog.tsx
-#: components/budgets/budgets-table.tsx
-#: components/goals/goal-dialog.tsx
-#: components/goals/goals-table.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-#: components/recurring-transactions/recurring-transactions-table.tsx
-msgctxt "QirE3M"
-msgid "Start Date"
-msgstr "Ngày bắt đầu"
-
-#: components/budgets/budget-dialog.tsx
-#: components/goals/goal-dialog.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-#: components/statistics/statistics-filters.tsx
-#: components/transactions/transaction-dialog.tsx
-#: components/transactions/transaction-filters.tsx
-msgctxt "ftg7GK"
-msgid "Select Date"
-msgstr "Chọn ngày"
-
-#: components/budgets/budget-dialog.tsx
-#: components/budgets/budgets-table.tsx
-#: components/goals/goal-dialog.tsx
-#: components/goals/goals-table.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-#: components/recurring-transactions/recurring-transactions-table.tsx
-msgctxt "T4GOiX"
-msgid "End Date"
-msgstr "Ngày kết thúc"
-
-#: components/budgets/budget-dialog.tsx
-#: components/categories/category-dialog.tsx
-#: components/goals/goal-dialog.tsx
-#: components/transactions/transaction-dialog.tsx
-msgctxt "BWpuKl"
-msgid "Update"
-msgstr "Cập nhật"
-
-#: components/budgets/budget-dialog.tsx
-#: components/budgets/budgets-page.tsx
-#: components/categories/categories-page.tsx
-#: components/categories/category-dialog.tsx
-#: components/goals/goal-dialog.tsx
-#: components/goals/goals-page.tsx
-#: components/home/homepage.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-#: components/recurring-transactions/recurring-transactions-page.tsx
-#: components/transactions/transaction-dialog.tsx
-#: components/transactions/transactions-page.tsx
-msgctxt "2_2yg-"
-msgid "Add"
-msgstr "Thêm"
 
 #: components/budgets/budget-filters.tsx
 #: components/goals/goal-filters.tsx
@@ -1288,6 +1222,101 @@ msgctxt "6_aEFZ"
 msgid "Upcoming"
 msgstr "Sắp tới"
 
+#: components/budgets/budget-form.tsx
+msgctxt "2g82CP"
+msgid "Edit Budget"
+msgstr "Chỉnh sửa ngân sách"
+
+#: components/budgets/budget-form.tsx
+msgctxt "zMoeFN"
+msgid "Add Budget"
+msgstr "Thêm ngân sách"
+
+#: components/budgets/budget-form.tsx
+msgctxt "zSiCkT"
+msgid "Update budget information."
+msgstr "Cập nhật thông tin ngân sách."
+
+#: components/budgets/budget-form.tsx
+msgctxt "PVSBse"
+msgid "Create a budget for a category to track your spending."
+msgstr "Tạo ngân sách cho một danh mục để theo dõi chi tiêu của bạn."
+
+#: components/budgets/budget-form.tsx
+#: components/goals/goal-form.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/settings/currency-selector.tsx
+#: components/settings/settings-page.tsx
+#: components/transactions/export-button.tsx
+#: components/transactions/transaction-form.tsx
+msgctxt "55hdQy"
+msgid "Currency"
+msgstr "Tiền tệ"
+
+#: components/budgets/budget-form.tsx
+#: components/budgets/budgets-table.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/recurring-transactions/recurring-transactions-table.tsx
+#: components/transactions/export-button.tsx
+#: components/transactions/transaction-form.tsx
+#: components/transactions/transactions-table.tsx
+msgctxt "_0TOL5"
+msgid "Amount"
+msgstr "Số tiền"
+
+#: components/budgets/budget-form.tsx
+#: components/budgets/budgets-table.tsx
+#: components/goals/goal-form.tsx
+#: components/goals/goals-table.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/recurring-transactions/recurring-transactions-table.tsx
+msgctxt "QirE3M"
+msgid "Start Date"
+msgstr "Ngày bắt đầu"
+
+#: components/budgets/budget-form.tsx
+#: components/goals/goal-form.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/statistics/statistics-filters.tsx
+#: components/transactions/transaction-filters.tsx
+#: components/transactions/transaction-form.tsx
+msgctxt "ftg7GK"
+msgid "Select Date"
+msgstr "Chọn ngày"
+
+#: components/budgets/budget-form.tsx
+#: components/budgets/budgets-table.tsx
+#: components/goals/goal-form.tsx
+#: components/goals/goals-table.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/recurring-transactions/recurring-transactions-table.tsx
+msgctxt "T4GOiX"
+msgid "End Date"
+msgstr "Ngày kết thúc"
+
+#: components/budgets/budget-form.tsx
+#: components/categories/category-form.tsx
+#: components/goals/goal-form.tsx
+#: components/transactions/transaction-form.tsx
+msgctxt "BWpuKl"
+msgid "Update"
+msgstr "Cập nhật"
+
+#: components/budgets/budget-form.tsx
+#: components/budgets/budgets-page.tsx
+#: components/categories/categories-page.tsx
+#: components/categories/category-form.tsx
+#: components/goals/goal-form.tsx
+#: components/goals/goals-page.tsx
+#: components/home/homepage.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/recurring-transactions/recurring-transactions-page.tsx
+#: components/transactions/transaction-form.tsx
+#: components/transactions/transactions-page.tsx
+msgctxt "2_2yg-"
+msgid "Add"
+msgstr "Thêm"
+
 #: components/budgets/budgets-page.tsx
 msgctxt "3fGt__"
 msgid "Set and manage budgets for your outflow categories."
@@ -1334,12 +1363,12 @@ msgctxt "wEQDC6"
 msgid "Edit"
 msgstr "Chỉnh sửa"
 
-#: components/budgets/delete-budget-dialog.tsx
+#: components/budgets/delete-budget.tsx
 msgctxt "q6vl7b"
 msgid "Delete Budget"
 msgstr "Xóa ngân sách"
 
-#: components/budgets/delete-budget-dialog.tsx
+#: components/budgets/delete-budget.tsx
 msgctxt "x1Tqbe"
 msgid "Are you sure you want to delete this budget? This action cannot be undone."
 msgstr "Bạn có chắc chắn muốn xóa ngân sách này không? Hành động này không thể hoàn tác."
@@ -1365,17 +1394,17 @@ msgid "No categories found matching your filters."
 msgstr "Không tìm thấy danh mục phù hợp với bộ lọc của bạn."
 
 #: components/categories/categories-table.tsx
-#: components/categories/category-dialog.tsx
+#: components/categories/category-form.tsx
 msgctxt "vEYtiq"
 msgid "Category Name"
 msgstr "Tên danh mục"
 
 #: components/categories/categories-table.tsx
-#: components/categories/category-dialog.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
+#: components/categories/category-form.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
 #: components/recurring-transactions/recurring-transactions-table.tsx
 #: components/transactions/export-button.tsx
-#: components/transactions/transaction-dialog.tsx
+#: components/transactions/transaction-form.tsx
 #: components/transactions/transactions-table.tsx
 msgctxt "Q8Qw5B"
 msgid "Description"
@@ -1394,65 +1423,34 @@ msgid "Type"
 msgstr "Loại"
 
 #: components/categories/categories-table.tsx
-#: components/categories/category-dialog.tsx
 #: components/categories/category-filters.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
+#: components/categories/category-form.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
 #: components/recurring-transactions/recurring-transactions-filters.tsx
 #: components/recurring-transactions/recurring-transactions-table.tsx
 #: components/statistics/statistics-table.tsx
 #: components/transactions/export-button.tsx
-#: components/transactions/transaction-dialog.tsx
 #: components/transactions/transaction-filters.tsx
+#: components/transactions/transaction-form.tsx
 #: components/transactions/transactions-table.tsx
 msgctxt "PqYX1W"
 msgid "Inflow"
 msgstr "Dòng tiền vào"
 
 #: components/categories/categories-table.tsx
-#: components/categories/category-dialog.tsx
 #: components/categories/category-filters.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
+#: components/categories/category-form.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
 #: components/recurring-transactions/recurring-transactions-filters.tsx
 #: components/recurring-transactions/recurring-transactions-table.tsx
 #: components/statistics/statistics-table.tsx
 #: components/transactions/export-button.tsx
-#: components/transactions/transaction-dialog.tsx
 #: components/transactions/transaction-filters.tsx
+#: components/transactions/transaction-form.tsx
 #: components/transactions/transactions-table.tsx
 msgctxt "KKrCi6"
 msgid "Outflow"
 msgstr "Dòng tiền ra"
-
-#: components/categories/category-dialog.tsx
-msgctxt "THThZY"
-msgid "Edit Category"
-msgstr "Chỉnh sửa danh mục"
-
-#: components/categories/category-dialog.tsx
-msgctxt "5Fs4aA"
-msgid "Add Category"
-msgstr "Thêm danh mục"
-
-#: components/categories/category-dialog.tsx
-msgctxt "1VRDDQ"
-msgid "Update custom category information."
-msgstr "Cập nhật thông tin danh mục tùy chỉnh."
-
-#: components/categories/category-dialog.tsx
-msgctxt "0jMR1h"
-msgid "Create a custom category for your transactions."
-msgstr "Tạo danh mục tùy chỉnh cho các giao dịch của bạn."
-
-#: components/categories/category-dialog.tsx
-msgctxt "TxCpcX"
-msgid "e.g. Salary, Groceries"
-msgstr "ví dụ: Lương, Mua sắm"
-
-#: components/categories/category-dialog.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-msgctxt "s0F42g"
-msgid "Enter a description..."
-msgstr "Nhập mô tả..."
 
 #: components/categories/category-filters.tsx
 msgctxt "T83iU7"
@@ -1466,12 +1464,43 @@ msgctxt "UjTL-F"
 msgid "All Types"
 msgstr "Tất cả các loại"
 
-#: components/categories/delete-category-dialog.tsx
+#: components/categories/category-form.tsx
+msgctxt "THThZY"
+msgid "Edit Category"
+msgstr "Chỉnh sửa danh mục"
+
+#: components/categories/category-form.tsx
+msgctxt "5Fs4aA"
+msgid "Add Category"
+msgstr "Thêm danh mục"
+
+#: components/categories/category-form.tsx
+msgctxt "1VRDDQ"
+msgid "Update custom category information."
+msgstr "Cập nhật thông tin danh mục tùy chỉnh."
+
+#: components/categories/category-form.tsx
+msgctxt "0jMR1h"
+msgid "Create a custom category for your transactions."
+msgstr "Tạo danh mục tùy chỉnh cho các giao dịch của bạn."
+
+#: components/categories/category-form.tsx
+msgctxt "TxCpcX"
+msgid "e.g. Salary, Groceries"
+msgstr "ví dụ: Lương, Mua sắm"
+
+#: components/categories/category-form.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
+msgctxt "s0F42g"
+msgid "Enter a description..."
+msgstr "Nhập mô tả..."
+
+#: components/categories/delete-category.tsx
 msgctxt "JtR9Fg"
 msgid "Delete Category"
 msgstr "Xóa danh mục"
 
-#: components/categories/delete-category-dialog.tsx
+#: components/categories/delete-category.tsx
 msgctxt "qjLKlD"
 msgid "Are you sure you want to delete this category? This action cannot be undone."
 msgstr "Bạn có chắc chắn muốn xóa danh mục này không? Hành động này không thể hoàn tác."
@@ -1491,52 +1520,15 @@ msgctxt "PmRC5G"
 msgid "Create Custom Category"
 msgstr "Tạo danh mục tùy chỉnh"
 
-#: components/goals/delete-goal-dialog.tsx
+#: components/goals/delete-goal.tsx
 msgctxt "F3XA9-"
 msgid "Delete Goal"
 msgstr "Xóa mục tiêu"
 
-#: components/goals/delete-goal-dialog.tsx
+#: components/goals/delete-goal.tsx
 msgctxt "EwRebq"
 msgid "Are you sure you want to delete this goal? This action cannot be undone."
 msgstr "Bạn có chắc chắn muốn xóa mục tiêu này không? Hành động này không thể hoàn tác."
-
-#: components/goals/goal-dialog.tsx
-msgctxt "sOXElg"
-msgid "Edit Goal"
-msgstr "Chỉnh sửa mục tiêu"
-
-#: components/goals/goal-dialog.tsx
-msgctxt "5WuADX"
-msgid "Add Goal"
-msgstr "Thêm mục tiêu"
-
-#: components/goals/goal-dialog.tsx
-msgctxt "_kQug4"
-msgid "Update goal information."
-msgstr "Cập nhật thông tin mục tiêu."
-
-#: components/goals/goal-dialog.tsx
-msgctxt "dzmlX3"
-msgid "Create a new financial goal."
-msgstr "Tạo mục tiêu tài chính mới."
-
-#: components/goals/goal-dialog.tsx
-#: components/goals/goals-table.tsx
-msgctxt "gQxxlw"
-msgid "Goal Name"
-msgstr "Tên mục tiêu"
-
-#: components/goals/goal-dialog.tsx
-msgctxt "rH4tSt"
-msgid "e.g. Save for vacation"
-msgstr "ví dụ: Tiết kiệm cho kỳ nghỉ"
-
-#: components/goals/goal-dialog.tsx
-#: components/goals/goals-table.tsx
-msgctxt "MPOzul"
-msgid "Target Amount"
-msgstr "Số tiền mục tiêu"
 
 #: components/goals/goal-filters.tsx
 msgctxt "-xHZ7x"
@@ -1557,6 +1549,43 @@ msgstr "Thấp (75-100%)"
 msgctxt "7IAF5Y"
 msgid "Warning (< 75%)"
 msgstr "Cảnh báo (< 75%)"
+
+#: components/goals/goal-form.tsx
+msgctxt "sOXElg"
+msgid "Edit Goal"
+msgstr "Chỉnh sửa mục tiêu"
+
+#: components/goals/goal-form.tsx
+msgctxt "5WuADX"
+msgid "Add Goal"
+msgstr "Thêm mục tiêu"
+
+#: components/goals/goal-form.tsx
+msgctxt "_kQug4"
+msgid "Update goal information."
+msgstr "Cập nhật thông tin mục tiêu."
+
+#: components/goals/goal-form.tsx
+msgctxt "dzmlX3"
+msgid "Create a new financial goal."
+msgstr "Tạo mục tiêu tài chính mới."
+
+#: components/goals/goal-form.tsx
+#: components/goals/goals-table.tsx
+msgctxt "gQxxlw"
+msgid "Goal Name"
+msgstr "Tên mục tiêu"
+
+#: components/goals/goal-form.tsx
+msgctxt "rH4tSt"
+msgid "e.g. Save for vacation"
+msgstr "ví dụ: Tiết kiệm cho kỳ nghỉ"
+
+#: components/goals/goal-form.tsx
+#: components/goals/goals-table.tsx
+msgctxt "MPOzul"
+msgid "Target Amount"
+msgstr "Số tiền mục tiêu"
 
 #: components/goals/goals-page.tsx
 msgctxt "6rbe1E"
@@ -1805,36 +1834,6 @@ msgctxt "naYgGy"
 msgid "You will need to sign in again to access your account."
 msgstr "Bạn sẽ cần đăng nhập lại để truy cập tài khoản của mình."
 
-#: components/layout/stop-impersonation-dialog.tsx
-msgctxt "H1m7wl"
-msgid "Failed to stop impersonating! Please try again later."
-msgstr "Dừng đóng vai thất bại! Vui lòng thử lại sau."
-
-#: components/layout/stop-impersonation-dialog.tsx
-msgctxt "LKxCOb"
-msgid "Impersonating"
-msgstr "Đang đóng vai"
-
-#: components/layout/stop-impersonation-dialog.tsx
-msgctxt "fA8c13"
-msgid "Stop impersonating this user?"
-msgstr "Dừng đóng vai người dùng này?"
-
-#: components/layout/stop-impersonation-dialog.tsx
-msgctxt "AB6aDn"
-msgid "You are currently impersonating"
-msgstr "Bạn hiện đang đóng vai"
-
-#: components/layout/stop-impersonation-dialog.tsx
-msgctxt "eybH_m"
-msgid "Stopping will restore your admin session and redirect you back to the admin panel."
-msgstr "Việc dừng lại sẽ khôi phục phiên quản trị viên của bạn và chuyển hướng bạn trở lại bảng quản trị."
-
-#: components/layout/stop-impersonation-dialog.tsx
-msgctxt "d0A6B0"
-msgid "Stop Impersonating"
-msgstr "Dừng đóng vai"
-
 #: components/password-input.tsx
 msgctxt "K3fWTv"
 msgid "Hide password"
@@ -1845,105 +1844,105 @@ msgctxt "JHTwdB"
 msgid "Show password"
 msgstr "Hiện mật khẩu"
 
-#: components/recurring-transactions/delete-recurring-transaction-dialog.tsx
+#: components/recurring-transactions/delete-recurring-transaction.tsx
 msgctxt "mwZmom"
 msgid "Delete Recurring Transaction"
 msgstr "Xóa giao dịch định kỳ"
 
-#: components/recurring-transactions/delete-recurring-transaction-dialog.tsx
+#: components/recurring-transactions/delete-recurring-transaction.tsx
 msgctxt "B58bFw"
 msgid "Are you sure you want to delete this recurring transaction? This action cannot be undone."
 msgstr "Bạn có chắc chắn muốn xóa giao dịch định kỳ này không? Hành động này không thể hoàn tác."
 
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
 msgctxt "m1EF9E"
 msgid "Duplicate Recurring Transaction"
 msgstr "Nhân bản giao dịch định kỳ"
 
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
 msgctxt "sYXY5N"
 msgid "Add Recurring Transaction"
 msgstr "Thêm giao dịch định kỳ"
 
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
 msgctxt "SfZLFQ"
 msgid "Create a new recurring transaction based on the selected one."
 msgstr "Tạo giao dịch định kỳ mới dựa trên giao dịch đã chọn."
 
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
 msgctxt "adePxB"
 msgid "Create a recurring transaction."
 msgstr "Tạo một giao dịch định kỳ."
 
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
 #: components/recurring-transactions/recurring-transactions-table.tsx
 msgctxt "vAW30j"
 msgid "Frequency"
 msgstr "Tần suất"
 
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
 #: components/recurring-transactions/recurring-transactions-table.tsx
 msgctxt "zxvhnE"
 msgid "Daily"
 msgstr "Hàng ngày"
 
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
 #: components/recurring-transactions/recurring-transactions-table.tsx
 msgctxt "_clOBU"
 msgid "Weekly"
 msgstr "Hàng tuần"
 
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
 #: components/recurring-transactions/recurring-transactions-table.tsx
 msgctxt "03X4YH"
 msgid "Bi-Weekly"
 msgstr "Hai tuần một lần"
 
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
 #: components/recurring-transactions/recurring-transactions-table.tsx
 msgctxt "wYsv4Z"
 msgid "Monthly"
 msgstr "Hàng tháng"
 
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
 #: components/recurring-transactions/recurring-transactions-table.tsx
 msgctxt "b1Ou36"
 msgid "Quarterly"
 msgstr "Hàng quý"
 
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
 #: components/recurring-transactions/recurring-transactions-table.tsx
 msgctxt "dqD39h"
 msgid "Yearly"
 msgstr "Hàng năm"
 
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
 #: components/recurring-transactions/recurring-transactions-table.tsx
 msgctxt "D9n-q2"
 msgid "Random"
 msgstr "Ngẫu nhiên"
 
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
 msgctxt "CpM7W_"
 msgid "Every X Days"
 msgstr "Mỗi X ngày"
 
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
 msgctxt "FP2XQQ"
 msgid "e.g. 15"
 msgstr "ví dụ: 15"
 
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
 msgctxt "InWqys"
 msgid "Optional"
 msgstr "Không bắt buộc"
 
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
 msgctxt "mpcI7I"
 msgid "No End Date"
 msgstr "Không có ngày kết thúc"
 
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
 #: components/recurring-transactions/recurring-transactions-table.tsx
 msgctxt "4fHiNl"
 msgid "Duplicate"
@@ -2001,162 +2000,162 @@ msgctxt "b-8NFf"
 msgid "Next: {date}"
 msgstr "Tiếp theo: {date}"
 
-#: components/settings/active-sessions-dialog.tsx
+#: components/settings/active-sessions-manager.tsx
 msgctxt "HuQudj"
 msgid "Failed to terminate all sessions! Please try again later."
 msgstr "Chấm dứt tất cả các phiên thất bại! Vui lòng thử lại sau."
 
-#: components/settings/active-sessions-dialog.tsx
+#: components/settings/active-sessions-manager.tsx
 msgctxt "i3aVwj"
 msgid "All sessions terminated."
 msgstr "Tất cả các phiên đã bị chấm dứt."
 
-#: components/settings/active-sessions-dialog.tsx
+#: components/settings/active-sessions-manager.tsx
 msgctxt "h_tqwp"
 msgid "View Active Sessions"
 msgstr "Xem các phiên đang hoạt động"
 
-#: components/settings/active-sessions-dialog.tsx
+#: components/settings/active-sessions-manager.tsx
 #: components/settings/settings-page.tsx
 msgctxt "V3ka34"
 msgid "Active Sessions"
 msgstr "Các phiên đang hoạt động"
 
-#: components/settings/active-sessions-dialog.tsx
+#: components/settings/active-sessions-manager.tsx
 #: components/settings/settings-page.tsx
 msgctxt "xLvLBD"
 msgid "Manage your active sessions."
 msgstr "Quản lý các phiên đang hoạt động của bạn."
 
-#: components/settings/active-sessions-dialog.tsx
+#: components/settings/active-sessions-manager.tsx
 msgctxt "-E02To"
 msgid "Unknown Device"
 msgstr "Thiết bị không xác định"
 
-#: components/settings/active-sessions-dialog.tsx
+#: components/settings/active-sessions-manager.tsx
 msgctxt "fF376U"
 msgid "Current"
 msgstr "Hiện tại"
 
-#: components/settings/active-sessions-dialog.tsx
+#: components/settings/active-sessions-manager.tsx
 msgctxt "bLQmWN"
 msgid "Unknown Location"
 msgstr "Vị trí không xác định"
 
-#: components/settings/active-sessions-dialog.tsx
+#: components/settings/active-sessions-manager.tsx
 msgctxt "oA2uW_"
 msgid "Terminate"
 msgstr "Chấm dứt"
 
-#: components/settings/active-sessions-dialog.tsx
+#: components/settings/active-sessions-manager.tsx
 msgctxt "DC_DQF"
 msgid "Terminate All"
 msgstr "Chấm dứt tất cả"
 
-#: components/settings/change-name-dialog.tsx
+#: components/settings/change-name-form.tsx
 msgctxt "pdaEmb"
 msgid "Failed to update name! Please try again later."
 msgstr "Cập nhật tên thất bại! Vui lòng thử lại sau."
 
-#: components/settings/change-name-dialog.tsx
+#: components/settings/change-name-form.tsx
 msgctxt "oALrPz"
 msgid "Your name has been updated."
 msgstr "Tên của bạn đã được cập nhật."
 
-#: components/settings/change-name-dialog.tsx
+#: components/settings/change-name-form.tsx
 #: components/settings/settings-page.tsx
 msgctxt "r5LPv0"
 msgid "Change Name"
 msgstr "Đổi tên"
 
-#: components/settings/change-name-dialog.tsx
+#: components/settings/change-name-form.tsx
 #: components/settings/settings-page.tsx
 msgctxt "z7OVdl"
 msgid "Update your display name."
 msgstr "Cập nhật tên hiển thị của bạn."
 
-#: components/settings/change-name-dialog.tsx
+#: components/settings/change-name-form.tsx
 msgctxt "HAlOn1"
 msgid "Name"
 msgstr "Tên"
 
-#: components/settings/change-name-dialog.tsx
+#: components/settings/change-name-form.tsx
 msgctxt "g4FbZ5"
 msgid "Enter your name..."
 msgstr "Nhập tên của bạn..."
 
-#: components/settings/change-name-dialog.tsx
-#: components/settings/change-password-dialog.tsx
-#: components/settings/change-username-dialog.tsx
+#: components/settings/change-name-form.tsx
+#: components/settings/change-password-form.tsx
+#: components/settings/change-username-form.tsx
 msgctxt "jvo0vs"
 msgid "Save"
 msgstr "Lưu"
 
-#: components/settings/change-password-dialog.tsx
+#: components/settings/change-password-form.tsx
 msgctxt "UR3aU3"
 msgid "Current password is incorrect!"
 msgstr "Mật khẩu hiện tại không chính xác!"
 
-#: components/settings/change-password-dialog.tsx
+#: components/settings/change-password-form.tsx
 msgctxt "I-C2uX"
 msgid "Failed to update password! Please try again later."
 msgstr "Cập nhật mật khẩu thất bại! Vui lòng thử lại sau."
 
-#: components/settings/change-password-dialog.tsx
+#: components/settings/change-password-form.tsx
 msgctxt "kgHPAz"
 msgid "Your password has been changed."
 msgstr "Mật khẩu của bạn đã được thay đổi."
 
-#: components/settings/change-password-dialog.tsx
+#: components/settings/change-password-form.tsx
 #: components/settings/settings-page.tsx
 msgctxt "QiKKFz"
 msgid "Change Password"
 msgstr "Đổi mật khẩu"
 
-#: components/settings/change-password-dialog.tsx
+#: components/settings/change-password-form.tsx
 #: components/settings/settings-page.tsx
 msgctxt "luD-rc"
 msgid "Update your password."
 msgstr "Cập nhật mật khẩu của bạn."
 
-#: components/settings/change-password-dialog.tsx
+#: components/settings/change-password-form.tsx
 msgctxt "GretYf"
 msgid "Current Password"
 msgstr "Mật khẩu hiện tại"
 
-#: components/settings/change-password-dialog.tsx
+#: components/settings/change-password-form.tsx
 msgctxt "vfG-nh"
 msgid "Confirm Password"
 msgstr "Xác nhận mật khẩu"
 
-#: components/settings/change-password-dialog.tsx
+#: components/settings/change-password-form.tsx
 msgctxt "zFD28X"
 msgid "Sign out from all other devices."
 msgstr "Đăng xuất khỏi tất cả các thiết bị khác."
 
-#: components/settings/change-username-dialog.tsx
+#: components/settings/change-username-form.tsx
 msgctxt "IaZaQX"
 msgid "Failed to update username! Please try again later."
 msgstr "Cập nhật tên đăng nhập thất bại! Vui lòng thử lại sau."
 
-#: components/settings/change-username-dialog.tsx
+#: components/settings/change-username-form.tsx
 msgctxt "8KK2w-"
 msgid "Your username has been changed."
 msgstr "Tên đăng nhập của bạn đã được thay đổi."
 
-#: components/settings/change-username-dialog.tsx
+#: components/settings/change-username-form.tsx
 #: components/settings/settings-page.tsx
 msgctxt "19mdX0"
 msgid "Change Username"
 msgstr "Đổi tên đăng nhập"
 
-#: components/settings/change-username-dialog.tsx
+#: components/settings/change-username-form.tsx
 #: components/settings/settings-page.tsx
 msgctxt "TXe4LX"
 msgid "Update your unique username."
 msgstr "Cập nhật tên đăng nhập duy nhất của bạn."
 
-#: components/settings/change-username-dialog.tsx
+#: components/settings/change-username-form.tsx
 msgctxt "v60thv"
 msgid "Enter your username..."
 msgstr "Nhập tên đăng nhập của bạn..."
@@ -2221,62 +2220,62 @@ msgctxt "EQpyb8"
 msgid "Toggle theme"
 msgstr "Chuyển đổi chủ đề"
 
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "e7Db3T"
 msgid "Disable 2FA"
 msgstr "Tắt 2FA"
 
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "ZhrNZz"
 msgid "Enable 2FA"
 msgstr "Bật 2FA"
 
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "deAXlH"
 msgid "Enable Two-Factor Authentication"
 msgstr "Bật xác thực hai yếu tố"
 
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "VNORmj"
 msgid "Scan the QR code with your authenticator app."
 msgstr "Quét mã QR bằng ứng dụng xác thực của bạn."
 
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "JHBmG8"
 msgid "Secret Key"
 msgstr "Khóa bí mật"
 
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "0onqf3"
 msgid "Disable Two-Factor Authentication"
 msgstr "Tắt xác thực hai yếu tố"
 
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "fUrrOz"
 msgid "Enter your password to disable 2FA."
 msgstr "Nhập mật khẩu của bạn để tắt 2FA."
 
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "6vQ8Z2"
 msgid "Invalid password."
 msgstr "Mật khẩu không hợp lệ."
 
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "Lq08V_"
 msgid "Failed to enable 2FA! Please try again later."
 msgstr "Bật 2FA thất bại! Vui lòng thử lại sau."
 
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "FSRmm9"
 msgid "Two-factor authentication is now enabled."
 msgstr "Xác thực hai yếu tố đã được bật."
 
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "Y1o_zZ"
 msgid "Failed to disable 2FA! Please try again later."
 msgstr "Tắt 2FA thất bại! Vui lòng thử lại sau."
 
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "BBb4xb"
 msgid "Two-factor authentication is now disabled."
 msgstr "Xác thực hai yếu tố đã được tắt."
@@ -2337,18 +2336,18 @@ msgctxt "CDTMW3"
 msgid "Total Amount"
 msgstr "Tổng số tiền"
 
-#: components/transactions/delete-transaction-dialog.tsx
+#: components/transactions/delete-transaction.tsx
 msgctxt "nPfy7y"
 msgid "Delete Transaction"
 msgstr "Xóa giao dịch"
 
-#: components/transactions/delete-transaction-dialog.tsx
+#: components/transactions/delete-transaction.tsx
 msgctxt "cj6kmp"
 msgid "Are you sure you want to delete this transaction? This action cannot be undone."
 msgstr "Bạn có chắc chắn muốn xóa giao dịch này không? Hành động này không thể hoàn tác."
 
 #: components/transactions/export-button.tsx
-#: components/transactions/transaction-dialog.tsx
+#: components/transactions/transaction-form.tsx
 #: components/transactions/transactions-table.tsx
 msgctxt "P7PLVj"
 msgid "Date"
@@ -2369,35 +2368,35 @@ msgctxt "GGrENy"
 msgid "Export transactions with current filters applied."
 msgstr "Xuất các giao dịch với các bộ lọc hiện tại được áp dụng."
 
-#: components/transactions/transaction-dialog.tsx
-msgctxt "P5C72A"
-msgid "Edit Transaction"
-msgstr "Chỉnh sửa giao dịch"
-
-#: components/transactions/transaction-dialog.tsx
-msgctxt "DJIUi0"
-msgid "Add Transaction"
-msgstr "Thêm giao dịch"
-
-#: components/transactions/transaction-dialog.tsx
-msgctxt "ET95oG"
-msgid "Update transaction information."
-msgstr "Cập nhật thông tin giao dịch."
-
-#: components/transactions/transaction-dialog.tsx
-msgctxt "GAJmZB"
-msgid "Add your inflow or outflow to track your personal finances."
-msgstr "Thêm dòng tiền vào hoặc ra để theo dõi tài chính cá nhân của bạn."
-
-#: components/transactions/transaction-dialog.tsx
-msgctxt "9WG2aE"
-msgid "Enter a description for the transaction..."
-msgstr "Nhập mô tả cho giao dịch..."
-
 #: components/transactions/transaction-filters.tsx
 msgctxt "gD5509"
 msgid "Search transactions..."
 msgstr "Tìm kiếm giao dịch..."
+
+#: components/transactions/transaction-form.tsx
+msgctxt "P5C72A"
+msgid "Edit Transaction"
+msgstr "Chỉnh sửa giao dịch"
+
+#: components/transactions/transaction-form.tsx
+msgctxt "DJIUi0"
+msgid "Add Transaction"
+msgstr "Thêm giao dịch"
+
+#: components/transactions/transaction-form.tsx
+msgctxt "ET95oG"
+msgid "Update transaction information."
+msgstr "Cập nhật thông tin giao dịch."
+
+#: components/transactions/transaction-form.tsx
+msgctxt "GAJmZB"
+msgid "Add your inflow or outflow to track your personal finances."
+msgstr "Thêm dòng tiền vào hoặc ra để theo dõi tài chính cá nhân của bạn."
+
+#: components/transactions/transaction-form.tsx
+msgctxt "9WG2aE"
+msgid "Enter a description for the transaction..."
+msgstr "Nhập mô tả cho giao dịch..."
 
 #: components/transactions/transactions-page.tsx
 msgctxt "MBywHq"

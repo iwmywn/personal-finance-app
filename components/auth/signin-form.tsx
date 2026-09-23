@@ -10,6 +10,14 @@ import { toast } from "sonner"
 
 import { twoFactorRoute } from "@/routes"
 import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import {
   Form,
   FormButton,
   FormControl,
@@ -27,6 +35,8 @@ import { authClient } from "@/lib/auth-client"
 import type { AuthErrorCode } from "@/lib/definitions"
 import { getSafeCallbackUrl } from "@/lib/utils"
 import type { SignInFormValues } from "@/schemas/types"
+
+import { LanguageSelector } from "./language-selector"
 
 export function SignInForm() {
   const t = useExtracted()
@@ -122,54 +132,67 @@ export function SignInForm() {
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="username"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel htmlFor="form-username">{t("Username")}</FormLabel>
-              <FormControl>
-                <Input
-                  id="form-username"
-                  placeholder="admin"
-                  type="text"
-                  autoComplete="username"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+    <Card>
+      <CardHeader>
+        <CardTitle>{t("Sign In")}</CardTitle>
+        <CardDescription>
+          {t("Enter your username and password to sign in to your account.")}
+        </CardDescription>
+        <CardAction>
+          <LanguageSelector />
+        </CardAction>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="form-username">{t("Username")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      id="form-username"
+                      placeholder="admin"
+                      type="text"
+                      autoComplete="username"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel htmlFor="form-password">{t("Password")}</FormLabel>
-              <FormControl>
-                <PasswordInput
-                  id="form-password"
-                  placeholder="********"
-                  autoComplete="off"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="form-password">{t("Password")}</FormLabel>
+                  <FormControl>
+                    <PasswordInput
+                      id="form-password"
+                      placeholder="********"
+                      autoComplete="off"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <FormButton
-          isSubmitting={form.formState.isSubmitting}
-          className="w-full"
-        >
-          {t("Sign In")}
-        </FormButton>
-      </form>
-    </Form>
+            <FormButton
+              isSubmitting={form.formState.isSubmitting}
+              className="w-full"
+            >
+              {t("Sign In")}
+            </FormButton>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   )
 }

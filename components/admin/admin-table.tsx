@@ -42,9 +42,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { BanUserDialog } from "@/components/admin/ban-user-dialog"
-import { DeleteUserDialog } from "@/components/admin/delete-user-dialog"
-import { SetUserPasswordDialog } from "@/components/admin/set-user-password-dialog"
+import { BanUserForm } from "@/components/admin/ban-user-form"
+import { DeleteUser } from "@/components/admin/delete-user"
+import { SetUserPasswordForm } from "@/components/admin/set-user-password-form"
 import { useUser } from "@/contexts/user-context"
 import { useFormatDate } from "@/hooks/use-format-date"
 import { authClient } from "@/lib/auth-client"
@@ -312,20 +312,20 @@ export function AdminTable({
 
       {selectedUser && (
         <>
-          <BanUserDialog
-            key={selectedUser.id + "BanUserDialog"}
+          <BanUserForm
+            key={selectedUser.id + "BanUserForm"}
             user={selectedUser}
             isOpen={isBanOpen}
             setIsOpen={setIsBanOpen}
           />
-          <SetUserPasswordDialog
-            key={selectedUser.id + "SetPasswordDialog"}
+          <SetUserPasswordForm
+            key={selectedUser.id + "SetUserPasswordForm"}
             user={selectedUser}
             isOpen={isPasswordOpen}
             setIsOpen={setIsPasswordOpen}
           />
-          <DeleteUserDialog
-            key={selectedUser.id + "DeleteUserDialog"}
+          <DeleteUser
+            key={selectedUser.id + "DeleteUser"}
             user={selectedUser}
             isOpen={isDeleteOpen}
             setIsOpen={setIsDeleteOpen}

@@ -33,12 +33,12 @@ import type { AuthErrorCode } from "@/lib/definitions"
 import { DEFAULT_ROLE } from "@/lib/role"
 import type { AdminUserFormValues } from "@/schemas/types"
 
-interface CreateUserDialogProps {
+interface CreateUserFormProps {
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
 }
 
-export function CreateUserDialog({ isOpen, setIsOpen }: CreateUserDialogProps) {
+export function CreateUserForm({ isOpen, setIsOpen }: CreateUserFormProps) {
   const t = useExtracted()
   const router = useRouter()
   const { createAdminUserSchema } = useSchemas()

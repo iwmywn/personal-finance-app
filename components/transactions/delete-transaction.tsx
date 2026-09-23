@@ -18,17 +18,17 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Spinner } from "@/components/ui/spinner"
 
-interface DeleteTransactionDialogProps {
+interface DeleteTransactionProps {
   transactionId: string
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
 }
 
-export function DeleteTransactionDialog({
+export function DeleteTransaction({
   transactionId,
   isOpen,
   setIsOpen,
-}: DeleteTransactionDialogProps) {
+}: DeleteTransactionProps) {
   const t = useExtracted()
   const router = useRouter()
   const [isPending, startTransition] = useTransition()

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { useExtracted } from "next-intl"
 import { toast } from "sonner"
 
-import { deleteUser } from "@/actions/admin.actions"
+import { deleteBudget } from "@/actions/budget.actions"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,19 +17,18 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Spinner } from "@/components/ui/spinner"
-import type { User } from "@/lib/definitions"
 
-interface DeleteUserDialogProps {
-  user: User
+interface DeleteBudgetProps {
+  budgetId: string
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
 }
 
-export function DeleteUserDialog({
-  user,
+export function DeleteBudget({
+  budgetId,
   isOpen,
   setIsOpen,
-}: DeleteUserDialogProps) {
+}: DeleteBudgetProps) {
   const t = useExtracted()
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
@@ -39,7 +38,7 @@ export function DeleteUserDialog({
 
     startTransition(async () => {
       try {
-        const { error, success } = await deleteUser(user.id)
+        const { error, success } = await deleteBudget(budgetId)
 
         if (success === undefined) {
           toast.error(error)
@@ -49,7 +48,7 @@ export function DeleteUserDialog({
           router.refresh()
         }
       } catch {
-        toast.error(t("Failed to delete user! Please try again later."))
+        toast.error(t("Failed to delete budget! Please try again later."))
       }
     })
   }
@@ -58,17 +57,10 @@ export function DeleteUserDialog({
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{t("Delete User Account")}</AlertDialogTitle>
+          <AlertDialogTitle>{t("Delete Budget")}</AlertDialogTitle>
           <AlertDialogDescription>
             {t(
-              "Are you sure you want to permanently delete this user account?"
-            )}{" "}
-            <strong>
-              {user.name} ({user.email})
-            </strong>
-            .{" "}
-            {t(
-              "All associated data will be permanently deleted. This action cannot be undone."
+              "Are you sure you want to delete this budget? This action cannot be undone."
             )}
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -76,13 +68,8 @@ export function DeleteUserDialog({
           <AlertDialogCancel disabled={isPending}>
             {t("Cancel")}
           </AlertDialogCancel>
-          <AlertDialogAction
-            className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
-            onClick={handleDelete}
-            disabled={isPending}
-          >
-            {isPending && <Spinner className="size-4" />}
-            {t("Delete")}
+          <AlertDialogAction onClick={handleDelete} disabled={isPending}>
+            {isPending && <Spinner />} {t("Delete")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

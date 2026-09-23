@@ -41,13 +41,13 @@ import { authClient } from "@/lib/auth-client"
 import type { User } from "@/lib/definitions"
 import type { AdminBanFormValues } from "@/schemas/types"
 
-interface BanUserDialogProps {
+interface BanUserFormProps {
   user: User
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
 }
 
-export function BanUserDialog({ user, isOpen, setIsOpen }: BanUserDialogProps) {
+export function BanUserForm({ user, isOpen, setIsOpen }: BanUserFormProps) {
   const t = useExtracted()
   const router = useRouter()
   const formatDate = useFormatDate()

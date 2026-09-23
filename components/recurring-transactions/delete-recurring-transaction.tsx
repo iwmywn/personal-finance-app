@@ -18,17 +18,17 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Spinner } from "@/components/ui/spinner"
 
-interface DeleteRecurringDialogProps {
+interface DeleteRecurringTransactionProps {
   recurringId: string
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
 }
 
-export function DeleteRecurringTransactionDialog({
+export function DeleteRecurringTransaction({
   recurringId,
   isOpen,
   setIsOpen,
-}: DeleteRecurringDialogProps) {
+}: DeleteRecurringTransactionProps) {
   const t = useExtracted()
   const router = useRouter()
   const [isPending, startTransition] = useTransition()

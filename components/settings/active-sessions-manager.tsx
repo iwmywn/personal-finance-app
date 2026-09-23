@@ -31,7 +31,7 @@ import { Spinner } from "@/components/ui/spinner"
 import { useUser } from "@/contexts/user-context"
 import { authClient } from "@/lib/auth-client"
 
-export function ActiveSessionsDialog() {
+export function ActiveSessionsManager() {
   const t = useExtracted()
   const router = useRouter()
   const { session: currentSession, sessions: activeSessions } = useUser()

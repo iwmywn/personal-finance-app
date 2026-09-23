@@ -41,7 +41,7 @@ const colors = [
   "--sidebar-ring",
 ]
 
-export function ColorDialog() {
+export function Color() {
   return (
     <Dialog>
       <DialogTrigger asChild>

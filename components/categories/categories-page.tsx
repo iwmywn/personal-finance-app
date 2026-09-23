@@ -4,8 +4,8 @@ import { useState } from "react"
 import { useExtracted } from "next-intl"
 
 import { Button } from "@/components/ui/button"
-import { CategoryDialog } from "@/components/categories/category-dialog"
 import { CategoryFilters } from "@/components/categories/category-filters"
+import { CategoryForm } from "@/components/categories/category-form"
 
 export default function CategoriesPage() {
   const [isOpen, setIsOpen] = useState<boolean>(false)
@@ -27,7 +27,7 @@ export default function CategoriesPage() {
         <CategoryFilters />
       </div>
 
-      <CategoryDialog isOpen={isOpen} setIsOpen={setIsOpen} />
+      <CategoryForm isOpen={isOpen} setIsOpen={setIsOpen} />
     </>
   )
 }

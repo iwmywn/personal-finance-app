@@ -35,8 +35,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { DeleteGoalDialog } from "@/components/goals/delete-goal-dialog"
-import { GoalDialog } from "@/components/goals/goal-dialog"
+import { DeleteGoal } from "@/components/goals/delete-goal"
+import { GoalForm } from "@/components/goals/goal-form"
 import { useGoals } from "@/contexts/goals-context"
 import { useTransactions } from "@/contexts/transactions-context"
 import { useCategory } from "@/hooks/use-category"
@@ -205,14 +205,14 @@ export function GoalsTable({ filteredGoals }: GoalsTableProps) {
 
       {selectedGoal && (
         <>
-          <GoalDialog
-            key={selectedGoal._id + "GoalDialog"}
+          <GoalForm
+            key={selectedGoal._id + "GoalForm"}
             goal={selectedGoal}
             isOpen={isEditOpen}
             setIsOpen={setIsEditOpen}
           />
-          <DeleteGoalDialog
-            key={selectedGoal._id + "DeleteGoalDialog"}
+          <DeleteGoal
+            key={selectedGoal._id + "DeleteGoal"}
             goalId={selectedGoal._id}
             isOpen={isDeleteOpen}
             setIsOpen={setIsDeleteOpen}

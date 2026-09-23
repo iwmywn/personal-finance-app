@@ -6,7 +6,7 @@ import { useExtracted } from "next-intl"
 import type { AdminStats } from "@/actions/admin.actions"
 import { Button } from "@/components/ui/button"
 import { AdminFilters } from "@/components/admin/admin-filters"
-import { CreateUserDialog } from "@/components/admin/create-user-dialog"
+import { CreateUserForm } from "@/components/admin/create-user-form"
 import type { User } from "@/lib/definitions"
 
 interface AdminPageProps {
@@ -39,7 +39,7 @@ export default function AdminPage({
         <AdminFilters initialStats={initialStats} initialUsers={initialUsers} />
       </div>
 
-      <CreateUserDialog isOpen={isOpen} setIsOpen={setIsOpen} />
+      <CreateUserForm isOpen={isOpen} setIsOpen={setIsOpen} />
     </>
   )
 }

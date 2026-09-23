@@ -31,66 +31,52 @@ import { Input } from "@/components/ui/input"
 import { useUser } from "@/contexts/user-context"
 import { useSchemas } from "@/hooks/use-schemas"
 import { authClient } from "@/lib/auth-client"
-import type { UsernameFormValues } from "@/schemas/types"
+import type { NameFormValues } from "@/schemas/types"
 
-export function ChangeUsernameDialog() {
+export function ChangeNameForm() {
   const t = useExtracted()
+  const { createNameSchema } = useSchemas()
   const router = useRouter()
   const { user } = useUser()
-  const [isOpen, setIsOpen] = useState<boolean>(false)
-  const { createUsernameSchema } = useSchemas()
-  const form = useForm<UsernameFormValues>({
-    resolver: zodResolver(createUsernameSchema()),
+  const form = useForm<NameFormValues>({
+    resolver: zodResolver(createNameSchema()),
     defaultValues: {
-      username: user.username || "",
+      name: user.name,
     },
   })
+  const [isOpen, setIsOpen] = useState<boolean>(false)
 
-  async function onSubmit(values: UsernameFormValues) {
+  async function onSubmit(values: NameFormValues) {
     try {
-      const { data: response, error } = await authClient.isUsernameAvailable({
-        username: values.username,
-      })
-
-      if (error || !response) {
-        toast.error(
-          t("Failed to check username availability! Please try again later.")
-        )
-      } else if (!response.available && user.username !== values.username) {
-        toast.error(t("This username is already taken."))
-      } else {
-        await authClient.updateUser({
-          username: values.username,
-          fetchOptions: {
-            onError: () => {
-              toast.error(
-                t("Failed to update username! Please try again later.")
-              )
-            },
-            onSuccess: () => {
-              setIsOpen(false)
-              toast.success(t("Your username has been changed."))
-              router.refresh()
-              form.reset({ username: values.username })
-            },
+      await authClient.updateUser({
+        name: values.name,
+        fetchOptions: {
+          onError: () => {
+            toast.error(t("Failed to update name! Please try again later."))
           },
-        })
-      }
+          onSuccess: () => {
+            setIsOpen(false)
+            toast.success(t("Your name has been updated."))
+            router.refresh()
+            form.reset({ name: values.name })
+          },
+        },
+      })
     } catch {
-      toast.error(t("Failed to update username! Please try again later."))
+      toast.error(t("Failed to update name! Please try again later."))
     }
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">{t("Change Username")}</Button>
+        <Button variant="outline">{t("Change Name")}</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t("Change Username")}</DialogTitle>
+          <DialogTitle>{t("Change Name")}</DialogTitle>
           <DialogDescription>
-            {t("Update your unique username.")}
+            {t("Update your display name.")}
           </DialogDescription>
         </DialogHeader>
 
@@ -98,15 +84,15 @@ export function ChangeUsernameDialog() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="username"
+              name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel htmlFor="form-username">{t("Username")}</FormLabel>
+                  <FormLabel htmlFor="form-name">{t("Name")}</FormLabel>
                   <FormControl>
                     <Input
-                      id="form-username"
-                      placeholder={t("Enter your username...")}
-                      autoComplete="username"
+                      id="form-name"
+                      placeholder={t("Enter your name...")}
+                      autoComplete="name"
                       {...field}
                     />
                   </FormControl>

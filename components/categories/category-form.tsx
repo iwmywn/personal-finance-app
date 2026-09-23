@@ -43,17 +43,17 @@ import type { CategoryType } from "@/lib/category"
 import type { Category } from "@/lib/definitions"
 import type { CategoryFormValues } from "@/schemas/types"
 
-interface CategoryDialogProps {
+interface CategoryFormProps {
   category?: Category
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
 }
 
-export function CategoryDialog({
+export function CategoryForm({
   category,
   isOpen,
   setIsOpen,
-}: CategoryDialogProps) {
+}: CategoryFormProps) {
   const t = useExtracted()
   const router = useRouter()
   const [type, setType] = useState<CategoryType>(category?.type || "inflow")

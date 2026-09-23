@@ -15,17 +15,14 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { StopImpersonationDialog } from "@/components/layout/stop-impersonation-dialog"
+import { StopImpersonation } from "@/components/admin/stop-impersonation"
 import { clientEnv } from "@/env/client"
 import { useNav } from "@/hooks/use-nav"
 
-const ColorDialog =
+const Color =
   clientEnv.NEXT_PUBLIC_NODE_ENV === "development"
     ? dynamic(
-        () =>
-          import("@/components/layout/color-dialog").then(
-            (mod) => mod.ColorDialog
-          ),
+        () => import("@/components/layout/color").then((mod) => mod.Color),
         { ssr: false }
       )
     : () => null
@@ -69,8 +66,8 @@ export function Header() {
         </Breadcrumb>
       </div>
       <div className="flex items-center gap-2">
-        <StopImpersonationDialog />
-        <ColorDialog />
+        <StopImpersonation />
+        <Color />
       </div>
     </header>
   )

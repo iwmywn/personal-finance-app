@@ -4,8 +4,8 @@ import { useState } from "react"
 import { useExtracted } from "next-intl"
 
 import { Button } from "@/components/ui/button"
-import { TransactionDialog } from "@/components/transactions/transaction-dialog"
 import { TransactionFilters } from "@/components/transactions/transaction-filters"
+import { TransactionForm } from "@/components/transactions/transaction-form"
 
 export default function TransactionsPage() {
   const [isOpen, setIsOpen] = useState<boolean>(false)
@@ -29,7 +29,7 @@ export default function TransactionsPage() {
         <TransactionFilters />
       </div>
 
-      <TransactionDialog isOpen={isOpen} setIsOpen={setIsOpen} />
+      <TransactionForm isOpen={isOpen} setIsOpen={setIsOpen} />
     </>
   )
 }

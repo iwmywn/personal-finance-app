@@ -9,7 +9,10 @@ import { useExtracted } from "next-intl"
 import { useForm, useWatch } from "react-hook-form"
 import { toast } from "sonner"
 
-import { createGoal, updateGoal } from "@/actions/goal.actions"
+import {
+  createTransaction,
+  updateTransaction,
+} from "@/actions/transaction.actions"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -30,7 +33,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
+  InputGroupTextarea,
+} from "@/components/ui/input-group"
 import {
   Popover,
   PopoverContent,
@@ -43,57 +51,64 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CategoryFormSelect } from "@/components/category-form-select"
 import { CurrencyInput } from "@/components/currency-input"
 import { useUser } from "@/contexts/user-context"
 import { useFormatDate } from "@/hooks/use-format-date"
 import { useSchemas } from "@/hooks/use-schemas"
+import type { CategoryType } from "@/lib/category"
 import { CURRENCIES, CURRENCY_CONFIG } from "@/lib/currency"
 import type { Currency } from "@/lib/currency"
 import { parseToLocalDate } from "@/lib/date"
-import type { Goal } from "@/lib/definitions"
-import type { GoalFormValues } from "@/schemas/types"
+import type { Transaction } from "@/lib/definitions"
+import type { TransactionFormValues } from "@/schemas/types"
 
-interface GoalDialogProps {
-  goal?: Goal
+interface TransactionFormProps {
+  transaction?: Transaction
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
 }
 
-export function GoalDialog({ goal, isOpen, setIsOpen }: GoalDialogProps) {
-  const [startCalendarOpen, setStartCalendarOpen] = useState<boolean>(false)
-  const [endCalendarOpen, setEndCalendarOpen] = useState<boolean>(false)
+export function TransactionForm({
+  transaction,
+  isOpen,
+  setIsOpen,
+}: TransactionFormProps) {
+  const [type, setType] = useState<CategoryType>(transaction?.type || "inflow")
+  const [calendarOpen, setCalendarOpen] = useState<boolean>(false)
   const t = useExtracted()
   const { user } = useUser()
   const formatDate = useFormatDate()
   const router = useRouter()
-  const { createGoalSchema } = useSchemas()
-  const form = useForm<GoalFormValues>({
-    resolver: zodResolver(createGoalSchema()),
+  const { createTransactionSchema } = useSchemas()
+  const form = useForm<TransactionFormValues>({
+    resolver: zodResolver(createTransactionSchema()),
     defaultValues: {
-      categoryKey: goal?.categoryKey || "",
-      name: goal?.name || "",
-      currency: goal?.currency ?? (user.currency as Currency),
-      targetAmount: goal?.targetAmount ?? "",
-      startDate: parseToLocalDate(goal?.startDate),
-      endDate: parseToLocalDate(goal?.endDate),
+      type: transaction?.type || "inflow",
+      currency:
+        transaction?.originalCurrency ??
+        transaction?.currency ??
+        (user.currency as Currency),
+      amount: transaction?.originalAmount ?? transaction?.amount ?? "",
+      description: transaction?.description || "",
+      categoryKey: transaction?.categoryKey || "",
+      date: parseToLocalDate(transaction?.date),
     },
   })
 
-  const startDate = useWatch({
+  const selectedDate = useWatch({
     control: form.control,
-    name: "startDate",
+    name: "date",
   })
 
-  const endDate = useWatch({
-    control: form.control,
-    name: "endDate",
-  })
-
-  async function onSubmit(values: GoalFormValues) {
-    if (goal) {
+  async function onSubmit(values: TransactionFormValues) {
+    if (transaction) {
       try {
-        const { error, success } = await updateGoal(goal._id, values)
+        const { error, success } = await updateTransaction(
+          transaction._id,
+          values
+        )
 
         if (success === undefined) {
           toast.error(error)
@@ -103,11 +118,11 @@ export function GoalDialog({ goal, isOpen, setIsOpen }: GoalDialogProps) {
           router.refresh()
         }
       } catch {
-        toast.error(t("Failed to update goal! Please try again later."))
+        toast.error(t("Failed to update transaction! Please try again later."))
       }
     } else {
       try {
-        const { error, success } = await createGoal(values)
+        const { error, success } = await createTransaction(values)
 
         if (success === undefined) {
           toast.error(error)
@@ -115,29 +130,66 @@ export function GoalDialog({ goal, isOpen, setIsOpen }: GoalDialogProps) {
           setIsOpen(false)
           toast.success(success)
           router.refresh()
-          form.reset()
+          form.reset({
+            ...form.formState.defaultValues,
+            type,
+          })
         }
       } catch {
-        toast.error(t("Failed to create goal! Please try again later."))
+        toast.error(t("Failed to create transaction! Please try again later."))
       }
     }
   }
 
+  const handleTypeChange = (type: CategoryType) => {
+    setType(type)
+    form.setValue("type", type)
+    form.resetField("categoryKey", { defaultValue: "" })
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="max-h-[85vh] overflow-y-auto">
+      <DialogContent>
         <DialogHeader>
-          <DialogTitle>{goal ? t("Edit Goal") : t("Add Goal")}</DialogTitle>
+          <DialogTitle>
+            {transaction ? t("Edit Transaction") : t("Add Transaction")}
+          </DialogTitle>
           <DialogDescription>
-            {goal
-              ? t("Update goal information.")
-              : t("Create a new financial goal.")}
+            {transaction
+              ? t("Update transaction information.")
+              : t(
+                  "Add your inflow or outflow to track your personal finances."
+                )}
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <CategoryFormSelect control={form.control} type="inflow" />
+            <Tabs
+              value={type}
+              onValueChange={(value) => handleTypeChange(value as CategoryType)}
+            >
+              <TabsList className="w-full">
+                <TabsTrigger value="inflow">{t("Inflow")}</TabsTrigger>
+                <TabsTrigger value="outflow">{t("Outflow")}</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="inflow" className="space-y-4">
+                <CategoryFormSelect
+                  control={form.control}
+                  type="inflow"
+                  showDescription
+                />
+              </TabsContent>
+
+              <TabsContent value="outflow" className="space-y-4">
+                <CategoryFormSelect
+                  control={form.control}
+                  type="outflow"
+                  showDescription
+                />
+              </TabsContent>
+            </Tabs>
 
             <FormField
               control={form.control}
@@ -148,7 +200,7 @@ export function GoalDialog({ goal, isOpen, setIsOpen }: GoalDialogProps) {
                   <Select
                     onValueChange={(value) => {
                       field.onChange(value)
-                      form.setValue("targetAmount", "")
+                      form.setValue("amount", "")
                     }}
                     value={field.value}
                   >
@@ -172,35 +224,13 @@ export function GoalDialog({ goal, isOpen, setIsOpen }: GoalDialogProps) {
 
             <FormField
               control={form.control}
-              name="name"
+              name="amount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel htmlFor="form-goal-name">
-                    {t("Goal Name")}
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      id="form-goal-name"
-                      placeholder={t("e.g. Save for vacation")}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="targetAmount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel htmlFor="form-target-amount">
-                    {t("Target Amount")}
-                  </FormLabel>
+                  <FormLabel htmlFor="form-amount">{t("Amount")}</FormLabel>
                   <FormControl>
                     <CurrencyInput
-                      id="form-target-amount"
+                      id="form-amount"
                       value={field.value}
                       onValueChange={field.onChange}
                       currency={form.getValues("currency")}
@@ -213,51 +243,29 @@ export function GoalDialog({ goal, isOpen, setIsOpen }: GoalDialogProps) {
 
             <FormField
               control={form.control}
-              name="startDate"
+              name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel htmlFor="form-start-date">
-                    {t("Start Date")}
+                  <FormLabel htmlFor="form-description">
+                    {t("Description")}
                   </FormLabel>
-                  <Popover
-                    open={startCalendarOpen}
-                    onOpenChange={setStartCalendarOpen}
-                  >
-                    <FormControl>
-                      <PopoverTrigger id="form-start-date" asChild>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-full justify-between font-normal",
-                            !startDate && "text-muted-foreground"
-                          )}
-                        >
-                          {startDate ? (
-                            formatDate(startDate)
-                          ) : (
-                            <span>{t("Select Date")}</span>
-                          )}
-                          <CalendarIcon />
-                        </Button>
-                      </PopoverTrigger>
-                    </FormControl>
-                    <PopoverContent
-                      className="w-auto overflow-hidden p-0"
-                      align="start"
-                    >
-                      <Calendar
-                        autoFocus
-                        mode="single"
-                        selected={startDate}
-                        captionLayout="dropdown"
-                        onSelect={(date) => {
-                          field.onChange(date)
-                          setStartCalendarOpen(false)
-                        }}
-                        disabled={(date) => endDate && date > endDate}
+                  <FormControl>
+                    <InputGroup>
+                      <InputGroupTextarea
+                        id="form-description"
+                        placeholder={t(
+                          "Enter a description for the transaction..."
+                        )}
+                        maxLength={200}
+                        {...field}
                       />
-                    </PopoverContent>
-                  </Popover>
+                      <InputGroupAddon align="block-end">
+                        <InputGroupText className="text-muted-foreground text-xs">
+                          {field.value?.length || 0}/200
+                        </InputGroupText>
+                      </InputGroupAddon>
+                    </InputGroup>
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -265,25 +273,22 @@ export function GoalDialog({ goal, isOpen, setIsOpen }: GoalDialogProps) {
 
             <FormField
               control={form.control}
-              name="endDate"
+              name="date"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel htmlFor="form-end-date">{t("End Date")}</FormLabel>
-                  <Popover
-                    open={endCalendarOpen}
-                    onOpenChange={setEndCalendarOpen}
-                  >
+                  <FormLabel htmlFor="form-date">{t("Date")}</FormLabel>
+                  <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
                     <FormControl>
-                      <PopoverTrigger id="form-end-date" asChild>
+                      <PopoverTrigger id="form-date" asChild>
                         <Button
                           variant="outline"
                           className={cn(
                             "w-full justify-between font-normal",
-                            !endDate && "text-muted-foreground"
+                            !selectedDate && "text-muted-foreground"
                           )}
                         >
-                          {endDate ? (
-                            formatDate(endDate)
+                          {selectedDate ? (
+                            formatDate(selectedDate)
                           ) : (
                             <span>{t("Select Date")}</span>
                           )}
@@ -298,13 +303,13 @@ export function GoalDialog({ goal, isOpen, setIsOpen }: GoalDialogProps) {
                       <Calendar
                         autoFocus
                         mode="single"
-                        selected={endDate}
+                        selected={selectedDate}
                         captionLayout="dropdown"
                         onSelect={(date) => {
                           field.onChange(date)
-                          setEndCalendarOpen(false)
+                          setCalendarOpen(false)
                         }}
-                        disabled={(date) => startDate && date <= startDate}
+                        disabled={(date) => date > new Date()}
                       />
                     </PopoverContent>
                   </Popover>
@@ -318,7 +323,7 @@ export function GoalDialog({ goal, isOpen, setIsOpen }: GoalDialogProps) {
                 <Button variant="outline">{t("Cancel")}</Button>
               </DialogClose>
               <FormButton isSubmitting={form.formState.isSubmitting}>
-                {goal ? t("Update") : t("Add")}
+                {transaction ? t("Update") : t("Add")}
               </FormButton>
             </DialogFooter>
           </form>
