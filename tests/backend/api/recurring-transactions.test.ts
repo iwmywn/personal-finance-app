@@ -4,8 +4,12 @@ import { Decimal128, ObjectId } from "mongodb"
 import {
   insertTestRecurringTransaction,
   insertTestTransaction,
+  insertTestUser,
 } from "@/tests/backend/helpers/database"
-import { mockDBRecurringTransaction } from "@/tests/shared/data"
+import {
+  mockDBBannedUser,
+  mockDBRecurringTransaction,
+} from "@/tests/shared/data"
 import { GET } from "@/app/api/(cronjobs)/recurring-transactions/route"
 import {
   getDueDates,
@@ -571,6 +575,56 @@ describe("Recurring Transactions Cron Job", () => {
         expect(updatedRec?.lastGeneratedDate).toEqual(
           localDateToUTCMidnight(new Date("2024-02-03"))
         )
+
+        vi.useRealTimers()
+      })
+
+      it("should not process recurring transactions belonging to banned users", async () => {
+        await insertTestUser(mockDBBannedUser)
+
+        const lastMonthUTC = localDateToUTCMidnight(new Date("2024-01-01"))
+
+        const bannedUserRecurringTransaction: DBRecurringTransaction = {
+          ...mockDBRecurringTransaction,
+          _id: new ObjectId(),
+          userId: mockDBBannedUser._id,
+          frequency: "monthly",
+          startDate: localDateToUTCMidnight(new Date("2024-01-01")),
+          lastGeneratedDate: lastMonthUTC,
+        }
+
+        await insertTestRecurringTransaction(bannedUserRecurringTransaction)
+
+        vi.useFakeTimers()
+        vi.setSystemTime(new Date("2024-02-01T12:00:00.000Z"))
+
+        const request = new NextRequest(cronEndpoint, {
+          headers: {
+            authorization: `Bearer ${cronSecret}`,
+          },
+        })
+
+        const response = await GET(request)
+        const data = await response.json()
+
+        expect(response.status).toBe(200)
+        expect(data.success).toBe(true)
+        expect(data.created).toBe(0)
+        expect(data.createdIds).toHaveLength(0)
+
+        const transactionsCollection = await getTransactionsCollection()
+        const transactions = await transactionsCollection
+          .find({ userId: mockDBBannedUser._id })
+          .toArray()
+
+        expect(transactions).toHaveLength(0)
+
+        const recurringCollection = await getRecurringTransactionsCollection()
+        const updatedRecurring = await recurringCollection.findOne({
+          _id: bannedUserRecurringTransaction._id,
+        })
+
+        expect(updatedRecurring?.lastGeneratedDate).toEqual(lastMonthUTC)
 
         vi.useRealTimers()
       })

@@ -14,12 +14,12 @@ export function formatCurrency(
   return new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
-  }).format(parseFloat(amount))
+  }).format(amount as unknown as number)
 }
 
 export function getUniqueYears(transactions: Transaction[]): number[] {
   return Array.from(
-    new Set(transactions.map((t) => new Date(t.date).getFullYear()))
+    new Set(transactions.map((t) => new Date(t.date).getUTCFullYear()))
   ).sort((a, b) => b - a)
 }
 

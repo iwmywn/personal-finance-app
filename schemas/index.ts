@@ -146,7 +146,24 @@ export function buildSchemas(messages: SchemaMessages) {
         .max(200, {
           message: messages.descriptionMaxLength,
         }),
-      date: baseDateSchema(messages.dateRequired),
+      date: baseDateSchema(messages.dateRequired).refine(
+        (date) => {
+          const earliestTimezoneDate = new Date(
+            Date.now() + 14 * 60 * 60 * 1000
+          )
+          const maxAllowedMidnight = new Date(
+            Date.UTC(
+              earliestTimezoneDate.getUTCFullYear(),
+              earliestTimezoneDate.getUTCMonth(),
+              earliestTimezoneDate.getUTCDate()
+            )
+          )
+          return date.getTime() <= maxAllowedMidnight.getTime()
+        },
+        {
+          message: messages.dateCannotBeInFuture,
+        }
+      ),
     })
 
   const createCategorySchema = () =>

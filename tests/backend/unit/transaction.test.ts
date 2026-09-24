@@ -31,6 +31,19 @@ describe("Transactions", async () => {
       expect(result.error).toBe("Invalid data!")
     })
 
+    it("should return error when transaction date is in the future", async () => {
+      mockAuthenticatedUser()
+
+      const futureDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+      const result = await createTransaction({
+        ...mockValidTransactionValues,
+        date: futureDate,
+      })
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe("Invalid data!")
+    })
+
     it("should return error when not authenticated", async () => {
       mockUnauthenticatedUser()
 

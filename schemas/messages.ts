@@ -36,6 +36,7 @@ export async function getSchemaMessages() {
     descriptionRequired: t("Description is required."),
     descriptionMaxLength: t("Description must be at most 200 characters."),
     dateRequired: t("Date is required."),
+    dateCannotBeInFuture: t("Transaction date cannot be in the future."),
     typeRequired: t("Type is required."),
     categoryNameRequired: t("Category name is required."),
     categoryNameMaxLength: t("Category name must be at most 50 characters."),

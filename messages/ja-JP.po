@@ -2830,6 +2830,11 @@ msgid "Date is required."
 msgstr "日付は必須です。"
 
 #: schemas/messages.ts
+msgctxt "4zNmm0"
+msgid "Transaction date cannot be in the future."
+msgstr "取引日は未来の日付にすることはできません。"
+
+#: schemas/messages.ts
 msgctxt "goeMxG"
 msgid "Type is required."
 msgstr "タイプは必須です。"

@@ -9,6 +9,7 @@ import { serverEnv } from "@/env/server"
 import {
   getRecurringTransactionsCollection,
   getTransactionsCollection,
+  getUsersCollection,
 } from "@/lib/collections"
 import { normalizeToUTCMidnight } from "@/lib/date"
 import type { DBRecurringTransaction } from "@/lib/definitions"
@@ -28,14 +29,28 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const [transactionsCollection, recurringCollection] = await Promise.all([
-      getTransactionsCollection(),
-      getRecurringTransactionsCollection(),
-    ])
+    const [transactionsCollection, recurringCollection, usersCollection] =
+      await Promise.all([
+        getTransactionsCollection(),
+        getRecurringTransactionsCollection(),
+        getUsersCollection(),
+      ])
+
+    const bannedUsers = await usersCollection
+      .find({ banned: true }, { projection: { _id: 1 } })
+      .toArray()
+    const bannedUserIds = bannedUsers.flatMap((u) => [u._id, u._id.toString()])
 
     const todayUTC = normalizeToUTCMidnight(new Date())
 
     const cursor = recurringCollection.find({
+      ...(bannedUserIds.length > 0
+        ? {
+            userId: {
+              $nin: bannedUserIds as unknown as DBRecurringTransaction["userId"][],
+            },
+          }
+        : {}),
       $or: [
         { endDate: { $exists: false } },
         { endDate: null as unknown as Date },

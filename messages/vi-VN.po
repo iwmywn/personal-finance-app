@@ -2830,6 +2830,11 @@ msgid "Date is required."
 msgstr "Ngày là bắt buộc."
 
 #: schemas/messages.ts
+msgctxt "4zNmm0"
+msgid "Transaction date cannot be in the future."
+msgstr "Ngày giao dịch không thể ở tương lai."
+
+#: schemas/messages.ts
 msgctxt "goeMxG"
 msgid "Type is required."
 msgstr "Loại là bắt buộc."

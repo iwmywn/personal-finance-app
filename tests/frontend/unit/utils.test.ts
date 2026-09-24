@@ -39,6 +39,11 @@ describe("Utils", () => {
       expect(result).toContain("1.000.000.000")
       expect(result).toContain("₫")
     })
+
+    it("should preserve precision for amounts exceeding 15 digits without float truncation", () => {
+      const result = formatCurrency("1234567890123456.78", "en-US", "USD")
+      expect(result).toBe("$1,234,567,890,123,456.78")
+    })
   })
 
   describe("getUniqueYears", () => {
@@ -55,6 +60,17 @@ describe("Utils", () => {
     it("should handle single year", () => {
       const singleYear = mockTransactions.slice(1, 3)
       const result = getUniqueYears(singleYear)
+      expect(result).toEqual([2024])
+    })
+
+    it("should extract UTC years consistently without timezone shifts", () => {
+      const utcTransactions = [
+        {
+          ...mockTransactions[0],
+          date: new Date("2024-01-01T00:00:00.000Z"),
+        },
+      ]
+      const result = getUniqueYears(utcTransactions)
       expect(result).toEqual([2024])
     })
   })
