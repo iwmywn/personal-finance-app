@@ -79,7 +79,7 @@ describe("Statistics", () => {
       expect(result.lowestTransaction).toEqual(mockTransactions[3])
       expect(result.avgOutflow).toBe("200")
       expect(result.savingsRate).toBe("60")
-      expect(result.popularCategory).toEqual(["salary_bonus"])
+      expect(result.popularCategory).toEqual(["housing"])
     })
 
     it("should handle empty transactions", () => {
@@ -109,6 +109,40 @@ describe("Statistics", () => {
       // (3000 - 2000) / 3000 * 100 = 1000 / 3000 * 100 = 33.3333...% -> "33.3"
       const result = calculateQuickStats(transactions)
       expect(result.savingsRate).toBe("33.3")
+    })
+
+    it("should report -100 savings rate when there is only outflow and no inflow", () => {
+      const transactions = [
+        {
+          ...mockTransactions[1],
+          type: "outflow" as const,
+          amount: "2000",
+          categoryKey: "food_beverage",
+        },
+        {
+          ...mockTransactions[3],
+          type: "outflow" as const,
+          amount: "500",
+          categoryKey: "transportation",
+        },
+      ]
+      const result = calculateQuickStats(transactions)
+      expect(result.savingsRate).toBe("-100")
+      expect(result.popularCategory).toEqual(["food_beverage"])
+    })
+
+    it("should report 100 savings rate and empty popularCategory when there is only inflow and no outflow", () => {
+      const transactions = [
+        {
+          ...mockTransactions[0],
+          type: "inflow" as const,
+          amount: "5000",
+          categoryKey: "salary_bonus",
+        },
+      ]
+      const result = calculateQuickStats(transactions)
+      expect(result.savingsRate).toBe("100")
+      expect(result.popularCategory).toEqual([])
     })
   })
 

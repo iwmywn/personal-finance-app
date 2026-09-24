@@ -69,11 +69,10 @@ export function calculateQuickStats(transactions: Transaction[]): QuickStats {
     } else if (t.type === "outflow") {
       totalOutflow = totalOutflow.plus(amount)
       outflowCount++
+      categorySums[t.categoryKey] = (
+        categorySums[t.categoryKey] || new Decimal(0)
+      ).plus(amount)
     }
-
-    categorySums[t.categoryKey] = (
-      categorySums[t.categoryKey] || new Decimal(0)
-    ).plus(amount)
   }
 
   const avgOutflow =
@@ -86,20 +85,24 @@ export function calculateQuickStats(transactions: Transaction[]): QuickStats {
         .mul(100)
         .toDecimalPlaces(1)
         .toString()
-    : null
+    : totalOutflow.greaterThan(0)
+      ? "-100"
+      : "0"
 
   const maxTotal = Object.values(categorySums).reduce(
     (max, val) => (val.greaterThan(max) ? val : max),
     new Decimal(0)
   )
 
-  const popularCategory = Object.entries(categorySums).reduce<CategoryKey[]>(
-    (acc, [key, total]) => {
-      if (total.equals(maxTotal)) acc.push(key as CategoryKey)
-      return acc
-    },
-    []
-  )
+  const popularCategory = maxTotal.greaterThan(0)
+    ? Object.entries(categorySums).reduce<CategoryKey[]>(
+        (acc, [key, total]) => {
+          if (total.equals(maxTotal)) acc.push(key as CategoryKey)
+          return acc
+        },
+        []
+      )
+    : []
 
   return {
     currentMonthCount,

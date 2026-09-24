@@ -73,36 +73,23 @@ export async function GET(request: NextRequest) {
     missingDates.sort((a, b) => a.getTime() - b.getTime())
     const datesToSync = missingDates.slice(0, MAX_DATES_PER_RUN)
 
-    const results = await Promise.allSettled(
-      datesToSync.map(async (d) => {
-        await ensureExchangeRateForDate(d)
-        await missingRatesCollection.deleteOne({ date: d })
-        return d
-      })
-    )
-
     let syncedCount = 0
     const errors: { date: string; error: string }[] = []
-    const errorUpdates: Promise<unknown>[] = []
 
-    for (let index = 0; index < results.length; index++) {
-      const res = results[index]
-      const d = datesToSync[index]
-      if (res.status === "fulfilled") {
+    for (const d of datesToSync) {
+      try {
+        await ensureExchangeRateForDate(d)
+        await missingRatesCollection.deleteOne({ date: d })
         syncedCount++
-      } else {
+      } catch (error) {
         const errorMsg =
-          res.reason instanceof Error ? res.reason.message : String(res.reason)
+          error instanceof Error ? error.message : String(error ?? "")
         errors.push({
           date: d.toISOString().split("T")[0],
           error: errorMsg,
         })
-        errorUpdates.push(enqueueMissingExchangeRateDate(d, res.reason))
+        await enqueueMissingExchangeRateDate(d, error)
       }
-    }
-
-    if (errorUpdates.length > 0) {
-      await Promise.allSettled(errorUpdates)
     }
 
     const remainingQueueCount = await missingRatesCollection.countDocuments()
