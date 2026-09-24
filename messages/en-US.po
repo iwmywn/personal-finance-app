@@ -1871,19 +1871,9 @@ msgid "Inactive"
 msgstr "Inactive"
 
 #: components/recurring-transactions/recurring-transaction-form.tsx
-msgctxt "m1EF9E"
-msgid "Duplicate Recurring Transaction"
-msgstr "Duplicate Recurring Transaction"
-
-#: components/recurring-transactions/recurring-transaction-form.tsx
 msgctxt "sYXY5N"
 msgid "Add Recurring Transaction"
 msgstr "Add Recurring Transaction"
-
-#: components/recurring-transactions/recurring-transaction-form.tsx
-msgctxt "SfZLFQ"
-msgid "Create a new recurring transaction based on the selected one."
-msgstr "Create a new recurring transaction based on the selected one."
 
 #: components/recurring-transactions/recurring-transaction-form.tsx
 msgctxt "adePxB"
@@ -1957,12 +1947,6 @@ msgstr "Optional"
 msgctxt "mpcI7I"
 msgid "No End Date"
 msgstr "No End Date"
-
-#: components/recurring-transactions/recurring-transaction-form.tsx
-#: components/recurring-transactions/recurring-transactions-table.tsx
-msgctxt "4fHiNl"
-msgid "Duplicate"
-msgstr "Duplicate"
 
 #: components/recurring-transactions/recurring-transactions-page.tsx
 #: hooks/use-nav.ts

@@ -1871,19 +1871,9 @@ msgid "Inactive"
 msgstr "Không hoạt động"
 
 #: components/recurring-transactions/recurring-transaction-form.tsx
-msgctxt "m1EF9E"
-msgid "Duplicate Recurring Transaction"
-msgstr "Nhân bản giao dịch định kỳ"
-
-#: components/recurring-transactions/recurring-transaction-form.tsx
 msgctxt "sYXY5N"
 msgid "Add Recurring Transaction"
 msgstr "Thêm giao dịch định kỳ"
-
-#: components/recurring-transactions/recurring-transaction-form.tsx
-msgctxt "SfZLFQ"
-msgid "Create a new recurring transaction based on the selected one."
-msgstr "Tạo giao dịch định kỳ mới dựa trên giao dịch đã chọn."
 
 #: components/recurring-transactions/recurring-transaction-form.tsx
 msgctxt "adePxB"
@@ -1957,12 +1947,6 @@ msgstr "Không bắt buộc"
 msgctxt "mpcI7I"
 msgid "No End Date"
 msgstr "Không có ngày kết thúc"
-
-#: components/recurring-transactions/recurring-transaction-form.tsx
-#: components/recurring-transactions/recurring-transactions-table.tsx
-msgctxt "4fHiNl"
-msgid "Duplicate"
-msgstr "Nhân bản"
 
 #: components/recurring-transactions/recurring-transactions-page.tsx
 #: hooks/use-nav.ts

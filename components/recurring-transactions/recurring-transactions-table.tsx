@@ -35,7 +35,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { DeleteRecurringTransaction } from "@/components/recurring-transactions/delete-recurring-transaction"
-import { RecurringTransactionForm } from "@/components/recurring-transactions/recurring-transaction-form"
 import { useRecurring } from "@/contexts/recurring-context"
 import { useCategory } from "@/hooks/use-category"
 import { useFormatCurrency } from "@/hooks/use-format-currency"
@@ -53,7 +52,6 @@ export function RecurringTransactionsTable({
   const { recurringTransactions } = useRecurring()
   const [selectedRecurring, setSelectedRecurring] =
     useState<RecurringTransaction | null>(null)
-  const [isDuplicateOpen, setIsDuplicateOpen] = useState<boolean>(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false)
   const t = useExtracted()
   const { getCategoryLabel, getCategoryDescription } = useCategory()
@@ -212,15 +210,6 @@ export function RecurringTransactionsTable({
                             <DropdownMenuContent>
                               <DropdownMenuItem
                                 className="cursor-pointer"
-                                onClick={() => {
-                                  setSelectedRecurring(recurring)
-                                  setIsDuplicateOpen(true)
-                                }}
-                              >
-                                {t("Duplicate")}
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                className="cursor-pointer"
                                 variant="destructive"
                                 onClick={() => {
                                   setSelectedRecurring(recurring)
@@ -243,20 +232,12 @@ export function RecurringTransactionsTable({
       </Card>
 
       {selectedRecurring && (
-        <>
-          <RecurringTransactionForm
-            key={selectedRecurring._id + "RecurringTransactionForm"}
-            recurring={selectedRecurring}
-            isOpen={isDuplicateOpen}
-            setIsOpen={setIsDuplicateOpen}
-          />
-          <DeleteRecurringTransaction
-            key={selectedRecurring._id + "DeleteRecurringTransaction"}
-            recurringId={selectedRecurring._id}
-            isOpen={isDeleteOpen}
-            setIsOpen={setIsDeleteOpen}
-          />
-        </>
+        <DeleteRecurringTransaction
+          key={selectedRecurring._id + "DeleteRecurringTransaction"}
+          recurringId={selectedRecurring._id}
+          isOpen={isDeleteOpen}
+          setIsOpen={setIsDeleteOpen}
+        />
       )}
     </>
   )

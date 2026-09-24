@@ -1871,19 +1871,9 @@ msgid "Inactive"
 msgstr "비활성"
 
 #: components/recurring-transactions/recurring-transaction-form.tsx
-msgctxt "m1EF9E"
-msgid "Duplicate Recurring Transaction"
-msgstr "반복 거래 복제"
-
-#: components/recurring-transactions/recurring-transaction-form.tsx
 msgctxt "sYXY5N"
 msgid "Add Recurring Transaction"
 msgstr "반복 거래 추가"
-
-#: components/recurring-transactions/recurring-transaction-form.tsx
-msgctxt "SfZLFQ"
-msgid "Create a new recurring transaction based on the selected one."
-msgstr "선택한 항목을 기반으로 새 반복 거래를 만드세요."
 
 #: components/recurring-transactions/recurring-transaction-form.tsx
 msgctxt "adePxB"
@@ -1957,12 +1947,6 @@ msgstr "선택사항"
 msgctxt "mpcI7I"
 msgid "No End Date"
 msgstr "종료일 없음"
-
-#: components/recurring-transactions/recurring-transaction-form.tsx
-#: components/recurring-transactions/recurring-transactions-table.tsx
-msgctxt "4fHiNl"
-msgid "Duplicate"
-msgstr "복제"
 
 #: components/recurring-transactions/recurring-transactions-page.tsx
 #: hooks/use-nav.ts

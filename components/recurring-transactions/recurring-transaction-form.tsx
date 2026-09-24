@@ -58,24 +58,20 @@ import { useSchemas } from "@/hooks/use-schemas"
 import type { CategoryType } from "@/lib/category"
 import { CURRENCIES, CURRENCY_CONFIG } from "@/lib/currency"
 import type { Currency } from "@/lib/currency"
-import type { RecurringTransaction } from "@/lib/definitions"
 import type { RecurringTransactionFormValues } from "@/schemas/types"
 
 interface RecurringTransactionFormProps {
-  recurring?: RecurringTransaction
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
 }
 
 export function RecurringTransactionForm({
-  recurring,
   isOpen,
   setIsOpen,
 }: RecurringTransactionFormProps) {
-  const isDuplicate = Boolean(recurring)
   const [startCalendarOpen, setStartCalendarOpen] = useState<boolean>(false)
   const [endCalendarOpen, setEndCalendarOpen] = useState<boolean>(false)
-  const [type, setType] = useState<CategoryType>(recurring?.type || "inflow")
+  const [type, setType] = useState<CategoryType>("inflow")
   const t = useExtracted()
   const { user } = useUser()
   const formatDate = useFormatDate()
@@ -84,13 +80,13 @@ export function RecurringTransactionForm({
   const form = useForm<RecurringTransactionFormValues>({
     resolver: zodResolver(createRecurringTransactionSchema()),
     defaultValues: {
-      type: recurring?.type || "inflow",
-      categoryKey: recurring?.categoryKey || "",
-      currency: recurring?.currency ?? (user.currency as Currency),
-      amount: recurring?.amount ?? "",
-      description: recurring?.description || "",
-      frequency: recurring?.frequency || "monthly",
-      randomEveryXDays: recurring?.randomEveryXDays || undefined,
+      type: "inflow",
+      categoryKey: "",
+      currency: user.currency as Currency,
+      amount: "",
+      description: "",
+      frequency: "monthly",
+      randomEveryXDays: undefined,
       startDate: undefined,
       endDate: undefined,
       lastGeneratedDate: undefined,
@@ -149,17 +145,9 @@ export function RecurringTransactionForm({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>
-            {isDuplicate
-              ? t("Duplicate Recurring Transaction")
-              : t("Add Recurring Transaction")}
-          </DialogTitle>
+          <DialogTitle>{t("Add Recurring Transaction")}</DialogTitle>
           <DialogDescription>
-            {isDuplicate
-              ? t(
-                  "Create a new recurring transaction based on the selected one."
-                )
-              : t("Create a recurring transaction.")}
+            {t("Create a recurring transaction.")}
           </DialogDescription>
         </DialogHeader>
 
@@ -457,7 +445,7 @@ export function RecurringTransactionForm({
               </DialogClose>
 
               <FormButton isSubmitting={form.formState.isSubmitting}>
-                {isDuplicate ? t("Duplicate") : t("Add")}
+                {t("Add")}
               </FormButton>
             </DialogFooter>
           </form>

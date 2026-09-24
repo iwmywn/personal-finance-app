@@ -1871,19 +1871,9 @@ msgid "Inactive"
 msgstr "不活跃"
 
 #: components/recurring-transactions/recurring-transaction-form.tsx
-msgctxt "m1EF9E"
-msgid "Duplicate Recurring Transaction"
-msgstr "复制定期交易"
-
-#: components/recurring-transactions/recurring-transaction-form.tsx
 msgctxt "sYXY5N"
 msgid "Add Recurring Transaction"
 msgstr "添加定期交易"
-
-#: components/recurring-transactions/recurring-transaction-form.tsx
-msgctxt "SfZLFQ"
-msgid "Create a new recurring transaction based on the selected one."
-msgstr "基于所选定期交易创建新的定期交易。"
 
 #: components/recurring-transactions/recurring-transaction-form.tsx
 msgctxt "adePxB"
@@ -1957,12 +1947,6 @@ msgstr "可选"
 msgctxt "mpcI7I"
 msgid "No End Date"
 msgstr "无结束日期"
-
-#: components/recurring-transactions/recurring-transaction-form.tsx
-#: components/recurring-transactions/recurring-transactions-table.tsx
-msgctxt "4fHiNl"
-msgid "Duplicate"
-msgstr "复制"
 
 #: components/recurring-transactions/recurring-transactions-page.tsx
 #: hooks/use-nav.ts
