@@ -525,7 +525,7 @@ msgstr "사용자"
 #: components/budgets/budgets-table.tsx
 #: components/goals/goal-filters.tsx
 #: components/goals/goals-table.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
 #: components/recurring-transactions/recurring-transactions-table.tsx
 msgctxt "tzMNF3"
 msgid "Status"
@@ -542,7 +542,7 @@ msgstr "모든 상태"
 #: components/budgets/budgets-table.tsx
 #: components/goals/goal-filters.tsx
 #: components/goals/goals-table.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
 #: components/recurring-transactions/recurring-transactions-table.tsx
 msgctxt "3a5wL8"
 msgid "Active"
@@ -558,7 +558,7 @@ msgstr "차단됨"
 #: components/budgets/budget-filters.tsx
 #: components/categories/category-filters.tsx
 #: components/goals/goal-filters.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
 #: components/statistics/statistics-filters.tsx
 #: components/transactions/transaction-filters.tsx
 msgctxt "jm_spn"
@@ -796,13 +796,13 @@ msgstr "만료일:"
 #: components/admin/delete-user.tsx
 #: components/admin/set-user-password-form.tsx
 #: components/admin/stop-impersonation.tsx
+#: components/auth/sign-out-button.tsx
 #: components/budgets/budget-form.tsx
 #: components/budgets/delete-budget.tsx
 #: components/categories/category-form.tsx
 #: components/categories/delete-category.tsx
 #: components/goals/delete-goal.tsx
 #: components/goals/goal-form.tsx
-#: components/layout/secondary-nav.tsx
 #: components/recurring-transactions/delete-recurring-transaction.tsx
 #: components/recurring-transactions/recurring-transaction-form.tsx
 #: components/settings/change-name-form.tsx
@@ -1014,6 +1014,31 @@ msgctxt "y1Z3or"
 msgid "Language"
 msgstr "언어"
 
+#: components/auth/sign-out-button.tsx
+msgctxt "XuxYAf"
+msgid "Failed to sign out! Please try again later."
+msgstr "로그아웃에 실패했습니다! 나중에 다시 시도해주세요."
+
+#: components/auth/sign-out-button.tsx
+msgctxt "hlp8qc"
+msgid "Signed out."
+msgstr "로그아웃되었습니다."
+
+#: components/auth/sign-out-button.tsx
+msgctxt "F62y-K"
+msgid "Sign Out"
+msgstr "로그아웃"
+
+#: components/auth/sign-out-button.tsx
+msgctxt "BHBJUz"
+msgid "Are you sure you want to sign out?"
+msgstr "로그아웃하시겠습니까?"
+
+#: components/auth/sign-out-button.tsx
+msgctxt "naYgGy"
+msgid "You will need to sign in again to access your account."
+msgstr "계정에 다시 액세스하려면 다시 로그인해야 합니다."
+
 #: components/auth/signin-form.tsx
 msgctxt "ExP2LI"
 msgid "CAPTCHA verification failed! Please try again later."
@@ -1112,7 +1137,7 @@ msgstr "확인"
 
 #: components/budgets/budget-filters.tsx
 #: components/goals/goal-filters.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
 #: components/statistics/statistics-filters.tsx
 #: components/transactions/transaction-filters.tsx
 msgctxt "TBovrx"
@@ -1121,7 +1146,7 @@ msgstr "월"
 
 #: components/budgets/budget-filters.tsx
 #: components/goals/goal-filters.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
 #: components/statistics/statistics-filters.tsx
 #: components/transactions/transaction-filters.tsx
 msgctxt "O-ZfC8"
@@ -1130,7 +1155,7 @@ msgstr "모든 월"
 
 #: components/budgets/budget-filters.tsx
 #: components/goals/goal-filters.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
 #: components/statistics/statistics-filters.tsx
 #: components/transactions/transaction-filters.tsx
 msgctxt "IFo1oo"
@@ -1139,7 +1164,7 @@ msgstr "연도"
 
 #: components/budgets/budget-filters.tsx
 #: components/goals/goal-filters.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
 #: components/statistics/statistics-filters.tsx
 #: components/transactions/transaction-filters.tsx
 msgctxt "5JGC4V"
@@ -1151,7 +1176,7 @@ msgstr "모든 연도"
 #: components/category-form-select.tsx
 #: components/goals/goal-filters.tsx
 #: components/goals/goals-table.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
 #: components/recurring-transactions/recurring-transactions-table.tsx
 #: components/statistics/statistics-table.tsx
 #: components/transactions/export-button.tsx
@@ -1163,7 +1188,7 @@ msgstr "카테고리"
 
 #: components/budgets/budget-filters.tsx
 #: components/goals/goal-filters.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
 #: components/transactions/transaction-filters.tsx
 msgctxt "1X6HtI"
 msgid "All Categories"
@@ -1206,7 +1231,7 @@ msgstr "초과 (≥ 100%)"
 
 #: components/budgets/budget-filters.tsx
 #: components/goals/goal-filters.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
 msgctxt "tADQQm"
 msgid "All Statuses"
 msgstr "모든 상태"
@@ -1313,7 +1338,7 @@ msgstr "업데이트"
 #: components/categories/category-form.tsx
 #: components/goals/goal-form.tsx
 #: components/goals/goals-page.tsx
-#: components/home/homepage.tsx
+#: components/home/home-page.tsx
 #: components/recurring-transactions/recurring-transaction-form.tsx
 #: components/recurring-transactions/recurring-transactions-page.tsx
 #: components/transactions/transaction-form.tsx
@@ -1417,7 +1442,7 @@ msgstr "설명"
 
 #: components/categories/categories-table.tsx
 #: components/categories/category-filters.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
 #: components/recurring-transactions/recurring-transactions-table.tsx
 #: components/statistics/statistics-table.tsx
 #: components/transactions/export-button.tsx
@@ -1430,8 +1455,8 @@ msgstr "유형"
 #: components/categories/categories-table.tsx
 #: components/categories/category-filters.tsx
 #: components/categories/category-form.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
 #: components/recurring-transactions/recurring-transaction-form.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
 #: components/recurring-transactions/recurring-transactions-table.tsx
 #: components/statistics/statistics-table.tsx
 #: components/transactions/export-button.tsx
@@ -1445,8 +1470,8 @@ msgstr "유입"
 #: components/categories/categories-table.tsx
 #: components/categories/category-filters.tsx
 #: components/categories/category-form.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
 #: components/recurring-transactions/recurring-transaction-form.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
 #: components/recurring-transactions/recurring-transactions-table.tsx
 #: components/statistics/statistics-table.tsx
 #: components/transactions/export-button.tsx
@@ -1463,7 +1488,7 @@ msgid "Search categories..."
 msgstr "카테고리 검색..."
 
 #: components/categories/category-filters.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
 #: components/transactions/transaction-filters.tsx
 msgctxt "UjTL-F"
 msgid "All Types"
@@ -1617,12 +1642,12 @@ msgctxt "GkiQMs"
 msgid "Accumulated"
 msgstr "누적"
 
-#: components/home/homepage.tsx
+#: components/home/home-page.tsx
 msgctxt "UKxoV8"
 msgid "Welcome back"
 msgstr "다시 오신 것을 환영합니다"
 
-#: components/home/homepage.tsx
+#: components/home/home-page.tsx
 msgctxt "9A7jRV"
 msgid "Here's what's happening with your finances this month."
 msgstr "이번 달 재정 상황을 확인하세요."
@@ -1814,31 +1839,6 @@ msgctxt "3aju6V"
 msgid "CANNOT FETCH RECURRING TRANSACTIONS DATA"
 msgstr "반복 거래 데이터를 가져올 수 없습니다"
 
-#: components/layout/secondary-nav.tsx
-msgctxt "XuxYAf"
-msgid "Failed to sign out! Please try again later."
-msgstr "로그아웃에 실패했습니다! 나중에 다시 시도해주세요."
-
-#: components/layout/secondary-nav.tsx
-msgctxt "hlp8qc"
-msgid "Signed out."
-msgstr "로그아웃되었습니다."
-
-#: components/layout/secondary-nav.tsx
-msgctxt "F62y-K"
-msgid "Sign Out"
-msgstr "로그아웃"
-
-#: components/layout/secondary-nav.tsx
-msgctxt "BHBJUz"
-msgid "Are you sure you want to sign out?"
-msgstr "로그아웃하시겠습니까?"
-
-#: components/layout/secondary-nav.tsx
-msgctxt "naYgGy"
-msgid "You will need to sign in again to access your account."
-msgstr "계정에 다시 액세스하려면 다시 로그인해야 합니다."
-
 #: components/password-input.tsx
 msgctxt "K3fWTv"
 msgid "Hide password"
@@ -1858,6 +1858,17 @@ msgstr "반복 거래 삭제"
 msgctxt "B58bFw"
 msgid "Are you sure you want to delete this recurring transaction? This action cannot be undone."
 msgstr "이 반복 거래를 삭제하시겠습니까? 이 작업은 취소할 수 없습니다."
+
+#: components/recurring-transactions/recurring-transaction-filters.tsx
+msgctxt "jZimtU"
+msgid "Search recurring transactions..."
+msgstr "반복 거래 검색..."
+
+#: components/recurring-transactions/recurring-transaction-filters.tsx
+#: components/recurring-transactions/recurring-transactions-table.tsx
+msgctxt "6Tps09"
+msgid "Inactive"
+msgstr "비활성"
 
 #: components/recurring-transactions/recurring-transaction-form.tsx
 msgctxt "m1EF9E"
@@ -1952,17 +1963,6 @@ msgstr "종료일 없음"
 msgctxt "4fHiNl"
 msgid "Duplicate"
 msgstr "복제"
-
-#: components/recurring-transactions/recurring-transactions-filters.tsx
-msgctxt "jZimtU"
-msgid "Search recurring transactions..."
-msgstr "반복 거래 검색..."
-
-#: components/recurring-transactions/recurring-transactions-filters.tsx
-#: components/recurring-transactions/recurring-transactions-table.tsx
-msgctxt "6Tps09"
-msgid "Inactive"
-msgstr "비활성"
 
 #: components/recurring-transactions/recurring-transactions-page.tsx
 #: hooks/use-nav.ts

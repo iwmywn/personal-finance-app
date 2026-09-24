@@ -35,7 +35,7 @@ import type { AuthErrorCode } from "@/lib/definitions"
 import { getSafeCallbackUrl } from "@/lib/utils"
 import type { TwoFactorCodeFormValues } from "@/schemas/types"
 
-export function TwoFactorVerificationForm() {
+export function TwoFactorForm() {
   const t = useExtracted()
   const router = useRouter()
   const searchParams = useSearchParams()

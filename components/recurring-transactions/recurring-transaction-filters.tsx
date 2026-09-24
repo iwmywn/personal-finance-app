@@ -29,7 +29,7 @@ import { useMonths } from "@/hooks/use-months"
 import { filterRecurringTransactions } from "@/lib/filters"
 import { getUniqueDateRangeYears } from "@/lib/utils"
 
-export function RecurringTransactionsFilters() {
+export function RecurringTransactionFilters() {
   const { recurringTransactions } = useRecurring()
   const [searchTerm, setSearchTerm] = useState<string>("")
   const [filterMonth, setFilterMonth] = useState<string>("all")

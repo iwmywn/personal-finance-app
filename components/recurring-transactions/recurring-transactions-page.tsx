@@ -4,8 +4,8 @@ import { useState } from "react"
 import { useExtracted } from "next-intl"
 
 import { Button } from "@/components/ui/button"
+import { RecurringTransactionFilters } from "@/components/recurring-transactions/recurring-transaction-filters"
 import { RecurringTransactionForm } from "@/components/recurring-transactions/recurring-transaction-form"
-import { RecurringTransactionsFilters } from "@/components/recurring-transactions/recurring-transactions-filters"
 
 export default function RecurringTransactionsPage() {
   const [isOpen, setIsOpen] = useState<boolean>(false)
@@ -24,7 +24,7 @@ export default function RecurringTransactionsPage() {
           <Button onClick={() => setIsOpen(true)}>{t("Add")}</Button>
         </div>
 
-        <RecurringTransactionsFilters />
+        <RecurringTransactionFilters />
       </div>
 
       <RecurringTransactionForm isOpen={isOpen} setIsOpen={setIsOpen} />
