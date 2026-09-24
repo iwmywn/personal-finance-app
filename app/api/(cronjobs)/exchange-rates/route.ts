@@ -35,6 +35,8 @@ export async function GET(request: NextRequest) {
     const datesToCheck = new Set<number>()
     datesToCheck.add(yesterdayUTC.getTime())
 
+    await missingRatesCollection.deleteMany({ retryCount: { $gt: 5 } })
+
     const queuedDocs = await missingRatesCollection
       .find({})
       .sort({ createdAt: 1 })

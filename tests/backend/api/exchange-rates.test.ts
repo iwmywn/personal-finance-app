@@ -157,5 +157,30 @@ describe("Exchange Rates Cron Job", () => {
       expect(json.success).toBe(true)
       expect(json.errors.length).toBeGreaterThan(0)
     })
+
+    it("should remove records that have been retried more than 5 times", async () => {
+      const oldPoisonDate = new Date("1970-01-01T00:00:00Z")
+      await insertTestMissingExchangeRate({
+        _id: new ObjectId(),
+        date: oldPoisonDate,
+        createdAt: new Date(),
+        retryCount: 6,
+      })
+
+      const request = new NextRequest(cronEndpoint, {
+        headers: {
+          authorization: `Bearer ${cronSecret}`,
+        },
+      })
+
+      const response = await GET(request)
+      expect(response.status).toBe(200)
+
+      const missingRatesCollection = await getMissingExchangeRatesCollection()
+      const poisonDoc = await missingRatesCollection.findOne({
+        date: oldPoisonDate,
+      })
+      expect(poisonDoc).toBeNull()
+    })
   })
 })

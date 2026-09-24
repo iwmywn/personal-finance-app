@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { SearchIcon, XIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 
@@ -26,6 +26,7 @@ import { RecurringTransactionsTable } from "@/components/recurring-transactions/
 import { useRecurring } from "@/contexts/recurring-context"
 import { useCategory } from "@/hooks/use-category"
 import { useMonths } from "@/hooks/use-months"
+import { localDateToUTCMidnight } from "@/lib/date"
 import { filterRecurringTransactions } from "@/lib/filters"
 import { getUniqueDateRangeYears } from "@/lib/utils"
 
@@ -62,6 +63,8 @@ export function RecurringTransactionFilters() {
     setFilterCategoryKey("all")
   }
 
+  const todayUTC = useMemo(() => localDateToUTCMidnight(new Date()), [])
+
   const filteredRecurring = filterRecurringTransactions(recurringTransactions, {
     searchTerm,
     filterMonth,
@@ -69,6 +72,7 @@ export function RecurringTransactionFilters() {
     filterType,
     filterStatus,
     filterCategoryKey,
+    todayUTC,
   })
 
   return (

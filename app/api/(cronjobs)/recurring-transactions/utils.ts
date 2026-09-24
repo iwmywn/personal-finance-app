@@ -88,13 +88,25 @@ export function getNextDate(
       )
     : startUTC
 
-  while (candidate < todayUTC && !isSameUTCDate(candidate, todayUTC)) {
-    candidate = stepNextDate(
+  const MAX_ITERATIONS = 366
+  let iterations = 0
+
+  while (
+    candidate < todayUTC &&
+    !isSameUTCDate(candidate, todayUTC) &&
+    iterations < MAX_ITERATIONS
+  ) {
+    const next = stepNextDate(
       candidate,
       rec.frequency,
       startUTC,
       rec.randomEveryXDays
     )
+    if (next.getTime() <= candidate.getTime()) {
+      break
+    }
+    candidate = next
+    iterations++
   }
 
   if (endUTC && candidate.getTime() > endUTC.getTime()) {

@@ -1029,5 +1029,15 @@ describe("Filters", () => {
       })
       expect(foodOnly.map((r) => r._id)).toEqual(["rec-active-no-end"])
     })
+
+    it("should respect todayUTC passed from caller to prevent timezone mismatch", () => {
+      // If today is June 16, rec-active-ending-today (ends June 15) should be inactive
+      const customTodayUTC = new Date("2026-06-16T00:00:00Z")
+      const result = filterRecurringTransactions(recurringList, {
+        filterStatus: "active",
+        todayUTC: customTodayUTC,
+      })
+      expect(result.map((r) => r._id)).toEqual(["rec-active-no-end"])
+    })
   })
 })

@@ -798,6 +798,17 @@ describe("Recurring Transactions Cron Job", () => {
         }
         expect(getNextDate(afterGenerated, todayUTC)).toBeNull()
       })
+
+      it("should not exceed MAX_ITERATIONS when startDate is far in the past", () => {
+        const ancientRec: DBRecurringTransaction = {
+          ...baseRecurring,
+          frequency: "daily",
+          startDate: new Date("1900-01-01T00:00:00.000Z"),
+        }
+        const todayUTC = new Date("2026-01-01T00:00:00.000Z")
+        const result = getNextDate(ancientRec, todayUTC)
+        expect(result).not.toBeNull()
+      })
     })
   })
 })
