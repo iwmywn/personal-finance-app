@@ -65,7 +65,7 @@
     "husky": "9.1.7",
     "lint-staged": "17.5.1",
     "mongodb-memory-server": "11.3.0",
-    "prettier": "3.9.8",
+    "prettier": "3.9.9",
     "prettier-plugin-tailwindcss": "0.8.1",
     "react-doctor": "0.9.14",
     "tailwindcss": "4.3.3",
