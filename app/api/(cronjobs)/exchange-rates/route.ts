@@ -15,7 +15,7 @@ import { addDays, normalizeToUTCMidnight } from "@/lib/date"
 // Vercel Cron Jobs only trigger HTTP GET requests.
 // [See official docs](https://vercel.com/docs/cron-jobs#how-cron-jobs-work)
 
-const MAX_DATES_PER_RUN = 10
+const MAX_DATES_PER_RUN = 5
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get("authorization")

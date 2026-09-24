@@ -20,7 +20,7 @@ import { getDueDates } from "./utils"
 // Vercel Cron Jobs only trigger HTTP GET requests.
 // [See official docs](https://vercel.com/docs/cron-jobs#how-cron-jobs-work)
 
-const BATCH_SIZE = 50
+const BATCH_SIZE = 5
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get("authorization")
