@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState } from "react"
 import Link from "next/link"
@@ -166,7 +166,7 @@ export function GoalsTable({ filteredGoals }: GoalsTableProps) {
                           <DropdownMenuContent>
                             <DropdownMenuItem asChild>
                               <Link
-                                href={`/transactions?from=${serializeUTCDate(goal.startDate)}&to=${serializeUTCDate(goal.endDate)}&category=${goal.categoryKey}`}
+                                href={`/transactions?from=${serializeUTCDate(goal.startDate)}&to=${serializeUTCDate(goal.endDate)}&type=inflow&category=${goal.categoryKey}`}
                                 className="cursor-pointer"
                               >
                                 {t("View")}

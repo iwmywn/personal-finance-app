@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState } from "react"
 import Link from "next/link"
@@ -177,7 +177,7 @@ export function BudgetsTable({ filteredBudgets }: BudgetsTableProps) {
                           <DropdownMenuContent>
                             <DropdownMenuItem asChild>
                               <Link
-                                href={`/transactions?from=${serializeUTCDate(budget.startDate)}&to=${serializeUTCDate(budget.endDate)}&category=${budget.categoryKey}`}
+                                href={`/transactions?from=${serializeUTCDate(budget.startDate)}&to=${serializeUTCDate(budget.endDate)}&type=outflow&category=${budget.categoryKey}`}
                                 className="cursor-pointer"
                               >
                                 {t("View")}
