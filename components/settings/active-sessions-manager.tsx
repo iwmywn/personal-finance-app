@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { Laptop, Smartphone } from "lucide-react"
 import { useExtracted } from "next-intl"
@@ -9,7 +9,7 @@ import { UAParser } from "ua-parser-js"
 
 import { signInRoute } from "@/routes"
 import { getLocationFromIP } from "@/actions/location.actions"
-import { revokeSessionById } from "@/actions/session.actions"
+import { getSessions, revokeSessionById } from "@/actions/session.actions"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -30,15 +30,33 @@ import {
 import { Spinner } from "@/components/ui/spinner"
 import { useUser } from "@/contexts/user-context"
 import { authClient } from "@/lib/auth-client"
+import type { Session } from "@/lib/definitions"
 
 export function ActiveSessionsManager() {
   const t = useExtracted()
   const router = useRouter()
-  const { session: currentSession, sessions: activeSessions } = useUser()
+  const { session: currentSession } = useUser()
+  const [activeSessions, setActiveSessions] = useState<Session[]>([])
+  const [isPending, startTransition] = useTransition()
   const [isTerminating, setIsTerminating] = useState<string | undefined>()
   const [isRevokingAll, setIsRevokingAll] = useState<boolean>(false)
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const [locations, setLocations] = useState<Record<string, string | null>>({})
+
+  function handleOpenChange(open: boolean) {
+    setIsOpen(open)
+
+    if (open) {
+      startTransition(async () => {
+        const res = await getSessions()
+        if (res.sessions) {
+          setActiveSessions(res.sessions)
+        } else if (res.error) {
+          toast.error(res.error)
+        }
+      })
+    }
+  }
 
   const sortedSessions = useMemo(() => {
     const allSessions = activeSessions.some((s) => s.id === currentSession.id)
@@ -119,6 +137,7 @@ export function ActiveSessionsManager() {
         toast.error(error)
       } else {
         toast.success(success)
+        setActiveSessions((prev) => prev.filter((s) => s.id !== sessionId))
         router.refresh()
       }
     } catch {
@@ -186,7 +205,7 @@ export function ActiveSessionsManager() {
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button variant="outline">{t("View Active Sessions")}</Button>
       </DialogTrigger>
@@ -197,60 +216,66 @@ export function ActiveSessionsManager() {
             {t("Manage your active sessions.")}
           </DialogDescription>
         </DialogHeader>
-        <div className="max-h-[60vh] space-y-3 overflow-y-auto">
-          {sortedSessions.map((s) => {
-            const parser = new UAParser(s.userAgent || "")
-            const device = parser.getDevice()
-            const os = parser.getOS()
-            const browser = parser.getBrowser()
-            const isCurrentSession = s.id === currentSession.id
-            const location = locations[s.id]
+        {isPending && sortedSessions.length === 0 ? (
+          <div className="flex h-32 items-center justify-center">
+            <Spinner className="size-6" />
+          </div>
+        ) : (
+          <div className="max-h-[60vh] space-y-3 overflow-y-auto">
+            {sortedSessions.map((s) => {
+              const parser = new UAParser(s.userAgent || "")
+              const device = parser.getDevice()
+              const os = parser.getOS()
+              const browser = parser.getBrowser()
+              const isCurrentSession = s.id === currentSession.id
+              const location = locations[s.id]
 
-            return (
-              <Item key={s.id} variant="outline">
-                <ItemMedia variant="icon">
-                  {device.type === "mobile" ? (
-                    <Smartphone className="text-muted-foreground h-5 w-5" />
-                  ) : (
-                    <Laptop className="text-muted-foreground h-5 w-5" />
-                  )}
-                </ItemMedia>
-                <ItemContent>
-                  <ItemTitle>
-                    <div>
-                      {os.name || s.userAgent || t("Unknown Device")}
-                      {browser.name && `, ${browser.name}`}
-                    </div>
-                    {isCurrentSession && (
-                      <>
-                        <div>&middot;</div>
-                        <div className="text-green-500">{t("Current")}</div>
-                      </>
-                    )}
-                  </ItemTitle>
-                  <ItemDescription>
-                    {location === undefined ? (
-                      <Spinner className="size-3.5" />
+              return (
+                <Item key={s.id} variant="outline">
+                  <ItemMedia variant="icon">
+                    {device.type === "mobile" ? (
+                      <Smartphone className="text-muted-foreground h-5 w-5" />
                     ) : (
-                      (location ?? t("Unknown Location"))
+                      <Laptop className="text-muted-foreground h-5 w-5" />
                     )}
-                  </ItemDescription>
-                </ItemContent>
-                <ItemActions>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleRevokeSession(s.id)}
-                    disabled={isTerminating === s.id || isRevokingAll}
-                  >
-                    {isTerminating === s.id && <Spinner />}
-                    {t("Terminate")}
-                  </Button>
-                </ItemActions>
-              </Item>
-            )
-          })}
-        </div>
+                  </ItemMedia>
+                  <ItemContent>
+                    <ItemTitle>
+                      <div>
+                        {os.name || s.userAgent || t("Unknown Device")}
+                        {browser.name && `, ${browser.name}`}
+                      </div>
+                      {isCurrentSession && (
+                        <>
+                          <div>&middot;</div>
+                          <div className="text-green-500">{t("Current")}</div>
+                        </>
+                      )}
+                    </ItemTitle>
+                    <ItemDescription>
+                      {location === undefined ? (
+                        <Spinner className="size-3.5" />
+                      ) : (
+                        (location ?? t("Unknown Location"))
+                      )}
+                    </ItemDescription>
+                  </ItemContent>
+                  <ItemActions>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleRevokeSession(s.id)}
+                      disabled={isTerminating === s.id || isRevokingAll}
+                    >
+                      {isTerminating === s.id && <Spinner />}
+                      {t("Terminate")}
+                    </Button>
+                  </ItemActions>
+                </Item>
+              )
+            })}
+          </div>
+        )}
         <Button
           onClick={handleRevokeAllSessions}
           disabled={isRevokingAll || isTerminating !== undefined}

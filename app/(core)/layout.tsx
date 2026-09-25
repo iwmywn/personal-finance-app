@@ -1,9 +1,9 @@
-﻿import { cookies } from "next/headers"
+import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
 
 import { signInRoute } from "@/routes"
-import { getSession, getSessions } from "@/actions/session.actions"
+import { getSession } from "@/actions/session.actions"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { AppSidebar } from "@/components/layout/app-sidebar"
@@ -15,17 +15,15 @@ export default async function DashboardLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const [cookieStore, sessionResult, sessionsResult] = await Promise.all([
+  const [cookieStore, sessionResult] = await Promise.all([
     cookies(),
     getSession(),
-    getSessions(),
   ])
   const defaultOpen = cookieStore.get("sidebar_state")?.value === "true"
 
   const { user, session } = sessionResult
-  const { sessions } = sessionsResult
 
-  if (!user || !session || !sessions) {
+  if (!user || !session) {
     redirect(signInRoute)
   }
 
@@ -36,7 +34,6 @@ export default async function DashboardLayout({
           value={{
             user,
             session,
-            sessions,
           }}
         >
           <SidebarProvider defaultOpen={defaultOpen}>

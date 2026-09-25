@@ -68,6 +68,12 @@ export function TransactionsTable({
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false)
   const [isCurrentPage, setIsCurrentPage] = useState<number>(1)
+  const [prevTransactions, setPrevTransactions] = useState(filteredTransactions)
+
+  if (prevTransactions !== filteredTransactions) {
+    setPrevTransactions(filteredTransactions)
+    setIsCurrentPage(1)
+  }
 
   const totalPages =
     Math.ceil(filteredTransactions.length / ITEMS_PER_PAGE) || 1

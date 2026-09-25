@@ -78,19 +78,44 @@ export async function GET(request: NextRequest) {
     let syncedCount = 0
     const errors: { date: string; error: string }[] = []
 
-    for (const d of datesToSync) {
-      try {
-        await ensureExchangeRateForDate(d)
-        await missingRatesCollection.deleteOne({ date: d })
-        syncedCount++
-      } catch (error) {
+    const syncResults = await Promise.allSettled(
+      datesToSync.map(async (d) => {
+        try {
+          await ensureExchangeRateForDate(d)
+          await missingRatesCollection.deleteOne({ date: d })
+          return { success: true, date: d }
+        } catch (error) {
+          const errorMsg =
+            error instanceof Error ? error.message : String(error ?? "")
+          await enqueueMissingExchangeRateDate(d, error)
+          return {
+            success: false,
+            date: d,
+            error: errorMsg,
+          }
+        }
+      })
+    )
+
+    for (const res of syncResults) {
+      if (res.status === "fulfilled") {
+        if (res.value.success) {
+          syncedCount++
+        } else {
+          errors.push({
+            date: res.value.date.toISOString().split("T")[0] as string,
+            error: res.value.error as string,
+          })
+        }
+      } else {
         const errorMsg =
-          error instanceof Error ? error.message : String(error ?? "")
+          res.reason instanceof Error
+            ? res.reason.message
+            : String(res.reason ?? "")
         errors.push({
-          date: d.toISOString().split("T")[0],
+          date: "unknown",
           error: errorMsg,
         })
-        await enqueueMissingExchangeRateDate(d, error)
       }
     }
 

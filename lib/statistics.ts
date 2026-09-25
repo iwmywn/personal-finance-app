@@ -7,9 +7,12 @@ import type { Budget, Goal, Transaction } from "@/lib/definitions"
 import { convertAmountWithRates, progressColorClass } from "@/lib/utils"
 
 export function getCurrentMonthTransactions(
-  transactions: Transaction[]
+  transactions: Transaction[],
+  today?: Date
 ): Transaction[] {
-  const todayUTC = localDateToUTCMidnight(new Date())
+  const todayUTC = today
+    ? normalizeToUTCMidnight(today)
+    : localDateToUTCMidnight(new Date())
   const currentMonth = todayUTC.getUTCMonth()
   const currentYear = todayUTC.getUTCFullYear()
 
@@ -31,8 +34,14 @@ interface QuickStats {
   popularCategory: CategoryKey[]
 }
 
-export function calculateQuickStats(transactions: Transaction[]): QuickStats {
-  const currentMonthTransactions = getCurrentMonthTransactions(transactions)
+export function calculateQuickStats(
+  transactions: Transaction[],
+  today?: Date
+): QuickStats {
+  const currentMonthTransactions = getCurrentMonthTransactions(
+    transactions,
+    today
+  )
 
   const currentMonthCount = currentMonthTransactions.length
 
