@@ -51,5 +51,6 @@
 
 ## 5. Notes / Constraints
 
+- **Commands**: Always use pnpm.
 - **Environment Variables**: Managed strictly via `@t3-oss/env-nextjs` in the `env/` folder. Do not use `process.env` directly if possible.
 - **React Doctor**: Configured in `doctor.config.mjs` to audit React code health, enforce React Compiler compatibility, prevent SSR hydration mismatches, and maintain clean component architecture.
