@@ -1714,14 +1714,14 @@ msgid "The percentage of money you save compared to inflow ((Inflow - Outflow) /
 msgstr "流入に対して節約したお金の割合（(流入 - 流出) / 流入 × 100%）。"
 
 #: components/home/quick-stats.tsx
-msgctxt "O8QihK"
-msgid "Popular Category"
-msgstr "人気カテゴリ"
+msgctxt "Kls-XI"
+msgid "Popular Expense Category"
+msgstr "人気の支出カテゴリー"
 
 #: components/home/quick-stats.tsx
-msgctxt "wEyaDt"
-msgid "Category with the highest total amount in the month."
-msgstr "月間で総額が最も高いカテゴリ。"
+msgctxt "HS4zWl"
+msgid "Outflow category with the highest total amount in the month."
+msgstr "月内で合計金額が最も高い支出カテゴリー。"
 
 #: components/home/recent-transactions.tsx
 msgctxt "GMkXVd"

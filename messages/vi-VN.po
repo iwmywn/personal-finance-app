@@ -308,7 +308,7 @@ msgstr "Truy cập bị từ chối! Vui lòng tải lại trang và thử lại
 #: actions/session.actions.ts
 msgctxt "fyjUn0"
 msgid "Access denied! Admin privileges required."
-msgstr "Truy cập bị từ chối! Cần có quyền quản trị viên."
+msgstr "Truy cập bị từ chối! Yêu cầu quyền quản trị viên."
 
 #: actions/session.actions.ts
 msgctxt "sc5uVX"
@@ -1714,14 +1714,14 @@ msgid "The percentage of money you save compared to inflow ((Inflow - Outflow) /
 msgstr "Tỷ lệ phần trăm tiền bạn tiết kiệm được so với dòng tiền vào ((Dòng tiền vào - Dòng tiền ra) / Dòng tiền vào × 100%)."
 
 #: components/home/quick-stats.tsx
-msgctxt "O8QihK"
-msgid "Popular Category"
-msgstr "Danh mục phổ biến"
+msgctxt "Kls-XI"
+msgid "Popular Expense Category"
+msgstr "Danh mục chi tiêu phổ biến"
 
 #: components/home/quick-stats.tsx
-msgctxt "wEyaDt"
-msgid "Category with the highest total amount in the month."
-msgstr "Danh mục có tổng số tiền cao nhất trong tháng."
+msgctxt "HS4zWl"
+msgid "Outflow category with the highest total amount in the month."
+msgstr "Danh mục chi tiền có tổng số tiền cao nhất trong tháng."
 
 #: components/home/recent-transactions.tsx
 msgctxt "GMkXVd"

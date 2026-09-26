@@ -10,7 +10,9 @@ import {
 import { useExtracted } from "next-intl"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useUser } from "@/contexts/user-context"
 import { useFormatCurrency } from "@/hooks/use-format-currency"
+import type { Currency } from "@/lib/currency"
 import type { Transaction } from "@/lib/definitions"
 import { calculateSummaryStats } from "@/lib/statistics"
 import { toDecimal } from "@/lib/utils"
@@ -23,6 +25,7 @@ export function StatisticsSummary({
   filteredTransactions,
 }: StatisticsSummaryProps) {
   const t = useExtracted()
+  const { user } = useUser()
   const formatCurrency = useFormatCurrency()
   const {
     totalInflow,
@@ -31,7 +34,7 @@ export function StatisticsSummary({
     transactionCount,
     inflowCount,
     outflowCount,
-  } = calculateSummaryStats(filteredTransactions)
+  } = calculateSummaryStats(filteredTransactions, user.currency as Currency)
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -40,7 +43,7 @@ export function StatisticsSummary({
           <CardTitle>{t("Total Inflow")}</CardTitle>
           <ArrowUpIcon className="size-4 text-green-600" />
         </CardHeader>
-        <CardContent>
+        <CardContent suppressHydrationWarning>
           <div className="text-2xl wrap-anywhere text-green-600">
             {formatCurrency(totalInflow)}
           </div>
@@ -55,7 +58,7 @@ export function StatisticsSummary({
           <CardTitle>{t("Total Outflow")}</CardTitle>
           <ArrowDownIcon className="size-4 text-red-600" />
         </CardHeader>
-        <CardContent>
+        <CardContent suppressHydrationWarning>
           <div className="text-2xl wrap-anywhere text-red-600">
             {formatCurrency(totalOutflow)}
           </div>
@@ -74,7 +77,7 @@ export function StatisticsSummary({
             <TrendingDownIcon className="size-4 text-red-600" />
           )}
         </CardHeader>
-        <CardContent>
+        <CardContent suppressHydrationWarning>
           <div
             className={`text-2xl wrap-anywhere ${
               toDecimal(balance).greaterThan(0)
@@ -102,7 +105,7 @@ export function StatisticsSummary({
           <CardTitle>{t("Total Transactions")}</CardTitle>
           <ActivityIcon className="size-4 text-blue-600" />
         </CardHeader>
-        <CardContent>
+        <CardContent suppressHydrationWarning>
           <div className="text-2xl wrap-anywhere text-blue-600">
             {transactionCount}
           </div>

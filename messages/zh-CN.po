@@ -308,7 +308,7 @@ msgstr "访问被拒绝！请刷新页面并重试。"
 #: actions/session.actions.ts
 msgctxt "fyjUn0"
 msgid "Access denied! Admin privileges required."
-msgstr "拒绝访问！需要管理员权限。"
+msgstr "访问被拒绝！需要管理员权限。"
 
 #: actions/session.actions.ts
 msgctxt "sc5uVX"
@@ -1714,14 +1714,14 @@ msgid "The percentage of money you save compared to inflow ((Inflow - Outflow) /
 msgstr "与流入相比，您节省的资金百分比（（流入 - 流出）/ 流入 × 100%）。"
 
 #: components/home/quick-stats.tsx
-msgctxt "O8QihK"
-msgid "Popular Category"
-msgstr "热门分类"
+msgctxt "Kls-XI"
+msgid "Popular Expense Category"
+msgstr "热门支出类别"
 
 #: components/home/quick-stats.tsx
-msgctxt "wEyaDt"
-msgid "Category with the highest total amount in the month."
-msgstr "本月总金额最高的分类。"
+msgctxt "HS4zWl"
+msgid "Outflow category with the highest total amount in the month."
+msgstr "当月总金额最高的支出类别。"
 
 #: components/home/recent-transactions.tsx
 msgctxt "GMkXVd"

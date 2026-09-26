@@ -101,8 +101,12 @@ export function BudgetsTable({ filteredBudgets }: BudgetsTableProps) {
                 <TableBody>
                   {budgetsWithSpent.map((budget) => (
                     <TableRow key={budget._id} className="[&>td]:text-center">
-                      <TableCell>{formatDate(budget.startDate)}</TableCell>
-                      <TableCell>{formatDate(budget.endDate)}</TableCell>
+                      <TableCell suppressHydrationWarning>
+                        {formatDate(budget.startDate)}
+                      </TableCell>
+                      <TableCell suppressHydrationWarning>
+                        {formatDate(budget.endDate)}
+                      </TableCell>
                       <TableCell>
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -132,7 +136,7 @@ export function BudgetsTable({ filteredBudgets }: BudgetsTableProps) {
                           budget.currency
                         )}
                       </TableCell>
-                      <TableCell>
+                      <TableCell suppressHydrationWarning>
                         <Badge
                           className={
                             budget.status === "expired"
@@ -149,7 +153,7 @@ export function BudgetsTable({ filteredBudgets }: BudgetsTableProps) {
                               : t("Upcoming")}
                         </Badge>
                       </TableCell>
-                      <TableCell className="min-w-32">
+                      <TableCell className="min-w-32" suppressHydrationWarning>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Progress

@@ -127,7 +127,9 @@ export function TransactionsTable({
                         key={transaction._id.toString()}
                         className="[&>td]:text-center"
                       >
-                        <TableCell>{formatDate(transaction.date)}</TableCell>
+                        <TableCell suppressHydrationWarning>
+                          {formatDate(transaction.date)}
+                        </TableCell>
                         <TableCell className="max-w-md min-w-52 wrap-anywhere whitespace-normal">
                           {transaction.description}
                         </TableCell>
@@ -156,7 +158,10 @@ export function TransactionsTable({
                             </TooltipContent>
                           </Tooltip>
                         </TableCell>
-                        <TableCell className="min-w-38 wrap-anywhere whitespace-normal">
+                        <TableCell
+                          className="min-w-38 wrap-anywhere whitespace-normal"
+                          suppressHydrationWarning
+                        >
                           <span
                             className={`font-semibold ${
                               transaction.type === "inflow"
@@ -165,7 +170,10 @@ export function TransactionsTable({
                             }`}
                           >
                             {transaction.type === "inflow" ? "+" : "-"}
-                            {formatCurrency(transaction.amount)}
+                            {formatCurrency(
+                              transaction.amount,
+                              transaction.currency
+                            )}
                           </span>
                         </TableCell>
                         <TableCell>

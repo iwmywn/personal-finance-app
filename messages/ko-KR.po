@@ -308,7 +308,7 @@ msgstr "접근이 거부되었습니다! 페이지를 새로고침하고 다시 
 #: actions/session.actions.ts
 msgctxt "fyjUn0"
 msgid "Access denied! Admin privileges required."
-msgstr "액세스가 거부되었습니다! 관리자 권한이 필요합니다."
+msgstr "접근이 거부되었습니다! 관리자 권한이 필요합니다."
 
 #: actions/session.actions.ts
 msgctxt "sc5uVX"
@@ -1714,14 +1714,14 @@ msgid "The percentage of money you save compared to inflow ((Inflow - Outflow) /
 msgstr "유입 대비 저축한 금액의 비율((유입 - 유출) / 유입 × 100%)."
 
 #: components/home/quick-stats.tsx
-msgctxt "O8QihK"
-msgid "Popular Category"
-msgstr "인기 카테고리"
+msgctxt "Kls-XI"
+msgid "Popular Expense Category"
+msgstr "인기 지출 카테고리"
 
 #: components/home/quick-stats.tsx
-msgctxt "wEyaDt"
-msgid "Category with the highest total amount in the month."
-msgstr "이번 달 총 금액이 가장 높은 카테고리."
+msgctxt "HS4zWl"
+msgid "Outflow category with the highest total amount in the month."
+msgstr "해당 월에 총 지출액이 가장 높은 지출 카테고리입니다."
 
 #: components/home/recent-transactions.tsx
 msgctxt "GMkXVd"

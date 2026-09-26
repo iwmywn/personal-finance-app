@@ -4,8 +4,8 @@ import type { NextRequest } from "next/server"
 import { getSessionCookie } from "better-auth/cookies"
 
 import * as routes from "@/routes"
-import { getSession } from "@/actions/session.actions"
 import { siteConfig } from "@/app/pfa.config"
+import { auth } from "@/lib/auth"
 import { isAdminRole } from "@/lib/role"
 
 function redirectIfProtectedRoute(request: NextRequest) {
@@ -42,9 +42,11 @@ export default async function proxy(request: NextRequest) {
   const { nextUrl } = request
   const { pathname } = nextUrl
 
-  const { user, session } = await getSession()
+  const session = await auth.api.getSession({
+    headers: request.headers,
+  })
 
-  if (!user || !session) {
+  if (!session) {
     return redirectIfProtectedRoute(request)
   }
 
@@ -55,7 +57,7 @@ export default async function proxy(request: NextRequest) {
     return redirectTo(routes.DEFAULT_SIGNIN_REDIRECT, nextUrl)
   }
 
-  if (pathname.startsWith("/admin") && !isAdminRole(user.role)) {
+  if (pathname.startsWith("/admin") && !isAdminRole(session.user.role)) {
     return redirectTo(routes.DEFAULT_SIGNIN_REDIRECT, nextUrl)
   }
 

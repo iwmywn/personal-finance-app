@@ -3,6 +3,7 @@ import "@/tests/backend/mocks/env.mock"
 import "@/tests/backend/mocks/cache.mock"
 import "@/tests/backend/mocks/server.mock"
 import "@/tests/backend/mocks/server-only.mock"
+import "@/tests/backend/mocks/headers.mock"
 
 import { MongoMemoryReplSet } from "mongodb-memory-server"
 

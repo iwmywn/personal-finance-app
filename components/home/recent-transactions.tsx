@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { Fragment } from "react"
 import { WalletIcon } from "lucide-react"
@@ -64,12 +64,18 @@ export function RecentTransactions() {
                       <div className="text-sm wrap-anywhere">
                         {transaction.description}
                       </div>
-                      <div className="text-muted-foreground text-xs">
+                      <div
+                        className="text-muted-foreground text-xs"
+                        suppressHydrationWarning
+                      >
                         {formatDate(transaction.date)}
                       </div>
                     </div>
                   </div>
-                  <div className="max-w-2/4 text-right">
+                  <div
+                    className="max-w-2/4 text-right"
+                    suppressHydrationWarning
+                  >
                     <div
                       className={`text-sm wrap-anywhere ${
                         transaction.type === "inflow"
@@ -78,7 +84,7 @@ export function RecentTransactions() {
                       }`}
                     >
                       {transaction.type === "inflow" ? "+" : "-"}
-                      {formatCurrency(transaction.amount)}
+                      {formatCurrency(transaction.amount, transaction.currency)}
                     </div>
                   </div>
                 </div>

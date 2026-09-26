@@ -88,7 +88,8 @@ export async function ensureExchangeRateForDate(date: Date): Promise<void> {
 
 export async function enqueueMissingExchangeRateDate(
   date: Date,
-  error?: unknown
+  error?: unknown,
+  incrementRetry: boolean = false
 ): Promise<void> {
   const collection = await getMissingExchangeRatesCollection()
   const normalizedDate = normalizeToUTCMidnight(date)
@@ -96,8 +97,11 @@ export async function enqueueMissingExchangeRateDate(
   await collection.updateOne(
     { date: normalizedDate },
     {
-      $setOnInsert: { createdAt: new Date() },
-      $inc: { retryCount: 1 },
+      $setOnInsert: {
+        createdAt: new Date(),
+        ...(incrementRetry ? {} : { retryCount: 0 }),
+      },
+      ...(incrementRetry ? { $inc: { retryCount: 1 } } : {}),
       $set: {
         lastError: error instanceof Error ? error.message : String(error ?? ""),
         updatedAt: new Date(),

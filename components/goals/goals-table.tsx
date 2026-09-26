@@ -100,8 +100,12 @@ export function GoalsTable({ filteredGoals }: GoalsTableProps) {
                 <TableBody>
                   {goalsWithStats.map((goal) => (
                     <TableRow key={goal._id} className="[&>td]:text-center">
-                      <TableCell>{formatDate(goal.startDate)}</TableCell>
-                      <TableCell>{formatDate(goal.endDate)}</TableCell>
+                      <TableCell suppressHydrationWarning>
+                        {formatDate(goal.startDate)}
+                      </TableCell>
+                      <TableCell suppressHydrationWarning>
+                        {formatDate(goal.endDate)}
+                      </TableCell>
                       <TableCell className="font-medium">{goal.name}</TableCell>
                       <TableCell>
                         <Tooltip>
@@ -121,7 +125,7 @@ export function GoalsTable({ filteredGoals }: GoalsTableProps) {
                       <TableCell>
                         {formatCurrency(goal.accumulated, goal.currency)}
                       </TableCell>
-                      <TableCell>
+                      <TableCell suppressHydrationWarning>
                         <Badge
                           className={
                             goal.status === "expired"
@@ -138,7 +142,7 @@ export function GoalsTable({ filteredGoals }: GoalsTableProps) {
                               : t("Upcoming")}
                         </Badge>
                       </TableCell>
-                      <TableCell className="min-w-32">
+                      <TableCell className="min-w-32" suppressHydrationWarning>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Progress

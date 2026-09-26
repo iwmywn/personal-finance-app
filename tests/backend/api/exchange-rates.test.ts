@@ -182,5 +182,60 @@ describe("Exchange Rates Cron Job", () => {
       })
       expect(poisonDoc).toBeNull()
     })
+
+    it("should not increment retryCount when enqueueMissingExchangeRateDate is called multiple times for the same date", async () => {
+      const testDate = new Date("2024-05-20T00:00:00Z")
+      const { enqueueMissingExchangeRateDate } =
+        await import("@/actions/exchange-rates.actions")
+
+      // Simulate 6 transactions being added on the same date with missing rate
+      for (let i = 0; i < 6; i++) {
+        await enqueueMissingExchangeRateDate(
+          testDate,
+          new Error(`Error on tx ${i}`)
+        )
+      }
+
+      const missingRatesCollection = await getMissingExchangeRatesCollection()
+      const doc = await missingRatesCollection.findOne({
+        date: normalizeToUTCMidnight(testDate),
+      })
+
+      expect(doc).not.toBeNull()
+      expect(doc?.retryCount).toBe(0)
+    })
+
+    it("should increment retryCount by 1 when cron job fails to fetch rate", async () => {
+      const testDate = new Date("2024-05-21T00:00:00Z")
+      await insertTestMissingExchangeRate({
+        _id: new ObjectId(),
+        date: testDate,
+        createdAt: new Date(),
+        retryCount: 0,
+      })
+
+      vi.spyOn(globalThis, "fetch").mockResolvedValue({
+        ok: false,
+        status: 500,
+        statusText: "Internal Server Error",
+      } as Response)
+
+      const request = new NextRequest(cronEndpoint, {
+        headers: {
+          authorization: `Bearer ${cronSecret}`,
+        },
+      })
+
+      const response = await GET(request)
+      expect(response.status).toBe(200)
+
+      const missingRatesCollection = await getMissingExchangeRatesCollection()
+      const doc = await missingRatesCollection.findOne({
+        date: testDate,
+      })
+
+      expect(doc).not.toBeNull()
+      expect(doc?.retryCount).toBe(1)
+    })
   })
 })

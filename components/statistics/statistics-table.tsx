@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import type { Route } from "next"
 import Link from "next/link"
@@ -35,8 +35,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { useTransactions } from "@/contexts/transactions-context"
+import { useUser } from "@/contexts/user-context"
 import { useCategory } from "@/hooks/use-category"
 import { useFormatCurrency } from "@/hooks/use-format-currency"
+import type { Currency } from "@/lib/currency"
 import { serializeLocalDate } from "@/lib/date"
 import type { Transaction } from "@/lib/definitions"
 import { calculateCategoriesStats } from "@/lib/statistics"
@@ -56,11 +58,15 @@ export function StatisticsTable({
   filterStates,
 }: TransactionBreakdownTableProps) {
   const { transactions } = useTransactions()
+  const { user } = useUser()
   const t = useExtracted()
   const { getCategoryLabel, getCategoryDescription } = useCategory()
   const formatCurrency = useFormatCurrency()
 
-  const categoryStats = calculateCategoriesStats(filteredTransactions)
+  const categoryStats = calculateCategoriesStats(
+    filteredTransactions,
+    user.currency as Currency
+  )
 
   const getTransactionsHref = (stat: {
     type: string

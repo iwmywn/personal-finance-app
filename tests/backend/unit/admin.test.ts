@@ -40,19 +40,6 @@ import {
 import { connect } from "@/lib/db"
 import type { User } from "@/lib/definitions"
 
-vi.mock("next/headers", () => ({
-  headers: vi.fn(),
-}))
-
-vi.mock("@/lib/auth", () => ({
-  auth: {
-    api: {
-      listUsers: vi.fn(),
-      removeUser: vi.fn(),
-    },
-  },
-}))
-
 type UserWithRole = NonNullable<
   Awaited<ReturnType<typeof auth.api.listUsers>>
 >["users"][number]

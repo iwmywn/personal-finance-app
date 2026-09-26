@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
         } catch (error) {
           const errorMsg =
             error instanceof Error ? error.message : String(error ?? "")
-          await enqueueMissingExchangeRateDate(d, error)
+          await enqueueMissingExchangeRateDate(d, error, true)
           return {
             success: false,
             date: d,

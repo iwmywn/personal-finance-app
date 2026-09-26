@@ -1,61 +1,10 @@
 import "server-only"
 
 import { MongoServerError } from "mongodb"
-import type { CreateIndexesOptions, Db, IndexSpecification } from "mongodb"
-
-async function createIndexSafely(
-  db: Db,
-  collectionName: string,
-  key: IndexSpecification,
-  options: CreateIndexesOptions
-) {
-  const collection = db.collection(collectionName)
-  try {
-    await collection.createIndex(key, options)
-  } catch (error) {
-    if (
-      error instanceof MongoServerError &&
-      (error.code === 85 || error.code === 86) &&
-      options.name
-    ) {
-      await collection.dropIndex(options.name).catch(() => {})
-      await collection.createIndex(key, options)
-      return
-    }
-    throw error
-  }
-}
+import type { Db } from "mongodb"
 
 async function ensureIndexes(db: Db) {
   await Promise.all([
-    // Index transactions by userId and date descending for fast listing and sorting.
-    // Allows multiple transactions with identical details on the same date.
-    db.collection("transactions").createIndex(
-      {
-        userId: 1,
-        date: -1,
-      },
-      {
-        name: "userId_date",
-      }
-    ),
-
-    createIndexSafely(
-      db,
-      "transactions",
-      {
-        recurringId: 1,
-        date: 1,
-      },
-      {
-        name: "recurringId_date",
-        unique: true,
-        partialFilterExpression: {
-          recurringId: { $type: "objectId" },
-        },
-      }
-    ),
-
     db.collection("budgets").createIndex(
       {
         userId: 1,
@@ -65,15 +14,6 @@ async function ensureIndexes(db: Db) {
         endDate: 1,
       },
       { unique: true, name: "userId_categoryKey_currency_startDate_endDate" }
-    ),
-
-    db.collection("categories").createIndex(
-      {
-        userId: 1,
-        type: 1,
-        label: 1,
-      },
-      { unique: true, name: "userId_type_label" }
     ),
 
     db.collection("goals").createIndex(
@@ -88,6 +28,39 @@ async function ensureIndexes(db: Db) {
       {
         unique: true,
         name: "userId_name_categoryKey_currency_startDate_endDate",
+      }
+    ),
+
+    db.collection("categories").createIndex(
+      {
+        userId: 1,
+        type: 1,
+        label: 1,
+      },
+      { unique: true, name: "userId_type_label" }
+    ),
+
+    db.collection("transactions").createIndex(
+      {
+        userId: 1,
+        date: -1,
+      },
+      {
+        name: "userId_date",
+      }
+    ),
+
+    db.collection("transactions").createIndex(
+      {
+        recurringId: 1,
+        date: 1,
+      },
+      {
+        name: "recurringId_date",
+        unique: true,
+        partialFilterExpression: {
+          recurringId: { $type: "objectId" },
+        },
       }
     ),
 
@@ -117,13 +90,11 @@ async function ensureIndexes(db: Db) {
       .collection("missingExchangeRates")
       .createIndex({ date: 1 }, { unique: true, name: "date" }),
 
-    createIndexSafely(
-      db,
-      "users",
+    db.collection("users").createIndex(
       { username: 1 },
       {
         unique: true,
-        name: "username_unique",
+        name: "username",
         partialFilterExpression: {
           username: { $type: "string" },
         },

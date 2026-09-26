@@ -36,10 +36,15 @@ interface QuickStats {
 
 export function calculateQuickStats(
   transactions: Transaction[],
-  today?: Date
+  today?: Date,
+  targetCurrency?: Currency
 ): QuickStats {
+  const scopedTransactions = targetCurrency
+    ? transactions.filter((t) => t.currency === targetCurrency)
+    : transactions
+
   const currentMonthTransactions = getCurrentMonthTransactions(
-    transactions,
+    scopedTransactions,
     today
   )
 
@@ -133,10 +138,19 @@ interface SummaryStats {
 }
 
 export function calculateSummaryStats(
-  transactions: Transaction[]
+  transactions: Transaction[],
+  targetCurrency?: Currency
 ): SummaryStats {
-  const inflowTransactions = transactions.filter((t) => t.type === "inflow")
-  const outflowTransactions = transactions.filter((t) => t.type === "outflow")
+  const scopedTransactions = targetCurrency
+    ? transactions.filter((t) => t.currency === targetCurrency)
+    : transactions
+
+  const inflowTransactions = scopedTransactions.filter(
+    (t) => t.type === "inflow"
+  )
+  const outflowTransactions = scopedTransactions.filter(
+    (t) => t.type === "outflow"
+  )
 
   const totalInflow = inflowTransactions.reduce(
     (sum, t) => sum.plus(new Decimal(t.amount)),
@@ -147,7 +161,7 @@ export function calculateSummaryStats(
     new Decimal(0)
   )
   const balance = totalInflow.minus(totalOutflow)
-  const transactionCount = transactions.length
+  const transactionCount = scopedTransactions.length
   const inflowCount = inflowTransactions.length
   const outflowCount = outflowTransactions.length
 
@@ -169,13 +183,22 @@ interface CategoryStats {
 }
 
 export function calculateCategoriesStats(
-  transactions: Transaction[]
+  transactions: Transaction[],
+  targetCurrency?: Currency
 ): CategoryStats[] {
-  const categories = Array.from(new Set(transactions.map((t) => t.categoryKey)))
+  const scopedTransactions = targetCurrency
+    ? transactions.filter((t) => t.currency === targetCurrency)
+    : transactions
+
+  const categories = Array.from(
+    new Set(scopedTransactions.map((t) => t.categoryKey))
+  )
 
   return categories
     .map((categoryKey) => {
-      const filtered = transactions.filter((t) => t.categoryKey === categoryKey)
+      const filtered = scopedTransactions.filter(
+        (t) => t.categoryKey === categoryKey
+      )
       const total = filtered.reduce(
         (sum, t) => sum.plus(new Decimal(t.amount)),
         new Decimal(0)
@@ -190,7 +213,9 @@ export function calculateCategoriesStats(
     .sort((a, b) => {
       const aDecimal = new Decimal(a.total)
       const bDecimal = new Decimal(b.total)
-      return bDecimal.greaterThan(aDecimal) ? 1 : -1
+      if (bDecimal.greaterThan(aDecimal)) return 1
+      if (bDecimal.lessThan(aDecimal)) return -1
+      return 0
     })
 }
 

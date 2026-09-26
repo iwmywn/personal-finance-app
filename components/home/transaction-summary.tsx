@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import {
   ArrowDownIcon,
@@ -10,7 +10,9 @@ import { useExtracted } from "next-intl"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useTransactions } from "@/contexts/transactions-context"
+import { useUser } from "@/contexts/user-context"
 import { useFormatCurrency } from "@/hooks/use-format-currency"
+import type { Currency } from "@/lib/currency"
 import {
   calculateSummaryStats,
   getCurrentMonthTransactions,
@@ -19,14 +21,14 @@ import { toDecimal } from "@/lib/utils"
 
 export function TransactionSummary() {
   const { transactions } = useTransactions()
+  const { user } = useUser()
   const t = useExtracted()
   const formatCurrency = useFormatCurrency()
 
   const currentMonthTransactions = getCurrentMonthTransactions(transactions)
 
-  const { totalInflow, totalOutflow, balance } = calculateSummaryStats(
-    currentMonthTransactions
-  )
+  const { totalInflow, totalOutflow, balance, inflowCount, outflowCount } =
+    calculateSummaryStats(currentMonthTransactions, user.currency as Currency)
 
   return (
     <div className="grid gap-4 md:grid-cols-3">
@@ -35,17 +37,12 @@ export function TransactionSummary() {
           <CardTitle>{t("Monthly Inflow")}</CardTitle>
           <ArrowUpIcon className="size-4 text-green-600" />
         </CardHeader>
-        <CardContent>
+        <CardContent suppressHydrationWarning>
           <div className="text-2xl wrap-anywhere text-green-600">
             {formatCurrency(totalInflow)}
           </div>
           <div className="text-muted-foreground text-sm">
-            {
-              currentMonthTransactions.filter(
-                (tHomeFE) => tHomeFE.type === "inflow"
-              ).length
-            }{" "}
-            {t("transactions")}
+            {inflowCount} {t("transactions")}
           </div>
         </CardContent>
       </Card>
@@ -55,17 +52,12 @@ export function TransactionSummary() {
           <CardTitle>{t("Monthly Outflow")}</CardTitle>
           <ArrowDownIcon className="size-4 text-red-600" />
         </CardHeader>
-        <CardContent>
+        <CardContent suppressHydrationWarning>
           <div className="text-2xl wrap-anywhere text-red-600">
             {formatCurrency(totalOutflow)}
           </div>
           <div className="text-muted-foreground text-sm">
-            {
-              currentMonthTransactions.filter(
-                (tHomeFE) => tHomeFE.type === "outflow"
-              ).length
-            }{" "}
-            {t("transactions")}
+            {outflowCount} {t("transactions")}
           </div>
         </CardContent>
       </Card>
@@ -79,7 +71,7 @@ export function TransactionSummary() {
             <TrendingDownIcon className="size-4 text-red-600" />
           )}
         </CardHeader>
-        <CardContent>
+        <CardContent suppressHydrationWarning>
           <div
             className={`text-2xl wrap-anywhere ${
               toDecimal(balance).greaterThan(0)

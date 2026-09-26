@@ -144,6 +144,41 @@ describe("Statistics", () => {
       expect(result.savingsRate).toBe("100")
       expect(result.popularCategory).toEqual([])
     })
+
+    it("should filter by targetCurrency when provided", () => {
+      const fixedDate = new Date("2026-03-15T12:00:00Z")
+      const mixedTransactions = [
+        {
+          ...mockTransactions[0],
+          date: fixedDate,
+          currency: "USD" as const,
+          amount: "100",
+          type: "inflow" as const,
+        },
+        {
+          ...mockTransactions[1],
+          date: fixedDate,
+          currency: "VND" as const,
+          amount: "5000000",
+          type: "outflow" as const,
+        },
+        {
+          ...mockTransactions[2],
+          date: fixedDate,
+          currency: "USD" as const,
+          amount: "40",
+          type: "outflow" as const,
+          categoryKey: "food_beverage" as const,
+        },
+      ]
+      const result = calculateQuickStats(mixedTransactions, fixedDate, "USD")
+      expect(result.currentMonthCount).toBe(2)
+      expect(result.highestTransaction?.amount).toBe("100")
+      expect(result.highestTransaction?.currency).toBe("USD")
+      expect(result.lowestTransaction?.amount).toBe("40")
+      expect(result.avgOutflow).toBe("40")
+      expect(result.popularCategory).toEqual(["food_beverage"])
+    })
   })
 
   describe("calculateSummaryStats", () => {
@@ -167,6 +202,36 @@ describe("Statistics", () => {
       expect(result.transactionCount).toBe(0)
       expect(result.inflowCount).toBe(0)
       expect(result.outflowCount).toBe(0)
+    })
+
+    it("should filter by targetCurrency when provided", () => {
+      const mixedTransactions = [
+        {
+          ...mockTransactions[0],
+          currency: "USD" as const,
+          amount: "100",
+          type: "inflow" as const,
+        },
+        {
+          ...mockTransactions[1],
+          currency: "VND" as const,
+          amount: "50000",
+          type: "inflow" as const,
+        },
+        {
+          ...mockTransactions[2],
+          currency: "USD" as const,
+          amount: "30",
+          type: "outflow" as const,
+        },
+      ]
+      const result = calculateSummaryStats(mixedTransactions, "USD")
+      expect(result.totalInflow).toBe("100")
+      expect(result.totalOutflow).toBe("30")
+      expect(result.balance).toBe("70")
+      expect(result.transactionCount).toBe(2)
+      expect(result.inflowCount).toBe(1)
+      expect(result.outflowCount).toBe(1)
     })
   })
 
@@ -198,6 +263,42 @@ describe("Statistics", () => {
     it("should handle empty transactions", () => {
       const result = calculateCategoriesStats([])
       expect(result).toEqual([])
+    })
+
+    it("should handle equal totals without violating strict weak ordering", () => {
+      const txs = [
+        { ...mockTransactions[0], categoryKey: "housing", amount: "100" },
+        {
+          ...mockTransactions[1],
+          categoryKey: "transportation",
+          amount: "100",
+        },
+      ]
+      const result = calculateCategoriesStats(txs)
+      expect(result).toHaveLength(2)
+      expect(result[0].total).toBe("100")
+      expect(result[1].total).toBe("100")
+    })
+
+    it("should filter by targetCurrency when provided", () => {
+      const mixedTxs = [
+        {
+          ...mockTransactions[0],
+          categoryKey: "housing",
+          amount: "100",
+          currency: "USD" as const,
+        },
+        {
+          ...mockTransactions[1],
+          categoryKey: "housing",
+          amount: "50000",
+          currency: "VND" as const,
+        },
+      ]
+      const result = calculateCategoriesStats(mixedTxs, "USD")
+      expect(result).toHaveLength(1)
+      expect(result[0].total).toBe("100")
+      expect(result[0].count).toBe(1)
     })
   })
 

@@ -130,8 +130,10 @@ export function RecurringTransactionsTable({
                         key={recurring._id}
                         className="[&>td]:text-center"
                       >
-                        <TableCell>{formatDate(recurring.startDate)}</TableCell>
-                        <TableCell>
+                        <TableCell suppressHydrationWarning>
+                          {formatDate(recurring.startDate)}
+                        </TableCell>
+                        <TableCell suppressHydrationWarning>
                           {recurring.endDate
                             ? formatDate(recurring.endDate)
                             : t("No end date")}
@@ -165,7 +167,7 @@ export function RecurringTransactionsTable({
                         <TableCell>
                           {formatCurrency(recurring.amount, recurring.currency)}
                         </TableCell>
-                        <TableCell>
+                        <TableCell suppressHydrationWarning>
                           <div className="flex flex-col gap-1">
                             <span>
                               {getFrequencyLabel(recurring.frequency)}
@@ -186,7 +188,7 @@ export function RecurringTransactionsTable({
                             ) : null}
                           </div>
                         </TableCell>
-                        <TableCell>
+                        <TableCell suppressHydrationWarning>
                           <Badge
                             className={!isEnded ? "badge-green" : "badge-gray"}
                           >
