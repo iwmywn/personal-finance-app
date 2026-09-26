@@ -49,6 +49,7 @@ export function ActiveSessionsManager() {
     if (open) {
       startTransition(async () => {
         const res = await getSessions()
+
         if (res.sessions) {
           setActiveSessions(res.sessions)
         } else if (res.error) {
@@ -218,7 +219,7 @@ export function ActiveSessionsManager() {
         </DialogHeader>
         {isPending && sortedSessions.length === 0 ? (
           <div className="flex h-32 items-center justify-center">
-            <Spinner className="size-6" />
+            <Spinner />
           </div>
         ) : (
           <div className="max-h-[60vh] space-y-3 overflow-y-auto">
