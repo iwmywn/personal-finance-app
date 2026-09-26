@@ -25,7 +25,7 @@ export function getCurrentMonthTransactions(
   })
 }
 
-interface QuickStats {
+type QuickStats = {
   currentMonthCount: number
   highestTransaction: Transaction | null
   lowestTransaction: Transaction | null

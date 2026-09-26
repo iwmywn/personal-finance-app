@@ -1,11 +1,11 @@
-import { createParser } from "nuqs/server"
-
 import type { Locale } from "@/i18n/config"
 
-type DateParts = {
+import type { Transaction } from "./definitions"
+
+export type DateParts = {
   year: number
-  month: number // 1-indexed (1-12)
-  day: number // 1-indexed (1-31)
+  month: number
+  day: number
 }
 
 /**
@@ -81,20 +81,6 @@ export function serializeUTCDate(date: Date | string): string {
     d.getUTCDate()
   )
 }
-
-/**
- * Nuqs URL query parser for local Date values (serialized as YYYY-MM-DD).
- */
-export const parseAsLocalDate = createParser({
-  parse: (queryValue: string) => {
-    const parts = parseDateParts(queryValue)
-    if (!parts) return null
-    const date = new Date(parts.year, parts.month - 1, parts.day)
-    return isNaN(date.getTime()) ? null : date
-  },
-  serialize: serializeLocalDate,
-  eq: (a: Date, b: Date) => serializeLocalDate(a) === serializeLocalDate(b),
-})
 
 /**
  * Normalizes a Date or string to UTC Midnight (00:00:00.000Z), preserving its UTC calendar date.
@@ -228,4 +214,34 @@ export function formatDate(
     year: "numeric",
     timeZone: isUTCMidnight ? "UTC" : undefined,
   }).format(d)
+}
+
+export function getUniqueYears(transactions: Transaction[]): number[] {
+  return Array.from(
+    new Set(transactions.map((t) => new Date(t.date).getUTCFullYear()))
+  ).sort((a, b) => b - a)
+}
+
+type DateRangeItem = {
+  startDate: Date | string
+  endDate?: Date | string | null
+}
+
+export function getUniqueDateRangeYears(items: DateRangeItem[]): number[] {
+  return Array.from(
+    new Set(
+      items.flatMap((item) => {
+        const years: number[] = []
+        if (item.startDate) {
+          const startYear = new Date(item.startDate).getUTCFullYear()
+          if (!isNaN(startYear)) years.push(startYear)
+        }
+        if (item.endDate) {
+          const endYear = new Date(item.endDate).getUTCFullYear()
+          if (!isNaN(endYear)) years.push(endYear)
+        }
+        return years
+      })
+    )
+  ).sort((a, b) => b - a)
 }

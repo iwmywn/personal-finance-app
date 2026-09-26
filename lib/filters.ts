@@ -12,7 +12,7 @@ import type {
 import { calculateBudgetsStats, calculateGoalsStats } from "@/lib/statistics"
 import { progressColorClass } from "@/lib/utils"
 
-interface Filters {
+type Filters = {
   searchTerm?: string
   selectedDate?: Date | null
   dateRange?: {

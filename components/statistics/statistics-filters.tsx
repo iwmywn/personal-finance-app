@@ -26,8 +26,8 @@ import { StatisticsTable } from "@/components/statistics/statistics-table"
 import { useTransactions } from "@/contexts/transactions-context"
 import { useFormatDate } from "@/hooks/use-format-date"
 import { useMonths } from "@/hooks/use-months"
+import { getUniqueYears } from "@/lib/date"
 import { filterTransactions } from "@/lib/filters"
-import { getUniqueYears } from "@/lib/utils"
 
 export function StatisticsFilters() {
   const { transactions } = useTransactions()

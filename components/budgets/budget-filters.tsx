@@ -19,8 +19,8 @@ import { useBudgets } from "@/contexts/budgets-context"
 import { useTransactions } from "@/contexts/transactions-context"
 import { useCategory } from "@/hooks/use-category"
 import { useMonths } from "@/hooks/use-months"
+import { getUniqueDateRangeYears } from "@/lib/date"
 import { filterBudgets } from "@/lib/filters"
-import { getUniqueDateRangeYears } from "@/lib/utils"
 
 export function BudgetFilters() {
   const { budgets } = useBudgets()

@@ -34,9 +34,9 @@ import { useTransactions } from "@/contexts/transactions-context"
 import { useCategory } from "@/hooks/use-category"
 import { useFormatDate } from "@/hooks/use-format-date"
 import { useMonths } from "@/hooks/use-months"
-import { parseAsLocalDate } from "@/lib/date"
+import { getUniqueYears } from "@/lib/date"
 import { filterTransactions } from "@/lib/filters"
-import { getUniqueYears } from "@/lib/utils"
+import { parseAsLocalDate } from "@/lib/parser"
 
 export function TransactionFilters() {
   const { transactions } = useTransactions()

@@ -2,50 +2,7 @@ import type { Route } from "next"
 import Decimal from "decimal.js"
 
 import { DEFAULT_SIGNIN_REDIRECT } from "@/routes"
-import type { Locale } from "@/i18n/config"
 import type { Currency } from "@/lib/currency"
-import type { Transaction } from "@/lib/definitions"
-
-export function formatCurrency(
-  amount: string,
-  locale: Locale,
-  currency: Currency
-): string {
-  return new Intl.NumberFormat(locale, {
-    style: "currency",
-    currency,
-  }).format(amount as unknown as number)
-}
-
-export function getUniqueYears(transactions: Transaction[]): number[] {
-  return Array.from(
-    new Set(transactions.map((t) => new Date(t.date).getUTCFullYear()))
-  ).sort((a, b) => b - a)
-}
-
-export type DateRangeItem = {
-  startDate: Date | string
-  endDate?: Date | string | null
-}
-
-export function getUniqueDateRangeYears(items: DateRangeItem[]): number[] {
-  return Array.from(
-    new Set(
-      items.flatMap((item) => {
-        const years: number[] = []
-        if (item.startDate) {
-          const startYear = new Date(item.startDate).getUTCFullYear()
-          if (!isNaN(startYear)) years.push(startYear)
-        }
-        if (item.endDate) {
-          const endYear = new Date(item.endDate).getUTCFullYear()
-          if (!isNaN(endYear)) years.push(endYear)
-        }
-        return years
-      })
-    )
-  ).sort((a, b) => b - a)
-}
 
 export const progressColorClass = {
   gray: "[&>[data-slot=progress-indicator]]:bg-gray-600",

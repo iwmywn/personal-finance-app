@@ -35,3 +35,13 @@ export const CURRENCY_CONFIG: CurrencyConfig = {
     locale: "vi-VN",
   },
 }
+export function formatCurrency(
+  amount: string,
+  locale: Locale,
+  currency: Currency
+): string {
+  return new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency,
+  }).format(amount as unknown as number)
+}

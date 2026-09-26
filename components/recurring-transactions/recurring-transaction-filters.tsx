@@ -26,9 +26,8 @@ import { RecurringTransactionsTable } from "@/components/recurring-transactions/
 import { useRecurring } from "@/contexts/recurring-context"
 import { useCategory } from "@/hooks/use-category"
 import { useMonths } from "@/hooks/use-months"
-import { localDateToUTCMidnight } from "@/lib/date"
+import { getUniqueDateRangeYears, localDateToUTCMidnight } from "@/lib/date"
 import { filterRecurringTransactions } from "@/lib/filters"
-import { getUniqueDateRangeYears } from "@/lib/utils"
 
 export function RecurringTransactionFilters() {
   const { recurringTransactions } = useRecurring()

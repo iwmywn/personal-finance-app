@@ -1,9 +1,8 @@
 ﻿"use client"
 
 import { useUser } from "@/contexts/user-context"
-import { CURRENCY_CONFIG } from "@/lib/currency"
+import { CURRENCY_CONFIG, formatCurrency } from "@/lib/currency"
 import type { Currency } from "@/lib/currency"
-import { formatCurrency } from "@/lib/utils"
 
 export function useFormatCurrency() {
   const { user } = useUser()

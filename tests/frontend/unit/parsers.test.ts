@@ -1,9 +1,9 @@
 import {
-  parseAsLocalDate,
   parseToLocalDate,
   parseToUTCMidnight,
   serializeUTCDate,
 } from "@/lib/date"
+import { parseAsLocalDate } from "@/lib/parser"
 
 describe("Parsers", () => {
   describe("parseAsLocalDate", () => {

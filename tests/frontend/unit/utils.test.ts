@@ -1,12 +1,8 @@
 import { mockTransactions } from "@/tests/shared/data"
 import { sanitizeCSVField } from "@/components/transactions/export-button"
-import {
-  convertAmountWithRates,
-  formatCurrency,
-  getSafeCallbackUrl,
-  getUniqueDateRangeYears,
-  getUniqueYears,
-} from "@/lib/utils"
+import { formatCurrency } from "@/lib/currency"
+import { getUniqueDateRangeYears, getUniqueYears } from "@/lib/date"
+import { convertAmountWithRates, getSafeCallbackUrl } from "@/lib/utils"
 
 describe("Utils", () => {
   describe("formatCurrency", () => {

@@ -8,13 +8,13 @@ import {
   isSameUTCDate,
   localDateToUTCMidnight,
   normalizeToUTCMidnight,
-  parseAsLocalDate,
   parseDateParts,
   parseToLocalDate,
   parseToUTCMidnight,
   serializeLocalDate,
   serializeUTCDate,
 } from "@/lib/date"
+import { parseAsLocalDate } from "@/lib/parser"
 
 describe("lib/date.ts Unified Date Module", () => {
   afterEach(() => {
