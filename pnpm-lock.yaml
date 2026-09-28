@@ -211,6 +211,9 @@ importers:
       radix-ui:
         specifier: 1.6.7
         version: 1.6.7(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      rate-limiter-flexible:
+        specifier: 11.2.1
+        version: 11.2.1
       react:
         specifier: 19.3.0
         version: 19.3.0
@@ -4704,6 +4707,9 @@ packages:
         optional: true
       '@types/react-dom':
         optional: true
+
+  rate-limiter-flexible@11.2.1:
+    resolution: {integrity: sha512-JAaz01HZ893zAw+Hx5MdM1z3lLAkyVvNpqR+GNp0k3kjuQB8gY91fXhf5C0osWs+A7iKgFv585qzwmjS3aBHlA==}
 
   react-currency-input-field@4.0.6:
     resolution: {integrity: sha512-TdR5RQnefI4lC47h8Nt3kZJo5cfyoOpEm8Eqoa04TygZn3Bk6AYubJP7QPUQl4YQBeG1WQlaf8BvL1v9IpK5ig==}
@@ -9462,6 +9468,8 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.3.0
       '@types/react-dom': 19.3.0(@types/react@19.3.0)
+
+  rate-limiter-flexible@11.2.1: {}
 
   react-currency-input-field@4.0.6(react@19.3.0):
     dependencies:

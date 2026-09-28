@@ -10,6 +10,7 @@ import {
 import {
   mockDBBudget,
   mockDBUser,
+  mockUser,
   mockValidBudgetValues,
 } from "@/tests/shared/data"
 import {
@@ -20,6 +21,7 @@ import {
 } from "@/actions/budget.actions"
 import { getBudgetsCollection } from "@/lib/collections"
 import { localDateToUTCMidnight } from "@/lib/date"
+import { triggerRateLimit } from "@/lib/rate-limit"
 
 describe("Budgets", async () => {
   describe("createBudget", () => {
@@ -39,6 +41,18 @@ describe("Budgets", async () => {
       expect(result.success).toBeUndefined()
       expect(result.error).toBe(
         "Access denied! Please refresh the page and try again."
+      )
+    })
+
+    it("should return error when rate limit is exceeded", async () => {
+      mockAuthenticatedUser()
+      await triggerRateLimit(`budget:${mockUser.id}`)
+
+      const result = await createBudget(mockValidBudgetValues)
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe(
+        "Too many requests! Please slow down and try again later."
       )
     })
 
@@ -165,6 +179,21 @@ describe("Budgets", async () => {
       expect(result.success).toBeUndefined()
       expect(result.error).toBe(
         "Access denied! Please refresh the page and try again."
+      )
+    })
+
+    it("should return error when rate limit is exceeded", async () => {
+      mockAuthenticatedUser()
+      await triggerRateLimit(`budget:${mockUser.id}`)
+
+      const result = await updateBudget(
+        mockDBBudget._id.toString(),
+        mockValidBudgetValues
+      )
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe(
+        "Too many requests! Please slow down and try again later."
       )
     })
 
@@ -372,6 +401,18 @@ describe("Budgets", async () => {
       expect(result.success).toBeUndefined()
       expect(result.error).toBe(
         "Access denied! Please refresh the page and try again."
+      )
+    })
+
+    it("should return error when rate limit is exceeded", async () => {
+      mockAuthenticatedUser()
+      await triggerRateLimit(`budget:${mockUser.id}`)
+
+      const result = await deleteBudget(mockDBBudget._id.toString())
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe(
+        "Too many requests! Please slow down and try again later."
       )
     })
 

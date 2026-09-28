@@ -7,6 +7,7 @@ import { getExtracted } from "next-intl/server"
 import { getGoalsCollection } from "@/lib/collections"
 import type { ActionResponse, Goal } from "@/lib/definitions"
 import { isDuplicateKeyError } from "@/lib/indexes"
+import { isRateLimited, RATE_LIMIT_PRESETS } from "@/lib/rate-limit"
 import { getSchemas } from "@/schemas/server"
 import type { GoalFormValues } from "@/schemas/types"
 
@@ -31,6 +32,12 @@ export async function createGoal(
 
     if (!user || !session) {
       return { error }
+    }
+
+    if (await isRateLimited(`goal:${user.id}`, RATE_LIMIT_PRESETS.NORMAL)) {
+      return {
+        error: t("Too many requests! Please slow down and try again later."),
+      }
     }
 
     const isValidCategory = await isValidUserCategory(
@@ -92,6 +99,12 @@ export async function updateGoal(
       return { error }
     }
 
+    if (await isRateLimited(`goal:${user.id}`, RATE_LIMIT_PRESETS.NORMAL)) {
+      return {
+        error: t("Too many requests! Please slow down and try again later."),
+      }
+    }
+
     const isValidCategory = await isValidUserCategory(
       user.id,
       parsedValues.data.categoryKey,
@@ -148,6 +161,12 @@ export async function deleteGoal(goalId: string): Promise<ActionResponse> {
 
     if (!user || !session) {
       return { error }
+    }
+
+    if (await isRateLimited(`goal:${user.id}`, RATE_LIMIT_PRESETS.MODERATE)) {
+      return {
+        error: t("Too many requests! Please slow down and try again later."),
+      }
     }
 
     const goalsCollection = await getGoalsCollection()

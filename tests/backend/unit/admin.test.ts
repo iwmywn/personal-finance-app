@@ -305,6 +305,20 @@ describe("Admin", () => {
           providerId: "credential",
           accountId: "account-123",
         }),
+        db.collection("twoFactors").insertOne({
+          userId: targetUserId.toString(),
+          secret: "two-factor-secret",
+        }),
+        db.collection("verifications").insertOne({
+          identifier: "2fa-61Vu-KEnpelHAivKHqV4",
+          value: targetUserId.toString(),
+          expiresAt: new Date(),
+        }),
+        db.collection("verifications").insertOne({
+          identifier: "2fa-attempts-2fa-61Vu-KEnpelHAivKHqV4",
+          value: "0",
+          expiresAt: new Date(),
+        }),
       ])
 
       const result = await deleteUser(targetUserId.toString())
@@ -337,6 +351,8 @@ describe("Admin", () => {
         recCount,
         sessionCount,
         accountCount,
+        twoFactorCount,
+        verificationCount,
       ] = await Promise.all([
         usersColl.countDocuments({ _id: targetUserId }),
         transactionsColl.countDocuments({ userId: targetUserId }),
@@ -350,6 +366,15 @@ describe("Admin", () => {
         db.collection("accounts").countDocuments({
           $or: [{ userId: targetUserId }, { userId: targetUserId.toString() }],
         }),
+        db.collection("twoFactors").countDocuments({
+          $or: [{ userId: targetUserId }, { userId: targetUserId.toString() }],
+        }),
+        db.collection("verifications").countDocuments({
+          $or: [
+            { value: targetUserId.toString() },
+            { identifier: "2fa-attempts-2fa-61Vu-KEnpelHAivKHqV4" },
+          ],
+        }),
       ])
 
       expect(userCount).toBe(0)
@@ -360,6 +385,8 @@ describe("Admin", () => {
       expect(recCount).toBe(0)
       expect(sessionCount).toBe(0)
       expect(accountCount).toBe(0)
+      expect(twoFactorCount).toBe(0)
+      expect(verificationCount).toBe(0)
     })
 
     it("should rollback all deletions if a failure occurs during transaction to prevent orphaned data", async () => {

@@ -14,6 +14,7 @@ import {
 import { withTransaction } from "@/lib/db"
 import type { ActionResponse, Category } from "@/lib/definitions"
 import { isDuplicateKeyError } from "@/lib/indexes"
+import { isRateLimited, RATE_LIMIT_PRESETS } from "@/lib/rate-limit"
 import { getSchemas } from "@/schemas/server"
 import type { CategoryFormValues } from "@/schemas/types"
 
@@ -36,6 +37,12 @@ export async function createCustomCategory(
 
     if (!user || !session) {
       return { error }
+    }
+
+    if (await isRateLimited(`category:${user.id}`, RATE_LIMIT_PRESETS.NORMAL)) {
+      return {
+        error: t("Too many requests! Please slow down and try again later."),
+      }
     }
 
     const categoriesCollection = await getCategoriesCollection()
@@ -82,6 +89,12 @@ export async function updateCustomCategory(
 
     if (!user || !session) {
       return { error }
+    }
+
+    if (await isRateLimited(`category:${user.id}`, RATE_LIMIT_PRESETS.NORMAL)) {
+      return {
+        error: t("Too many requests! Please slow down and try again later."),
+      }
     }
 
     const categoriesCollection = await getCategoriesCollection()
@@ -150,6 +163,12 @@ export async function deleteCustomCategory(
 
     if (!user || !session) {
       return { error }
+    }
+
+    if (await isRateLimited(`category:${user.id}`, RATE_LIMIT_PRESETS.STRICT)) {
+      return {
+        error: t("Too many requests! Please slow down and try again later."),
+      }
     }
 
     const [

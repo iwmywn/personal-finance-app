@@ -52,15 +52,17 @@ async function ensureIndexes(db: Db) {
 
     db.collection("transactions").createIndex(
       {
-        recurringId: 1,
+        userId: 1,
+        type: 1,
+        categoryKey: 1,
+        amount: 1,
+        currency: 1,
+        description: 1,
         date: 1,
       },
       {
-        name: "recurringId_date",
         unique: true,
-        partialFilterExpression: {
-          recurringId: { $type: "objectId" },
-        },
+        name: "userId_type_categoryKey_amount_currency_description_date",
       }
     ),
 

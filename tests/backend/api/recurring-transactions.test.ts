@@ -191,7 +191,6 @@ describe("Recurring Transactions Cron Job", () => {
           currency: recurringTransaction.currency,
           description: recurringTransaction.description,
           date: todayUTC,
-          recurringId: recurringTransaction._id,
         }
 
         await insertTestTransaction(existingTransaction)
@@ -239,7 +238,7 @@ describe("Recurring Transactions Cron Job", () => {
         vi.useRealTimers()
       })
 
-      it("should not skip recurring transaction when user created a manual transaction with identical attributes", async () => {
+      it("should skip recurring transaction when user created a manual transaction with identical attributes", async () => {
         const todayUTC = localDateToUTCMidnight(new Date("2024-02-01"))
         const lastMonthUTC = localDateToUTCMidnight(new Date("2024-01-01"))
 
@@ -253,7 +252,7 @@ describe("Recurring Transactions Cron Job", () => {
 
         await insertTestRecurringTransaction(recurringTransaction)
 
-        // Manual transaction with identical fields but without recurringId
+        // Manual transaction with identical fields
         const manualTransaction: DBTransaction = {
           _id: new ObjectId(),
           userId: recurringTransaction.userId,
@@ -281,15 +280,24 @@ describe("Recurring Transactions Cron Job", () => {
 
         expect(response.status).toBe(200)
         expect(data.success).toBe(true)
-        expect(data.created).toBe(1)
-        expect(data.skippedCount).toBe(0)
+        expect(data.created).toBe(0)
+        expect(data.createdIds).toHaveLength(0)
+        expect(data.skippedCount).toBe(1)
+        expect(data.skippedReason).toHaveLength(1)
+        expect(data.skippedReason[0]).toEqual({
+          id: recurringTransaction._id.toString(),
+          reason: "existing",
+        })
 
         const transactionsCollection = await getTransactionsCollection()
         const transactions = await transactionsCollection
           .find({ userId: recurringTransaction.userId })
           .toArray()
 
-        expect(transactions).toHaveLength(2)
+        expect(transactions).toHaveLength(1)
+        expect(transactions[0]._id.toString()).toBe(
+          manualTransaction._id.toString()
+        )
 
         vi.useRealTimers()
       })
@@ -517,7 +525,7 @@ describe("Recurring Transactions Cron Job", () => {
         vi.useRealTimers()
       })
 
-      it("should backfill missed occurrences and attach recurringId when cron was delayed", async () => {
+      it("should backfill missed occurrences when cron was delayed", async () => {
         const startDateUTC = localDateToUTCMidnight(new Date("2024-02-01"))
         const lastGeneratedDateUTC = localDateToUTCMidnight(
           new Date("2024-02-01")
@@ -555,12 +563,6 @@ describe("Recurring Transactions Cron Job", () => {
           .toArray()
 
         expect(createdTxs).toHaveLength(2)
-        expect(createdTxs[0].recurringId?.toString()).toBe(
-          recurringTransaction._id.toString()
-        )
-        expect(createdTxs[1].recurringId?.toString()).toBe(
-          recurringTransaction._id.toString()
-        )
         expect(createdTxs[0].date).toEqual(
           localDateToUTCMidnight(new Date("2024-02-02"))
         )

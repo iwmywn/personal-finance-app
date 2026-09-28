@@ -158,6 +158,19 @@ export async function deleteUser(userId: string): Promise<ActionResponse> {
         $or: [{ userId: userObjectId }, { userId }],
       }
 
+      const userVerifications = await db
+        .collection("verifications")
+        .find(
+          { value: userId },
+          { session: dbSession, projection: { identifier: 1 } }
+        )
+        .toArray()
+
+      const attemptIdentifiers = userVerifications
+        .map((doc) => doc.identifier)
+        .filter(Boolean)
+        .map((identifier) => `2fa-attempts-${identifier}`)
+
       await Promise.all([
         db
           .collection("sessions")
@@ -168,20 +181,18 @@ export async function deleteUser(userId: string): Promise<ActionResponse> {
         db
           .collection("twoFactors")
           .deleteMany(userFilter, { session: dbSession }),
-        targetUser.email
-          ? db.collection("verifications").deleteMany(
-              {
-                $or: [
-                  { identifier: targetUser.email },
-                  { userId: userObjectId },
-                  { userId },
-                ],
-              },
-              { session: dbSession }
-            )
-          : Promise.resolve(),
+        db.collection("verifications").deleteMany(
+          {
+            $or: [
+              { value: userId },
+              ...(attemptIdentifiers.length > 0
+                ? [{ identifier: { $in: attemptIdentifiers } }]
+                : []),
+            ],
+          },
+          { session: dbSession }
+        ),
       ])
-
       await usersCollection.deleteOne(
         { _id: userObjectId },
         { session: dbSession }

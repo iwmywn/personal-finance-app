@@ -20,6 +20,7 @@ import {
   mockDBRecurringTransaction,
   mockDBTransaction,
   mockDBUser,
+  mockUser,
   mockValidCategoryValues,
 } from "@/tests/shared/data"
 import {
@@ -30,6 +31,7 @@ import {
 } from "@/actions/category.actions"
 import { isValidUserCategory } from "@/actions/category.server"
 import { getCategoriesCollection } from "@/lib/collections"
+import { triggerRateLimit } from "@/lib/rate-limit"
 
 describe("Categories", async () => {
   describe("isValidUserCategory", () => {
@@ -135,6 +137,18 @@ describe("Categories", async () => {
       )
     })
 
+    it("should return error when rate limit is exceeded", async () => {
+      mockAuthenticatedUser()
+      await triggerRateLimit(`category:${mockUser.id}`)
+
+      const result = await createCustomCategory(mockValidCategoryValues)
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe(
+        "Too many requests! Please slow down and try again later."
+      )
+    })
+
     it("should successfully create custom category", async () => {
       mockAuthenticatedUser()
 
@@ -233,6 +247,21 @@ describe("Categories", async () => {
       expect(result.success).toBeUndefined()
       expect(result.error).toBe(
         "Access denied! Please refresh the page and try again."
+      )
+    })
+
+    it("should return error when rate limit is exceeded", async () => {
+      mockAuthenticatedUser()
+      await triggerRateLimit(`category:${mockUser.id}`)
+
+      const result = await updateCustomCategory(
+        mockDBCustomCategory._id.toString(),
+        mockValidCategoryValues
+      )
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe(
+        "Too many requests! Please slow down and try again later."
       )
     })
 
@@ -410,6 +439,20 @@ describe("Categories", async () => {
       expect(result.success).toBeUndefined()
       expect(result.error).toBe(
         "Access denied! Please refresh the page and try again."
+      )
+    })
+
+    it("should return error when rate limit is exceeded", async () => {
+      mockAuthenticatedUser()
+      await triggerRateLimit(`category:${mockUser.id}`)
+
+      const result = await deleteCustomCategory(
+        mockDBCustomCategory._id.toString()
+      )
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe(
+        "Too many requests! Please slow down and try again later."
       )
     })
 

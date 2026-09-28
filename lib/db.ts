@@ -19,7 +19,7 @@ declare global {
 
 let db: Db | undefined
 
-function getClientPromise() {
+export function getClientPromise(): Promise<MongoClient> {
   if (!globalThis._mongoClientPromise) {
     const options: MongoClientOptions = {}
     globalThis._mongoClientPromise = new MongoClient(
@@ -51,11 +51,18 @@ export async function disconnect(): Promise<void> {
     } catch {
       // Ignore connection close interruptions during teardown
     }
-    globalThis._mongoClientPromise = undefined
     globalThis._mongoClient = undefined
-    db = undefined
-    resetIndexes()
+  } else if (globalThis._mongoClientPromise) {
+    try {
+      const client = await globalThis._mongoClientPromise
+      await client.close()
+    } catch {
+      // Ignore connection close interruptions during teardown
+    }
   }
+  globalThis._mongoClientPromise = undefined
+  db = undefined
+  resetIndexes()
 }
 
 export async function collection<T>(

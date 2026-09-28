@@ -52,6 +52,15 @@ msgid "Invalid data!"
 msgstr "잘못된 데이터입니다!"
 
 #: actions/budget.actions.ts
+#: actions/category.actions.ts
+#: actions/goal.actions.ts
+#: actions/recurring.actions.ts
+#: actions/transaction.actions.ts
+msgctxt "OYzwyU"
+msgid "Too many requests! Please slow down and try again later."
+msgstr "요청이 너무 많습니다! 잠시 후 다시 시도해 주세요."
+
+#: actions/budget.actions.ts
 #: actions/goal.actions.ts
 #: actions/recurring.actions.ts
 #: actions/transaction.actions.ts
@@ -338,6 +347,11 @@ msgid "Transaction has been created."
 msgstr "거래가 생성되었습니다."
 
 #: actions/transaction.actions.ts
+msgctxt "SkAC63"
+msgid "This transaction already exists! Please merge transactions or add more details in the description."
+msgstr "이 거래는 이미 존재합니다! 거래를 합치거나 설명에 세부정보를 추가하세요."
+
+#: actions/transaction.actions.ts
 #: components/transactions/transaction-form.tsx
 msgctxt "8rBc81"
 msgid "Failed to create transaction! Please try again later."
@@ -357,11 +371,6 @@ msgstr "거래를 찾을 수 없거나 편집 권한이 없습니다!"
 msgctxt "VHOeqA"
 msgid "Transaction has been updated."
 msgstr "거래가 업데이트되었습니다."
-
-#: actions/transaction.actions.ts
-msgctxt "0JEV07"
-msgid "A transaction for this recurring schedule already exists on this date!"
-msgstr "이 반복 일정에 대한 거래가 해당 날짜에 이미 존재합니다!"
 
 #: actions/transaction.actions.ts
 #: components/transactions/transaction-form.tsx

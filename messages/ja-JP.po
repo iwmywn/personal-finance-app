@@ -52,6 +52,15 @@ msgid "Invalid data!"
 msgstr "無効なデータです！"
 
 #: actions/budget.actions.ts
+#: actions/category.actions.ts
+#: actions/goal.actions.ts
+#: actions/recurring.actions.ts
+#: actions/transaction.actions.ts
+msgctxt "OYzwyU"
+msgid "Too many requests! Please slow down and try again later."
+msgstr "リクエストが多すぎます！少し時間を置いてから再度お試しください。"
+
+#: actions/budget.actions.ts
 #: actions/goal.actions.ts
 #: actions/recurring.actions.ts
 #: actions/transaction.actions.ts
@@ -338,6 +347,11 @@ msgid "Transaction has been created."
 msgstr "取引が作成されました。"
 
 #: actions/transaction.actions.ts
+msgctxt "SkAC63"
+msgid "This transaction already exists! Please merge transactions or add more details in the description."
+msgstr "この取引は既に存在します！取引を統合するか、説明に詳細を追加してください。"
+
+#: actions/transaction.actions.ts
 #: components/transactions/transaction-form.tsx
 msgctxt "8rBc81"
 msgid "Failed to create transaction! Please try again later."
@@ -357,11 +371,6 @@ msgstr "取引が見つからないか、編集権限がありません！"
 msgctxt "VHOeqA"
 msgid "Transaction has been updated."
 msgstr "取引が更新されました。"
-
-#: actions/transaction.actions.ts
-msgctxt "0JEV07"
-msgid "A transaction for this recurring schedule already exists on this date!"
-msgstr "この定期スケジュールの取引はこの日付に既に存在します！"
 
 #: actions/transaction.actions.ts
 #: components/transactions/transaction-form.tsx

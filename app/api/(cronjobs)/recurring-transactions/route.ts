@@ -78,7 +78,12 @@ export async function GET(request: NextRequest) {
           await Promise.all(
             dueDates.map(async (targetDate) => {
               const existingTransaction = await transactionsCollection.findOne({
-                recurringId: rec._id,
+                userId: rec.userId,
+                type: rec.type,
+                categoryKey: rec.categoryKey,
+                amount: rec.amount,
+                currency: rec.currency,
+                description: rec.description,
                 date: targetDate,
               })
 
@@ -100,7 +105,6 @@ export async function GET(request: NextRequest) {
                   currency: rec.currency,
                   description: rec.description,
                   date: targetDate,
-                  recurringId: rec._id,
                 })
 
                 createdCount++

@@ -52,6 +52,15 @@ msgid "Invalid data!"
 msgstr "Invalid data!"
 
 #: actions/budget.actions.ts
+#: actions/category.actions.ts
+#: actions/goal.actions.ts
+#: actions/recurring.actions.ts
+#: actions/transaction.actions.ts
+msgctxt "OYzwyU"
+msgid "Too many requests! Please slow down and try again later."
+msgstr "Too many requests! Please slow down and try again later."
+
+#: actions/budget.actions.ts
 #: actions/goal.actions.ts
 #: actions/recurring.actions.ts
 #: actions/transaction.actions.ts
@@ -338,6 +347,11 @@ msgid "Transaction has been created."
 msgstr "Transaction has been created."
 
 #: actions/transaction.actions.ts
+msgctxt "SkAC63"
+msgid "This transaction already exists! Please merge transactions or add more details in the description."
+msgstr "This transaction already exists! Please merge transactions or add more details in the description."
+
+#: actions/transaction.actions.ts
 #: components/transactions/transaction-form.tsx
 msgctxt "8rBc81"
 msgid "Failed to create transaction! Please try again later."
@@ -357,11 +371,6 @@ msgstr "Transaction not found or you don't have permission to edit!"
 msgctxt "VHOeqA"
 msgid "Transaction has been updated."
 msgstr "Transaction has been updated."
-
-#: actions/transaction.actions.ts
-msgctxt "0JEV07"
-msgid "A transaction for this recurring schedule already exists on this date!"
-msgstr "A transaction for this recurring schedule already exists on this date!"
 
 #: actions/transaction.actions.ts
 #: components/transactions/transaction-form.tsx

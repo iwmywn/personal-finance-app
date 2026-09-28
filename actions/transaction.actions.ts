@@ -9,6 +9,7 @@ import { getTransactionsCollection } from "@/lib/collections"
 import type { Currency } from "@/lib/currency"
 import type { ActionResponse, Transaction } from "@/lib/definitions"
 import { isDuplicateKeyError } from "@/lib/indexes"
+import { isRateLimited, RATE_LIMIT_PRESETS } from "@/lib/rate-limit"
 import { getSchemas } from "@/schemas/server"
 import type { TransactionFormValues } from "@/schemas/types"
 
@@ -38,6 +39,14 @@ export async function createTransaction(
 
     if (!user || !session) {
       return { error }
+    }
+
+    if (
+      await isRateLimited(`transaction:${user.id}`, RATE_LIMIT_PRESETS.NORMAL)
+    ) {
+      return {
+        error: t("Too many requests! Please slow down and try again later."),
+      }
     }
 
     const isValidCategory = await isValidUserCategory(
@@ -78,6 +87,13 @@ export async function createTransaction(
     updateTag(`transactions-${user.id}`)
     return { success: t("Transaction has been created.") }
   } catch (error) {
+    if (isDuplicateKeyError(error)) {
+      return {
+        error: t(
+          "This transaction already exists! Please merge transactions or add more details in the description."
+        ),
+      }
+    }
     console.error("Error creating transaction:", error)
     return { error: t("Failed to create transaction! Please try again later.") }
   }
@@ -107,6 +123,14 @@ export async function updateTransaction(
 
     if (!user || !session) {
       return { error }
+    }
+
+    if (
+      await isRateLimited(`transaction:${user.id}`, RATE_LIMIT_PRESETS.NORMAL)
+    ) {
+      return {
+        error: t("Too many requests! Please slow down and try again later."),
+      }
     }
 
     const isValidCategory = await isValidUserCategory(
@@ -165,7 +189,7 @@ export async function updateTransaction(
     if (isDuplicateKeyError(error)) {
       return {
         error: t(
-          "A transaction for this recurring schedule already exists on this date!"
+          "This transaction already exists! Please merge transactions or add more details in the description."
         ),
       }
     }
@@ -190,6 +214,14 @@ export async function deleteTransaction(
 
     if (!user || !session) {
       return { error }
+    }
+
+    if (
+      await isRateLimited(`transaction:${user.id}`, RATE_LIMIT_PRESETS.MODERATE)
+    ) {
+      return {
+        error: t("Too many requests! Please slow down and try again later."),
+      }
     }
 
     const transactionsCollection = await getTransactionsCollection()
@@ -244,9 +276,6 @@ async function getCachedTransactions(userId: string, targetCurrency: Currency) {
       _id: transaction._id.toString(),
       userId: transaction.userId.toString(),
       amount: transaction.amount.toString(),
-      recurringId: transaction.recurringId
-        ? transaction.recurringId.toString()
-        : undefined,
     })) as Transaction[]
     const converted = await convertTransactionsToCurrency(
       mapped,

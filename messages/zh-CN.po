@@ -52,6 +52,15 @@ msgid "Invalid data!"
 msgstr "无效数据！"
 
 #: actions/budget.actions.ts
+#: actions/category.actions.ts
+#: actions/goal.actions.ts
+#: actions/recurring.actions.ts
+#: actions/transaction.actions.ts
+msgctxt "OYzwyU"
+msgid "Too many requests! Please slow down and try again later."
+msgstr "请求过于频繁！请稍后再试。"
+
+#: actions/budget.actions.ts
 #: actions/goal.actions.ts
 #: actions/recurring.actions.ts
 #: actions/transaction.actions.ts
@@ -338,6 +347,11 @@ msgid "Transaction has been created."
 msgstr "交易已创建。"
 
 #: actions/transaction.actions.ts
+msgctxt "SkAC63"
+msgid "This transaction already exists! Please merge transactions or add more details in the description."
+msgstr "此交易已存在！请合并交易或在描述中添加更多详细信息。"
+
+#: actions/transaction.actions.ts
 #: components/transactions/transaction-form.tsx
 msgctxt "8rBc81"
 msgid "Failed to create transaction! Please try again later."
@@ -357,11 +371,6 @@ msgstr "未找到交易或您没有权限编辑！"
 msgctxt "VHOeqA"
 msgid "Transaction has been updated."
 msgstr "交易已更新。"
-
-#: actions/transaction.actions.ts
-msgctxt "0JEV07"
-msgid "A transaction for this recurring schedule already exists on this date!"
-msgstr "此定期计划在此日期的交易已存在！"
 
 #: actions/transaction.actions.ts
 #: components/transactions/transaction-form.tsx

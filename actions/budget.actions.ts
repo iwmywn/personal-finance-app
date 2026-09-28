@@ -7,6 +7,7 @@ import { getExtracted } from "next-intl/server"
 import { getBudgetsCollection } from "@/lib/collections"
 import type { ActionResponse, Budget } from "@/lib/definitions"
 import { isDuplicateKeyError } from "@/lib/indexes"
+import { isRateLimited, RATE_LIMIT_PRESETS } from "@/lib/rate-limit"
 import { getSchemas } from "@/schemas/server"
 import type { BudgetFormValues } from "@/schemas/types"
 
@@ -31,6 +32,12 @@ export async function createBudget(
 
     if (!user || !session) {
       return { error }
+    }
+
+    if (await isRateLimited(`budget:${user.id}`, RATE_LIMIT_PRESETS.NORMAL)) {
+      return {
+        error: t("Too many requests! Please slow down and try again later."),
+      }
     }
 
     const isValidCategory = await isValidUserCategory(
@@ -91,6 +98,12 @@ export async function updateBudget(
       return { error }
     }
 
+    if (await isRateLimited(`budget:${user.id}`, RATE_LIMIT_PRESETS.NORMAL)) {
+      return {
+        error: t("Too many requests! Please slow down and try again later."),
+      }
+    }
+
     const isValidCategory = await isValidUserCategory(
       user.id,
       parsedValues.data.categoryKey,
@@ -146,6 +159,12 @@ export async function deleteBudget(budgetId: string): Promise<ActionResponse> {
 
     if (!user || !session) {
       return { error }
+    }
+
+    if (await isRateLimited(`budget:${user.id}`, RATE_LIMIT_PRESETS.MODERATE)) {
+      return {
+        error: t("Too many requests! Please slow down and try again later."),
+      }
     }
 
     const budgetsCollection = await getBudgetsCollection()

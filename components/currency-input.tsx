@@ -25,6 +25,7 @@ const CurrencyInput = React.forwardRef<HTMLInputElement, CurrencyInputProps>(
         placeholder="0"
         intlConfig={{ locale: config.locale, currency }}
         allowNegativeValue={false}
+        inputMode="decimal"
         {...props}
       />
     )

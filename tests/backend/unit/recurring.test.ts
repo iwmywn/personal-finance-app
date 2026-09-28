@@ -10,6 +10,7 @@ import {
 import {
   mockDBRecurringTransaction,
   mockDBUser,
+  mockUser,
   mockValidRecurringTransactionValues,
 } from "@/tests/shared/data"
 import {
@@ -19,6 +20,7 @@ import {
 } from "@/actions/recurring.actions"
 import { getRecurringTransactionsCollection } from "@/lib/collections"
 import { localDateToUTCMidnight } from "@/lib/date"
+import { triggerRateLimit } from "@/lib/rate-limit"
 
 describe("Recurring Transactions", async () => {
   beforeEach(() => {
@@ -50,6 +52,20 @@ describe("Recurring Transactions", async () => {
       expect(result.success).toBeUndefined()
       expect(result.error).toBe(
         "Access denied! Please refresh the page and try again."
+      )
+    })
+
+    it("should return error when rate limit is exceeded", async () => {
+      mockAuthenticatedUser()
+      await triggerRateLimit(`recurring:${mockUser.id}`)
+
+      const result = await createRecurringTransaction(
+        mockValidRecurringTransactionValues
+      )
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe(
+        "Too many requests! Please slow down and try again later."
       )
     })
 
@@ -226,6 +242,20 @@ describe("Recurring Transactions", async () => {
       expect(result.success).toBeUndefined()
       expect(result.error).toBe(
         "Access denied! Please refresh the page and try again."
+      )
+    })
+
+    it("should return error when rate limit is exceeded", async () => {
+      mockAuthenticatedUser()
+      await triggerRateLimit(`recurring:${mockUser.id}`)
+
+      const result = await deleteRecurringTransaction(
+        mockDBRecurringTransaction._id.toString()
+      )
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe(
+        "Too many requests! Please slow down and try again later."
       )
     })
 

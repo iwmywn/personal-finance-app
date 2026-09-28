@@ -7,6 +7,7 @@ import { getExtracted } from "next-intl/server"
 import { getRecurringTransactionsCollection } from "@/lib/collections"
 import type { ActionResponse, RecurringTransaction } from "@/lib/definitions"
 import { isDuplicateKeyError } from "@/lib/indexes"
+import { isRateLimited, RATE_LIMIT_PRESETS } from "@/lib/rate-limit"
 import { getSchemas } from "@/schemas/server"
 import type { RecurringTransactionFormValues } from "@/schemas/types"
 
@@ -31,6 +32,14 @@ export async function createRecurringTransaction(
 
     if (!user || !session) {
       return { error }
+    }
+
+    if (
+      await isRateLimited(`recurring:${user.id}`, RATE_LIMIT_PRESETS.STRICT)
+    ) {
+      return {
+        error: t("Too many requests! Please slow down and try again later."),
+      }
     }
 
     const isValidCategory = await isValidUserCategory(
@@ -92,6 +101,14 @@ export async function deleteRecurringTransaction(
 
     if (!user || !session) {
       return { error }
+    }
+
+    if (
+      await isRateLimited(`recurring:${user.id}`, RATE_LIMIT_PRESETS.MODERATE)
+    ) {
+      return {
+        error: t("Too many requests! Please slow down and try again later."),
+      }
     }
 
     const recurringCollection = await getRecurringTransactionsCollection()

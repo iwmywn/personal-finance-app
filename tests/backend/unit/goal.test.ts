@@ -10,6 +10,7 @@ import {
 import {
   mockDBGoal,
   mockDBUser,
+  mockUser,
   mockValidGoalValues,
 } from "@/tests/shared/data"
 import {
@@ -20,6 +21,7 @@ import {
 } from "@/actions/goal.actions"
 import { getGoalsCollection } from "@/lib/collections"
 import { localDateToUTCMidnight } from "@/lib/date"
+import { triggerRateLimit } from "@/lib/rate-limit"
 
 describe("Goals", async () => {
   describe("createGoal", () => {
@@ -39,6 +41,18 @@ describe("Goals", async () => {
       expect(result.success).toBeUndefined()
       expect(result.error).toBe(
         "Access denied! Please refresh the page and try again."
+      )
+    })
+
+    it("should return error when rate limit is exceeded", async () => {
+      mockAuthenticatedUser()
+      await triggerRateLimit(`goal:${mockUser.id}`)
+
+      const result = await createGoal(mockValidGoalValues)
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe(
+        "Too many requests! Please slow down and try again later."
       )
     })
 
@@ -182,6 +196,21 @@ describe("Goals", async () => {
       expect(result.success).toBeUndefined()
       expect(result.error).toBe(
         "Access denied! Please refresh the page and try again."
+      )
+    })
+
+    it("should return error when rate limit is exceeded", async () => {
+      mockAuthenticatedUser()
+      await triggerRateLimit(`goal:${mockUser.id}`)
+
+      const result = await updateGoal(
+        mockDBGoal._id.toString(),
+        mockValidGoalValues
+      )
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe(
+        "Too many requests! Please slow down and try again later."
       )
     })
 
@@ -388,6 +417,18 @@ describe("Goals", async () => {
       expect(result.success).toBeUndefined()
       expect(result.error).toBe(
         "Access denied! Please refresh the page and try again."
+      )
+    })
+
+    it("should return error when rate limit is exceeded", async () => {
+      mockAuthenticatedUser()
+      await triggerRateLimit(`goal:${mockUser.id}`)
+
+      const result = await deleteGoal(mockDBGoal._id.toString())
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe(
+        "Too many requests! Please slow down and try again later."
       )
     })
 

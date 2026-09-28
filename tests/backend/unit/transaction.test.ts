@@ -10,6 +10,7 @@ import {
 import {
   mockDBTransaction,
   mockDBUser,
+  mockUser,
   mockValidTransactionValues,
 } from "@/tests/shared/data"
 import {
@@ -20,6 +21,7 @@ import {
 } from "@/actions/transaction.actions"
 import { getTransactionsCollection } from "@/lib/collections"
 import { localDateToUTCMidnight } from "@/lib/date"
+import { triggerRateLimit } from "@/lib/rate-limit"
 
 describe("Transactions", async () => {
   describe("createTransaction", () => {
@@ -52,6 +54,18 @@ describe("Transactions", async () => {
       expect(result.success).toBeUndefined()
       expect(result.error).toBe(
         "Access denied! Please refresh the page and try again."
+      )
+    })
+
+    it("should return error when rate limit is exceeded", async () => {
+      mockAuthenticatedUser()
+      await triggerRateLimit(`transaction:${mockUser.id}`)
+
+      const result = await createTransaction(mockValidTransactionValues)
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe(
+        "Too many requests! Please slow down and try again later."
       )
     })
 
@@ -126,7 +140,7 @@ describe("Transactions", async () => {
       fetchSpy.mockRestore()
     })
 
-    it("should successfully create multiple transactions with identical details on the same day", async () => {
+    it("should return error when attempting to create duplicate transaction on the same day", async () => {
       mockAuthenticatedUser()
 
       const firstResult = await createTransaction(mockValidTransactionValues)
@@ -134,17 +148,19 @@ describe("Transactions", async () => {
 
       expect(firstResult.success).toBe("Transaction has been created.")
       expect(firstResult.error).toBeUndefined()
-      expect(secondResult.success).toBe("Transaction has been created.")
-      expect(secondResult.error).toBeUndefined()
+      expect(secondResult.success).toBeUndefined()
+      expect(secondResult.error).toBe(
+        "This transaction already exists! Please merge transactions or add more details in the description."
+      )
 
       const transactionsCollection = await getTransactionsCollection()
       const count = await transactionsCollection.countDocuments({
         userId: mockDBUser._id,
       })
-      expect(count).toBe(2)
+      expect(count).toBe(1)
     })
 
-    it("should successfully create duplicate transactions concurrently", async () => {
+    it("should reject concurrent duplicate transactions due to unique constraint", async () => {
       mockAuthenticatedUser()
 
       const [firstResult, secondResult] = await Promise.all([
@@ -152,16 +168,24 @@ describe("Transactions", async () => {
         createTransaction(mockValidTransactionValues),
       ])
 
-      expect(firstResult.success).toBe("Transaction has been created.")
-      expect(firstResult.error).toBeUndefined()
-      expect(secondResult.success).toBe("Transaction has been created.")
-      expect(secondResult.error).toBeUndefined()
+      const results = [firstResult, secondResult]
+      const successes = results.filter(
+        (r) => r.success === "Transaction has been created."
+      )
+      const errors = results.filter(
+        (r) =>
+          r.error ===
+          "This transaction already exists! Please merge transactions or add more details in the description."
+      )
+
+      expect(successes).toHaveLength(1)
+      expect(errors).toHaveLength(1)
 
       const transactionsCollection = await getTransactionsCollection()
       const count = await transactionsCollection.countDocuments({
         userId: mockDBUser._id,
       })
-      expect(count).toBe(2)
+      expect(count).toBe(1)
     })
 
     it("should return error when database operation throws error", async () => {
@@ -212,6 +236,21 @@ describe("Transactions", async () => {
       expect(result.success).toBeUndefined()
       expect(result.error).toBe(
         "Access denied! Please refresh the page and try again."
+      )
+    })
+
+    it("should return error when rate limit is exceeded", async () => {
+      mockAuthenticatedUser()
+      await triggerRateLimit(`transaction:${mockUser.id}`)
+
+      const result = await updateTransaction(
+        mockDBTransaction._id.toString(),
+        mockValidTransactionValues
+      )
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe(
+        "Too many requests! Please slow down and try again later."
       )
     })
 
@@ -353,7 +392,7 @@ describe("Transactions", async () => {
       fetchSpy.mockRestore()
     })
 
-    it("should allow updating transaction to have identical details as another transaction on the same date", async () => {
+    it("should return error when updating transaction to have identical details as another transaction on the same date", async () => {
       await Promise.all([
         insertTestTransaction(mockDBTransaction),
         insertTestTransaction({
@@ -373,11 +412,13 @@ describe("Transactions", async () => {
         date: mockDBTransaction.date,
       })
 
-      expect(result.success).toBe("Transaction has been updated.")
-      expect(result.error).toBeUndefined()
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe(
+        "This transaction already exists! Please merge transactions or add more details in the description."
+      )
     })
 
-    it("should allow concurrent updates resulting in identical transactions", async () => {
+    it("should reject concurrent updates resulting in identical transactions", async () => {
       await Promise.all([
         insertTestTransaction({
           ...mockDBTransaction,
@@ -406,10 +447,18 @@ describe("Transactions", async () => {
         updateTransaction("690d2e5f7d5c36bf6c82ff1f", targetValues),
       ])
 
-      expect(firstResult.success).toBe("Transaction has been updated.")
-      expect(firstResult.error).toBeUndefined()
-      expect(secondResult.success).toBe("Transaction has been updated.")
-      expect(secondResult.error).toBeUndefined()
+      const results = [firstResult, secondResult]
+      const successes = results.filter(
+        (r) => r.success === "Transaction has been updated."
+      )
+      const errors = results.filter(
+        (r) =>
+          r.error ===
+          "This transaction already exists! Please merge transactions or add more details in the description."
+      )
+
+      expect(successes).toHaveLength(1)
+      expect(errors).toHaveLength(1)
     })
 
     it("should return error when database operation throws error", async () => {
@@ -446,6 +495,18 @@ describe("Transactions", async () => {
       expect(result.success).toBeUndefined()
       expect(result.error).toBe(
         "Access denied! Please refresh the page and try again."
+      )
+    })
+
+    it("should return error when rate limit is exceeded", async () => {
+      mockAuthenticatedUser()
+      await triggerRateLimit(`transaction:${mockUser.id}`)
+
+      const result = await deleteTransaction(mockDBTransaction._id.toString())
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe(
+        "Too many requests! Please slow down and try again later."
       )
     })
 

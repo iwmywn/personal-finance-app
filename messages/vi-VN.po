@@ -52,6 +52,15 @@ msgid "Invalid data!"
 msgstr "Dữ liệu không hợp lệ!"
 
 #: actions/budget.actions.ts
+#: actions/category.actions.ts
+#: actions/goal.actions.ts
+#: actions/recurring.actions.ts
+#: actions/transaction.actions.ts
+msgctxt "OYzwyU"
+msgid "Too many requests! Please slow down and try again later."
+msgstr "Quá nhiều yêu cầu! Vui lòng thao tác chậm lại và thử lại sau."
+
+#: actions/budget.actions.ts
 #: actions/goal.actions.ts
 #: actions/recurring.actions.ts
 #: actions/transaction.actions.ts
@@ -338,6 +347,11 @@ msgid "Transaction has been created."
 msgstr "Giao dịch đã được tạo."
 
 #: actions/transaction.actions.ts
+msgctxt "SkAC63"
+msgid "This transaction already exists! Please merge transactions or add more details in the description."
+msgstr "Giao dịch này đã tồn tại! Vui lòng gộp giao dịch hoặc thêm chi tiết ở mô tả."
+
+#: actions/transaction.actions.ts
 #: components/transactions/transaction-form.tsx
 msgctxt "8rBc81"
 msgid "Failed to create transaction! Please try again later."
@@ -357,11 +371,6 @@ msgstr "Không tìm thấy giao dịch hoặc bạn không có quyền chỉnh s
 msgctxt "VHOeqA"
 msgid "Transaction has been updated."
 msgstr "Giao dịch đã được cập nhật."
-
-#: actions/transaction.actions.ts
-msgctxt "0JEV07"
-msgid "A transaction for this recurring schedule already exists on this date!"
-msgstr "Giao dịch cho lịch định kỳ này vào ngày này đã tồn tại!"
 
 #: actions/transaction.actions.ts
 #: components/transactions/transaction-form.tsx

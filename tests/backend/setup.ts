@@ -8,6 +8,7 @@ import "@/tests/backend/mocks/headers.mock"
 import { MongoMemoryReplSet } from "mongodb-memory-server"
 
 import { connect, disconnect } from "@/lib/db"
+import { resetRateLimitStore } from "@/lib/rate-limit"
 
 let mongoServer: MongoMemoryReplSet
 
@@ -31,6 +32,7 @@ afterAll(async () => {
 
 beforeEach(() => {
   vi.resetAllMocks()
+  resetRateLimitStore()
 })
 
 afterEach(async () => {

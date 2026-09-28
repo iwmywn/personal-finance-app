@@ -95,11 +95,11 @@ export const auth = betterAuth({
     customRules: {
       "/sign-in/username": {
         window: 60,
-        max: 5,
+        max: 10,
       },
       "/sign-in/email": {
         window: 60,
-        max: 5,
+        max: 10,
       },
     },
   },
