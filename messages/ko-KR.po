@@ -7,6 +7,17 @@ msgstr ""
 "X-Message-Key: msgctxt\n"
 
 #: actions/admin.actions.ts
+#: actions/budget.actions.ts
+#: actions/category.actions.ts
+#: actions/goal.actions.ts
+#: actions/recurring.actions.ts
+#: actions/session.actions.ts
+#: actions/transaction.actions.ts
+msgctxt "OYzwyU"
+msgid "Too many requests! Please slow down and try again later."
+msgstr "요청이 너무 많습니다! 잠시 후 다시 시도해 주세요."
+
+#: actions/admin.actions.ts
 msgctxt "gfVKAY"
 msgid "Failed to list users! Please try again later."
 msgstr "사용자 목록을 가져오지 못했습니다! 나중에 다시 시도해주세요."
@@ -50,15 +61,6 @@ msgstr "사용자 삭제에 실패했습니다! 나중에 다시 시도해주세
 msgctxt "5GmpFA"
 msgid "Invalid data!"
 msgstr "잘못된 데이터입니다!"
-
-#: actions/budget.actions.ts
-#: actions/category.actions.ts
-#: actions/goal.actions.ts
-#: actions/recurring.actions.ts
-#: actions/transaction.actions.ts
-msgctxt "OYzwyU"
-msgid "Too many requests! Please slow down and try again later."
-msgstr "요청이 너무 많습니다! 잠시 후 다시 시도해 주세요."
 
 #: actions/budget.actions.ts
 #: actions/goal.actions.ts
@@ -2400,6 +2402,16 @@ msgstr "거래에 대한 설명을 입력하세요..."
 msgctxt "MBywHq"
 msgid "Manage cash inflows and outflows to track your personal finances."
 msgstr "개인 재정을 추적하기 위해 현금 유입 및 유출을 관리하세요."
+
+#: components/transactions/transactions-table.tsx
+msgctxt "iRMvlA"
+msgid "Exchange rate pending"
+msgstr "환율 대기 중"
+
+#: components/transactions/unconverted-transactions-alert.tsx
+msgctxt "bBbh-Z"
+msgid "Some transactions are pending exchange rates and are displayed in their original currency."
+msgstr "일부 거래는 환율 대기 중이며 원래 통화로 표시됩니다."
 
 #: components/ui/breadcrumb.tsx
 msgctxt "I5NMJ8"

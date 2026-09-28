@@ -7,6 +7,17 @@ msgstr ""
 "X-Message-Key: msgctxt\n"
 
 #: actions/admin.actions.ts
+#: actions/budget.actions.ts
+#: actions/category.actions.ts
+#: actions/goal.actions.ts
+#: actions/recurring.actions.ts
+#: actions/session.actions.ts
+#: actions/transaction.actions.ts
+msgctxt "OYzwyU"
+msgid "Too many requests! Please slow down and try again later."
+msgstr "Too many requests! Please slow down and try again later."
+
+#: actions/admin.actions.ts
 msgctxt "gfVKAY"
 msgid "Failed to list users! Please try again later."
 msgstr "Failed to list users! Please try again later."
@@ -50,15 +61,6 @@ msgstr "Failed to delete user! Please try again later."
 msgctxt "5GmpFA"
 msgid "Invalid data!"
 msgstr "Invalid data!"
-
-#: actions/budget.actions.ts
-#: actions/category.actions.ts
-#: actions/goal.actions.ts
-#: actions/recurring.actions.ts
-#: actions/transaction.actions.ts
-msgctxt "OYzwyU"
-msgid "Too many requests! Please slow down and try again later."
-msgstr "Too many requests! Please slow down and try again later."
 
 #: actions/budget.actions.ts
 #: actions/goal.actions.ts
@@ -2400,6 +2402,16 @@ msgstr "Enter a description for the transaction..."
 msgctxt "MBywHq"
 msgid "Manage cash inflows and outflows to track your personal finances."
 msgstr "Manage cash inflows and outflows to track your personal finances."
+
+#: components/transactions/transactions-table.tsx
+msgctxt "iRMvlA"
+msgid "Exchange rate pending"
+msgstr "Exchange rate pending"
+
+#: components/transactions/unconverted-transactions-alert.tsx
+msgctxt "bBbh-Z"
+msgid "Some transactions are pending exchange rates and are displayed in their original currency."
+msgstr "Some transactions are pending exchange rates and are displayed in their original currency."
 
 #: components/ui/breadcrumb.tsx
 msgctxt "I5NMJ8"

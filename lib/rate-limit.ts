@@ -64,7 +64,7 @@ function getMongoLimiter(
     limiter = new RateLimiterMongo({
       storeClient: client,
       dbName: serverEnv.DB_NAME,
-      tableName: "rateLimits",
+      tableName: "actionRateLimits",
       points,
       duration,
       keyPrefix: `${points}_${duration}`,

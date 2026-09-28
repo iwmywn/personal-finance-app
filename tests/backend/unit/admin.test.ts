@@ -39,6 +39,7 @@ import {
 } from "@/lib/collections"
 import { connect } from "@/lib/db"
 import type { User } from "@/lib/definitions"
+import { triggerRateLimit } from "@/lib/rate-limit"
 
 type UserWithRole = NonNullable<
   Awaited<ReturnType<typeof auth.api.listUsers>>
@@ -84,6 +85,19 @@ describe("Admin", () => {
       expect(result.stats).toBeUndefined()
       expect(result.error).toBe("Access denied! Admin privileges required.")
       expect(auth.api.listUsers).not.toHaveBeenCalled()
+    })
+
+    it("should return error when rate limit is exceeded in getAdminData", async () => {
+      mockAuthenticatedAdmin()
+      await triggerRateLimit(`admin:data:${mockAdminUser.id}`)
+
+      const result = await getAdminData()
+
+      expect(result.users).toBeUndefined()
+      expect(result.stats).toBeUndefined()
+      expect(result.error).toBe(
+        "Too many requests! Please slow down and try again later."
+      )
     })
 
     it("should handle error when auth.api.listUsers throws", async () => {
@@ -425,6 +439,18 @@ describe("Admin", () => {
       expect(txCount).toBe(1)
 
       deleteOneSpy.mockRestore()
+    })
+
+    it("should return error when rate limit is exceeded in deleteUser", async () => {
+      mockAuthenticatedAdmin()
+      await triggerRateLimit(`admin:delete:${mockAdminUser.id}`)
+
+      const result = await deleteUser("68f712e4cda4897217a05a1c")
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe(
+        "Too many requests! Please slow down and try again later."
+      )
     })
   })
 })

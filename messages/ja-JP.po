@@ -7,6 +7,17 @@ msgstr ""
 "X-Message-Key: msgctxt\n"
 
 #: actions/admin.actions.ts
+#: actions/budget.actions.ts
+#: actions/category.actions.ts
+#: actions/goal.actions.ts
+#: actions/recurring.actions.ts
+#: actions/session.actions.ts
+#: actions/transaction.actions.ts
+msgctxt "OYzwyU"
+msgid "Too many requests! Please slow down and try again later."
+msgstr "リクエストが多すぎます！少し時間を置いてから再度お試しください。"
+
+#: actions/admin.actions.ts
 msgctxt "gfVKAY"
 msgid "Failed to list users! Please try again later."
 msgstr "ユーザー一覧の取得に失敗しました！後でもう一度お試しください。"
@@ -50,15 +61,6 @@ msgstr "ユーザーの削除に失敗しました！後でもう一度お試し
 msgctxt "5GmpFA"
 msgid "Invalid data!"
 msgstr "無効なデータです！"
-
-#: actions/budget.actions.ts
-#: actions/category.actions.ts
-#: actions/goal.actions.ts
-#: actions/recurring.actions.ts
-#: actions/transaction.actions.ts
-msgctxt "OYzwyU"
-msgid "Too many requests! Please slow down and try again later."
-msgstr "リクエストが多すぎます！少し時間を置いてから再度お試しください。"
 
 #: actions/budget.actions.ts
 #: actions/goal.actions.ts
@@ -2400,6 +2402,16 @@ msgstr "取引の説明を入力..."
 msgctxt "MBywHq"
 msgid "Manage cash inflows and outflows to track your personal finances."
 msgstr "個人の財務を追跡するために現金の流入と流出を管理します。"
+
+#: components/transactions/transactions-table.tsx
+msgctxt "iRMvlA"
+msgid "Exchange rate pending"
+msgstr "為替レート保留中"
+
+#: components/transactions/unconverted-transactions-alert.tsx
+msgctxt "bBbh-Z"
+msgid "Some transactions are pending exchange rates and are displayed in their original currency."
+msgstr "一部の取引は為替レートが保留中のため、元の通貨で表示されています。"
 
 #: components/ui/breadcrumb.tsx
 msgctxt "I5NMJ8"

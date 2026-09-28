@@ -93,7 +93,7 @@ describe("Rate Limiter (RateLimiterMongo + RateLimiterMemory fallback)", () => {
     expect(await isRateLimited(key, opts)).toBe(true)
 
     const db = await connect()
-    await db.collection("rateLimits").deleteMany({})
+    await db.collection("actionRateLimits").deleteMany({})
     resetRateLimitStore()
 
     expect(await isRateLimited(key, opts)).toBe(false)

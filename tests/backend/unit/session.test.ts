@@ -9,6 +9,7 @@ import {
 } from "@/actions/session.actions"
 import { auth } from "@/lib/auth"
 import type { Session } from "@/lib/definitions"
+import { triggerRateLimit } from "@/lib/rate-limit"
 
 vi.mock("next/headers", () => ({
   headers: vi.fn(),
@@ -259,6 +260,19 @@ describe("Session", () => {
       expect(result.error).toBe("Session not found.")
       expect(auth.api.revokeSession).not.toHaveBeenCalled()
       expect(result.success).toBeUndefined()
+    })
+
+    it("should return error when rate limit is exceeded in revokeSessionById", async () => {
+      vi.mocked(auth.api.listSessions).mockResolvedValueOnce([mockSession])
+      await triggerRateLimit(`session:revoke:${mockSession.userId}`)
+
+      const result = await revokeSessionById(mockSession.id)
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe(
+        "Too many requests! Please slow down and try again later."
+      )
+      expect(auth.api.revokeSession).not.toHaveBeenCalled()
     })
 
     it("should return session not found error when listSessions returns null", async () => {

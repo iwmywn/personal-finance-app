@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { MoreVerticalIcon, WalletIcon } from "lucide-react"
+import { AlertCircleIcon, MoreVerticalIcon, WalletIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 
 import { Badge } from "@/components/ui/badge"
@@ -43,7 +43,9 @@ import {
 import { DeleteTransaction } from "@/components/transactions/delete-transaction"
 import { ExportButton } from "@/components/transactions/export-button"
 import { TransactionForm } from "@/components/transactions/transaction-form"
+import { UnconvertedTransactionsAlert } from "@/components/transactions/unconverted-transactions-alert"
 import { useTransactions } from "@/contexts/transactions-context"
+import { useUser } from "@/contexts/user-context"
 import { useCategory } from "@/hooks/use-category"
 import { useFormatCurrency } from "@/hooks/use-format-currency"
 import { useFormatDate } from "@/hooks/use-format-date"
@@ -59,6 +61,7 @@ export function TransactionsTable({
   filteredTransactions,
 }: TransactionsTableProps) {
   const { transactions } = useTransactions()
+  const { user } = useUser()
   const t = useExtracted()
   const { getCategoryLabel, getCategoryDescription } = useCategory()
   const formatDate = useFormatDate()
@@ -105,6 +108,9 @@ export function TransactionsTable({
             </Empty>
           ) : (
             <div className="flex h-full flex-col justify-between gap-4">
+              <UnconvertedTransactionsAlert
+                transactions={filteredTransactions}
+              />
               <div className="table-wrapper min-h-0 flex-1">
                 <Table>
                   <TableHeader className="bg-muted sticky top-0 z-1">
@@ -162,19 +168,36 @@ export function TransactionsTable({
                           className="min-w-38 wrap-anywhere whitespace-normal"
                           suppressHydrationWarning
                         >
-                          <span
-                            className={`font-semibold ${
-                              transaction.type === "inflow"
-                                ? "text-green-600"
-                                : "text-red-600"
-                            }`}
-                          >
-                            {transaction.type === "inflow" ? "+" : "-"}
-                            {formatCurrency(
-                              transaction.amount,
-                              transaction.currency
+                          <div className="flex items-center justify-center gap-1.5">
+                            <span
+                              className={`font-semibold ${
+                                transaction.type === "inflow"
+                                  ? "text-green-600"
+                                  : "text-red-600"
+                              }`}
+                            >
+                              {transaction.type === "inflow" ? "+" : "-"}
+                              {formatCurrency(
+                                transaction.amount,
+                                transaction.currency
+                              )}
+                            </span>
+                            {transaction.currency !== user.currency && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <span className="inline-flex cursor-help items-center text-amber-500 hover:text-amber-600">
+                                    <AlertCircleIcon className="size-4 shrink-0" />
+                                    <span className="sr-only">
+                                      {t("Exchange rate pending")}
+                                    </span>
+                                  </span>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  {t("Exchange rate pending")}
+                                </TooltipContent>
+                              </Tooltip>
                             )}
-                          </span>
+                          </div>
                         </TableCell>
                         <TableCell>
                           <DropdownMenu>

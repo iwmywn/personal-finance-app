@@ -7,6 +7,17 @@ msgstr ""
 "X-Message-Key: msgctxt\n"
 
 #: actions/admin.actions.ts
+#: actions/budget.actions.ts
+#: actions/category.actions.ts
+#: actions/goal.actions.ts
+#: actions/recurring.actions.ts
+#: actions/session.actions.ts
+#: actions/transaction.actions.ts
+msgctxt "OYzwyU"
+msgid "Too many requests! Please slow down and try again later."
+msgstr "Quá nhiều yêu cầu! Vui lòng thao tác chậm lại và thử lại sau."
+
+#: actions/admin.actions.ts
 msgctxt "gfVKAY"
 msgid "Failed to list users! Please try again later."
 msgstr "Lấy danh sách người dùng thất bại! Vui lòng thử lại sau."
@@ -50,15 +61,6 @@ msgstr "Xóa người dùng thất bại! Vui lòng thử lại sau."
 msgctxt "5GmpFA"
 msgid "Invalid data!"
 msgstr "Dữ liệu không hợp lệ!"
-
-#: actions/budget.actions.ts
-#: actions/category.actions.ts
-#: actions/goal.actions.ts
-#: actions/recurring.actions.ts
-#: actions/transaction.actions.ts
-msgctxt "OYzwyU"
-msgid "Too many requests! Please slow down and try again later."
-msgstr "Quá nhiều yêu cầu! Vui lòng thao tác chậm lại và thử lại sau."
 
 #: actions/budget.actions.ts
 #: actions/goal.actions.ts
@@ -2400,6 +2402,16 @@ msgstr "Nhập mô tả cho giao dịch..."
 msgctxt "MBywHq"
 msgid "Manage cash inflows and outflows to track your personal finances."
 msgstr "Quản lý dòng tiền vào và ra để theo dõi tài chính cá nhân của bạn."
+
+#: components/transactions/transactions-table.tsx
+msgctxt "iRMvlA"
+msgid "Exchange rate pending"
+msgstr "Đang chờ tỷ giá"
+
+#: components/transactions/unconverted-transactions-alert.tsx
+msgctxt "bBbh-Z"
+msgid "Some transactions are pending exchange rates and are displayed in their original currency."
+msgstr "Một số giao dịch đang chờ tỷ giá và được hiển thị bằng loại tiền tệ gốc."
 
 #: components/ui/breadcrumb.tsx
 msgctxt "I5NMJ8"

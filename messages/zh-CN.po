@@ -7,6 +7,17 @@ msgstr ""
 "X-Message-Key: msgctxt\n"
 
 #: actions/admin.actions.ts
+#: actions/budget.actions.ts
+#: actions/category.actions.ts
+#: actions/goal.actions.ts
+#: actions/recurring.actions.ts
+#: actions/session.actions.ts
+#: actions/transaction.actions.ts
+msgctxt "OYzwyU"
+msgid "Too many requests! Please slow down and try again later."
+msgstr "请求过于频繁！请稍后再试。"
+
+#: actions/admin.actions.ts
 msgctxt "gfVKAY"
 msgid "Failed to list users! Please try again later."
 msgstr "获取用户列表失败！请稍后再试。"
@@ -50,15 +61,6 @@ msgstr "删除用户失败！请稍后再试。"
 msgctxt "5GmpFA"
 msgid "Invalid data!"
 msgstr "无效数据！"
-
-#: actions/budget.actions.ts
-#: actions/category.actions.ts
-#: actions/goal.actions.ts
-#: actions/recurring.actions.ts
-#: actions/transaction.actions.ts
-msgctxt "OYzwyU"
-msgid "Too many requests! Please slow down and try again later."
-msgstr "请求过于频繁！请稍后再试。"
 
 #: actions/budget.actions.ts
 #: actions/goal.actions.ts
@@ -2400,6 +2402,16 @@ msgstr "输入交易描述..."
 msgctxt "MBywHq"
 msgid "Manage cash inflows and outflows to track your personal finances."
 msgstr "管理现金流入和流出以跟踪您的个人财务。"
+
+#: components/transactions/transactions-table.tsx
+msgctxt "iRMvlA"
+msgid "Exchange rate pending"
+msgstr "汇率待定"
+
+#: components/transactions/unconverted-transactions-alert.tsx
+msgctxt "bBbh-Z"
+msgid "Some transactions are pending exchange rates and are displayed in their original currency."
+msgstr "部分交易正在等待汇率，并以其原始货币显示。"
 
 #: components/ui/breadcrumb.tsx
 msgctxt "I5NMJ8"

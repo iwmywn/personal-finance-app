@@ -16,6 +16,7 @@ import {
 } from "@/lib/collections"
 import { connect, withTransaction } from "@/lib/db"
 import type { ActionResponse, User } from "@/lib/definitions"
+import { isRateLimited, RATE_LIMIT_PRESETS } from "@/lib/rate-limit"
 import { ADMIN_ROLE } from "@/lib/role"
 
 import { getSession } from "./session.actions"
@@ -39,6 +40,14 @@ export async function getAdminData(): Promise<{
     const { error, user, session } = await getSession(true)
 
     if (!user || !session) return { error }
+
+    if (
+      await isRateLimited(`admin:data:${user.id}`, RATE_LIMIT_PRESETS.NORMAL)
+    ) {
+      return {
+        error: t("Too many requests! Please slow down and try again later."),
+      }
+    }
 
     const result = await auth.api.listUsers({
       headers: headersList,
@@ -100,6 +109,14 @@ export async function deleteUser(userId: string): Promise<ActionResponse> {
     const { error, user, session } = await getSession(true)
 
     if (!user || !session) return { error }
+
+    if (
+      await isRateLimited(`admin:delete:${user.id}`, RATE_LIMIT_PRESETS.STRICT)
+    ) {
+      return {
+        error: t("Too many requests! Please slow down and try again later."),
+      }
+    }
 
     if (user.id === userId) {
       return { error: t("You cannot delete your own account!") }

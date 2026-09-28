@@ -6,6 +6,7 @@ import { getExtracted } from "next-intl/server"
 
 import { auth } from "@/lib/auth"
 import type { ActionResponse, Session, User } from "@/lib/definitions"
+import { isRateLimited, RATE_LIMIT_PRESETS } from "@/lib/rate-limit"
 import { isAdminRole } from "@/lib/role"
 
 /**
@@ -98,6 +99,17 @@ export async function revokeSessionById(
     const targetSession = sessions?.find((s) => s.id === sessionId)
     if (!targetSession) {
       return { error: t("Session not found.") }
+    }
+
+    if (
+      await isRateLimited(
+        `session:revoke:${targetSession.userId}`,
+        RATE_LIMIT_PRESETS.MODERATE
+      )
+    ) {
+      return {
+        error: t("Too many requests! Please slow down and try again later."),
+      }
     }
 
     await auth.api.revokeSession({
