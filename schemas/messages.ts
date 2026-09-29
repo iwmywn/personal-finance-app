@@ -41,6 +41,7 @@ export async function getSchemaMessages() {
     categoryNameRequired: t("Category name is required."),
     categoryNameMaxLength: t("Category name must be at most 50 characters."),
     startDateRequired: t("Start date is required."),
+    startDateMustBeInFuture: t("Start date must be in the future."),
     endDateRequired: t("End date is required."),
     endDateAfterStartDate: t("End date must be after start date."),
     goalNameRequired: t("Goal name is required."),

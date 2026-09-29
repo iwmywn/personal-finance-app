@@ -2875,6 +2875,11 @@ msgid "Start date is required."
 msgstr "Start date is required."
 
 #: schemas/messages.ts
+msgctxt "Z75W2Q"
+msgid "Start date must be in the future."
+msgstr "Start date must be in the future."
+
+#: schemas/messages.ts
 msgctxt "1uO2me"
 msgid "End date is required."
 msgstr "End date is required."

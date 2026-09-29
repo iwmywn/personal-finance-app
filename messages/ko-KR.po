@@ -2875,6 +2875,11 @@ msgid "Start date is required."
 msgstr "시작일은 필수입니다."
 
 #: schemas/messages.ts
+msgctxt "Z75W2Q"
+msgid "Start date must be in the future."
+msgstr "시작 날짜는 미래여야 합니다."
+
+#: schemas/messages.ts
 msgctxt "1uO2me"
 msgid "End date is required."
 msgstr "종료일은 필수입니다."

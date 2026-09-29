@@ -75,13 +75,7 @@ export function getNextDate(
       )
     : startUTC
 
-  const MAX_ITERATIONS = 366
-  let iterations = 0
-
-  while (
-    candidate.getTime() < todayUTC.getTime() &&
-    iterations < MAX_ITERATIONS
-  ) {
+  while (candidate.getTime() < todayUTC.getTime()) {
     const next = stepNextDate(
       candidate,
       rec.frequency,
@@ -92,7 +86,6 @@ export function getNextDate(
       break
     }
     candidate = next
-    iterations++
   }
 
   if (endUTC && candidate.getTime() > endUTC.getTime()) {
@@ -123,11 +116,7 @@ export function getDueDates(
       )
     : startUTC
 
-  const MAX_OCCURRENCES = 366
-  while (
-    candidate.getTime() <= effectiveEndUTC.getTime() &&
-    dueDates.length < MAX_OCCURRENCES
-  ) {
+  while (candidate.getTime() <= effectiveEndUTC.getTime()) {
     dueDates.push(candidate)
 
     const next = stepNextDate(

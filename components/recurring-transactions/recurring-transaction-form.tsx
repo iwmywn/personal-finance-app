@@ -370,7 +370,13 @@ export function RecurringTransactionForm({
                           field.onChange(date)
                           setStartCalendarOpen(false)
                         }}
-                        disabled={(date) => Boolean(endDate && date > endDate)}
+                        disabled={(date) => {
+                          const today = new Date()
+                          today.setHours(0, 0, 0, 0)
+                          return (
+                            date <= today || Boolean(endDate && date > endDate)
+                          )
+                        }}
                       />
                     </PopoverContent>
                   </Popover>
@@ -427,9 +433,14 @@ export function RecurringTransactionForm({
                           field.onChange(date)
                           setEndCalendarOpen(false)
                         }}
-                        disabled={(date) =>
-                          Boolean(startDate && date <= startDate)
-                        }
+                        disabled={(date) => {
+                          const today = new Date()
+                          today.setHours(0, 0, 0, 0)
+                          return (
+                            date <= today ||
+                            Boolean(startDate && date <= startDate)
+                          )
+                        }}
                       />
                     </PopoverContent>
                   </Popover>

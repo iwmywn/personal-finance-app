@@ -3,7 +3,7 @@ import * as z from "zod"
 
 import { CATEGORY_TYPES } from "@/lib/category"
 import { CURRENCIES, CURRENCY_CONFIG } from "@/lib/currency"
-import { parseToUTCMidnight } from "@/lib/date"
+import { normalizeToUTCMidnight, parseToUTCMidnight } from "@/lib/date"
 import { ASSIGNABLE_ROLES } from "@/lib/role"
 import type { SchemaMessages } from "@/schemas/messages"
 
@@ -337,6 +337,15 @@ export function buildSchemas(messages: SchemaMessages) {
       })
       .superRefine((data, ctx) => {
         validateAmountForCurrency(data.currency, data.amount, "amount", ctx)
+
+        const todayUTC = normalizeToUTCMidnight(new Date())
+        if (data.startDate.getTime() <= todayUTC.getTime()) {
+          ctx.addIssue({
+            path: ["startDate"],
+            message: messages.startDateMustBeInFuture,
+            code: "custom",
+          })
+        }
 
         if (data.frequency === "random" && !data.randomEveryXDays) {
           ctx.addIssue({

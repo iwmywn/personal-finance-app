@@ -257,7 +257,7 @@ export const mockValidRecurringTransactionValues = {
   description: "Freelance project payment",
   frequency: "monthly" as const,
   randomEveryXDays: undefined,
-  startDate: localDateToUTCMidnight(new Date("2024-02-01")),
+  startDate: localDateToUTCMidnight(new Date("2024-07-01")),
   endDate: localDateToUTCMidnight(new Date("2024-12-31")),
 }
 
