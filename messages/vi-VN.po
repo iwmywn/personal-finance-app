@@ -988,6 +988,11 @@ msgid "Failed to stop impersonating! Please try again later."
 msgstr "Dừng đóng vai thất bại! Vui lòng thử lại sau."
 
 #: components/admin/stop-impersonation.tsx
+msgctxt "IF-3KJ"
+msgid "Stopped impersonation session."
+msgstr "Đã dừng phiên đóng vai."
+
+#: components/admin/stop-impersonation.tsx
 msgctxt "LKxCOb"
 msgid "Impersonating"
 msgstr "Đang đóng vai"

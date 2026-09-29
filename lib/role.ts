@@ -1,6 +1,9 @@
 export const ADMIN_ROLE = "admin"
 const USER_ROLE = "user"
 
+/**
+ * Currently only supports creating regular user accounts.
+ */
 export const ASSIGNABLE_ROLES = [USER_ROLE] as const
 type AssignableRole = (typeof ASSIGNABLE_ROLES)[number]
 

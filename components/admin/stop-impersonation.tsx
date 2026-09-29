@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
@@ -54,7 +54,7 @@ export function StopImpersonation() {
             },
             onSuccess: () => {
               setIsOpen(false)
-              toast.success("Stopped impersonation session.")
+              toast.success(t("Stopped impersonation session."))
               router.push("/admin")
               router.refresh()
             },

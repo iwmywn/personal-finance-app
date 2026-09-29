@@ -988,6 +988,11 @@ msgid "Failed to stop impersonating! Please try again later."
 msgstr "停止模拟失败！请稍后再试。"
 
 #: components/admin/stop-impersonation.tsx
+msgctxt "IF-3KJ"
+msgid "Stopped impersonation session."
+msgstr "已停止模拟会话。"
+
+#: components/admin/stop-impersonation.tsx
 msgctxt "LKxCOb"
 msgid "Impersonating"
 msgstr "正在模拟"

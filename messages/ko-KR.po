@@ -988,6 +988,11 @@ msgid "Failed to stop impersonating! Please try again later."
 msgstr "가장 중지에 실패했습니다! 나중에 다시 시도해주세요."
 
 #: components/admin/stop-impersonation.tsx
+msgctxt "IF-3KJ"
+msgid "Stopped impersonation session."
+msgstr "가장 세션이 중지되었습니다."
+
+#: components/admin/stop-impersonation.tsx
 msgctxt "LKxCOb"
 msgid "Impersonating"
 msgstr "가장 중"

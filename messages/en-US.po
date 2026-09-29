@@ -988,6 +988,11 @@ msgid "Failed to stop impersonating! Please try again later."
 msgstr "Failed to stop impersonating! Please try again later."
 
 #: components/admin/stop-impersonation.tsx
+msgctxt "IF-3KJ"
+msgid "Stopped impersonation session."
+msgstr "Stopped impersonation session."
+
+#: components/admin/stop-impersonation.tsx
 msgctxt "LKxCOb"
 msgid "Impersonating"
 msgstr "Impersonating"

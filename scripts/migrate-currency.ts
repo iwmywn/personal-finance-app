@@ -67,7 +67,9 @@ async function migrate() {
       console.log(`Fetching exchange rates for date ${dateStr}...`)
 
       const url = `https://api.currencyapi.com/v3/historical?apikey=${apiKey}&currencies=${currenciesParam}&date=${dateStr}`
-      const response = await fetch(url)
+      const response = await fetch(url, {
+        signal: AbortSignal.timeout(5000),
+      })
 
       if (!response.ok) {
         console.error(
