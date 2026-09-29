@@ -2354,6 +2354,16 @@ msgid "Date"
 msgstr "날짜"
 
 #: components/transactions/export-button.tsx
+msgctxt "bW1-Mh"
+msgid "Original Amount"
+msgstr "원래 금액"
+
+#: components/transactions/export-button.tsx
+msgctxt "CeWvK9"
+msgid "Original Currency"
+msgstr "원래 통화"
+
+#: components/transactions/export-button.tsx
 msgctxt "jRf7yh"
 msgid "Export Transactions (CSV)"
 msgstr "거래 내보내기 (CSV)"

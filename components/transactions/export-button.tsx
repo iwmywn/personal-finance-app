@@ -43,6 +43,8 @@ export function ExportButton({ filteredTransactions }: ExportButtonProps) {
       sanitizeCSVField(t("Category")),
       sanitizeCSVField(t("Amount")),
       sanitizeCSVField(t("Currency")),
+      sanitizeCSVField(t("Original Amount")),
+      sanitizeCSVField(t("Original Currency")),
       sanitizeCSVField(t("Description")),
     ]
     const rows = filteredTransactions.map((ft) => {
@@ -53,8 +55,23 @@ export function ExportButton({ filteredTransactions }: ExportButtonProps) {
       const category = sanitizeCSVField(getCategoryLabel(ft.categoryKey))
       const amount = sanitizeCSVField(ft.amount.toString())
       const currency = sanitizeCSVField(ft.currency)
+      const originalAmount = sanitizeCSVField(
+        (ft.originalAmount ?? ft.amount).toString()
+      )
+      const originalCurrency = sanitizeCSVField(
+        ft.originalCurrency ?? ft.currency
+      )
       const description = sanitizeCSVField(ft.description)
-      return [date, type, category, amount, currency, description]
+      return [
+        date,
+        type,
+        category,
+        amount,
+        currency,
+        originalAmount,
+        originalCurrency,
+        description,
+      ]
     })
 
     return [headers.join(","), ...rows.map((row) => row.join(","))].join("\n")

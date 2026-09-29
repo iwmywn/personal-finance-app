@@ -2,7 +2,7 @@ import Decimal from "decimal.js"
 import * as z from "zod"
 
 import { CATEGORY_TYPES } from "@/lib/category"
-import { CURRENCIES } from "@/lib/currency"
+import { CURRENCIES, CURRENCY_CONFIG } from "@/lib/currency"
 import { parseToUTCMidnight } from "@/lib/date"
 import { ASSIGNABLE_ROLES } from "@/lib/role"
 import type { SchemaMessages } from "@/schemas/messages"
@@ -28,7 +28,7 @@ export function buildSchemas(messages: SchemaMessages) {
     z
       .string()
       .min(1, { message: messages.amountRequired })
-      .regex(/^\d+(\.\d+)?$/, {
+      .regex(/^\d+(\.\d{1,2})?$/, {
         message: messages.amountInvalidNumber,
       })
       .refine(
@@ -52,6 +52,43 @@ export function buildSchemas(messages: SchemaMessages) {
         { message: messages.amountMax }
       )
       .transform((val) => new Decimal(val).toString())
+
+  const validateAmountForCurrency = (
+    currency: (typeof CURRENCIES)[number],
+    amount: string,
+    fieldPath: string,
+    ctx: z.RefinementCtx
+  ) => {
+    const decimals = CURRENCY_CONFIG[currency]?.decimals ?? 2
+    try {
+      const dec = new Decimal(amount)
+      if (decimals === 0) {
+        if (!dec.isInteger()) {
+          ctx.addIssue({
+            path: [fieldPath],
+            message: messages.amountInvalidNumber,
+            code: "custom",
+          })
+          return
+        }
+        if (dec.lt(1)) {
+          ctx.addIssue({
+            path: [fieldPath],
+            message: messages.amountMin,
+            code: "custom",
+          })
+        }
+      } else if (dec.decimalPlaces() > decimals) {
+        ctx.addIssue({
+          path: [fieldPath],
+          message: messages.amountInvalidNumber,
+          code: "custom",
+        })
+      }
+    } catch {
+      // Handled by baseAmount
+    }
+  }
 
   const baseDateSchema = (requiredMessage: string) =>
     z
@@ -117,7 +154,7 @@ export function buildSchemas(messages: SchemaMessages) {
         .string()
         .min(1, { message: messages.nameRequired })
         .max(100, { message: messages.nameMaxLength })
-        .regex(/^[\p{L}\s]+$/u, {
+        .regex(/^[\p{L}\s'-]+$/u, {
           message: messages.nameLettersOnly,
         }),
     })
@@ -128,43 +165,47 @@ export function buildSchemas(messages: SchemaMessages) {
     })
 
   const createTransactionSchema = () =>
-    z.object({
-      type: z.enum(CATEGORY_TYPES, {
-        message: messages.transactionTypeRequired,
-      }),
-      categoryKey: z.string().min(1, { message: messages.categoryRequired }),
-      currency: z.enum(CURRENCIES, {
-        message: messages.currencyRequired,
-      }),
-      amount: baseAmount(),
-      description: z
-        .string()
-        .trim()
-        .min(1, {
-          message: messages.descriptionRequired,
-        })
-        .max(200, {
-          message: messages.descriptionMaxLength,
+    z
+      .object({
+        type: z.enum(CATEGORY_TYPES, {
+          message: messages.transactionTypeRequired,
         }),
-      date: baseDateSchema(messages.dateRequired).refine(
-        (date) => {
-          const earliestTimezoneDate = new Date(
-            Date.now() + 14 * 60 * 60 * 1000
-          )
-          const maxAllowedMidnight = new Date(
-            Date.UTC(
-              earliestTimezoneDate.getUTCFullYear(),
-              earliestTimezoneDate.getUTCMonth(),
-              earliestTimezoneDate.getUTCDate()
+        categoryKey: z.string().min(1, { message: messages.categoryRequired }),
+        currency: z.enum(CURRENCIES, {
+          message: messages.currencyRequired,
+        }),
+        amount: baseAmount(),
+        description: z
+          .string()
+          .trim()
+          .min(1, {
+            message: messages.descriptionRequired,
+          })
+          .max(200, {
+            message: messages.descriptionMaxLength,
+          }),
+        date: baseDateSchema(messages.dateRequired).refine(
+          (date) => {
+            const earliestTimezoneDate = new Date(
+              Date.now() + 14 * 60 * 60 * 1000
             )
-          )
-          return date.getTime() <= maxAllowedMidnight.getTime()
-        },
-        {
-          message: messages.dateCannotBeInFuture,
-        }
-      ),
-    })
+            const maxAllowedMidnight = new Date(
+              Date.UTC(
+                earliestTimezoneDate.getUTCFullYear(),
+                earliestTimezoneDate.getUTCMonth(),
+                earliestTimezoneDate.getUTCDate()
+              )
+            )
+            return date.getTime() <= maxAllowedMidnight.getTime()
+          },
+          {
+            message: messages.dateCannotBeInFuture,
+          }
+        ),
+      })
+      .superRefine((data, ctx) => {
+        validateAmountForCurrency(data.currency, data.amount, "amount", ctx)
+      })
 
   const createCategorySchema = () =>
     z.object({
@@ -199,6 +240,12 @@ export function buildSchemas(messages: SchemaMessages) {
         endDate: baseDateSchema(messages.endDateRequired),
       })
       .superRefine((data, ctx) => {
+        validateAmountForCurrency(
+          data.currency,
+          data.allocatedAmount,
+          "allocatedAmount",
+          ctx
+        )
         if (data.endDate <= data.startDate) {
           ctx.addIssue({
             path: ["endDate"],
@@ -227,6 +274,12 @@ export function buildSchemas(messages: SchemaMessages) {
         endDate: baseDateSchema(messages.endDateRequired),
       })
       .superRefine((data, ctx) => {
+        validateAmountForCurrency(
+          data.currency,
+          data.targetAmount,
+          "targetAmount",
+          ctx
+        )
         if (data.endDate <= data.startDate) {
           ctx.addIssue({
             path: ["endDate"],
@@ -284,6 +337,8 @@ export function buildSchemas(messages: SchemaMessages) {
         lastGeneratedDate: baseOptionalDateSchema(),
       })
       .superRefine((data, ctx) => {
+        validateAmountForCurrency(data.currency, data.amount, "amount", ctx)
+
         if (data.frequency === "random" && !data.randomEveryXDays) {
           ctx.addIssue({
             path: ["randomEveryXDays"],
