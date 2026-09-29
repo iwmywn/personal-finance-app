@@ -158,7 +158,7 @@ describe("Exchange Rates Cron Job", () => {
       expect(json.errors.length).toBeGreaterThan(0)
     })
 
-    it("should remove records that have been retried more than 5 times", async () => {
+    it("should mark records that have failed after 6 retries as status failed without deleting them", async () => {
       const oldPoisonDate = new Date("1970-01-01T00:00:00Z")
       await insertTestMissingExchangeRate({
         _id: new ObjectId(),
@@ -180,7 +180,9 @@ describe("Exchange Rates Cron Job", () => {
       const poisonDoc = await missingRatesCollection.findOne({
         date: oldPoisonDate,
       })
-      expect(poisonDoc).toBeNull()
+      expect(poisonDoc).not.toBeNull()
+      expect(poisonDoc?.status).toBe("failed")
+      expect(poisonDoc?.failedAt).toBeDefined()
     })
 
     it("should not increment retryCount when enqueueMissingExchangeRateDate is called multiple times for the same date", async () => {

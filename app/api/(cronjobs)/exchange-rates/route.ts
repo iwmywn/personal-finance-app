@@ -1,14 +1,16 @@
+import { updateTag } from "next/cache"
 import type { NextRequest } from "next/server"
 
 import {
   enqueueMissingExchangeRateDate,
   ensureExchangeRateForDate,
 } from "@/actions/exchange-rates.actions"
-import { serverEnv } from "@/env/server"
 import {
   getExchangeRatesCollection,
   getMissingExchangeRatesCollection,
+  getTransactionsCollection,
 } from "@/lib/collections"
+import { verifyCronAuth } from "@/lib/cron"
 import { CURRENCIES } from "@/lib/currency"
 import { addDays, normalizeToUTCMidnight } from "@/lib/date"
 
@@ -19,7 +21,7 @@ const MAX_DATES_PER_RUN = 5
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get("authorization")
-  if (authHeader !== `Bearer ${serverEnv.CRON_SECRET}`) {
+  if (!verifyCronAuth(authHeader)) {
     return new Response("Unauthorized", { status: 401 })
   }
 
@@ -35,10 +37,18 @@ export async function GET(request: NextRequest) {
     const datesToCheck = new Set<number>()
     datesToCheck.add(yesterdayUTC.getTime())
 
-    await missingRatesCollection.deleteMany({ retryCount: { $gt: 5 } })
+    // Mark poisoned records as failed instead of deleting them, so admin can check and add manually
+    await missingRatesCollection.updateMany(
+      { retryCount: { $gte: 6 }, status: { $ne: "failed" } },
+      { $set: { status: "failed", failedAt: new Date() } }
+    )
 
+    // Only process queued docs that have not failed 6 times
     const queuedDocs = await missingRatesCollection
-      .find({})
+      .find({
+        status: { $ne: "failed" },
+        $or: [{ retryCount: { $lt: 6 } }, { retryCount: { $exists: false } }],
+      })
       .sort({ createdAt: 1 })
       .limit(MAX_DATES_PER_RUN)
       .toArray()
@@ -76,6 +86,7 @@ export async function GET(request: NextRequest) {
     const datesToSync = missingDates.slice(0, MAX_DATES_PER_RUN)
 
     let syncedCount = 0
+    const successfullySyncedDates: Date[] = []
     const errors: { date: string; error: string }[] = []
 
     const syncResults = await Promise.allSettled(
@@ -101,6 +112,7 @@ export async function GET(request: NextRequest) {
       if (res.status === "fulfilled") {
         if (res.value.success) {
           syncedCount++
+          successfullySyncedDates.push(res.value.date)
         } else {
           errors.push({
             date: res.value.date.toISOString().split("T")[0] as string,
@@ -119,7 +131,36 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const remainingQueueCount = await missingRatesCollection.countDocuments()
+    // Invalidate transactions cache for all users having transactions on synced dates
+    if (successfullySyncedDates.length > 0) {
+      const transactionsCollection = await getTransactionsCollection()
+      const affectedTransactions = await transactionsCollection
+        .find(
+          { date: { $in: successfullySyncedDates } },
+          { projection: { userId: 1 } }
+        )
+        .toArray()
+
+      const affectedUserIds = new Set<string>()
+      for (const tx of affectedTransactions) {
+        if (tx.userId) {
+          affectedUserIds.add(tx.userId.toString())
+        }
+      }
+      for (const userId of affectedUserIds) {
+        updateTag(`transactions-${userId}`)
+      }
+    }
+
+    // Mark any dates that just reached retryCount >= 6 as failed
+    await missingRatesCollection.updateMany(
+      { retryCount: { $gte: 6 }, status: { $ne: "failed" } },
+      { $set: { status: "failed", failedAt: new Date() } }
+    )
+
+    const remainingQueueCount = await missingRatesCollection.countDocuments({
+      status: { $ne: "failed" },
+    })
 
     return Response.json({
       success: true,

@@ -50,6 +50,8 @@ async function ensureIndexes(db: Db) {
       }
     ),
 
+    // Disallow creating duplicate identical transactions on the same day
+    // to keep transaction history clean and easy to read.
     db.collection("transactions").createIndex(
       {
         userId: 1,

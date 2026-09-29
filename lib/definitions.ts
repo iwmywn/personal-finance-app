@@ -108,6 +108,8 @@ type BaseMissingExchangeRate<Id extends ValidId> = {
   updatedAt?: Date
   retryCount?: number
   lastError?: string
+  status?: "failed"
+  failedAt?: Date
 }
 
 export type DBTransaction = BaseTransaction<ObjectId, Decimal128>

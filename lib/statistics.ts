@@ -34,21 +34,62 @@ type QuickStats = {
   popularCategory: CategoryKey[]
 }
 
+function resolveTransactionAmount(
+  t: Transaction,
+  targetCurrency?: Currency
+): Decimal | null {
+  if (!targetCurrency || t.currency === targetCurrency) {
+    return new Decimal(t.amount)
+  }
+
+  const originalAmount = t.originalAmount ?? t.amount
+  const originalCurrency = (t.originalCurrency ?? t.currency) as Currency
+
+  if (t.rates && originalCurrency && targetCurrency) {
+    const rateFrom = t.rates[originalCurrency]
+    const rateTo = t.rates[targetCurrency]
+    if (rateFrom && rateTo) {
+      return convertAmountWithRates(
+        originalAmount,
+        originalCurrency,
+        targetCurrency,
+        t.rates
+      )
+    }
+  }
+
+  return null
+}
+
 export function calculateQuickStats(
   transactions: Transaction[],
   today?: Date,
   targetCurrency?: Currency
 ): QuickStats {
-  const scopedTransactions = targetCurrency
-    ? transactions.filter((t) => t.currency === targetCurrency)
-    : transactions
+  const convertedItems: { t: Transaction; amount: Decimal }[] = []
 
-  const currentMonthTransactions = getCurrentMonthTransactions(
-    scopedTransactions,
-    today
-  )
+  for (const t of transactions) {
+    const amount = resolveTransactionAmount(t, targetCurrency)
+    if (amount !== null) {
+      convertedItems.push({ t, amount })
+    }
+  }
 
-  const currentMonthCount = currentMonthTransactions.length
+  const todayUTC = today
+    ? normalizeToUTCMidnight(today)
+    : localDateToUTCMidnight(new Date())
+  const currentMonth = todayUTC.getUTCMonth()
+  const currentYear = todayUTC.getUTCFullYear()
+
+  const currentMonthItems = convertedItems.filter((item) => {
+    const date = new Date(item.t.date)
+    return (
+      date.getUTCMonth() === currentMonth &&
+      date.getUTCFullYear() === currentYear
+    )
+  })
+
+  const currentMonthCount = currentMonthItems.length
 
   if (currentMonthCount === 0) {
     return {
@@ -61,21 +102,21 @@ export function calculateQuickStats(
     }
   }
 
-  let highestTransaction = currentMonthTransactions[0]
-  let lowestTransaction = currentMonthTransactions[0]
+  let highestItem = currentMonthItems[0]
+  let lowestItem = currentMonthItems[0]
   let totalInflow = new Decimal(0)
   let totalOutflow = new Decimal(0)
   let outflowCount = 0
   const categorySums: Record<string, Decimal> = {}
 
-  for (const t of currentMonthTransactions) {
-    const amount = new Decimal(t.amount)
+  for (const item of currentMonthItems) {
+    const { t, amount } = item
 
-    if (amount.greaterThan(new Decimal(highestTransaction.amount))) {
-      highestTransaction = t
+    if (amount.greaterThan(highestItem.amount)) {
+      highestItem = item
     }
-    if (amount.lessThan(new Decimal(lowestTransaction.amount))) {
-      lowestTransaction = t
+    if (amount.lessThan(lowestItem.amount)) {
+      lowestItem = item
     }
 
     if (t.type === "inflow") {
@@ -120,8 +161,8 @@ export function calculateQuickStats(
 
   return {
     currentMonthCount,
-    highestTransaction,
-    lowestTransaction,
+    highestTransaction: highestItem.t,
+    lowestTransaction: lowestItem.t,
     avgOutflow,
     savingsRate,
     popularCategory,
@@ -141,27 +182,32 @@ export function calculateSummaryStats(
   transactions: Transaction[],
   targetCurrency?: Currency
 ): SummaryStats {
-  const scopedTransactions = targetCurrency
-    ? transactions.filter((t) => t.currency === targetCurrency)
-    : transactions
+  const convertedItems: { t: Transaction; amount: Decimal }[] = []
 
-  const inflowTransactions = scopedTransactions.filter(
-    (t) => t.type === "inflow"
+  for (const t of transactions) {
+    const amount = resolveTransactionAmount(t, targetCurrency)
+    if (amount !== null) {
+      convertedItems.push({ t, amount })
+    }
+  }
+
+  const inflowTransactions = convertedItems.filter(
+    (item) => item.t.type === "inflow"
   )
-  const outflowTransactions = scopedTransactions.filter(
-    (t) => t.type === "outflow"
+  const outflowTransactions = convertedItems.filter(
+    (item) => item.t.type === "outflow"
   )
 
   const totalInflow = inflowTransactions.reduce(
-    (sum, t) => sum.plus(new Decimal(t.amount)),
+    (sum, item) => sum.plus(item.amount),
     new Decimal(0)
   )
   const totalOutflow = outflowTransactions.reduce(
-    (sum, t) => sum.plus(new Decimal(t.amount)),
+    (sum, item) => sum.plus(item.amount),
     new Decimal(0)
   )
   const balance = totalInflow.minus(totalOutflow)
-  const transactionCount = scopedTransactions.length
+  const transactionCount = convertedItems.length
   const inflowCount = inflowTransactions.length
   const outflowCount = outflowTransactions.length
 
@@ -186,28 +232,33 @@ export function calculateCategoriesStats(
   transactions: Transaction[],
   targetCurrency?: Currency
 ): CategoryStats[] {
-  const scopedTransactions = targetCurrency
-    ? transactions.filter((t) => t.currency === targetCurrency)
-    : transactions
+  const convertedItems: { t: Transaction; amount: Decimal }[] = []
+
+  for (const t of transactions) {
+    const amount = resolveTransactionAmount(t, targetCurrency)
+    if (amount !== null) {
+      convertedItems.push({ t, amount })
+    }
+  }
 
   const categories = Array.from(
-    new Set(scopedTransactions.map((t) => t.categoryKey))
+    new Set(convertedItems.map((item) => item.t.categoryKey))
   )
 
   return categories
     .map((categoryKey) => {
-      const filtered = scopedTransactions.filter(
-        (t) => t.categoryKey === categoryKey
+      const filtered = convertedItems.filter(
+        (item) => item.t.categoryKey === categoryKey
       )
       const total = filtered.reduce(
-        (sum, t) => sum.plus(new Decimal(t.amount)),
+        (sum, item) => sum.plus(item.amount),
         new Decimal(0)
       )
       return {
         categoryKey,
         count: filtered.length,
         total: total.toString(),
-        type: filtered[0].type,
+        type: filtered[0].t.type,
       }
     })
     .sort((a, b) => {

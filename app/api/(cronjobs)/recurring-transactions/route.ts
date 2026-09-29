@@ -5,12 +5,12 @@ import {
   enqueueMissingExchangeRateDate,
   ensureExchangeRateForDate,
 } from "@/actions/exchange-rates.actions"
-import { serverEnv } from "@/env/server"
 import {
   getRecurringTransactionsCollection,
   getTransactionsCollection,
   getUsersCollection,
 } from "@/lib/collections"
+import { verifyCronAuth } from "@/lib/cron"
 import { normalizeToUTCMidnight } from "@/lib/date"
 import type { DBRecurringTransaction } from "@/lib/definitions"
 import { isDuplicateKeyError } from "@/lib/indexes"
@@ -24,7 +24,7 @@ const MAX_TRANSACTIONS_PER_RUN = 5
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get("authorization")
-  if (authHeader !== `Bearer ${serverEnv.CRON_SECRET}`) {
+  if (!verifyCronAuth(authHeader)) {
     return new Response("Unauthorized", { status: 401 })
   }
 
@@ -56,6 +56,18 @@ export async function GET(request: NextRequest) {
         { endDate: { $exists: false } },
         { endDate: null as unknown as Date },
         { endDate: { $gte: todayUTC } },
+        {
+          $and: [
+            { endDate: { $lt: todayUTC } },
+            {
+              lastGeneratedDate: {
+                $exists: true,
+                $ne: null as unknown as Date,
+              },
+            },
+            { $expr: { $lt: ["$lastGeneratedDate", "$endDate"] } },
+          ],
+        },
       ],
     })
 
