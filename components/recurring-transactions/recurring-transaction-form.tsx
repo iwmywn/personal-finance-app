@@ -89,7 +89,6 @@ export function RecurringTransactionForm({
       randomEveryXDays: undefined,
       startDate: undefined,
       endDate: undefined,
-      lastGeneratedDate: undefined,
     },
   })
 

@@ -334,7 +334,6 @@ export function buildSchemas(messages: SchemaMessages) {
           .optional(),
         startDate: baseDateSchema(messages.startDateRequired),
         endDate: baseOptionalDateSchema(),
-        lastGeneratedDate: baseOptionalDateSchema(),
       })
       .superRefine((data, ctx) => {
         validateAmountForCurrency(data.currency, data.amount, "amount", ctx)

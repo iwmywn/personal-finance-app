@@ -1,37 +1,23 @@
-import {
-  addDays,
-  clampDayToMonth,
-  isSameUTCDate,
-  normalizeToUTCMidnight,
-} from "@/lib/date"
+import { addDays, clampDayToMonth, normalizeToUTCMidnight } from "@/lib/date"
 import type {
   DBRecurringTransaction,
   RecurringTransaction,
 } from "@/lib/definitions"
 
-function nextMonthlyDate(lastGeneratedDateUTC: Date, startDateUTC: Date): Date {
-  const y = lastGeneratedDateUTC.getUTCFullYear()
-  const m = lastGeneratedDateUTC.getUTCMonth() + 1
-  const targetDay = startDateUTC.getUTCDate()
-  return new Date(Date.UTC(y, m, clampDayToMonth(y, m + 1, targetDay)))
-}
-
-function nextQuarterlyDate(
-  lastGeneratedDateUTC: Date,
-  startDateUTC: Date
+function addMonthsClamped(
+  currentUTC: Date,
+  months: number,
+  targetDay: number
 ): Date {
-  const y = lastGeneratedDateUTC.getUTCFullYear()
-  const m = lastGeneratedDateUTC.getUTCMonth() + 3
-  const targetDay = startDateUTC.getUTCDate()
-  return new Date(Date.UTC(y, m, clampDayToMonth(y, m + 1, targetDay)))
-}
-
-function nextYearlyDate(lastGeneratedDateUTC: Date, startDateUTC: Date): Date {
-  const y = lastGeneratedDateUTC.getUTCFullYear() + 1
-  const targetMonth = startDateUTC.getUTCMonth()
-  const targetDay = startDateUTC.getUTCDate()
+  const nextMonth = currentUTC.getUTCMonth() + months
+  const targetYear = currentUTC.getUTCFullYear() + Math.floor(nextMonth / 12)
+  const targetMonthIndex = ((nextMonth % 12) + 12) % 12
   return new Date(
-    Date.UTC(y, targetMonth, clampDayToMonth(y, targetMonth + 1, targetDay))
+    Date.UTC(
+      targetYear,
+      targetMonthIndex,
+      clampDayToMonth(targetYear, targetMonthIndex + 1, targetDay)
+    )
   )
 }
 
@@ -41,6 +27,7 @@ function stepNextDate(
   startDateUTC: Date,
   randomEveryXDays?: number
 ): Date {
+  const targetDay = startDateUTC.getUTCDate()
   switch (frequency) {
     case "daily":
       return addDays(currentUTC, 1)
@@ -52,13 +39,13 @@ function stepNextDate(
       return addDays(currentUTC, 14)
 
     case "monthly":
-      return nextMonthlyDate(currentUTC, startDateUTC)
+      return addMonthsClamped(currentUTC, 1, targetDay)
 
     case "quarterly":
-      return nextQuarterlyDate(currentUTC, startDateUTC)
+      return addMonthsClamped(currentUTC, 3, targetDay)
 
     case "yearly":
-      return nextYearlyDate(currentUTC, startDateUTC)
+      return addMonthsClamped(currentUTC, 12, targetDay)
 
     case "random": {
       const days =
@@ -92,8 +79,7 @@ export function getNextDate(
   let iterations = 0
 
   while (
-    candidate < todayUTC &&
-    !isSameUTCDate(candidate, todayUTC) &&
+    candidate.getTime() < todayUTC.getTime() &&
     iterations < MAX_ITERATIONS
   ) {
     const next = stepNextDate(
@@ -125,19 +111,6 @@ export function getDueDates(
     ? normalizeToUTCMidnight(new Date(rec.endDate))
     : null
 
-  if (todayUTC < startUTC) {
-    return []
-  }
-
-  // If lastGeneratedDate is already today, or already reached endDate, nothing to generate
-  if (rec.lastGeneratedDate) {
-    const lastGen = normalizeToUTCMidnight(new Date(rec.lastGeneratedDate))
-    if (isSameUTCDate(lastGen, todayUTC) || (endUTC && lastGen >= endUTC)) {
-      return []
-    }
-  }
-
-  // Backfill all missed occurrences up to todayUTC
   const effectiveEndUTC = endUTC && endUTC < todayUTC ? endUTC : todayUTC
   const dueDates: Date[] = []
 
@@ -155,9 +128,7 @@ export function getDueDates(
     candidate.getTime() <= effectiveEndUTC.getTime() &&
     dueDates.length < MAX_OCCURRENCES
   ) {
-    if (candidate.getTime() >= startUTC.getTime()) {
-      dueDates.push(candidate)
-    }
+    dueDates.push(candidate)
 
     const next = stepNextDate(
       candidate,

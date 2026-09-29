@@ -51,6 +51,7 @@ export async function GET(request: NextRequest) {
             },
           }
         : {}),
+      startDate: { $lte: todayUTC },
       $or: [
         { endDate: { $exists: false } },
         { endDate: null as unknown as Date },

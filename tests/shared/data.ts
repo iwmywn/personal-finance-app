@@ -259,7 +259,6 @@ export const mockValidRecurringTransactionValues = {
   randomEveryXDays: undefined,
   startDate: localDateToUTCMidnight(new Date("2024-02-01")),
   endDate: localDateToUTCMidnight(new Date("2024-12-31")),
-  lastGeneratedDate: undefined,
 }
 
 export const mockTransactions: Transaction[] = [
