@@ -1,14 +1,22 @@
 "use server"
 
 import { cache } from "react"
-import { cookies } from "next/headers"
+import { cookies, headers } from "next/headers"
 
 import { DEFAULT_LOCALE, LOCALES } from "@/i18n/config"
 import type { Locale } from "@/i18n/config"
+import { auth } from "@/lib/auth"
 
 const COOKIE_NAME = "locale"
 
 export const getUserLocale = cache(async (): Promise<Locale> => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
+  if (session?.user.locale && LOCALES.includes(session.user.locale as Locale)) {
+    return session.user.locale as Locale
+  }
+
   const cookieLocale = (await cookies()).get(COOKIE_NAME)?.value
   if (cookieLocale && LOCALES.includes(cookieLocale as Locale))
     return cookieLocale as Locale
