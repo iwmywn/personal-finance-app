@@ -1,6 +1,7 @@
 import Decimal from "decimal.js"
 
 import { mockBudgets, mockGoals, mockTransactions } from "@/tests/shared/data"
+import type { Currency } from "@/lib/currency"
 import type { Transaction } from "@/lib/definitions"
 import {
   calculateBudgetsStats,
@@ -59,10 +60,47 @@ describe("Statistics", () => {
       expect(result.map((t) => t._id)).toEqual(["1", "2", "3", "4", "5"])
     })
 
-    it("should handle edge case dates correctly", () => {
-      const result = getCurrentMonthTransactions(mockTransactions)
-      expect(result).toHaveLength(5)
-      expect(result.map((t) => t._id)).toEqual(["1", "2", "3", "4", "5"])
+    it("should handle edge case boundary dates correctly", () => {
+      const boundaryTransactions: Transaction[] = [
+        {
+          ...mockTransactions[0],
+          _id: "tx-start",
+          date: new Date("2024-01-01T00:00:00.000Z"),
+        },
+        {
+          ...mockTransactions[0],
+          _id: "tx-end",
+          date: new Date("2024-01-31T23:59:59.999Z"),
+        },
+        {
+          ...mockTransactions[0],
+          _id: "tx-before",
+          date: new Date("2023-12-31T23:59:59.999Z"),
+        },
+        {
+          ...mockTransactions[0],
+          _id: "tx-after",
+          date: new Date("2024-02-01T00:00:00.000Z"),
+        },
+      ]
+
+      const result = getCurrentMonthTransactions(boundaryTransactions)
+      expect(result.map((t) => t._id)).toEqual(["tx-start", "tx-end"])
+    })
+
+    it("should filter by explicit today parameter when provided", () => {
+      const explicitToday = new Date("2024-05-15T12:00:00.000Z")
+      const mayTx: Transaction = {
+        ...mockTransactions[0],
+        _id: "may-1",
+        date: new Date("2024-05-10T10:00:00.000Z"),
+      }
+      const result = getCurrentMonthTransactions(
+        [...mockTransactions, mayTx],
+        explicitToday
+      )
+      expect(result).toHaveLength(1)
+      expect(result[0]._id).toBe("may-1")
     })
   })
 
@@ -179,6 +217,105 @@ describe("Statistics", () => {
       expect(result.avgOutflow).toBe("40")
       expect(result.popularCategory).toEqual(["food_beverage"])
     })
+
+    it("should accurately report unconvertedCount when some transactions cannot be converted to targetCurrency", () => {
+      const fixedDate = new Date("2024-06-15T10:00:00Z")
+      const mixedTransactions = [
+        {
+          ...mockTransactions[0],
+          date: fixedDate,
+          currency: "USD" as const,
+          amount: "100",
+          type: "inflow" as const,
+        },
+        {
+          ...mockTransactions[1],
+          date: fixedDate,
+          currency: "VND" as const,
+          amount: "5000000",
+          type: "outflow" as const,
+        },
+        {
+          ...mockTransactions[2],
+          date: fixedDate,
+          currency: "USD" as const,
+          amount: "40",
+          type: "outflow" as const,
+        },
+      ]
+      const result = calculateQuickStats(mixedTransactions, fixedDate, "USD")
+      expect(result.currentMonthCount).toBe(2)
+      expect(result.unconvertedCount).toBe(1)
+    })
+
+    it("should filter by explicit today parameter when provided", () => {
+      const explicitToday = new Date("2024-05-15T12:00:00.000Z")
+      const mayTx: Transaction = {
+        ...mockTransactions[1],
+        _id: "may-tx",
+        amount: "500",
+        date: new Date("2024-05-10T08:00:00.000Z"),
+      }
+      const result = calculateQuickStats(
+        [...mockTransactions, mayTx],
+        explicitToday
+      )
+      expect(result.currentMonthCount).toBe(1)
+      expect(result.highestTransaction?._id).toBe("may-tx")
+      expect(result.lowestTransaction?._id).toBe("may-tx")
+      expect(result.avgOutflow).toBe("500")
+    })
+
+    it("should report 0 savings rate when both totalInflow and totalOutflow are 0", () => {
+      const zeroTx: Transaction = {
+        ...mockTransactions[0],
+        amount: "0",
+      }
+      const result = calculateQuickStats([zeroTx])
+      expect(result.savingsRate).toBe("0")
+    })
+
+    it("should include all tied categories in popularCategory when multiple categories share max outflow", () => {
+      const tiedTx: Transaction[] = [
+        {
+          ...mockTransactions[1],
+          amount: "500",
+          categoryKey: "food_beverage",
+        },
+        {
+          ...mockTransactions[3],
+          amount: "500",
+          categoryKey: "transportation",
+        },
+      ]
+      const result = calculateQuickStats(tiedTx)
+      expect(result.popularCategory).toEqual([
+        "food_beverage",
+        "transportation",
+      ])
+    })
+
+    it("should convert transaction amounts using exchange rates when targetCurrency is provided", () => {
+      const fixedDate = new Date("2024-01-15T12:00:00.000Z")
+      const transactions: Transaction[] = [
+        {
+          ...mockTransactions[1],
+          date: fixedDate,
+          amount: "2500000",
+          currency: "VND",
+          originalAmount: "100",
+          originalCurrency: "USD",
+          rates: {
+            USD: "1",
+            VND: "25000",
+          } as Record<Currency, string>,
+        },
+      ]
+      const result = calculateQuickStats(transactions, fixedDate, "USD")
+      expect(result.currentMonthCount).toBe(1)
+      expect(result.unconvertedCount).toBe(0)
+      expect(result.avgOutflow).toBe("100")
+    })
   })
 
   describe("calculateSummaryStats", () => {
@@ -231,6 +368,62 @@ describe("Statistics", () => {
       expect(result.balance).toBe("70")
       expect(result.transactionCount).toBe(2)
       expect(result.inflowCount).toBe(1)
+      expect(result.outflowCount).toBe(1)
+      expect(result.unconvertedCount).toBe(1)
+    })
+
+    it("should convert transaction amounts with rates when targetCurrency is provided", () => {
+      const transactions: Transaction[] = [
+        {
+          ...mockTransactions[0],
+          type: "inflow",
+          amount: "2500000",
+          currency: "VND",
+          originalAmount: "100",
+          originalCurrency: "USD",
+          rates: {
+            USD: "1",
+            VND: "25000",
+          } as Record<Currency, string>,
+        },
+        {
+          ...mockTransactions[1],
+          type: "outflow",
+          amount: "500000",
+          currency: "VND",
+          originalAmount: "20",
+          originalCurrency: "USD",
+          rates: {
+            USD: "1",
+            VND: "25000",
+          } as Record<Currency, string>,
+        },
+      ]
+      const result = calculateSummaryStats(transactions, "USD")
+      expect(result.totalInflow).toBe("100")
+      expect(result.totalOutflow).toBe("20")
+      expect(result.balance).toBe("80")
+      expect(result.transactionCount).toBe(2)
+      expect(result.inflowCount).toBe(1)
+      expect(result.outflowCount).toBe(1)
+      expect(result.unconvertedCount).toBe(0)
+    })
+
+    it("should handle transactions with only inflow", () => {
+      const result = calculateSummaryStats([mockTransactions[0]])
+      expect(result.totalInflow).toBe("1000")
+      expect(result.totalOutflow).toBe("0")
+      expect(result.balance).toBe("1000")
+      expect(result.inflowCount).toBe(1)
+      expect(result.outflowCount).toBe(0)
+    })
+
+    it("should handle transactions with only outflow", () => {
+      const result = calculateSummaryStats([mockTransactions[1]])
+      expect(result.totalInflow).toBe("0")
+      expect(result.totalOutflow).toBe("200")
+      expect(result.balance).toBe("-200")
+      expect(result.inflowCount).toBe(0)
       expect(result.outflowCount).toBe(1)
     })
   })
@@ -297,6 +490,28 @@ describe("Statistics", () => {
       ]
       const result = calculateCategoriesStats(mixedTxs, "USD")
       expect(result).toHaveLength(1)
+      expect(result[0].total).toBe("100")
+      expect(result[0].count).toBe(1)
+    })
+
+    it("should convert transaction amounts with rates when targetCurrency is provided", () => {
+      const transactions: Transaction[] = [
+        {
+          ...mockTransactions[1],
+          categoryKey: "food_beverage",
+          amount: "2500000",
+          currency: "VND",
+          originalAmount: "100",
+          originalCurrency: "USD",
+          rates: {
+            USD: "1",
+            VND: "25000",
+          } as Record<Currency, string>,
+        },
+      ]
+      const result = calculateCategoriesStats(transactions, "USD")
+      expect(result).toHaveLength(1)
+      expect(result[0].categoryKey).toBe("food_beverage")
       expect(result[0].total).toBe("100")
       expect(result[0].count).toBe(1)
     })
@@ -595,6 +810,244 @@ describe("Statistics", () => {
       const result = calculateBudgetsStats([budget], transactions)
       expect(result[0].spent).toBe("150000")
     })
+
+    it("should skip transactions when rates map exists but lacks target currency rate", () => {
+      const budget = {
+        ...mockBudgets[0],
+        currency: "VND" as const,
+        categoryKey: "food_beverage" as const,
+        allocatedAmount: "1000000",
+        startDate: new Date("2024-01-01"),
+        endDate: new Date("2024-01-31"),
+      }
+
+      const transactions: Transaction[] = [
+        {
+          _id: "tx-usd-missing-vnd-rate",
+          userId: budget.userId,
+          type: "outflow",
+          categoryKey: "food_beverage",
+          amount: "50",
+          originalAmount: "50",
+          currency: "USD",
+          originalCurrency: "USD",
+          rates: {
+            USD: "1",
+            EUR: "0.92",
+          } as Record<Currency, string>,
+          description: "USD expense with rates map that lacks VND",
+          date: new Date("2024-01-15"),
+        },
+        {
+          _id: "tx-vnd",
+          userId: budget.userId,
+          type: "outflow",
+          categoryKey: "food_beverage",
+          amount: "150000",
+          currency: "VND",
+          description: "Matching VND expense",
+          date: new Date("2024-01-16"),
+        },
+      ]
+
+      const [result] = calculateBudgetsStats([budget], transactions)
+      expect(result.spent).toBe("150000")
+    })
+
+    it("should correctly mark budget as active on the exact endDate", () => {
+      vi.setSystemTime(new Date("2026-03-15T12:00:00.000Z"))
+      const budget = {
+        ...mockBudgets[0],
+        startDate: new Date("2026-03-01T00:00:00.000Z"),
+        endDate: new Date("2026-03-15T00:00:00.000Z"),
+      }
+      const transactions: Transaction[] = [
+        {
+          _id: "tx-end-boundary",
+          userId: budget.userId,
+          type: "outflow",
+          amount: "50000",
+          currency: budget.currency,
+          description: "End day transaction",
+          categoryKey: budget.categoryKey,
+          date: new Date("2026-03-15T00:00:00.000Z"),
+        },
+      ]
+      const [result] = calculateBudgetsStats([budget], transactions)
+      expect(result.status).toBe("active")
+      expect(result.spent).toBe("50000")
+    })
+
+    it("should correctly mark budget as active on the exact startDate", () => {
+      vi.setSystemTime(new Date("2026-03-01T12:00:00.000Z"))
+      const budget = {
+        ...mockBudgets[0],
+        startDate: new Date("2026-03-01T00:00:00.000Z"),
+        endDate: new Date("2026-03-31T00:00:00.000Z"),
+      }
+      const transactions: Transaction[] = [
+        {
+          _id: "tx-start-boundary",
+          userId: budget.userId,
+          type: "outflow",
+          amount: "30000",
+          currency: budget.currency,
+          description: "Start day transaction",
+          categoryKey: budget.categoryKey,
+          date: new Date("2026-03-01T00:00:00.000Z"),
+        },
+      ]
+      const [result] = calculateBudgetsStats([budget], transactions)
+      expect(result.status).toBe("active")
+      expect(result.spent).toBe("30000")
+    })
+
+    it("should mark budget as expired when today is strictly after endDate", () => {
+      vi.setSystemTime(new Date("2026-03-16T12:00:00.000Z"))
+      const budget = {
+        ...mockBudgets[0],
+        startDate: new Date("2026-03-01T00:00:00.000Z"),
+        endDate: new Date("2026-03-15T00:00:00.000Z"),
+      }
+      const [result] = calculateBudgetsStats([budget], [])
+      expect(result.status).toBe("expired")
+    })
+
+    it("should mark budget as upcoming when today is strictly before startDate", () => {
+      vi.setSystemTime(new Date("2026-02-28T12:00:00.000Z"))
+      const budget = {
+        ...mockBudgets[0],
+        startDate: new Date("2026-03-01T00:00:00.000Z"),
+        endDate: new Date("2026-03-15T00:00:00.000Z"),
+      }
+      const [result] = calculateBudgetsStats([budget], [])
+      expect(result.status).toBe("upcoming")
+    })
+
+    it("should correctly convert transaction amount to budget currency when transaction has rates", () => {
+      vi.setSystemTime(new Date("2026-03-10T00:00:00.000Z"))
+      const budget = {
+        ...mockBudgets[0],
+        currency: "USD" as const,
+        allocatedAmount: "200",
+        startDate: new Date("2026-03-01T00:00:00.000Z"),
+        endDate: new Date("2026-03-31T00:00:00.000Z"),
+      }
+      const transactions: Transaction[] = [
+        {
+          _id: "tx-vnd-to-usd",
+          userId: budget.userId,
+          type: "outflow",
+          amount: "100",
+          currency: "USD",
+          originalAmount: "2500000",
+          originalCurrency: "VND",
+          rates: {
+            USD: "1",
+            VND: "25000",
+            CNY: "7.2",
+            JPY: "150",
+            KRW: "1350",
+          },
+          description: "Shopping",
+          categoryKey: budget.categoryKey,
+          date: new Date("2026-03-05T00:00:00.000Z"),
+        },
+      ]
+      const [result] = calculateBudgetsStats([budget], transactions)
+      expect(result.spent).toBe("100")
+      expect(result.percentage).toBe(50)
+    })
+
+    it("should return yellow progress color when percentage is exactly 75 (budget)", () => {
+      const budget = {
+        ...mockBudgets[0],
+        allocatedAmount: "1000",
+      }
+      const transactions = [
+        {
+          ...mockTransactions[1],
+          categoryKey: budget.categoryKey,
+          amount: "750", // exactly 75%
+          date: new Date(budget.startDate),
+        },
+      ]
+      const result = calculateBudgetsStats([budget], transactions)[0]
+      expect(result.percentage).toBe(75)
+      expect(result.progressColorClass).toBe(progressColorClass.yellow)
+    })
+
+    it("should return red progress color when percentage is exactly 100 (budget)", () => {
+      const budget = {
+        ...mockBudgets[0],
+        allocatedAmount: "1000",
+      }
+      const transactions = [
+        {
+          ...mockTransactions[1],
+          categoryKey: budget.categoryKey,
+          amount: "1000", // exactly 100%
+          date: new Date(budget.startDate),
+        },
+      ]
+      const result = calculateBudgetsStats([budget], transactions)[0]
+      expect(result.percentage).toBe(100)
+      expect(result.progressColorClass).toBe(progressColorClass.red)
+    })
+
+    it("should use originalAmount when rates are missing but originalCurrency matches budget currency", () => {
+      const budget = {
+        ...mockBudgets[0],
+        currency: "USD" as const,
+        allocatedAmount: "200",
+        startDate: new Date("2024-01-01"),
+        endDate: new Date("2024-01-31"),
+      }
+      const transactions: Transaction[] = [
+        {
+          _id: "tx-usd-no-rates",
+          userId: budget.userId,
+          type: "outflow",
+          amount: "2500000",
+          currency: "VND",
+          originalAmount: "100",
+          originalCurrency: "USD",
+          description: "Expense with original USD",
+          categoryKey: budget.categoryKey,
+          date: new Date("2024-01-15"),
+        },
+      ]
+      const [result] = calculateBudgetsStats([budget], transactions)
+      expect(result.spent).toBe("100")
+      expect(result.percentage).toBe(50)
+    })
+
+    it("should use transaction amount when rates are missing, originalCurrency differs, but transaction currency matches budget currency", () => {
+      const budget = {
+        ...mockBudgets[0],
+        currency: "VND" as const,
+        allocatedAmount: "500000",
+        startDate: new Date("2024-01-01"),
+        endDate: new Date("2024-01-31"),
+      }
+      const transactions: Transaction[] = [
+        {
+          _id: "tx-vnd-diff-orig",
+          userId: budget.userId,
+          type: "outflow",
+          amount: "250000",
+          currency: "VND",
+          originalAmount: "10",
+          originalCurrency: "USD",
+          description: "VND expense with USD original but no rates",
+          categoryKey: budget.categoryKey,
+          date: new Date("2024-01-15"),
+        },
+      ]
+      const [result] = calculateBudgetsStats([budget], transactions)
+      expect(result.spent).toBe("250000")
+      expect(result.percentage).toBe(50)
+    })
   })
 
   describe("calculateGoalsStats", () => {
@@ -720,6 +1173,49 @@ describe("Statistics", () => {
       const result = calculateGoalsStats([goal], transactions)[0]
 
       expect(result.accumulated).toBe("100000")
+    })
+
+    it("should skip transactions when rates map exists but lacks target currency rate", () => {
+      const goal = {
+        ...mockGoals[0],
+        currency: "VND" as const,
+        categoryKey: "salary_bonus" as const,
+        targetAmount: "10000000",
+        startDate: new Date("2024-01-01"),
+        endDate: new Date("2024-01-31"),
+      }
+
+      const transactions: Transaction[] = [
+        {
+          _id: "tx-usd-missing-vnd-rate",
+          userId: goal.userId,
+          type: "inflow",
+          categoryKey: "salary_bonus",
+          amount: "100",
+          originalAmount: "100",
+          currency: "USD",
+          originalCurrency: "USD",
+          rates: {
+            USD: "1",
+            EUR: "0.92",
+          } as Record<Currency, string>,
+          description: "USD income with rates map that lacks VND",
+          date: new Date("2024-01-15"),
+        },
+        {
+          _id: "tx-vnd",
+          userId: goal.userId,
+          type: "inflow",
+          categoryKey: "salary_bonus",
+          amount: "2000000",
+          currency: "VND",
+          description: "Matching VND income",
+          date: new Date("2024-01-16"),
+        },
+      ]
+
+      const [result] = calculateGoalsStats([goal], transactions)
+      expect(result.accumulated).toBe("2000000")
     })
 
     it("should correctly identify status (active, expired, upcoming)", () => {
@@ -853,90 +1349,127 @@ describe("Statistics", () => {
       })
     })
 
-    it("should correctly mark budget as active on the exact endDate", () => {
+    it("should skip transactions with mismatched currency when exchange rates are missing", () => {
+      const goal = {
+        ...mockGoals[0],
+        currency: "VND" as const,
+        categoryKey: "salary_bonus" as const,
+        targetAmount: "10000000",
+        startDate: new Date("2024-01-01"),
+        endDate: new Date("2024-01-31"),
+      }
+
+      const transactions: Transaction[] = [
+        {
+          _id: "tx-usd-no-rates",
+          userId: goal.userId,
+          type: "inflow",
+          categoryKey: "salary_bonus",
+          amount: "100",
+          currency: "USD",
+          description: "Mismatched USD income without rates",
+          date: new Date("2024-01-15"),
+        },
+        {
+          _id: "tx-vnd",
+          userId: goal.userId,
+          type: "inflow",
+          categoryKey: "salary_bonus",
+          amount: "2000000",
+          currency: "VND",
+          description: "Matching VND income",
+          date: new Date("2024-01-16"),
+        },
+      ]
+
+      const [result] = calculateGoalsStats([goal], transactions)
+      expect(result.accumulated).toBe("2000000")
+    })
+
+    it("should correctly mark goal as active on the exact endDate", () => {
       vi.setSystemTime(new Date("2026-03-15T12:00:00.000Z"))
-      const budget = {
-        ...mockBudgets[0],
+      const goal = {
+        ...mockGoals[0],
         startDate: new Date("2026-03-01T00:00:00.000Z"),
         endDate: new Date("2026-03-15T00:00:00.000Z"),
       }
       const transactions: Transaction[] = [
         {
-          _id: "tx-end-boundary",
-          userId: budget.userId,
-          type: "outflow",
+          _id: "tx-goal-end-boundary",
+          userId: goal.userId,
+          type: "inflow",
           amount: "50000",
-          currency: budget.currency,
+          currency: goal.currency,
           description: "End day transaction",
-          categoryKey: budget.categoryKey,
+          categoryKey: goal.categoryKey,
           date: new Date("2026-03-15T00:00:00.000Z"),
         },
       ]
-      const [result] = calculateBudgetsStats([budget], transactions)
+      const [result] = calculateGoalsStats([goal], transactions)
       expect(result.status).toBe("active")
-      expect(result.spent).toBe("50000")
+      expect(result.accumulated).toBe("50000")
     })
 
-    it("should correctly mark budget as active on the exact startDate", () => {
+    it("should correctly mark goal as active on the exact startDate", () => {
       vi.setSystemTime(new Date("2026-03-01T12:00:00.000Z"))
-      const budget = {
-        ...mockBudgets[0],
+      const goal = {
+        ...mockGoals[0],
         startDate: new Date("2026-03-01T00:00:00.000Z"),
         endDate: new Date("2026-03-31T00:00:00.000Z"),
       }
       const transactions: Transaction[] = [
         {
-          _id: "tx-start-boundary",
-          userId: budget.userId,
-          type: "outflow",
+          _id: "tx-goal-start-boundary",
+          userId: goal.userId,
+          type: "inflow",
           amount: "30000",
-          currency: budget.currency,
+          currency: goal.currency,
           description: "Start day transaction",
-          categoryKey: budget.categoryKey,
+          categoryKey: goal.categoryKey,
           date: new Date("2026-03-01T00:00:00.000Z"),
         },
       ]
-      const [result] = calculateBudgetsStats([budget], transactions)
+      const [result] = calculateGoalsStats([goal], transactions)
       expect(result.status).toBe("active")
-      expect(result.spent).toBe("30000")
+      expect(result.accumulated).toBe("30000")
     })
 
-    it("should mark budget as expired when today is strictly after endDate", () => {
+    it("should mark goal as expired when today is strictly after endDate", () => {
       vi.setSystemTime(new Date("2026-03-16T12:00:00.000Z"))
-      const budget = {
-        ...mockBudgets[0],
+      const goal = {
+        ...mockGoals[0],
         startDate: new Date("2026-03-01T00:00:00.000Z"),
         endDate: new Date("2026-03-15T00:00:00.000Z"),
       }
-      const [result] = calculateBudgetsStats([budget], [])
+      const [result] = calculateGoalsStats([goal], [])
       expect(result.status).toBe("expired")
     })
 
-    it("should mark budget as upcoming when today is strictly before startDate", () => {
+    it("should mark goal as upcoming when today is strictly before startDate", () => {
       vi.setSystemTime(new Date("2026-02-28T12:00:00.000Z"))
-      const budget = {
-        ...mockBudgets[0],
+      const goal = {
+        ...mockGoals[0],
         startDate: new Date("2026-03-01T00:00:00.000Z"),
         endDate: new Date("2026-03-15T00:00:00.000Z"),
       }
-      const [result] = calculateBudgetsStats([budget], [])
+      const [result] = calculateGoalsStats([goal], [])
       expect(result.status).toBe("upcoming")
     })
 
-    it("should correctly convert transaction amount to budget currency when transaction has rates", () => {
+    it("should correctly convert transaction amount to goal currency when transaction has rates", () => {
       vi.setSystemTime(new Date("2026-03-10T00:00:00.000Z"))
-      const budget = {
-        ...mockBudgets[0],
+      const goal = {
+        ...mockGoals[0],
         currency: "USD" as const,
-        allocatedAmount: "200",
+        targetAmount: "200",
         startDate: new Date("2026-03-01T00:00:00.000Z"),
         endDate: new Date("2026-03-31T00:00:00.000Z"),
       }
       const transactions: Transaction[] = [
         {
-          _id: "tx-vnd-to-usd",
-          userId: budget.userId,
-          type: "outflow",
+          _id: "tx-vnd-to-usd-goal",
+          userId: goal.userId,
+          type: "inflow",
           amount: "100",
           currency: "USD",
           originalAmount: "2500000",
@@ -948,13 +1481,103 @@ describe("Statistics", () => {
             JPY: "150",
             KRW: "1350",
           },
-          description: "Shopping",
-          categoryKey: budget.categoryKey,
+          description: "Bonus in VND",
+          categoryKey: goal.categoryKey,
           date: new Date("2026-03-05T00:00:00.000Z"),
         },
       ]
-      const [result] = calculateBudgetsStats([budget], transactions)
-      expect(result.spent).toBe("100")
+      const [result] = calculateGoalsStats([goal], transactions)
+      expect(result.accumulated).toBe("100")
+      expect(result.percentage).toBe(50)
+    })
+
+    it("should return yellow progress color when percentage is exactly 75 (goal)", () => {
+      const goal = {
+        ...mockGoals[0],
+        targetAmount: "1000",
+      }
+      const transactions = [
+        {
+          ...mockTransactions[2],
+          categoryKey: goal.categoryKey,
+          amount: "750", // exactly 75%
+          date: new Date(goal.startDate),
+        },
+      ]
+      const result = calculateGoalsStats([goal], transactions)[0]
+      expect(result.percentage).toBe(75)
+      expect(result.progressColorClass).toBe(progressColorClass.yellow)
+    })
+
+    it("should return green progress color when percentage is exactly 100 (goal)", () => {
+      const goal = {
+        ...mockGoals[0],
+        targetAmount: "1000",
+      }
+      const transactions = [
+        {
+          ...mockTransactions[2],
+          categoryKey: goal.categoryKey,
+          amount: "1000", // exactly 100%
+          date: new Date(goal.startDate),
+        },
+      ]
+      const result = calculateGoalsStats([goal], transactions)[0]
+      expect(result.percentage).toBe(100)
+      expect(result.progressColorClass).toBe(progressColorClass.green)
+    })
+
+    it("should use originalAmount when rates are missing but originalCurrency matches goal currency", () => {
+      const goal = {
+        ...mockGoals[0],
+        currency: "USD" as const,
+        targetAmount: "200",
+        startDate: new Date("2024-01-01"),
+        endDate: new Date("2024-01-31"),
+      }
+      const transactions: Transaction[] = [
+        {
+          _id: "tx-usd-no-rates-goal",
+          userId: goal.userId,
+          type: "inflow",
+          amount: "2500000",
+          currency: "VND",
+          originalAmount: "100",
+          originalCurrency: "USD",
+          description: "Income with original USD",
+          categoryKey: goal.categoryKey,
+          date: new Date("2024-01-15"),
+        },
+      ]
+      const [result] = calculateGoalsStats([goal], transactions)
+      expect(result.accumulated).toBe("100")
+      expect(result.percentage).toBe(50)
+    })
+
+    it("should use transaction amount when rates are missing, originalCurrency differs, but transaction currency matches goal currency", () => {
+      const goal = {
+        ...mockGoals[0],
+        currency: "VND" as const,
+        targetAmount: "500000",
+        startDate: new Date("2024-01-01"),
+        endDate: new Date("2024-01-31"),
+      }
+      const transactions: Transaction[] = [
+        {
+          _id: "tx-vnd-diff-orig-goal",
+          userId: goal.userId,
+          type: "inflow",
+          amount: "250000",
+          currency: "VND",
+          originalAmount: "10",
+          originalCurrency: "USD",
+          description: "VND income with USD original but no rates",
+          categoryKey: goal.categoryKey,
+          date: new Date("2024-01-15"),
+        },
+      ]
+      const [result] = calculateGoalsStats([goal], transactions)
+      expect(result.accumulated).toBe("250000")
       expect(result.percentage).toBe(50)
     })
   })

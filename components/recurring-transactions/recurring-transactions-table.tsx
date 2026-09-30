@@ -175,7 +175,9 @@ export function RecurringTransactionsTable({
                             {recurring.frequency === "random" ? (
                               <span className="text-muted-foreground text-xs">
                                 {t("Every {days} days", {
-                                  days: recurring.randomEveryXDays!.toString(),
+                                  days:
+                                    recurring.randomEveryXDays?.toString() ??
+                                    "—",
                                 })}
                               </span>
                             ) : null}

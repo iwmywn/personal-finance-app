@@ -64,8 +64,6 @@ export function isDateRangeOverlapping(
   filterMonth: number | null,
   filterYear: number | null
 ): boolean {
-  if (!filterMonth && !filterYear) return true
-
   if (filterYear && filterMonth) {
     const filterStart = new Date(Date.UTC(filterYear, filterMonth - 1, 1))
     const filterEnd = new Date(Date.UTC(filterYear, filterMonth, 1) - 1)
@@ -99,9 +97,8 @@ export function isDateRangeOverlapping(
 
     if (startM <= endM) {
       return filterMonth >= startM && filterMonth <= endM
-    } else {
-      return filterMonth >= startM || filterMonth <= endM
     }
+    return filterMonth >= startM || filterMonth <= endM
   }
 
   return true
@@ -236,15 +233,12 @@ export function filterBudgets(
       let matchesProgress = true
       if (filterProgress === "gray") {
         matchesProgress = budget.progressColorClass === progressColorClass.gray
-      }
-      if (filterProgress === "green") {
+      } else if (filterProgress === "green") {
         matchesProgress = budget.progressColorClass === progressColorClass.green
-      }
-      if (filterProgress === "yellow") {
+      } else if (filterProgress === "yellow") {
         matchesProgress =
           budget.progressColorClass === progressColorClass.yellow
-      }
-      if (filterProgress === "red") {
+      } else if (filterProgress === "red") {
         matchesProgress = budget.progressColorClass === progressColorClass.red
       }
 

@@ -35,6 +35,7 @@ export function StatisticsSummary({
     transactionCount,
     inflowCount,
     outflowCount,
+    unconvertedCount,
   } = calculateSummaryStats(filteredTransactions, user.currency as Currency)
 
   return (
@@ -111,6 +112,12 @@ export function StatisticsSummary({
           <CardContent suppressHydrationWarning>
             <div className="text-2xl wrap-anywhere text-blue-600">
               {transactionCount}
+              {unconvertedCount > 0 && (
+                <span className="text-muted-foreground text-sm font-normal">
+                  {" "}
+                  (+{unconvertedCount})
+                </span>
+              )}
             </div>
             <div className="text-muted-foreground text-sm">
               {t("Total number of transactions")}

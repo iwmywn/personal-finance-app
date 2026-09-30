@@ -30,10 +30,6 @@ export const auth = betterAuth({
     expiresIn: 60 * 60 * 24 * 7,
     updateAge: 60 * 60 * 24,
     freshAge: 0,
-    cookieCache: {
-      enabled: true,
-      maxAge: 60,
-    },
   },
   user: {
     modelName: "users",

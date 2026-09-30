@@ -374,7 +374,7 @@ export function RecurringTransactionForm({
                           const today = new Date()
                           today.setHours(0, 0, 0, 0)
                           return (
-                            date <= today || Boolean(endDate && date > endDate)
+                            date < today || Boolean(endDate && date > endDate)
                           )
                         }}
                       />

@@ -27,6 +27,7 @@ export function getCurrentMonthTransactions(
 
 type QuickStats = {
   currentMonthCount: number
+  unconvertedCount: number
   highestTransaction: Transaction | null
   lowestTransaction: Transaction | null
   avgOutflow: string | null
@@ -66,34 +67,28 @@ export function calculateQuickStats(
   today?: Date,
   targetCurrency?: Currency
 ): QuickStats {
-  const convertedItems: { t: Transaction; amount: Decimal }[] = []
+  const currentMonthTransactions = getCurrentMonthTransactions(
+    transactions,
+    today
+  )
 
-  for (const t of transactions) {
+  const currentMonthItems: { t: Transaction; amount: Decimal }[] = []
+
+  for (const t of currentMonthTransactions) {
     const amount = resolveTransactionAmount(t, targetCurrency)
     if (amount !== null) {
-      convertedItems.push({ t, amount })
+      currentMonthItems.push({ t, amount })
     }
   }
 
-  const todayUTC = today
-    ? normalizeToUTCMidnight(today)
-    : localDateToUTCMidnight(new Date())
-  const currentMonth = todayUTC.getUTCMonth()
-  const currentYear = todayUTC.getUTCFullYear()
-
-  const currentMonthItems = convertedItems.filter((item) => {
-    const date = new Date(item.t.date)
-    return (
-      date.getUTCMonth() === currentMonth &&
-      date.getUTCFullYear() === currentYear
-    )
-  })
-
   const currentMonthCount = currentMonthItems.length
+  const unconvertedCount =
+    currentMonthTransactions.length - currentMonthItems.length
 
   if (currentMonthCount === 0) {
     return {
       currentMonthCount: 0,
+      unconvertedCount,
       highestTransaction: null,
       lowestTransaction: null,
       avgOutflow: null,
@@ -161,6 +156,7 @@ export function calculateQuickStats(
 
   return {
     currentMonthCount,
+    unconvertedCount,
     highestTransaction: highestItem.t,
     lowestTransaction: lowestItem.t,
     avgOutflow,
@@ -176,6 +172,7 @@ interface SummaryStats {
   transactionCount: number
   inflowCount: number
   outflowCount: number
+  unconvertedCount: number
 }
 
 export function calculateSummaryStats(
@@ -210,6 +207,7 @@ export function calculateSummaryStats(
   const transactionCount = convertedItems.length
   const inflowCount = inflowTransactions.length
   const outflowCount = outflowTransactions.length
+  const unconvertedCount = transactions.length - convertedItems.length
 
   return {
     totalInflow: totalInflow.toString(),
@@ -218,6 +216,7 @@ export function calculateSummaryStats(
     transactionCount,
     inflowCount,
     outflowCount,
+    unconvertedCount,
   }
 }
 
@@ -270,22 +269,18 @@ export function calculateCategoriesStats(
     })
 }
 
-interface StatBaseConfig<TBase, Transaction> {
+interface StatBaseConfig<TBase extends Budget | Goal> {
   type: "inflow" | "outflow"
   getBaseTargetAmount: (item: TBase) => string
   getBaseCurrency: (item: TBase) => Currency
   getBaseCategoryKey: (item: TBase) => string
-  getTransactionAmount: (t: Transaction) => string
-  getTransactionOriginalAmount: (t: Transaction) => string | undefined
-  getTransactionOriginalCurrency: (t: Transaction) => Currency | undefined
-  getTransactionRates: (t: Transaction) => Record<Currency, string> | undefined
   pickColor: (percentage: number, hasItems: boolean) => string
 }
 
 function calculateStatsBase<TBase extends Budget | Goal>(
   base: TBase,
   transactions: Transaction[],
-  config: StatBaseConfig<TBase, Transaction>
+  config: StatBaseConfig<TBase>
 ) {
   const startDateOnly = normalizeToUTCMidnight(new Date(base.startDate))
   const endDateOnly = normalizeToUTCMidnight(new Date(base.endDate))
@@ -306,28 +301,33 @@ function calculateStatsBase<TBase extends Budget | Goal>(
   const targetCurrency = config.getBaseCurrency(base)
 
   const total = filtered.reduce((sum, t) => {
-    const originalAmount = config.getTransactionOriginalAmount(t)
-    const originalCurrency = config.getTransactionOriginalCurrency(t)
-    const ratesStr = config.getTransactionRates(t)
+    const originalAmount = t.originalAmount
+    const originalCurrency = t.originalCurrency
+    const ratesStr = t.rates
 
     if (originalAmount && originalCurrency && ratesStr) {
-      const converted = convertAmountWithRates(
-        originalAmount,
-        originalCurrency,
-        targetCurrency,
-        ratesStr
-      )
-      return sum.plus(converted)
+      const rateFrom = ratesStr[originalCurrency]
+      const rateTo = ratesStr[targetCurrency]
+      if (originalCurrency === targetCurrency || (rateFrom && rateTo)) {
+        const converted = convertAmountWithRates(
+          originalAmount,
+          originalCurrency,
+          targetCurrency,
+          ratesStr
+        )
+        return sum.plus(converted)
+      }
+      return sum
     }
 
     const txCurrency = originalCurrency ?? t.currency
     if (txCurrency === targetCurrency) {
-      const amountToAdd = originalAmount ?? config.getTransactionAmount(t)
+      const amountToAdd = originalAmount ?? t.amount
       return sum.plus(new Decimal(amountToAdd))
     }
 
     if (t.currency === targetCurrency) {
-      return sum.plus(new Decimal(config.getTransactionAmount(t)))
+      return sum.plus(new Decimal(t.amount))
     }
 
     return sum
@@ -372,10 +372,6 @@ export function calculateBudgetsStats(
       getBaseTargetAmount: (b) => b.allocatedAmount,
       getBaseCurrency: (b) => b.currency,
       getBaseCategoryKey: (b) => b.categoryKey,
-      getTransactionAmount: (t) => t.amount,
-      getTransactionOriginalAmount: (t) => t.originalAmount,
-      getTransactionOriginalCurrency: (t) => t.originalCurrency,
-      getTransactionRates: (t) => t.rates,
       pickColor: (percentage, has) => {
         if (!has) return progressColorClass.gray
         if (percentage < 75) return progressColorClass.green
@@ -411,10 +407,6 @@ export function calculateGoalsStats(
       getBaseTargetAmount: (g) => g.targetAmount,
       getBaseCurrency: (g) => g.currency,
       getBaseCategoryKey: (g) => g.categoryKey,
-      getTransactionAmount: (t) => t.amount,
-      getTransactionOriginalAmount: (t) => t.originalAmount,
-      getTransactionOriginalCurrency: (t) => t.originalCurrency,
-      getTransactionRates: (t) => t.rates,
       pickColor: (percentage, has) => {
         if (!has) return progressColorClass.gray
         if (percentage >= 100) return progressColorClass.green

@@ -339,7 +339,7 @@ export function buildSchemas(messages: SchemaMessages) {
         validateAmountForCurrency(data.currency, data.amount, "amount", ctx)
 
         const todayUTC = normalizeToUTCMidnight(new Date())
-        if (data.startDate.getTime() <= todayUTC.getTime()) {
+        if (data.startDate.getTime() < todayUTC.getTime()) {
           ctx.addIssue({
             path: ["startDate"],
             message: messages.startDateMustBeInFuture,

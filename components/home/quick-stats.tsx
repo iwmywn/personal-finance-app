@@ -25,6 +25,7 @@ export function QuickStats() {
 
   const {
     currentMonthCount,
+    unconvertedCount,
     highestTransaction,
     lowestTransaction,
     avgOutflow,
@@ -43,7 +44,15 @@ export function QuickStats() {
             <TooltipTrigger asChild>
               <div className="row">
                 <div className="left">{t("Total Transactions")}:</div>
-                <div className="right">{currentMonthCount}</div>
+                <div className="right">
+                  {currentMonthCount}
+                  {unconvertedCount > 0 && (
+                    <span className="text-muted-foreground text-xs font-normal">
+                      {" "}
+                      (+{unconvertedCount})
+                    </span>
+                  )}
+                </div>
               </div>
             </TooltipTrigger>
             <TooltipContent>

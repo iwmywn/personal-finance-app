@@ -233,7 +233,7 @@ describe("Recurring Transactions", async () => {
       expect(result.error).toBe("Invalid data!")
     })
 
-    it("should return error when startDate is today", async () => {
+    it("should successfully create recurring transaction when startDate is today", async () => {
       mockAuthenticatedUser()
 
       const result = await createRecurringTransaction({
@@ -241,8 +241,8 @@ describe("Recurring Transactions", async () => {
         startDate: localDateToUTCMidnight(new Date("2024-06-01")),
       })
 
-      expect(result.success).toBeUndefined()
-      expect(result.error).toBe("Invalid data!")
+      expect(result.error).toBeUndefined()
+      expect(result.success).toBe("Recurring transaction has been created.")
     })
 
     it("should return error when database operation throws error", async () => {
