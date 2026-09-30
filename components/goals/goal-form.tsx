@@ -259,7 +259,7 @@ export function GoalForm({ goal, isOpen, setIsOpen }: GoalFormProps) {
                           field.onChange(date)
                           setStartCalendarOpen(false)
                         }}
-                        disabled={(date) => endDate && date > endDate}
+                        disabled={(date) => Boolean(endDate && date >= endDate)}
                       />
                     </PopoverContent>
                   </Popover>

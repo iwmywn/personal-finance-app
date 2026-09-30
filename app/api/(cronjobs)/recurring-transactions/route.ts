@@ -43,6 +43,14 @@ export async function GET(request: NextRequest) {
 
     const todayUTC = normalizeToUTCMidnight(new Date())
 
+    /**
+     * Query candidate recurring transactions to process:
+     * - Exclude schedules belonging to banned users.
+     * - Only process schedules whose start date has arrived (startDate <= todayUTC).
+     * - Match active schedules (no endDate or endDate >= todayUTC).
+     * - Match expired schedules that still have pending occurrences to backfill
+     *   (lastGeneratedDate is unset/null or lastGeneratedDate < endDate).
+     */
     const cursor = recurringCollection.find({
       ...(bannedUserIds.length > 0
         ? {
@@ -60,12 +68,12 @@ export async function GET(request: NextRequest) {
           $and: [
             { endDate: { $lt: todayUTC } },
             {
-              lastGeneratedDate: {
-                $exists: true,
-                $ne: null as unknown as Date,
-              },
+              $or: [
+                { lastGeneratedDate: { $exists: false } },
+                { lastGeneratedDate: null as unknown as Date },
+                { $expr: { $lt: ["$lastGeneratedDate", "$endDate"] } },
+              ],
             },
-            { $expr: { $lt: ["$lastGeneratedDate", "$endDate"] } },
           ],
         },
       ],
@@ -90,7 +98,7 @@ export async function GET(request: NextRequest) {
 
           await Promise.all(
             dueDates.map(async (targetDate) => {
-              const existingTransaction = await transactionsCollection.findOne({
+              const transactionData = {
                 userId: rec.userId,
                 type: rec.type,
                 categoryKey: rec.categoryKey,
@@ -98,27 +106,11 @@ export async function GET(request: NextRequest) {
                 currency: rec.currency,
                 description: rec.description,
                 date: targetDate,
-              })
-
-              if (existingTransaction) {
-                skippedReason.push({
-                  id: rec._id.toString(),
-                  reason: "existing",
-                })
-                affectedUserIds.add(rec.userId.toString())
-                return
               }
 
               try {
-                const insertResult = await transactionsCollection.insertOne({
-                  userId: rec.userId,
-                  type: rec.type,
-                  categoryKey: rec.categoryKey,
-                  amount: rec.amount,
-                  currency: rec.currency,
-                  description: rec.description,
-                  date: targetDate,
-                })
+                const insertResult =
+                  await transactionsCollection.insertOne(transactionData)
 
                 createdCount++
                 createdIds.push(insertResult.insertedId.toString())

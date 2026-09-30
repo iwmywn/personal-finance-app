@@ -137,6 +137,12 @@ export async function deleteRecurringTransaction(
   }
 }
 
+/**
+ * Note: Updating existing recurring transactions is intentionally not supported
+ * in order to preserve financial data integrity, schedule predictability, and audit consistency.
+ * If modifications to schedule, amount, or frequency are needed, users should delete
+ * the existing recurring schedule and create a new one.
+ */
 export async function getRecurringTransactions(): Promise<{
   error?: string
   recurringTransactions?: RecurringTransaction[]

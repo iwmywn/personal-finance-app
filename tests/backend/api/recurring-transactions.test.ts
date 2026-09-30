@@ -1,3 +1,4 @@
+import { updateTag } from "next/cache"
 import { NextRequest } from "next/server"
 import { Decimal128, ObjectId } from "mongodb"
 
@@ -10,11 +11,13 @@ import {
   mockDBBannedUser,
   mockDBRecurringTransaction,
 } from "@/tests/shared/data"
+import * as exchangeRatesActions from "@/actions/exchange-rates.actions"
 import { GET } from "@/app/api/(cronjobs)/recurring-transactions/route"
 import {
   getDueDates,
   getNextDate,
 } from "@/app/api/(cronjobs)/recurring-transactions/utils"
+import * as collections from "@/lib/collections"
 import {
   getRecurringTransactionsCollection,
   getTransactionsCollection,
@@ -449,6 +452,7 @@ describe("Recurring Transactions Cron Job", () => {
           description: "Expired Monthly Salary",
           frequency: "monthly",
           startDate: localDateToUTCMidnight(new Date("2024-01-01")),
+          lastGeneratedDate: localDateToUTCMidnight(new Date("2024-01-01")),
           endDate: yesterdayUTC, // Expired yesterday
         }
 
@@ -490,6 +494,49 @@ describe("Recurring Transactions Cron Job", () => {
 
         expect(expiredTx).toBeNull()
         expect(activeTx).toBeDefined()
+
+        vi.useRealTimers()
+      })
+
+      it("should backfill expired recurring transactions whose endDate has passed when lastGeneratedDate was not set", async () => {
+        const yesterdayUTC = localDateToUTCMidnight(new Date("2024-01-31"))
+
+        const expiredUnprocessedTransaction: DBRecurringTransaction = {
+          ...mockDBRecurringTransaction,
+          _id: new ObjectId("691d58b68a6aa5c9e69aad23"),
+          description: "Expired Unprocessed Salary",
+          frequency: "monthly",
+          startDate: localDateToUTCMidnight(new Date("2024-01-01")),
+          endDate: yesterdayUTC,
+        }
+
+        await insertTestRecurringTransaction(expiredUnprocessedTransaction)
+
+        vi.useFakeTimers()
+        vi.setSystemTime(new Date("2024-02-01T12:00:00.000Z"))
+
+        const request = new NextRequest(cronEndpoint, {
+          headers: {
+            authorization: `Bearer ${cronSecret}`,
+          },
+        })
+
+        const response = await GET(request)
+        const data = await response.json()
+
+        expect(response.status).toBe(200)
+        expect(data.success).toBe(true)
+        expect(data.created).toBe(1)
+
+        const transactionsCollection = await getTransactionsCollection()
+        const backfilledTx = await transactionsCollection.findOne({
+          description: "Expired Unprocessed Salary",
+        })
+
+        expect(backfilledTx).toBeDefined()
+        expect(backfilledTx?.date).toEqual(
+          localDateToUTCMidnight(new Date("2024-01-01"))
+        )
 
         vi.useRealTimers()
       })
@@ -630,6 +677,245 @@ describe("Recurring Transactions Cron Job", () => {
 
         vi.useRealTimers()
       })
+
+      it("should not process recurring transactions whose startDate is in the future", async () => {
+        const tomorrowUTC = localDateToUTCMidnight(new Date("2024-02-02"))
+
+        const futureRecurringTransaction: DBRecurringTransaction = {
+          ...mockDBRecurringTransaction,
+          _id: new ObjectId(),
+          frequency: "daily",
+          startDate: tomorrowUTC,
+        }
+
+        await insertTestRecurringTransaction(futureRecurringTransaction)
+
+        vi.useFakeTimers()
+        vi.setSystemTime(new Date("2024-02-01T12:00:00.000Z"))
+
+        const request = new NextRequest(cronEndpoint, {
+          headers: {
+            authorization: `Bearer ${cronSecret}`,
+          },
+        })
+
+        const response = await GET(request)
+        const data = await response.json()
+
+        expect(response.status).toBe(200)
+        expect(data.success).toBe(true)
+        expect(data.created).toBe(0)
+        expect(data.skippedCount).toBe(0)
+
+        const transactionsCollection = await getTransactionsCollection()
+        const txs = await transactionsCollection
+          .find({ userId: futureRecurringTransaction.userId })
+          .toArray()
+
+        expect(txs).toHaveLength(0)
+
+        vi.useRealTimers()
+      })
+
+      it("should backfill expired recurring transactions whose endDate has passed when lastGeneratedDate is before endDate", async () => {
+        const startDateUTC = localDateToUTCMidnight(new Date("2024-01-01"))
+        const lastGeneratedDateUTC = localDateToUTCMidnight(
+          new Date("2024-01-02")
+        )
+        const endDateUTC = localDateToUTCMidnight(new Date("2024-01-04"))
+
+        const expiredRecurringTransaction: DBRecurringTransaction = {
+          ...mockDBRecurringTransaction,
+          _id: new ObjectId(),
+          frequency: "daily",
+          startDate: startDateUTC,
+          lastGeneratedDate: lastGeneratedDateUTC,
+          endDate: endDateUTC,
+        }
+
+        await insertTestRecurringTransaction(expiredRecurringTransaction)
+
+        vi.useFakeTimers()
+        vi.setSystemTime(new Date("2024-02-01T12:00:00.000Z"))
+
+        const request = new NextRequest(cronEndpoint, {
+          headers: {
+            authorization: `Bearer ${cronSecret}`,
+          },
+        })
+
+        const response = await GET(request)
+        const data = await response.json()
+
+        expect(response.status).toBe(200)
+        expect(data.success).toBe(true)
+        expect(data.created).toBe(2)
+
+        const transactionsCollection = await getTransactionsCollection()
+        const createdTxs = await transactionsCollection
+          .find({ userId: expiredRecurringTransaction.userId })
+          .sort({ date: 1 })
+          .toArray()
+
+        expect(createdTxs).toHaveLength(2)
+        expect(createdTxs[0].date).toEqual(
+          localDateToUTCMidnight(new Date("2024-01-03"))
+        )
+        expect(createdTxs[1].date).toEqual(
+          localDateToUTCMidnight(new Date("2024-01-04"))
+        )
+
+        const recurringCollection = await getRecurringTransactionsCollection()
+        const updatedRec = await recurringCollection.findOne({
+          _id: expiredRecurringTransaction._id,
+        })
+        expect(updatedRec?.lastGeneratedDate).toEqual(endDateUTC)
+
+        vi.useRealTimers()
+      })
+
+      it("should process recurring transactions in batches when exceeding MAX_TRANSACTIONS_PER_RUN", async () => {
+        const yesterdayUTC = localDateToUTCMidnight(new Date("2024-01-31"))
+        const count = 7
+
+        for (let i = 0; i < count; i++) {
+          const rec: DBRecurringTransaction = {
+            ...mockDBRecurringTransaction,
+            _id: new ObjectId(),
+            description: `Batch Salary ${i}`,
+            categoryKey:
+              `category_${i}` as DBRecurringTransaction["categoryKey"],
+            frequency: "daily",
+            startDate: localDateToUTCMidnight(new Date("2024-01-01")),
+            lastGeneratedDate: yesterdayUTC,
+          }
+          await insertTestRecurringTransaction(rec)
+        }
+
+        vi.useFakeTimers()
+        vi.setSystemTime(new Date("2024-02-01T12:00:00.000Z"))
+
+        const request = new NextRequest(cronEndpoint, {
+          headers: {
+            authorization: `Bearer ${cronSecret}`,
+          },
+        })
+
+        const response = await GET(request)
+        const data = await response.json()
+
+        expect(response.status).toBe(200)
+        expect(data.success).toBe(true)
+        expect(data.created).toBe(7)
+        expect(data.createdIds).toHaveLength(7)
+
+        vi.useRealTimers()
+      })
+
+      it("should invalidate cache tags for affected users", async () => {
+        const lastMonthUTC = localDateToUTCMidnight(new Date("2024-01-01"))
+
+        const recurringTransaction: DBRecurringTransaction = {
+          ...mockDBRecurringTransaction,
+          _id: new ObjectId(),
+          userId: new ObjectId(),
+          frequency: "monthly",
+          startDate: localDateToUTCMidnight(new Date("2024-01-01")),
+          lastGeneratedDate: lastMonthUTC,
+        }
+
+        await insertTestRecurringTransaction(recurringTransaction)
+
+        vi.useFakeTimers()
+        vi.setSystemTime(new Date("2024-02-01T12:00:00.000Z"))
+
+        const request = new NextRequest(cronEndpoint, {
+          headers: {
+            authorization: `Bearer ${cronSecret}`,
+          },
+        })
+
+        await GET(request)
+
+        expect(updateTag).toHaveBeenCalledWith(
+          `transactions-${recurringTransaction.userId}`
+        )
+        expect(updateTag).toHaveBeenCalledWith(
+          `recurringTransactions-${recurringTransaction.userId}`
+        )
+
+        vi.useRealTimers()
+      })
+
+      it("should enqueue missing exchange rate when ensureExchangeRateForDate fails without failing the cron job", async () => {
+        const todayUTC = localDateToUTCMidnight(new Date("2024-02-01"))
+        const lastMonthUTC = localDateToUTCMidnight(new Date("2024-01-01"))
+
+        const recurringTransaction: DBRecurringTransaction = {
+          ...mockDBRecurringTransaction,
+          _id: new ObjectId(),
+          frequency: "monthly",
+          startDate: localDateToUTCMidnight(new Date("2024-01-01")),
+          lastGeneratedDate: lastMonthUTC,
+        }
+
+        await insertTestRecurringTransaction(recurringTransaction)
+
+        const ensureSpy = vi
+          .spyOn(exchangeRatesActions, "ensureExchangeRateForDate")
+          .mockRejectedValueOnce(new Error("API rate limit exceeded"))
+        const enqueueSpy = vi.spyOn(
+          exchangeRatesActions,
+          "enqueueMissingExchangeRateDate"
+        )
+
+        vi.useFakeTimers()
+        vi.setSystemTime(new Date("2024-02-01T12:00:00.000Z"))
+
+        const request = new NextRequest(cronEndpoint, {
+          headers: {
+            authorization: `Bearer ${cronSecret}`,
+          },
+        })
+
+        const response = await GET(request)
+        const data = await response.json()
+
+        expect(response.status).toBe(200)
+        expect(data.success).toBe(true)
+        expect(data.created).toBe(1)
+        expect(ensureSpy).toHaveBeenCalled()
+        expect(enqueueSpy).toHaveBeenCalledWith(
+          todayUTC,
+          expect.objectContaining({ message: "API rate limit exceeded" })
+        )
+
+        ensureSpy.mockRestore()
+        enqueueSpy.mockRestore()
+        vi.useRealTimers()
+      })
+
+      it("should return 500 when database operation fails", async () => {
+        const consoleSpy = vi
+          .spyOn(console, "error")
+          .mockImplementation(() => {})
+        const spy = vi
+          .spyOn(collections, "getTransactionsCollection")
+          .mockRejectedValueOnce(new Error("Connection error"))
+
+        const request = new NextRequest(cronEndpoint, {
+          headers: {
+            authorization: `Bearer ${cronSecret}`,
+          },
+        })
+
+        const response = await GET(request)
+        expect(response.status).toBe(500)
+        expect(await response.text()).toBe("Recurring transactions cron failed")
+
+        spy.mockRestore()
+        consoleSpy.mockRestore()
+      })
     })
   })
 
@@ -717,6 +1003,107 @@ describe("Recurring Transactions Cron Job", () => {
           localDateToUTCMidnight(new Date("2024-02-04")),
         ])
       })
+
+      it("should calculate due dates correctly for weekly frequency", () => {
+        const rec: DBRecurringTransaction = {
+          ...mockDBRecurringTransaction,
+          frequency: "weekly",
+          startDate: localDateToUTCMidnight(new Date("2024-01-01")),
+          lastGeneratedDate: localDateToUTCMidnight(new Date("2024-01-01")),
+        }
+        const today = localDateToUTCMidnight(new Date("2024-01-16"))
+        expect(getDueDates(rec, today)).toEqual([
+          localDateToUTCMidnight(new Date("2024-01-08")),
+          localDateToUTCMidnight(new Date("2024-01-15")),
+        ])
+      })
+
+      it("should calculate due dates correctly for bi-weekly frequency", () => {
+        const rec: DBRecurringTransaction = {
+          ...mockDBRecurringTransaction,
+          frequency: "bi-weekly",
+          startDate: localDateToUTCMidnight(new Date("2024-01-01")),
+          lastGeneratedDate: localDateToUTCMidnight(new Date("2024-01-01")),
+        }
+        const today = localDateToUTCMidnight(new Date("2024-01-30"))
+        expect(getDueDates(rec, today)).toEqual([
+          localDateToUTCMidnight(new Date("2024-01-15")),
+          localDateToUTCMidnight(new Date("2024-01-29")),
+        ])
+      })
+
+      it("should clamp targetDay to end of month for monthly frequency on leap year", () => {
+        const rec: DBRecurringTransaction = {
+          ...mockDBRecurringTransaction,
+          frequency: "monthly",
+          startDate: localDateToUTCMidnight(new Date("2024-01-31")),
+          lastGeneratedDate: localDateToUTCMidnight(new Date("2024-01-31")),
+        }
+        const today = localDateToUTCMidnight(new Date("2024-03-31"))
+        expect(getDueDates(rec, today)).toEqual([
+          localDateToUTCMidnight(new Date("2024-02-29")),
+          localDateToUTCMidnight(new Date("2024-03-31")),
+        ])
+      })
+
+      it("should calculate due dates correctly for quarterly frequency", () => {
+        const rec: DBRecurringTransaction = {
+          ...mockDBRecurringTransaction,
+          frequency: "quarterly",
+          startDate: localDateToUTCMidnight(new Date("2024-01-01")),
+          lastGeneratedDate: localDateToUTCMidnight(new Date("2024-01-01")),
+        }
+        const today = localDateToUTCMidnight(new Date("2024-07-02"))
+        expect(getDueDates(rec, today)).toEqual([
+          localDateToUTCMidnight(new Date("2024-04-01")),
+          localDateToUTCMidnight(new Date("2024-07-01")),
+        ])
+      })
+
+      it("should calculate due dates correctly for yearly frequency", () => {
+        const rec: DBRecurringTransaction = {
+          ...mockDBRecurringTransaction,
+          frequency: "yearly",
+          startDate: localDateToUTCMidnight(new Date("2024-01-01")),
+          lastGeneratedDate: localDateToUTCMidnight(new Date("2024-01-01")),
+          endDate: undefined,
+        }
+        const today = localDateToUTCMidnight(new Date("2026-01-02"))
+        expect(getDueDates(rec, today)).toEqual([
+          localDateToUTCMidnight(new Date("2025-01-01")),
+          localDateToUTCMidnight(new Date("2026-01-01")),
+        ])
+      })
+
+      it("should calculate due dates correctly for random frequency with custom days", () => {
+        const rec: DBRecurringTransaction = {
+          ...mockDBRecurringTransaction,
+          frequency: "random",
+          randomEveryXDays: 3,
+          startDate: localDateToUTCMidnight(new Date("2024-01-01")),
+          lastGeneratedDate: localDateToUTCMidnight(new Date("2024-01-01")),
+        }
+        const today = localDateToUTCMidnight(new Date("2024-01-08"))
+        expect(getDueDates(rec, today)).toEqual([
+          localDateToUTCMidnight(new Date("2024-01-04")),
+          localDateToUTCMidnight(new Date("2024-01-07")),
+        ])
+      })
+
+      it("should fallback randomEveryXDays to 1 when undefined or less than 1 in getDueDates", () => {
+        const rec: DBRecurringTransaction = {
+          ...mockDBRecurringTransaction,
+          frequency: "random",
+          randomEveryXDays: 0,
+          startDate: localDateToUTCMidnight(new Date("2024-01-01")),
+          lastGeneratedDate: localDateToUTCMidnight(new Date("2024-01-01")),
+        }
+        const today = localDateToUTCMidnight(new Date("2024-01-03"))
+        expect(getDueDates(rec, today)).toEqual([
+          localDateToUTCMidnight(new Date("2024-01-02")),
+          localDateToUTCMidnight(new Date("2024-01-03")),
+        ])
+      })
     })
 
     describe("getNextDate", () => {
@@ -799,6 +1186,99 @@ describe("Recurring Transactions Cron Job", () => {
           lastGeneratedDate: new Date("2026-03-23T00:00:00.000Z"),
         }
         expect(getNextDate(afterGenerated, todayUTC)).toBeNull()
+      })
+
+      it("should calculate next date for weekly frequency", () => {
+        const weeklyRec: DBRecurringTransaction = {
+          ...baseRecurring,
+          frequency: "weekly",
+          startDate: new Date("2026-01-01T00:00:00.000Z"),
+          lastGeneratedDate: new Date("2026-01-01T00:00:00.000Z"),
+        }
+        const todayUTC = new Date("2026-01-05T00:00:00.000Z")
+        expect(getNextDate(weeklyRec, todayUTC)).toEqual(
+          new Date("2026-01-08T00:00:00.000Z")
+        )
+      })
+
+      it("should calculate next date for bi-weekly frequency", () => {
+        const biWeeklyRec: DBRecurringTransaction = {
+          ...baseRecurring,
+          frequency: "bi-weekly",
+          startDate: new Date("2026-01-01T00:00:00.000Z"),
+          lastGeneratedDate: new Date("2026-01-01T00:00:00.000Z"),
+        }
+        const todayUTC = new Date("2026-01-10T00:00:00.000Z")
+        expect(getNextDate(biWeeklyRec, todayUTC)).toEqual(
+          new Date("2026-01-15T00:00:00.000Z")
+        )
+      })
+
+      it("should clamp targetDay to end of month for monthly frequency on leap year in getNextDate", () => {
+        const leapRec: DBRecurringTransaction = {
+          ...baseRecurring,
+          frequency: "monthly",
+          startDate: new Date("2024-01-31T00:00:00.000Z"),
+          lastGeneratedDate: new Date("2024-01-31T00:00:00.000Z"),
+        }
+        const todayUTC = new Date("2024-02-01T00:00:00.000Z")
+        expect(getNextDate(leapRec, todayUTC)).toEqual(
+          new Date("2024-02-29T00:00:00.000Z")
+        )
+      })
+
+      it("should calculate next date for quarterly frequency", () => {
+        const quarterlyRec: DBRecurringTransaction = {
+          ...baseRecurring,
+          frequency: "quarterly",
+          startDate: new Date("2026-01-01T00:00:00.000Z"),
+          lastGeneratedDate: new Date("2026-01-01T00:00:00.000Z"),
+        }
+        const todayUTC = new Date("2026-02-01T00:00:00.000Z")
+        expect(getNextDate(quarterlyRec, todayUTC)).toEqual(
+          new Date("2026-04-01T00:00:00.000Z")
+        )
+      })
+
+      it("should calculate next date for yearly frequency", () => {
+        const yearlyRec: DBRecurringTransaction = {
+          ...baseRecurring,
+          frequency: "yearly",
+          startDate: new Date("2026-01-01T00:00:00.000Z"),
+          lastGeneratedDate: new Date("2026-01-01T00:00:00.000Z"),
+        }
+        const todayUTC = new Date("2026-02-01T00:00:00.000Z")
+        expect(getNextDate(yearlyRec, todayUTC)).toEqual(
+          new Date("2027-01-01T00:00:00.000Z")
+        )
+      })
+
+      it("should calculate next date for random frequency with custom days", () => {
+        const randomRec: DBRecurringTransaction = {
+          ...baseRecurring,
+          frequency: "random",
+          randomEveryXDays: 4,
+          startDate: new Date("2026-01-01T00:00:00.000Z"),
+          lastGeneratedDate: new Date("2026-01-01T00:00:00.000Z"),
+        }
+        const todayUTC = new Date("2026-01-03T00:00:00.000Z")
+        expect(getNextDate(randomRec, todayUTC)).toEqual(
+          new Date("2026-01-05T00:00:00.000Z")
+        )
+      })
+
+      it("should fallback randomEveryXDays to 1 when undefined or less than 1 in getNextDate", () => {
+        const randomRec: DBRecurringTransaction = {
+          ...baseRecurring,
+          frequency: "random",
+          randomEveryXDays: -2,
+          startDate: new Date("2026-01-01T00:00:00.000Z"),
+          lastGeneratedDate: new Date("2026-01-01T00:00:00.000Z"),
+        }
+        const todayUTC = new Date("2026-01-01T00:00:00.000Z")
+        expect(getNextDate(randomRec, todayUTC)).toEqual(
+          new Date("2026-01-02T00:00:00.000Z")
+        )
       })
     })
   })

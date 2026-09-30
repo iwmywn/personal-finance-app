@@ -237,7 +237,7 @@ export function BudgetForm({ budget, isOpen, setIsOpen }: BudgetFormProps) {
                           field.onChange(date)
                           setStartCalendarOpen(false)
                         }}
-                        disabled={(date) => endDate && date > endDate}
+                        disabled={(date) => Boolean(endDate && date >= endDate)}
                       />
                     </PopoverContent>
                   </Popover>
