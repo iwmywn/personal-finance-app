@@ -834,7 +834,7 @@ describe("Statistics", () => {
           rates: {
             USD: "1",
             EUR: "0.92",
-          } as Record<Currency, string>,
+          } as unknown as Record<Currency, string>,
           description: "USD expense with rates map that lacks VND",
           date: new Date("2024-01-15"),
         },
@@ -1198,7 +1198,7 @@ describe("Statistics", () => {
           rates: {
             USD: "1",
             EUR: "0.92",
-          } as Record<Currency, string>,
+          } as unknown as Record<Currency, string>,
           description: "USD income with rates map that lacks VND",
           date: new Date("2024-01-15"),
         },

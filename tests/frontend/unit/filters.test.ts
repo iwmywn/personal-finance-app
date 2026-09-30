@@ -6,6 +6,7 @@ import {
   mockTransactions,
   mockUsers,
 } from "@/tests/shared/data"
+import type { User } from "@/lib/definitions"
 import {
   filterBudgets,
   filterCustomCategories,
