@@ -588,7 +588,8 @@ describe("Exchange Rates Cron Job", () => {
         retryCount: 0,
       })
 
-      // Cause ensureExchangeRateForDate to throw and enqueueMissingExchangeRateDate to also throw (unhandled inside map)
+      // Cause ensureExchangeRateForDate to throw and enqueueMissingExchangeRateDate
+      //  to also throw (unhandled inside map)
       vi.spyOn(
         exchangeRatesActions,
         "ensureExchangeRateForDate"
