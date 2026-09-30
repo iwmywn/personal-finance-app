@@ -55,3 +55,20 @@ export function getSafeCallbackUrl(
 
   return fallback
 }
+
+export function isUserBanned(
+  user:
+    | {
+        banned?: boolean | null
+        banExpires?: Date | string | number | null
+      }
+    | null
+    | undefined,
+  now: Date = new Date()
+): boolean {
+  if (!user || !user.banned) return false
+  if (!user.banExpires) return true
+  const expireTime = new Date(user.banExpires).getTime()
+  if (Number.isNaN(expireTime)) return true
+  return expireTime > now.getTime()
+}

@@ -10,7 +10,7 @@ import type {
   User,
 } from "@/lib/definitions"
 import { calculateBudgetsStats, calculateGoalsStats } from "@/lib/statistics"
-import { progressColorClass } from "@/lib/utils"
+import { isUserBanned, progressColorClass } from "@/lib/utils"
 
 type Filters = {
   searchTerm?: string
@@ -383,15 +383,19 @@ export function filterUsers(users: User[], filters: Filters): User[] {
       )
     : null
 
+  const now = new Date()
+
   return users.filter((user) => {
     const matchesSearch = matchingIds ? matchingIds.has(user.id) : true
 
     const matchesRole = filterRole === "all" || user.role === filterRole
 
+    const banned = isUserBanned(user, now)
+
     const matchesStatus =
       filterStatus === "all" ||
-      (filterStatus === "active" && !Boolean(user.banned)) ||
-      (filterStatus === "banned" && Boolean(user.banned))
+      (filterStatus === "active" && !banned) ||
+      (filterStatus === "banned" && banned)
 
     return matchesSearch && matchesRole && matchesStatus
   })

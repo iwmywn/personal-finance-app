@@ -18,8 +18,10 @@ import { connect, withTransaction } from "@/lib/db"
 import type { ActionResponse, User } from "@/lib/definitions"
 import { isRateLimited, RATE_LIMIT_PRESETS } from "@/lib/rate-limit"
 import { ADMIN_ROLE } from "@/lib/role"
+import { isUserBanned } from "@/lib/utils"
 
 import { getSession } from "./session.actions"
+import { getActiveBanMongoFilter } from "./utils"
 
 export type AdminStats = {
   totalUsers: number
@@ -49,6 +51,8 @@ export async function getAdminData(): Promise<{
       }
     }
 
+    // Note: Pagination is intentionally omitted here
+    // as the current low volume of users does not require it.
     const result = await auth.api.listUsers({
       headers: headersList,
       query: {
@@ -64,13 +68,14 @@ export async function getAdminData(): Promise<{
     const usersCollection = await getUsersCollection()
     const dbTotal = await usersCollection.countDocuments()
 
+    const now = new Date()
     let totalUsers = result.total
-    let bannedUsers = users.filter((u) => Boolean(u.banned)).length
+    let bannedUsers = users.filter((u) => isUserBanned(u, now)).length
     let adminUsers = users.filter((u) => u.role === ADMIN_ROLE).length
 
     if (dbTotal > 0) {
       const [dbBanned, dbAdmins] = await Promise.all([
-        usersCollection.countDocuments({ banned: true }),
+        usersCollection.countDocuments(getActiveBanMongoFilter(now)),
         usersCollection.countDocuments({ role: ADMIN_ROLE }),
       ])
       totalUsers = dbTotal

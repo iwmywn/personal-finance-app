@@ -39,6 +39,7 @@ import { useFormatDate } from "@/hooks/use-format-date"
 import { useSchemas } from "@/hooks/use-schemas"
 import { authClient } from "@/lib/auth-client"
 import type { User } from "@/lib/definitions"
+import { isUserBanned } from "@/lib/utils"
 import type { AdminBanFormValues } from "@/schemas/types"
 
 interface BanUserFormProps {
@@ -52,7 +53,7 @@ export function BanUserForm({ user, isOpen, setIsOpen }: BanUserFormProps) {
   const router = useRouter()
   const formatDate = useFormatDate()
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
-  const isBanned = Boolean(user.banned)
+  const isBanned = isUserBanned(user)
   const { createAdminBanSchema } = useSchemas()
   const form = useForm<AdminBanFormValues>({
     resolver: zodResolver(createAdminBanSchema()),

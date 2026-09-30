@@ -198,6 +198,40 @@ describe("Admin", () => {
       })
     })
 
+    it("should treat expired temporary bans as active users in stats", async () => {
+      mockAuthenticatedAdmin()
+
+      const users: User[] = [
+        mockUser,
+        {
+          ...mockBannedUser,
+          id: "user-expired-ban",
+          banned: true,
+          banExpires: new Date(Date.now() - 3600 * 1000),
+        },
+        {
+          ...mockBannedUser,
+          id: "user-active-ban",
+          banned: true,
+          banExpires: new Date(Date.now() + 3600 * 1000),
+        },
+      ]
+      vi.mocked(auth.api.listUsers).mockResolvedValueOnce({
+        users: users.map(toUserWithRole),
+        total: users.length,
+      })
+
+      const result = await getAdminData()
+
+      expect(result.error).toBeUndefined()
+      expect(result.stats).toEqual({
+        totalUsers: 3,
+        activeUsers: 2,
+        bannedUsers: 1,
+        adminUsers: 0,
+      })
+    })
+
     it("should return empty stats when users array is empty", async () => {
       mockAuthenticatedAdmin()
 

@@ -49,6 +49,7 @@ import { useUser } from "@/contexts/user-context"
 import { useFormatDate } from "@/hooks/use-format-date"
 import { authClient } from "@/lib/auth-client"
 import type { AuthErrorCode, User } from "@/lib/definitions"
+import { isUserBanned } from "@/lib/utils"
 
 interface AdminTableProps {
   filteredUsers: User[]
@@ -137,7 +138,7 @@ export function AdminTable({
                 <TableBody>
                   {filteredUsers.map((u) => {
                     const isSelf = u.id === currentUser.id
-                    const isBanned = Boolean(u.banned)
+                    const isBanned = isUserBanned(u)
                     const isTargetAdmin = u.role === "admin"
 
                     const hideMenu = isSelf || isTargetAdmin
@@ -312,6 +313,7 @@ export function AdminTable({
               </Table>
             </div>
           )}
+          {/* Note: Pagination is intentionally omitted for the admin user list as the current low volume of users does not require it. */}
         </CardContent>
       </Card>
 

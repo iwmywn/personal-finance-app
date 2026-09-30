@@ -5,6 +5,7 @@ import {
   enqueueMissingExchangeRateDate,
   ensureExchangeRateForDate,
 } from "@/actions/exchange-rates.actions"
+import { getActiveBanMongoFilter } from "@/actions/utils"
 import {
   getRecurringTransactionsCollection,
   getTransactionsCollection,
@@ -37,7 +38,7 @@ export async function GET(request: NextRequest) {
       ])
 
     const bannedUsers = await usersCollection
-      .find({ banned: true }, { projection: { _id: 1 } })
+      .find(getActiveBanMongoFilter(), { projection: { _id: 1 } })
       .toArray()
     const bannedUserIds = bannedUsers.flatMap((u) => [u._id, u._id.toString()])
 

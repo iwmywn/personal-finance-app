@@ -23,7 +23,11 @@ import {
   getTransactionsCollection,
 } from "@/lib/collections"
 import { localDateToUTCMidnight } from "@/lib/date"
-import type { DBRecurringTransaction, DBTransaction } from "@/lib/definitions"
+import type {
+  DBRecurringTransaction,
+  DBTransaction,
+  DBUser,
+} from "@/lib/definitions"
 
 const cronSecret = "test-cron-secret"
 const cronEndpoint = "http://localhost/api/recurring-transactions"
@@ -674,6 +678,59 @@ describe("Recurring Transactions Cron Job", () => {
         })
 
         expect(updatedRecurring?.lastGeneratedDate).toEqual(lastMonthUTC)
+
+        vi.useRealTimers()
+      })
+
+      it("should process recurring transactions belonging to users whose temporary ban has expired", async () => {
+        const expiredBannedUser: DBUser = {
+          ...mockDBBannedUser,
+          _id: new ObjectId(),
+          email: "expired-ban@gmail.com",
+          username: "expiredbanuser",
+          displayUsername: "expiredbanuser",
+          banned: true,
+          banExpires: new Date("2024-01-15T00:00:00.000Z"),
+        }
+        await insertTestUser(expiredBannedUser)
+
+        const lastMonthUTC = localDateToUTCMidnight(new Date("2024-01-01"))
+        const targetDateUTC = localDateToUTCMidnight(new Date("2024-02-01"))
+
+        const expiredBannedUserRecurring: DBRecurringTransaction = {
+          ...mockDBRecurringTransaction,
+          _id: new ObjectId(),
+          userId: expiredBannedUser._id,
+          frequency: "monthly",
+          startDate: localDateToUTCMidnight(new Date("2024-01-01")),
+          lastGeneratedDate: lastMonthUTC,
+        }
+
+        await insertTestRecurringTransaction(expiredBannedUserRecurring)
+
+        vi.useFakeTimers()
+        vi.setSystemTime(new Date("2024-02-01T12:00:00.000Z"))
+
+        const request = new NextRequest(cronEndpoint, {
+          headers: {
+            authorization: `Bearer ${cronSecret}`,
+          },
+        })
+
+        const response = await GET(request)
+        const data = await response.json()
+
+        expect(response.status).toBe(200)
+        expect(data.success).toBe(true)
+        expect(data.created).toBe(1)
+
+        const transactionsCollection = await getTransactionsCollection()
+        const transactions = await transactionsCollection
+          .find({ userId: expiredBannedUser._id })
+          .toArray()
+
+        expect(transactions).toHaveLength(1)
+        expect(transactions[0].date).toEqual(targetDateUTC)
 
         vi.useRealTimers()
       })

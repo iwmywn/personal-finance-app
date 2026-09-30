@@ -2,7 +2,11 @@ import { mockTransactions } from "@/tests/shared/data"
 import { sanitizeCSVField } from "@/components/transactions/export-button"
 import { formatCurrency } from "@/lib/currency"
 import { getUniqueDateRangeYears, getUniqueYears } from "@/lib/date"
-import { convertAmountWithRates, getSafeCallbackUrl } from "@/lib/utils"
+import {
+  convertAmountWithRates,
+  getSafeCallbackUrl,
+  isUserBanned,
+} from "@/lib/utils"
 
 describe("Utils", () => {
   describe("formatCurrency", () => {
@@ -242,6 +246,66 @@ describe("Utils", () => {
       ).not.toThrow()
       const negResult = convertAmountWithRates(100, "VND", "USD", negativeRates)
       expect(negResult.toString()).toBe("100")
+    })
+  })
+
+  describe("isUserBanned", () => {
+    const fixedNow = new Date("2026-06-15T12:00:00Z")
+
+    it("should return false when user is null, undefined, or not banned", () => {
+      expect(isUserBanned(null, fixedNow)).toBe(false)
+      expect(isUserBanned(undefined, fixedNow)).toBe(false)
+      expect(isUserBanned({ banned: false }, fixedNow)).toBe(false)
+      expect(isUserBanned({ banned: null }, fixedNow)).toBe(false)
+      expect(isUserBanned({ banned: undefined }, fixedNow)).toBe(false)
+    })
+
+    it("should return true when user is permanently banned (no banExpires)", () => {
+      expect(isUserBanned({ banned: true }, fixedNow)).toBe(true)
+      expect(isUserBanned({ banned: true, banExpires: null }, fixedNow)).toBe(
+        true
+      )
+      expect(
+        isUserBanned({ banned: true, banExpires: undefined }, fixedNow)
+      ).toBe(true)
+    })
+
+    it("should return true when temporary ban is active (banExpires in future)", () => {
+      const futureDate = new Date("2026-06-15T13:00:00Z")
+      expect(
+        isUserBanned({ banned: true, banExpires: futureDate }, fixedNow)
+      ).toBe(true)
+      expect(
+        isUserBanned(
+          { banned: true, banExpires: futureDate.toISOString() },
+          fixedNow
+        )
+      ).toBe(true)
+    })
+
+    it("should return false when temporary ban has expired (banExpires in past)", () => {
+      const pastDate = new Date("2026-06-15T11:00:00Z")
+      expect(
+        isUserBanned({ banned: true, banExpires: pastDate }, fixedNow)
+      ).toBe(false)
+      expect(
+        isUserBanned(
+          { banned: true, banExpires: pastDate.toISOString() },
+          fixedNow
+        )
+      ).toBe(false)
+    })
+
+    it("should return false when banExpires equals now", () => {
+      expect(
+        isUserBanned({ banned: true, banExpires: fixedNow }, fixedNow)
+      ).toBe(false)
+    })
+
+    it("should return true when banExpires is invalid date", () => {
+      expect(
+        isUserBanned({ banned: true, banExpires: "invalid-date" }, fixedNow)
+      ).toBe(true)
     })
   })
 })

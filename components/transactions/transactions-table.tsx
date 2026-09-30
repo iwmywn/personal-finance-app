@@ -55,10 +55,12 @@ const ITEMS_PER_PAGE = 10
 
 interface TransactionsTableProps {
   filteredTransactions: Transaction[]
+  filterKey?: string
 }
 
 export function TransactionsTable({
   filteredTransactions,
+  filterKey,
 }: TransactionsTableProps) {
   const { transactions } = useTransactions()
   const { user } = useUser()
@@ -71,15 +73,20 @@ export function TransactionsTable({
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false)
   const [isCurrentPage, setIsCurrentPage] = useState<number>(1)
-  const [prevTransactions, setPrevTransactions] = useState(filteredTransactions)
-
-  if (prevTransactions !== filteredTransactions) {
-    setPrevTransactions(filteredTransactions)
-    setIsCurrentPage(1)
-  }
+  const [prevFilterKey, setPrevFilterKey] = useState<string | undefined>(
+    filterKey
+  )
 
   const totalPages =
     Math.ceil(filteredTransactions.length / ITEMS_PER_PAGE) || 1
+
+  if (filterKey !== undefined && prevFilterKey !== filterKey) {
+    setPrevFilterKey(filterKey)
+    setIsCurrentPage(1)
+  } else if (isCurrentPage > totalPages) {
+    setIsCurrentPage(totalPages)
+  }
+
   const activePage = Math.min(Math.max(isCurrentPage, 1), totalPages)
 
   const startIndex = (activePage - 1) * ITEMS_PER_PAGE

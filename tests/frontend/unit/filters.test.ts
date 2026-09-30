@@ -1298,6 +1298,46 @@ describe("Filters", () => {
       })
       expect(bannedResult).toHaveLength(0)
     })
+
+    it("should treat user with expired temporary ban as active", () => {
+      const userWithExpiredBan: User = {
+        ...mockUsers[0],
+        id: "user-expired-ban",
+        banned: true,
+        banExpires: new Date(Date.now() - 3600 * 1000), // 1 hour ago
+      }
+
+      const activeResult = filterUsers([userWithExpiredBan], {
+        filterStatus: "active",
+      })
+      expect(activeResult).toHaveLength(1)
+      expect(activeResult[0].id).toBe("user-expired-ban")
+
+      const bannedResult = filterUsers([userWithExpiredBan], {
+        filterStatus: "banned",
+      })
+      expect(bannedResult).toHaveLength(0)
+    })
+
+    it("should treat user with active temporary ban as banned", () => {
+      const userWithActiveBan: User = {
+        ...mockUsers[0],
+        id: "user-active-ban",
+        banned: true,
+        banExpires: new Date(Date.now() + 3600 * 1000), // 1 hour in future
+      }
+
+      const activeResult = filterUsers([userWithActiveBan], {
+        filterStatus: "active",
+      })
+      expect(activeResult).toHaveLength(0)
+
+      const bannedResult = filterUsers([userWithActiveBan], {
+        filterStatus: "banned",
+      })
+      expect(bannedResult).toHaveLength(1)
+      expect(bannedResult[0].id).toBe("user-active-ban")
+    })
   })
 
   describe("filterRecurringTransactions", () => {

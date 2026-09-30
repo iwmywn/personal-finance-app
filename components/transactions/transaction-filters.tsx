@@ -429,7 +429,10 @@ export function TransactionFilters() {
         </CardContent>
       </Card>
 
-      <TransactionsTable filteredTransactions={filteredTransactions} />
+      <TransactionsTable
+        filteredTransactions={filteredTransactions}
+        filterKey={`${searchTerm ?? ""}_${selectedDateIso ?? ""}_${dateRangeFromIso ?? ""}_${dateRangeToIso ?? ""}_${filterMonth}_${filterYear}_${filterType}_${filterCategoryKey}`}
+      />
     </>
   )
 }
