@@ -4,7 +4,7 @@ import "./env/server"
 import type { NextConfig } from "next"
 import createNextIntlPlugin from "next-intl/plugin"
 
-import { LOCALES, SOURCE_LOCALE } from "./i18n/config"
+import { LOCALES, SOURCE_LOCALE } from "@/i18n/config"
 
 const withNextIntl = createNextIntlPlugin({
   experimental: {

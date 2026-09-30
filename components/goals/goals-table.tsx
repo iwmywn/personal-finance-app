@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import Link from "next/link"
 import { MoreVerticalIcon, TargetIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/tooltip"
 import { DeleteGoal } from "@/components/goals/delete-goal"
 import { GoalForm } from "@/components/goals/goal-form"
+import { UnconvertedTransactionsAlert } from "@/components/transactions/unconverted-transactions-alert"
 import { useGoals } from "@/contexts/goals-context"
 import { useTransactions } from "@/contexts/transactions-context"
 import { useCategory } from "@/hooks/use-category"
@@ -63,6 +64,11 @@ export function GoalsTable({ filteredGoals }: GoalsTableProps) {
 
   const goalsWithStats = calculateGoalsStats(filteredGoals, transactions)
 
+  const inflowTransactions = useMemo(
+    () => transactions.filter((t) => t.type === "inflow"),
+    [transactions]
+  )
+
   return (
     <>
       <Card className="flex-1 overflow-auto">
@@ -82,126 +88,136 @@ export function GoalsTable({ filteredGoals }: GoalsTableProps) {
               </EmptyHeader>
             </Empty>
           ) : (
-            <div className="table-wrapper">
-              <Table>
-                <TableHeader className="bg-muted sticky top-0 z-1">
-                  <TableRow className="[&>th]:text-center">
-                    <TableHead>{t("Start Date")}</TableHead>
-                    <TableHead>{t("End Date")}</TableHead>
-                    <TableHead>{t("Goal Name")}</TableHead>
-                    <TableHead>{t("Category")}</TableHead>
-                    <TableHead>{t("Target Amount")}</TableHead>
-                    <TableHead>{t("Accumulated")}</TableHead>
-                    <TableHead>{t("Status")}</TableHead>
-                    <TableHead>{t("Progress")}</TableHead>
-                    <TableHead></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {goalsWithStats.map((goal) => (
-                    <TableRow key={goal._id} className="[&>td]:text-center">
-                      <TableCell suppressHydrationWarning>
-                        {formatDate(goal.startDate)}
-                      </TableCell>
-                      <TableCell suppressHydrationWarning>
-                        {formatDate(goal.endDate)}
-                      </TableCell>
-                      <TableCell className="font-medium">{goal.name}</TableCell>
-                      <TableCell>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Badge variant="outline">
-                              {getCategoryLabel(goal.categoryKey)}
-                            </Badge>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            {getCategoryDescription(goal.categoryKey)}
-                          </TooltipContent>
-                        </Tooltip>
-                      </TableCell>
-                      <TableCell>
-                        {formatCurrency(goal.targetAmount, goal.currency)}
-                      </TableCell>
-                      <TableCell>
-                        {formatCurrency(goal.accumulated, goal.currency)}
-                      </TableCell>
-                      <TableCell suppressHydrationWarning>
-                        <Badge
-                          className={
-                            goal.status === "expired"
-                              ? "badge-red"
-                              : goal.status === "active"
-                                ? "badge-green"
-                                : "badge-yellow"
-                          }
-                        >
-                          {goal.status === "expired"
-                            ? t("Expired")
-                            : goal.status === "active"
-                              ? t("Active")
-                              : t("Upcoming")}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="min-w-32" suppressHydrationWarning>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Progress
-                              value={Math.min(100, goal.percentage)}
-                              className={`flex-1 ${goal.progressColorClass}`}
-                            />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            {goal.percentage.toFixed(1)}%
-                          </TooltipContent>
-                        </Tooltip>
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              className="dark:hover:bg-input/50"
-                              variant="ghost"
-                              size="icon"
-                            >
-                              <MoreVerticalIcon />
-                              <span className="sr-only">{t("Open menu")}</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <DropdownMenuItem asChild>
-                              <Link
-                                href={`/transactions?from=${serializeUTCDate(goal.startDate)}&to=${serializeUTCDate(goal.endDate)}&type=inflow&category=${goal.categoryKey}`}
-                                className="cursor-pointer"
-                              >
-                                {t("View")}
-                              </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="cursor-pointer"
-                              onClick={() => {
-                                setSelectedGoal(goal)
-                                setIsEditOpen(true)
-                              }}
-                            >
-                              {t("Edit")}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="cursor-pointer"
-                              variant="destructive"
-                              onClick={() => {
-                                setSelectedGoal(goal)
-                                setIsDeleteOpen(true)
-                              }}
-                            >
-                              {t("Delete")}
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
+            <div className="flex h-full flex-col gap-4">
+              <UnconvertedTransactionsAlert transactions={inflowTransactions} />
+              <div className="table-wrapper min-h-0 flex-1">
+                <Table>
+                  <TableHeader className="bg-muted sticky top-0 z-1">
+                    <TableRow className="[&>th]:text-center">
+                      <TableHead>{t("Start Date")}</TableHead>
+                      <TableHead>{t("End Date")}</TableHead>
+                      <TableHead>{t("Goal Name")}</TableHead>
+                      <TableHead>{t("Category")}</TableHead>
+                      <TableHead>{t("Target Amount")}</TableHead>
+                      <TableHead>{t("Accumulated")}</TableHead>
+                      <TableHead>{t("Status")}</TableHead>
+                      <TableHead>{t("Progress")}</TableHead>
+                      <TableHead></TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {goalsWithStats.map((goal) => (
+                      <TableRow key={goal._id} className="[&>td]:text-center">
+                        <TableCell suppressHydrationWarning>
+                          {formatDate(goal.startDate)}
+                        </TableCell>
+                        <TableCell suppressHydrationWarning>
+                          {formatDate(goal.endDate)}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {goal.name}
+                        </TableCell>
+                        <TableCell>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Badge variant="outline">
+                                {getCategoryLabel(goal.categoryKey)}
+                              </Badge>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {getCategoryDescription(goal.categoryKey)}
+                            </TooltipContent>
+                          </Tooltip>
+                        </TableCell>
+                        <TableCell>
+                          {formatCurrency(goal.targetAmount, goal.currency)}
+                        </TableCell>
+                        <TableCell>
+                          {formatCurrency(goal.accumulated, goal.currency)}
+                        </TableCell>
+                        <TableCell suppressHydrationWarning>
+                          <Badge
+                            className={
+                              goal.status === "expired"
+                                ? "badge-red"
+                                : goal.status === "active"
+                                  ? "badge-green"
+                                  : "badge-yellow"
+                            }
+                          >
+                            {goal.status === "expired"
+                              ? t("Expired")
+                              : goal.status === "active"
+                                ? t("Active")
+                                : t("Upcoming")}
+                          </Badge>
+                        </TableCell>
+                        <TableCell
+                          className="min-w-32"
+                          suppressHydrationWarning
+                        >
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Progress
+                                value={Math.min(100, goal.percentage)}
+                                className={`flex-1 ${goal.progressColorClass}`}
+                              />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {goal.percentage.toFixed(1)}%
+                            </TooltipContent>
+                          </Tooltip>
+                        </TableCell>
+                        <TableCell>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                className="dark:hover:bg-input/50"
+                                variant="ghost"
+                                size="icon"
+                              >
+                                <MoreVerticalIcon />
+                                <span className="sr-only">
+                                  {t("Open menu")}
+                                </span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              <DropdownMenuItem asChild>
+                                <Link
+                                  href={`/transactions?from=${serializeUTCDate(goal.startDate)}&to=${serializeUTCDate(goal.endDate)}&type=inflow&category=${goal.categoryKey}`}
+                                  className="cursor-pointer"
+                                >
+                                  {t("View")}
+                                </Link>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="cursor-pointer"
+                                onClick={() => {
+                                  setSelectedGoal(goal)
+                                  setIsEditOpen(true)
+                                }}
+                              >
+                                {t("Edit")}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="cursor-pointer"
+                                variant="destructive"
+                                onClick={() => {
+                                  setSelectedGoal(goal)
+                                  setIsDeleteOpen(true)
+                                }}
+                              >
+                                {t("Delete")}
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
           )}
         </CardContent>

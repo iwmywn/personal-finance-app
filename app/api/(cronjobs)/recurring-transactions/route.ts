@@ -13,6 +13,7 @@ import {
 } from "@/lib/collections"
 import { verifyCronAuth } from "@/lib/cron"
 import { normalizeToUTCMidnight } from "@/lib/date"
+import { withTransaction } from "@/lib/db"
 import type { DBRecurringTransaction } from "@/lib/definitions"
 import { isDuplicateKeyError } from "@/lib/indexes"
 
@@ -80,7 +81,6 @@ export async function GET(request: NextRequest) {
       ],
     })
 
-    let createdCount = 0
     const createdIds: string[] = []
     const skippedReason: { id: string; reason: "notToday" | "existing" }[] = []
     const affectedUserIds = new Set<string>()
@@ -97,9 +97,45 @@ export async function GET(request: NextRequest) {
             return
           }
 
-          await Promise.all(
-            dueDates.map(async (targetDate) => {
-              const transactionData = {
+          const scheduleCreatedIds: string[] = []
+          const scheduleDatesToEnsure: number[] = []
+
+          await withTransaction(async (dbSession) => {
+            const existingTxDocs = await transactionsCollection
+              .find(
+                {
+                  userId: rec.userId,
+                  type: rec.type,
+                  categoryKey: rec.categoryKey,
+                  amount: rec.amount,
+                  currency: rec.currency,
+                  description: rec.description,
+                  date: { $in: dueDates },
+                },
+                { session: dbSession }
+              )
+              .toArray()
+
+            const existingDateSet = new Set(
+              existingTxDocs.map((tx) => tx.date.getTime())
+            )
+
+            for (const targetDate of dueDates) {
+              if (existingDateSet.has(targetDate.getTime())) {
+                skippedReason.push({
+                  id: rec._id.toString(),
+                  reason: "existing",
+                })
+                affectedUserIds.add(rec.userId.toString())
+              }
+            }
+
+            const datesToInsert = dueDates.filter(
+              (targetDate) => !existingDateSet.has(targetDate.getTime())
+            )
+
+            if (datesToInsert.length > 0) {
+              const transactionDocs = datesToInsert.map((targetDate) => ({
                 userId: rec.userId,
                 type: rec.type,
                 categoryKey: rec.categoryKey,
@@ -107,16 +143,21 @@ export async function GET(request: NextRequest) {
                 currency: rec.currency,
                 description: rec.description,
                 date: targetDate,
-              }
+              }))
 
               try {
-                const insertResult =
-                  await transactionsCollection.insertOne(transactionData)
+                const insertResult = await transactionsCollection.insertMany(
+                  transactionDocs,
+                  { session: dbSession }
+                )
 
-                createdCount++
-                createdIds.push(insertResult.insertedId.toString())
-                affectedUserIds.add(rec.userId.toString())
-                datesToEnsure.add(targetDate.getTime())
+                const insertedIds = Object.values(insertResult.insertedIds).map(
+                  (id) => id.toString()
+                )
+                scheduleCreatedIds.push(...insertedIds)
+                for (const targetDate of datesToInsert) {
+                  scheduleDatesToEnsure.push(targetDate.getTime())
+                }
               } catch (error) {
                 if (isDuplicateKeyError(error)) {
                   skippedReason.push({
@@ -128,14 +169,23 @@ export async function GET(request: NextRequest) {
                 }
                 throw error
               }
-            })
-          )
+            }
 
-          const latestDate = dueDates[dueDates.length - 1]
-          await recurringCollection.updateOne(
-            { _id: rec._id },
-            { $set: { lastGeneratedDate: latestDate } }
-          )
+            const latestDate = dueDates[dueDates.length - 1]
+            await recurringCollection.updateOne(
+              { _id: rec._id },
+              { $set: { lastGeneratedDate: latestDate } },
+              { session: dbSession }
+            )
+          })
+
+          if (scheduleCreatedIds.length > 0) {
+            createdIds.push(...scheduleCreatedIds)
+            affectedUserIds.add(rec.userId.toString())
+            for (const ms of scheduleDatesToEnsure) {
+              datesToEnsure.add(ms)
+            }
+          }
         })
       )
     }
@@ -172,7 +222,7 @@ export async function GET(request: NextRequest) {
 
     return Response.json({
       success: true,
-      created: createdCount,
+      created: createdIds.length,
       createdIds,
       skippedCount: skippedReason.length,
       skippedReason,

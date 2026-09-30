@@ -1,6 +1,6 @@
 import { updateTag } from "next/cache"
 import { NextRequest } from "next/server"
-import { Decimal128, ObjectId } from "mongodb"
+import { Decimal128, MongoServerError, ObjectId } from "mongodb"
 
 import {
   insertTestRecurringTransaction,
@@ -973,6 +973,308 @@ describe("Recurring Transactions Cron Job", () => {
         spy.mockRestore()
         consoleSpy.mockRestore()
       })
+
+      it("should rollback transaction insertions and not update lastGeneratedDate if an error occurs during batch processing", async () => {
+        const consoleSpy = vi
+          .spyOn(console, "error")
+          .mockImplementation(() => {})
+
+        const startDateUTC = localDateToUTCMidnight(new Date("2024-02-01"))
+        const rec: DBRecurringTransaction = {
+          ...mockDBRecurringTransaction,
+          _id: new ObjectId(),
+          frequency: "daily",
+          startDate: startDateUTC,
+          lastGeneratedDate: startDateUTC,
+        }
+        await insertTestRecurringTransaction(rec)
+
+        vi.useFakeTimers()
+        vi.setSystemTime(new Date("2024-02-03T12:00:00.000Z"))
+
+        const recurringCollection = await getRecurringTransactionsCollection()
+        const transactionsCollection = await getTransactionsCollection()
+        const spyUpdateOne = vi
+          .spyOn(Object.getPrototypeOf(recurringCollection), "updateOne")
+          .mockImplementation(function () {
+            return Promise.reject(
+              new Error("Simulated network failure on recurring updateOne")
+            )
+          })
+
+        const request = new NextRequest(cronEndpoint, {
+          headers: {
+            authorization: `Bearer ${cronSecret}`,
+          },
+        })
+
+        const response = await GET(request)
+        expect(response.status).toBe(500)
+
+        // Verify rollback: no transactions should exist for this user
+        const txs = await transactionsCollection
+          .find({ userId: rec.userId })
+          .toArray()
+        expect(txs).toHaveLength(0)
+
+        // Verify lastGeneratedDate was NOT updated
+        const foundRec = await recurringCollection.findOne({ _id: rec._id })
+        expect(foundRec?.lastGeneratedDate).toEqual(startDateUTC)
+
+        vi.useRealTimers()
+        spyUpdateOne.mockRestore()
+        consoleSpy.mockRestore()
+      })
+
+      it("should handle duplicate key error during insertMany gracefully", async () => {
+        const lastMonthUTC = localDateToUTCMidnight(new Date("2024-01-01"))
+
+        const recurringTransaction: DBRecurringTransaction = {
+          ...mockDBRecurringTransaction,
+          _id: new ObjectId(),
+          frequency: "monthly",
+          startDate: localDateToUTCMidnight(new Date("2024-01-01")),
+          lastGeneratedDate: lastMonthUTC,
+        }
+        await insertTestRecurringTransaction(recurringTransaction)
+
+        const transactionsCollection = await getTransactionsCollection()
+        const duplicateError = new MongoServerError({
+          message: "E11000 duplicate key error collection",
+        })
+        duplicateError.code = 11000
+
+        const spyInsertMany = vi
+          .spyOn(Object.getPrototypeOf(transactionsCollection), "insertMany")
+          .mockImplementation(() => Promise.reject(duplicateError))
+
+        vi.useFakeTimers()
+        vi.setSystemTime(new Date("2024-02-01T12:00:00.000Z"))
+
+        const request = new NextRequest(cronEndpoint, {
+          headers: {
+            authorization: `Bearer ${cronSecret}`,
+          },
+        })
+
+        const response = await GET(request)
+        const data = await response.json()
+
+        expect(response.status).toBe(200)
+        expect(data.success).toBe(true)
+        expect(data.created).toBe(0)
+        expect(data.createdIds).toHaveLength(0)
+        expect(data.skippedCount).toBe(1)
+        expect(data.skippedReason).toHaveLength(1)
+        expect(data.skippedReason[0]).toEqual({
+          id: recurringTransaction._id.toString(),
+          reason: "existing",
+        })
+
+        expect(updateTag).toHaveBeenCalledWith(
+          `transactions-${recurringTransaction.userId}`
+        )
+        expect(updateTag).toHaveBeenCalledWith(
+          `recurringTransactions-${recurringTransaction.userId}`
+        )
+
+        spyInsertMany.mockRestore()
+        vi.useRealTimers()
+      })
+
+      it("should return 500 when insertMany throws a non-duplicate generic error", async () => {
+        const consoleSpy = vi
+          .spyOn(console, "error")
+          .mockImplementation(() => {})
+        const lastMonthUTC = localDateToUTCMidnight(new Date("2024-01-01"))
+
+        const recurringTransaction: DBRecurringTransaction = {
+          ...mockDBRecurringTransaction,
+          _id: new ObjectId(),
+          frequency: "monthly",
+          startDate: localDateToUTCMidnight(new Date("2024-01-01")),
+          lastGeneratedDate: lastMonthUTC,
+        }
+        await insertTestRecurringTransaction(recurringTransaction)
+
+        const transactionsCollection = await getTransactionsCollection()
+        const spyInsertMany = vi
+          .spyOn(Object.getPrototypeOf(transactionsCollection), "insertMany")
+          .mockImplementation(() =>
+            Promise.reject(new Error("Unexpected insertMany error"))
+          )
+
+        vi.useFakeTimers()
+        vi.setSystemTime(new Date("2024-02-01T12:00:00.000Z"))
+
+        const request = new NextRequest(cronEndpoint, {
+          headers: {
+            authorization: `Bearer ${cronSecret}`,
+          },
+        })
+
+        const response = await GET(request)
+        expect(response.status).toBe(500)
+        expect(await response.text()).toBe("Recurring transactions cron failed")
+
+        spyInsertMany.mockRestore()
+        consoleSpy.mockRestore()
+        vi.useRealTimers()
+      })
+
+      it("should handle partial backfill where one occurrence already exists and another is created", async () => {
+        const startDateUTC = localDateToUTCMidnight(new Date("2024-02-01"))
+        const rec: DBRecurringTransaction = {
+          ...mockDBRecurringTransaction,
+          _id: new ObjectId(),
+          frequency: "daily",
+          startDate: startDateUTC,
+          lastGeneratedDate: startDateUTC,
+        }
+        await insertTestRecurringTransaction(rec)
+
+        // Pre-insert transaction for 2024-02-02
+        const existingTxDate = localDateToUTCMidnight(new Date("2024-02-02"))
+        await insertTestTransaction({
+          _id: new ObjectId(),
+          userId: rec.userId,
+          type: rec.type,
+          categoryKey: rec.categoryKey,
+          amount: rec.amount,
+          currency: rec.currency,
+          description: rec.description,
+          date: existingTxDate,
+        })
+
+        // Current time: 2024-02-03 (due dates: 2024-02-02 and 2024-02-03)
+        vi.useFakeTimers()
+        vi.setSystemTime(new Date("2024-02-03T12:00:00.000Z"))
+
+        const request = new NextRequest(cronEndpoint, {
+          headers: {
+            authorization: `Bearer ${cronSecret}`,
+          },
+        })
+
+        const response = await GET(request)
+        const data = await response.json()
+
+        expect(response.status).toBe(200)
+        expect(data.success).toBe(true)
+        expect(data.created).toBe(1)
+        expect(data.createdIds).toHaveLength(1)
+        expect(data.skippedCount).toBe(1)
+        expect(data.skippedReason).toHaveLength(1)
+        expect(data.skippedReason[0]).toEqual({
+          id: rec._id.toString(),
+          reason: "existing",
+        })
+
+        const transactionsCollection = await getTransactionsCollection()
+        const userTxs = await transactionsCollection
+          .find({ userId: rec.userId })
+          .sort({ date: 1 })
+          .toArray()
+
+        expect(userTxs).toHaveLength(2)
+        expect(userTxs[0].date).toEqual(existingTxDate)
+        expect(userTxs[1].date).toEqual(
+          localDateToUTCMidnight(new Date("2024-02-03"))
+        )
+
+        const recurringCollection = await getRecurringTransactionsCollection()
+        const updatedRec = await recurringCollection.findOne({ _id: rec._id })
+        expect(updatedRec?.lastGeneratedDate).toEqual(
+          localDateToUTCMidnight(new Date("2024-02-03"))
+        )
+
+        vi.useRealTimers()
+      })
+
+      it("should not process recurring transactions belonging to users whose temporary ban is still active", async () => {
+        const activeBannedUser: DBUser = {
+          ...mockDBBannedUser,
+          _id: new ObjectId(),
+          email: "active-ban@gmail.com",
+          username: "activebanuser",
+          displayUsername: "activebanuser",
+          banned: true,
+          banExpires: new Date("2024-02-15T00:00:00.000Z"),
+        }
+        await insertTestUser(activeBannedUser)
+
+        const lastMonthUTC = localDateToUTCMidnight(new Date("2024-01-01"))
+        const activeBannedUserRecurring: DBRecurringTransaction = {
+          ...mockDBRecurringTransaction,
+          _id: new ObjectId(),
+          userId: activeBannedUser._id,
+          frequency: "monthly",
+          startDate: localDateToUTCMidnight(new Date("2024-01-01")),
+          lastGeneratedDate: lastMonthUTC,
+        }
+        await insertTestRecurringTransaction(activeBannedUserRecurring)
+
+        vi.useFakeTimers()
+        vi.setSystemTime(new Date("2024-02-01T12:00:00.000Z"))
+
+        const request = new NextRequest(cronEndpoint, {
+          headers: {
+            authorization: `Bearer ${cronSecret}`,
+          },
+        })
+
+        const response = await GET(request)
+        const data = await response.json()
+
+        expect(response.status).toBe(200)
+        expect(data.success).toBe(true)
+        expect(data.created).toBe(0)
+
+        const transactionsCollection = await getTransactionsCollection()
+        const transactions = await transactionsCollection
+          .find({ userId: activeBannedUser._id })
+          .toArray()
+        expect(transactions).toHaveLength(0)
+
+        vi.useRealTimers()
+      })
+
+      it("should process recurring transactions where endDate and lastGeneratedDate are explicitly null", async () => {
+        const todayUTC = localDateToUTCMidnight(new Date("2024-02-01"))
+        const recurringTransaction: DBRecurringTransaction = {
+          ...mockDBRecurringTransaction,
+          _id: new ObjectId(),
+          frequency: "monthly",
+          startDate: todayUTC,
+          endDate: null as unknown as Date,
+          lastGeneratedDate: null as unknown as Date,
+        }
+        await insertTestRecurringTransaction(recurringTransaction)
+
+        vi.useFakeTimers()
+        vi.setSystemTime(new Date("2024-02-01T12:00:00.000Z"))
+
+        const request = new NextRequest(cronEndpoint, {
+          headers: {
+            authorization: `Bearer ${cronSecret}`,
+          },
+        })
+
+        const response = await GET(request)
+        const data = await response.json()
+
+        expect(response.status).toBe(200)
+        expect(data.success).toBe(true)
+        expect(data.created).toBe(1)
+
+        const recurringCollection = await getRecurringTransactionsCollection()
+        const updatedRec = await recurringCollection.findOne({
+          _id: recurringTransaction._id,
+        })
+        expect(updatedRec?.lastGeneratedDate).toEqual(todayUTC)
+
+        vi.useRealTimers()
+      })
     })
   })
 
@@ -1161,6 +1463,21 @@ describe("Recurring Transactions Cron Job", () => {
           localDateToUTCMidnight(new Date("2024-01-03")),
         ])
       })
+
+      it("should fallback randomEveryXDays to 1 when undefined in getDueDates", () => {
+        const rec: DBRecurringTransaction = {
+          ...mockDBRecurringTransaction,
+          frequency: "random",
+          randomEveryXDays: undefined,
+          startDate: localDateToUTCMidnight(new Date("2024-01-01")),
+          lastGeneratedDate: localDateToUTCMidnight(new Date("2024-01-01")),
+        }
+        const today = localDateToUTCMidnight(new Date("2024-01-03"))
+        expect(getDueDates(rec, today)).toEqual([
+          localDateToUTCMidnight(new Date("2024-01-02")),
+          localDateToUTCMidnight(new Date("2024-01-03")),
+        ])
+      })
     })
 
     describe("getNextDate", () => {
@@ -1329,6 +1646,20 @@ describe("Recurring Transactions Cron Job", () => {
           ...baseRecurring,
           frequency: "random",
           randomEveryXDays: -2,
+          startDate: new Date("2026-01-01T00:00:00.000Z"),
+          lastGeneratedDate: new Date("2026-01-01T00:00:00.000Z"),
+        }
+        const todayUTC = new Date("2026-01-01T00:00:00.000Z")
+        expect(getNextDate(randomRec, todayUTC)).toEqual(
+          new Date("2026-01-02T00:00:00.000Z")
+        )
+      })
+
+      it("should fallback randomEveryXDays to 1 when undefined in getNextDate", () => {
+        const randomRec: DBRecurringTransaction = {
+          ...baseRecurring,
+          frequency: "random",
+          randomEveryXDays: undefined,
           startDate: new Date("2026-01-01T00:00:00.000Z"),
           lastGeneratedDate: new Date("2026-01-01T00:00:00.000Z"),
         }
