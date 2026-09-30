@@ -37,12 +37,6 @@ export async function GET(request: NextRequest) {
     const datesToCheck = new Set<number>()
     datesToCheck.add(yesterdayUTC.getTime())
 
-    // Mark poisoned records as failed instead of deleting them, so admin can check and add manually
-    await missingRatesCollection.updateMany(
-      { retryCount: { $gte: 6 }, status: { $ne: "failed" } },
-      { $set: { status: "failed", failedAt: new Date() } }
-    )
-
     // Only process queued docs that have not failed 6 times
     const queuedDocs = await missingRatesCollection
       .find({
@@ -73,13 +67,23 @@ export async function GET(request: NextRequest) {
     )
 
     const missingDates: Date[] = []
+    const resolvedDates: Date[] = []
     for (const ms of datesToCheck) {
       const rates = existingMap.get(ms)
       const isMissing =
         !rates || nonUSDCurrencies.some((c) => rates[c] === undefined)
       if (isMissing) {
         missingDates.push(new Date(ms))
+      } else {
+        resolvedDates.push(new Date(ms))
       }
+    }
+
+    // Clean up any queued records whose exchange rates are already fully resolved
+    if (resolvedDates.length > 0) {
+      await missingRatesCollection.deleteMany({
+        date: { $in: resolvedDates },
+      })
     }
 
     missingDates.sort((a, b) => a.getTime() - b.getTime())
@@ -89,8 +93,12 @@ export async function GET(request: NextRequest) {
     const successfullySyncedDates: Date[] = []
     const errors: { date: string; error: string }[] = []
 
+    type SyncItemResult =
+      | { success: true; date: Date }
+      | { success: false; date: Date; error: string }
+
     const syncResults = await Promise.allSettled(
-      datesToSync.map(async (d) => {
+      datesToSync.map(async (d): Promise<SyncItemResult> => {
         try {
           await ensureExchangeRateForDate(d)
           await missingRatesCollection.deleteOne({ date: d })
@@ -108,15 +116,17 @@ export async function GET(request: NextRequest) {
       })
     )
 
-    for (const res of syncResults) {
+    for (let i = 0; i < syncResults.length; i++) {
+      const res = syncResults[i]
+      const dateStr = datesToSync[i].toISOString().split("T")[0] as string
       if (res.status === "fulfilled") {
         if (res.value.success) {
           syncedCount++
           successfullySyncedDates.push(res.value.date)
         } else {
           errors.push({
-            date: res.value.date.toISOString().split("T")[0] as string,
-            error: res.value.error as string,
+            date: dateStr,
+            error: res.value.error,
           })
         }
       } else {
@@ -125,7 +135,7 @@ export async function GET(request: NextRequest) {
             ? res.reason.message
             : String(res.reason ?? "")
         errors.push({
-          date: "unknown",
+          date: dateStr,
           error: errorMsg,
         })
       }
