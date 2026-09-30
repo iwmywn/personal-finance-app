@@ -186,15 +186,10 @@ export function buildSchemas(messages: SchemaMessages) {
           }),
         date: baseDateSchema(messages.dateRequired).refine(
           (date) => {
-            const earliestTimezoneDate = new Date(
-              Date.now() + 14 * 60 * 60 * 1000
-            )
-            const maxAllowedMidnight = new Date(
-              Date.UTC(
-                earliestTimezoneDate.getUTCFullYear(),
-                earliestTimezoneDate.getUTCMonth(),
-                earliestTimezoneDate.getUTCDate()
-              )
+            // Allow up to UTC+14 (e.g., Kiribati / Line Islands) so users in the easternmost
+            // timezones recording transactions on their local "today" are not falsely flagged as future dates.
+            const maxAllowedMidnight = normalizeToUTCMidnight(
+              new Date(Date.now() + 14 * 60 * 60 * 1000)
             )
             return date.getTime() <= maxAllowedMidnight.getTime()
           },
@@ -338,8 +333,12 @@ export function buildSchemas(messages: SchemaMessages) {
       .superRefine((data, ctx) => {
         validateAmountForCurrency(data.currency, data.amount, "amount", ctx)
 
-        const todayUTC = normalizeToUTCMidnight(new Date())
-        if (data.startDate.getTime() < todayUTC.getTime()) {
+        // Allow down to UTC-12 (Anywhere on Earth / AoE) so users in westernmost
+        // timezones (e.g., UTC-8 to UTC-12) starting "today" in local evening are not falsely rejected as past dates.
+        const minAllowedMidnight = normalizeToUTCMidnight(
+          new Date(Date.now() + -12 * 60 * 60 * 1000)
+        )
+        if (data.startDate.getTime() < minAllowedMidnight.getTime()) {
           ctx.addIssue({
             path: ["startDate"],
             message: messages.startDateMustBeInFuture,

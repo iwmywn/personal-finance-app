@@ -24,8 +24,8 @@ export function convertAmountWithRates(
   const decAmount = new Decimal(amount)
   if (from === to || !rates) return decAmount
 
-  const rateFromVal = rates[from]
-  const rateToVal = rates[to]
+  const rateFromVal = rates[from] ?? (from === "USD" ? "1" : undefined)
+  const rateToVal = rates[to] ?? (to === "USD" ? "1" : undefined)
   if (!rateFromVal || !rateToVal) return decAmount
 
   const rateFrom = new Decimal(rateFromVal)

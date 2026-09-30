@@ -94,6 +94,20 @@ export async function GET(request: NextRequest) {
           const dueDates = getDueDates(rec, todayUTC)
           if (dueDates.length === 0) {
             skippedReason.push({ id: rec._id.toString(), reason: "notToday" })
+            if (
+              rec.endDate &&
+              normalizeToUTCMidnight(rec.endDate).getTime() < todayUTC.getTime()
+            ) {
+              await recurringCollection.updateOne(
+                { _id: rec._id },
+                {
+                  $set: {
+                    lastGeneratedDate: normalizeToUTCMidnight(rec.endDate),
+                  },
+                }
+              )
+              affectedUserIds.add(rec.userId.toString())
+            }
             return
           }
 
@@ -165,6 +179,12 @@ export async function GET(request: NextRequest) {
                     reason: "existing",
                   })
                   affectedUserIds.add(rec.userId.toString())
+                  const latestDate = dueDates[dueDates.length - 1]
+                  await recurringCollection.updateOne(
+                    { _id: rec._id },
+                    { $set: { lastGeneratedDate: latestDate } },
+                    { session: dbSession }
+                  )
                   return
                 }
                 throw error

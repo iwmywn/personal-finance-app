@@ -206,6 +206,27 @@ describe("Utils", () => {
       expect(resultUSD.toString()).toBe("1")
     })
 
+    it("should correctly convert when USD rate is omitted from rates map (default to 1)", () => {
+      const ratesWithoutUSD = {
+        VND: "25000",
+      }
+      const resultUSDToVND = convertAmountWithRates(
+        100,
+        "USD",
+        "VND",
+        ratesWithoutUSD
+      )
+      expect(resultUSDToVND.toString()).toBe("2500000")
+
+      const resultVNDToUSD = convertAmountWithRates(
+        25000,
+        "VND",
+        "USD",
+        ratesWithoutUSD
+      )
+      expect(resultVNDToUSD.toString()).toBe("1")
+    })
+
     it("should handle zero or negative rate defensively without throwing Division by zero", () => {
       const zeroFromRates = {
         USD: "1",
@@ -306,6 +327,26 @@ describe("Utils", () => {
       expect(
         isUserBanned({ banned: true, banExpires: "invalid-date" }, fixedNow)
       ).toBe(true)
+    })
+  })
+
+  describe("sanitizeCSVField", () => {
+    it("should safely handle null and undefined without throwing", () => {
+      expect(sanitizeCSVField(null)).toBe('""')
+      expect(sanitizeCSVField(undefined)).toBe('""')
+    })
+
+    it("should escape formula trigger characters with leading quote", () => {
+      expect(sanitizeCSVField("=SUM(A1:A10)")).toBe(`"'=SUM(A1:A10)"`)
+      expect(sanitizeCSVField("+1234")).toBe(`"'+1234"`)
+      expect(sanitizeCSVField("-5000")).toBe(`"'-5000"`)
+      expect(sanitizeCSVField("@test")).toBe(`"'@test"`)
+      expect(sanitizeCSVField("\ttab")).toBe(`"'\ttab"`)
+      expect(sanitizeCSVField("\rreturn")).toBe(`"'\rreturn"`)
+    })
+
+    it("should escape double quotes properly", () => {
+      expect(sanitizeCSVField('Hello "World"')).toBe(`"Hello ""World"""`)
     })
   })
 })

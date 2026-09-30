@@ -20,8 +20,10 @@ interface ExportButtonProps {
   filteredTransactions: Transaction[]
 }
 
-export function sanitizeCSVField(value: string): string {
-  let sanitized = value
+export function sanitizeCSVField(
+  value: string | number | null | undefined
+): string {
+  let sanitized = String(value ?? "")
   if (/^[=+\-@\t\r]/.test(sanitized)) {
     sanitized = `'${sanitized}`
   }

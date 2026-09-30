@@ -47,8 +47,11 @@ function resolveTransactionAmount(
   const originalCurrency = (t.originalCurrency ?? t.currency) as Currency
 
   if (t.rates && originalCurrency && targetCurrency) {
-    const rateFrom = t.rates[originalCurrency]
-    const rateTo = t.rates[targetCurrency]
+    const rateFrom =
+      t.rates[originalCurrency] ??
+      (originalCurrency === "USD" ? "1" : undefined)
+    const rateTo =
+      t.rates[targetCurrency] ?? (targetCurrency === "USD" ? "1" : undefined)
     if (rateFrom && rateTo) {
       return convertAmountWithRates(
         originalAmount,
@@ -306,8 +309,11 @@ function calculateStatsBase<TBase extends Budget | Goal>(
     const ratesStr = t.rates
 
     if (originalAmount && originalCurrency && ratesStr) {
-      const rateFrom = ratesStr[originalCurrency]
-      const rateTo = ratesStr[targetCurrency]
+      const rateFrom =
+        ratesStr[originalCurrency] ??
+        (originalCurrency === "USD" ? "1" : undefined)
+      const rateTo =
+        ratesStr[targetCurrency] ?? (targetCurrency === "USD" ? "1" : undefined)
       if (originalCurrency === targetCurrency || (rateFrom && rateTo)) {
         const converted = convertAmountWithRates(
           originalAmount,

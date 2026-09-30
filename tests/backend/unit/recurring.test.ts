@@ -245,6 +245,20 @@ describe("Recurring Transactions", async () => {
       expect(result.success).toBe("Recurring transaction has been created.")
     })
 
+    it("should allow startDate when it is today in western timezones (UTC-12)", async () => {
+      mockAuthenticatedUser()
+      // Simulate 02:00 UTC on 2024-06-02 (still June 1st in UTC-3 through UTC-12)
+      vi.setSystemTime(new Date("2024-06-02T02:00:00.000Z"))
+
+      const result = await createRecurringTransaction({
+        ...mockValidRecurringTransactionValues,
+        startDate: localDateToUTCMidnight(new Date("2024-06-01")),
+      })
+
+      expect(result.error).toBeUndefined()
+      expect(result.success).toBe("Recurring transaction has been created.")
+    })
+
     it("should return error when database operation throws error", async () => {
       mockAuthenticatedUser()
       mockRecurringTransactionCollectionError()

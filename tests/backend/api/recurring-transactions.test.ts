@@ -502,6 +502,45 @@ describe("Recurring Transactions Cron Job", () => {
         vi.useRealTimers()
       })
 
+      it("should update lastGeneratedDate to endDate when expired recurring transaction has no remaining due dates", async () => {
+        const yesterdayUTC = localDateToUTCMidnight(new Date("2024-01-31"))
+
+        const expiredRecurringTransaction: DBRecurringTransaction = {
+          ...mockDBRecurringTransaction,
+          _id: new ObjectId("691d58b68a6aa5c9e69aad99"),
+          description: "Expired Stale Recurring",
+          frequency: "monthly",
+          startDate: localDateToUTCMidnight(new Date("2024-01-01")),
+          lastGeneratedDate: localDateToUTCMidnight(new Date("2024-01-01")),
+          endDate: yesterdayUTC,
+        }
+
+        await insertTestRecurringTransaction(expiredRecurringTransaction)
+
+        vi.useFakeTimers()
+        vi.setSystemTime(new Date("2024-02-01T12:00:00.000Z"))
+
+        const request = new NextRequest(cronEndpoint, {
+          headers: {
+            authorization: `Bearer ${cronSecret}`,
+          },
+        })
+
+        const response = await GET(request)
+        const data = await response.json()
+
+        expect(response.status).toBe(200)
+        expect(data.success).toBe(true)
+
+        const recurringCollection = await getRecurringTransactionsCollection()
+        const updated = await recurringCollection.findOne({
+          _id: expiredRecurringTransaction._id,
+        })
+        expect(updated?.lastGeneratedDate).toEqual(yesterdayUTC)
+
+        vi.useRealTimers()
+      })
+
       it("should backfill expired recurring transactions whose endDate has passed when lastGeneratedDate was not set", async () => {
         const yesterdayUTC = localDateToUTCMidnight(new Date("2024-01-31"))
 
