@@ -19,7 +19,7 @@ export type RateLimitOptions = {
 
 /**
  * Standardized rate limit presets for server actions and API endpoints:
- * - NORMAL: Standard user actions (create/update transactions, budgets, goals, categories) -> 60 req/60s
+ * - NORMAL: Standard user actions (create/update transactions, budgets, goals, categories) -> 30 req/60s
  * - MODERATE: Sensitive mutations (deletions of single entities) -> 15 req/60s
  * - STRICT: Heavy mutations (cascade category deletion across 4 collections, recurring setup) -> 10 req/60s
  */
@@ -27,7 +27,7 @@ export const RATE_LIMIT_PRESETS: Record<
   RateLimitPreset,
   Required<RateLimitOptions>
 > = {
-  NORMAL: { points: 60, duration: 60 },
+  NORMAL: { points: 30, duration: 60 },
   MODERATE: { points: 15, duration: 60 },
   STRICT: { points: 10, duration: 60 },
 } as const
@@ -89,7 +89,6 @@ async function resolveLimiter(
 
 /**
  * Returns true if the key has exceeded the allowed rate limit.
- * Defaults to the NORMAL preset (60 requests / 60 seconds).
  */
 export async function isRateLimited(
   key: string,

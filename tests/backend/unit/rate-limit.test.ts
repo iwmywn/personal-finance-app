@@ -26,7 +26,6 @@ describe("Rate Limiter (RateLimiterMongo + RateLimiterMemory fallback)", () => {
     const keyNormal = "user-preset-normal"
     const keyStrict = "user-preset-strict"
 
-    // STRICT allows 10 points
     for (let i = 0; i < 10; i++) {
       expect(await isRateLimited(keyStrict, RATE_LIMIT_PRESETS.STRICT)).toBe(
         false
@@ -34,7 +33,6 @@ describe("Rate Limiter (RateLimiterMongo + RateLimiterMemory fallback)", () => {
     }
     expect(await isRateLimited(keyStrict, RATE_LIMIT_PRESETS.STRICT)).toBe(true)
 
-    // NORMAL is independent and allows up to 60 points
     expect(await isRateLimited(keyNormal, RATE_LIMIT_PRESETS.NORMAL)).toBe(
       false
     )
