@@ -38,22 +38,28 @@ type CurrencyApiResponse = {
 }
 
 async function fetchCurrencyApiRatesForDate(dateStr: string) {
-  const apiUrl = `https://api.currencyapi.com/v3/historical?apikey=${serverEnv.CURRENCY_API_SECRET}&currencies=${CURRENCIES.join(",")}&date=${dateStr}`
+  const apiUrl = `https://api.currencyapi.com/v3/historical?currencies=${CURRENCIES.join(",")}&date=${dateStr}`
 
-  const response = await fetch(apiUrl, {
-    signal: AbortSignal.timeout(5000),
-  })
+  try {
+    const response = await fetch(apiUrl, {
+      headers: { apikey: serverEnv.CURRENCY_API_SECRET },
+      signal: AbortSignal.timeout(5000),
+    })
+    if (!response.ok) {
+      throw new Error(
+        `Currency API returned status ${response.status} for date ${dateStr}`
+      )
+    }
 
-  if (!response.ok) {
+    const result = (await response.json()) as CurrencyApiResponse
+    return Object.fromEntries(
+      Object.entries(result.data).map(([code, item]) => [code, item.value])
+    )
+  } catch (error) {
     throw new Error(
-      `Currency API returned status ${response.status} for date ${dateStr}`
+      `Failed to fetch currency rates for date ${dateStr}: ${error instanceof Error ? error.message : String(error)}`
     )
   }
-
-  const result = (await response.json()) as CurrencyApiResponse
-  return Object.fromEntries(
-    Object.entries(result.data).map(([code, item]) => [code, item.value])
-  )
 }
 
 export async function ensureExchangeRateForDate(date: Date): Promise<void> {

@@ -44,6 +44,21 @@ describe("Utils", () => {
       const result = formatCurrency("1234567890123456.78", "en-US", "USD")
       expect(result).toBe("$1,234,567,890,123,456.78")
     })
+
+    it("should safely fallback to zero for invalid, null, undefined, or empty values", () => {
+      expect(formatCurrency("", "en-US", "USD")).toBe("$0.00")
+      expect(formatCurrency("   ", "en-US", "USD")).toBe("$0.00")
+      expect(formatCurrency("invalid-number", "en-US", "USD")).toBe("$0.00")
+      expect(formatCurrency(null, "en-US", "USD")).toBe("$0.00")
+      expect(formatCurrency(undefined, "en-US", "USD")).toBe("$0.00")
+      expect(formatCurrency(Number.NaN, "en-US", "USD")).toBe("$0.00")
+    })
+
+    it("should handle numeric types directly", () => {
+      expect(formatCurrency(1500, "en-US", "USD")).toBe("$1,500.00")
+      expect(formatCurrency(0, "en-US", "USD")).toBe("$0.00")
+      expect(formatCurrency(-50, "en-US", "USD")).toBe("-$50.00")
+    })
   })
 
   describe("getUniqueYears", () => {

@@ -3,11 +3,12 @@
 import { cache } from "react"
 import { cookies, headers } from "next/headers"
 
+import { siteConfig } from "@/app/pfa.config"
 import { DEFAULT_LOCALE, LOCALES } from "@/i18n/config"
 import type { Locale } from "@/i18n/config"
 import { auth } from "@/lib/auth"
 
-const COOKIE_NAME = "locale"
+const COOKIE_NAME = siteConfig.cookies.locale
 
 export const getUserLocale = cache(async (): Promise<Locale> => {
   const session = await auth.api.getSession({

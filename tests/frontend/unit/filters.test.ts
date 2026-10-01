@@ -1052,6 +1052,27 @@ describe("Filters", () => {
       expect(result.map((r) => r._id)).toEqual(["4", "5"])
     })
 
+    it("should filter by status - upcoming", () => {
+      const upcomingRec = {
+        ...mockRecurringTransactions[0],
+        _id: "upcoming-1",
+        startDate: new Date("2099-01-01"),
+        endDate: new Date("2099-12-31"),
+      }
+      const list = [...mockRecurringTransactions, upcomingRec]
+      const result = filterRecurringTransactions(list, {
+        filterStatus: "upcoming",
+      })
+
+      expect(result).toHaveLength(1)
+      expect(result[0]._id).toBe("upcoming-1")
+
+      const activeResult = filterRecurringTransactions(list, {
+        filterStatus: "active",
+      })
+      expect(activeResult.some((r) => r._id === "upcoming-1")).toBe(false)
+    })
+
     it("should filter by month", () => {
       const result = filterRecurringTransactions(mockRecurringTransactions, {
         filterMonth: "1",

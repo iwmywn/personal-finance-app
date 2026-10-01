@@ -354,11 +354,14 @@ export function filterRecurringTransactions(
     const matchesCategory =
       filterCategoryKey === "all" || recurring.categoryKey === filterCategoryKey
 
+    const isUpcoming = startDateOnly > todayUTC
     const isEnded = Boolean(endDateOnly && todayUTC > endDateOnly)
+    const isActive = !isUpcoming && !isEnded
 
     const matchesStatus =
       filterStatus === "all" ||
-      (filterStatus === "active" && !isEnded) ||
+      (filterStatus === "active" && isActive) ||
+      (filterStatus === "upcoming" && isUpcoming) ||
       (filterStatus === "inactive" && isEnded)
 
     return (

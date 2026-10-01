@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react"
 import Link from "next/link"
 import { MoreVerticalIcon, PiggyBankIcon } from "lucide-react"
-import { useExtracted } from "next-intl"
+import { useExtracted, useTimeZone } from "next-intl"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -62,8 +62,13 @@ export function BudgetsTable({ filteredBudgets }: BudgetsTableProps) {
   const { getCategoryLabel, getCategoryDescription } = useCategory()
   const formatDate = useFormatDate()
   const formatCurrency = useFormatCurrency()
+  const timeZone = useTimeZone()
 
-  const budgetsWithSpent = calculateBudgetsStats(filteredBudgets, transactions)
+  const budgetsWithSpent = calculateBudgetsStats(
+    filteredBudgets,
+    transactions,
+    timeZone
+  )
 
   const outflowTransactions = useMemo(
     () => transactions.filter((t) => t.type === "outflow"),
@@ -111,12 +116,8 @@ export function BudgetsTable({ filteredBudgets }: BudgetsTableProps) {
                   <TableBody>
                     {budgetsWithSpent.map((budget) => (
                       <TableRow key={budget._id} className="[&>td]:text-center">
-                        <TableCell suppressHydrationWarning>
-                          {formatDate(budget.startDate)}
-                        </TableCell>
-                        <TableCell suppressHydrationWarning>
-                          {formatDate(budget.endDate)}
-                        </TableCell>
+                        <TableCell>{formatDate(budget.startDate)}</TableCell>
+                        <TableCell>{formatDate(budget.endDate)}</TableCell>
                         <TableCell>
                           <Tooltip>
                             <TooltipTrigger asChild>
@@ -146,7 +147,7 @@ export function BudgetsTable({ filteredBudgets }: BudgetsTableProps) {
                             budget.currency
                           )}
                         </TableCell>
-                        <TableCell suppressHydrationWarning>
+                        <TableCell>
                           <Badge
                             className={
                               budget.status === "expired"
@@ -163,10 +164,7 @@ export function BudgetsTable({ filteredBudgets }: BudgetsTableProps) {
                                 : t("Upcoming")}
                           </Badge>
                         </TableCell>
-                        <TableCell
-                          className="min-w-32"
-                          suppressHydrationWarning
-                        >
+                        <TableCell className="min-w-32">
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Progress

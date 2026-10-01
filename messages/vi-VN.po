@@ -508,6 +508,7 @@ msgstr "Tìm kiếm theo tên, email hoặc tên đăng nhập..."
 
 #: components/admin/admin-filters.tsx
 #: components/admin/admin-table.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "1ZgrhW"
 msgid "Role"
 msgstr "Vai trò"
@@ -526,6 +527,7 @@ msgstr "Quản trị viên"
 
 #: components/admin/admin-filters.tsx
 #: components/admin/admin-table.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "EwRIOm"
 msgid "User"
 msgstr "Người dùng"
@@ -1256,17 +1258,19 @@ msgstr "Tất cả trạng thái"
 #: components/budgets/budgets-table.tsx
 #: components/goals/goal-filters.tsx
 #: components/goals/goals-table.tsx
-msgctxt "RahCRH"
-msgid "Expired"
-msgstr "Đã hết hạn"
+#: components/recurring-transactions/recurring-transaction-filters.tsx
+#: components/recurring-transactions/recurring-transactions-table.tsx
+msgctxt "6_aEFZ"
+msgid "Upcoming"
+msgstr "Sắp tới"
 
 #: components/budgets/budget-filters.tsx
 #: components/budgets/budgets-table.tsx
 #: components/goals/goal-filters.tsx
 #: components/goals/goals-table.tsx
-msgctxt "6_aEFZ"
-msgid "Upcoming"
-msgstr "Sắp tới"
+msgctxt "RahCRH"
+msgid "Expired"
+msgstr "Đã hết hạn"
 
 #: components/budgets/budget-form.tsx
 msgctxt "2g82CP"
@@ -1955,14 +1959,14 @@ msgid "e.g. 15"
 msgstr "ví dụ: 15"
 
 #: components/recurring-transactions/recurring-transaction-form.tsx
-msgctxt "InWqys"
-msgid "Optional"
-msgstr "Không bắt buộc"
-
-#: components/recurring-transactions/recurring-transaction-form.tsx
 msgctxt "mpcI7I"
 msgid "No End Date"
 msgstr "Không có ngày kết thúc"
+
+#: components/recurring-transactions/recurring-transaction-form.tsx
+msgctxt "QieJOp"
+msgid "If left blank, it will run indefinitely."
+msgstr "Nếu để trống, giao dịch sẽ chạy vô thời hạn."
 
 #: components/recurring-transactions/recurring-transactions-page.tsx
 #: hooks/use-nav.ts

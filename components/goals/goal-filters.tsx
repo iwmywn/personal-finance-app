@@ -207,9 +207,9 @@ export function GoalFilters() {
                 <SelectGroup>
                   <SelectItem value="all">{t("All Statuses")}</SelectItem>
                   <SelectSeparator />
-                  <SelectItem value="expired">{t("Expired")}</SelectItem>
                   <SelectItem value="active">{t("Active")}</SelectItem>
                   <SelectItem value="upcoming">{t("Upcoming")}</SelectItem>
+                  <SelectItem value="expired">{t("Expired")}</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>

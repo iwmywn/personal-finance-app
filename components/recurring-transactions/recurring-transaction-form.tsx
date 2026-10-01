@@ -25,6 +25,7 @@ import {
   Form,
   FormButton,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -390,9 +391,7 @@ export function RecurringTransactionForm({
               name="endDate"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel htmlFor="form-end-date">
-                    {t("End Date")} ({t("Optional")})
-                  </FormLabel>
+                  <FormLabel htmlFor="form-end-date">{t("End Date")}</FormLabel>
                   <Popover
                     open={endCalendarOpen}
                     onOpenChange={setEndCalendarOpen}
@@ -444,6 +443,9 @@ export function RecurringTransactionForm({
                       />
                     </PopoverContent>
                   </Popover>
+                  <FormDescription>
+                    {t("If left blank, it will run indefinitely.")}
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

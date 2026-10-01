@@ -90,7 +90,7 @@ describe("Proxy (Middleware)", () => {
         `${clientEnv.NEXT_PUBLIC_URL}${routes.twoFactorRoute}`,
         {
           headers: {
-            cookie: `${siteConfig.name}.two_factor=valid-2fa-token`,
+            cookie: `${siteConfig.name}.${siteConfig.cookies.twoFactor}=valid-2fa-token`,
           },
         }
       )
@@ -106,7 +106,7 @@ describe("Proxy (Middleware)", () => {
         `${clientEnv.NEXT_PUBLIC_URL}${routes.twoFactorRoute}`,
         {
           headers: {
-            cookie: `__Secure-${siteConfig.name}.two_factor=valid-2fa-token`,
+            cookie: `__Secure-${siteConfig.name}.${siteConfig.cookies.twoFactor}=valid-2fa-token`,
           },
         }
       )

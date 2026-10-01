@@ -6,7 +6,7 @@ import {
   TrendingDownIcon,
   TrendingUpIcon,
 } from "lucide-react"
-import { useExtracted } from "next-intl"
+import { useExtracted, useTimeZone } from "next-intl"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { UnconvertedTransactionsAlert } from "@/components/transactions/unconverted-transactions-alert"
@@ -25,8 +25,13 @@ export function TransactionSummary() {
   const { user } = useUser()
   const t = useExtracted()
   const formatCurrency = useFormatCurrency()
+  const timeZone = useTimeZone()
 
-  const currentMonthTransactions = getCurrentMonthTransactions(transactions)
+  const currentMonthTransactions = getCurrentMonthTransactions(
+    transactions,
+    undefined,
+    timeZone
+  )
 
   const { totalInflow, totalOutflow, balance, inflowCount, outflowCount } =
     calculateSummaryStats(currentMonthTransactions, user.currency as Currency)
@@ -40,7 +45,7 @@ export function TransactionSummary() {
             <CardTitle>{t("Monthly Inflow")}</CardTitle>
             <ArrowUpIcon className="size-4 text-green-600" />
           </CardHeader>
-          <CardContent suppressHydrationWarning>
+          <CardContent>
             <div className="text-2xl wrap-anywhere text-green-600">
               {formatCurrency(totalInflow)}
             </div>
@@ -55,7 +60,7 @@ export function TransactionSummary() {
             <CardTitle>{t("Monthly Outflow")}</CardTitle>
             <ArrowDownIcon className="size-4 text-red-600" />
           </CardHeader>
-          <CardContent suppressHydrationWarning>
+          <CardContent>
             <div className="text-2xl wrap-anywhere text-red-600">
               {formatCurrency(totalOutflow)}
             </div>
@@ -74,7 +79,7 @@ export function TransactionSummary() {
               <TrendingDownIcon className="size-4 text-red-600" />
             )}
           </CardHeader>
-          <CardContent suppressHydrationWarning>
+          <CardContent>
             <div
               className={`text-2xl wrap-anywhere ${
                 toDecimal(balance).greaterThan(0)

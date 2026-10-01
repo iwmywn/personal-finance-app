@@ -43,12 +43,22 @@ export const CURRENCY_CONFIG: CurrencyConfig = {
 }
 
 export function formatCurrency(
-  amount: string,
+  amount: string | number | null | undefined,
   locale: Locale,
   currency: Currency
 ): string {
+  let safeAmount: number | string = 0
+  if (typeof amount === "number") {
+    safeAmount = Number.isFinite(amount) ? amount : 0
+  } else if (typeof amount === "string") {
+    const trimmed = amount.trim()
+    if (trimmed !== "" && !Number.isNaN(Number(trimmed))) {
+      safeAmount = trimmed
+    }
+  }
+
   return new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
-  }).format(amount as unknown as number)
+  }).format(safeAmount as unknown as number)
 }

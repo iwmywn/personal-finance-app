@@ -118,6 +118,10 @@ export function RecurringTransactionsTable({
                 </TableHeader>
                 <TableBody>
                   {filteredRecurring.map((recurring) => {
+                    const isUpcoming = Boolean(
+                      recurring.startDate &&
+                      new Date(recurring.startDate) > todayUTC
+                    )
                     const isEnded = Boolean(
                       recurring.endDate &&
                       todayUTC > new Date(recurring.endDate)
@@ -130,10 +134,8 @@ export function RecurringTransactionsTable({
                         key={recurring._id}
                         className="[&>td]:text-center"
                       >
-                        <TableCell suppressHydrationWarning>
-                          {formatDate(recurring.startDate)}
-                        </TableCell>
-                        <TableCell suppressHydrationWarning>
+                        <TableCell>{formatDate(recurring.startDate)}</TableCell>
+                        <TableCell>
                           {recurring.endDate
                             ? formatDate(recurring.endDate)
                             : t("No end date")}
@@ -167,7 +169,7 @@ export function RecurringTransactionsTable({
                         <TableCell>
                           {formatCurrency(recurring.amount, recurring.currency)}
                         </TableCell>
-                        <TableCell suppressHydrationWarning>
+                        <TableCell>
                           <div className="flex flex-col gap-1">
                             <span>
                               {getFrequencyLabel(recurring.frequency)}
@@ -190,11 +192,21 @@ export function RecurringTransactionsTable({
                             ) : null}
                           </div>
                         </TableCell>
-                        <TableCell suppressHydrationWarning>
+                        <TableCell>
                           <Badge
-                            className={!isEnded ? "badge-green" : "badge-gray"}
+                            className={
+                              isEnded
+                                ? "badge-gray"
+                                : isUpcoming
+                                  ? "badge-yellow"
+                                  : "badge-green"
+                            }
                           >
-                            {!isEnded ? t("Active") : t("Inactive")}
+                            {isEnded
+                              ? t("Inactive")
+                              : isUpcoming
+                                ? t("Upcoming")
+                                : t("Active")}
                           </Badge>
                         </TableCell>
                         <TableCell>

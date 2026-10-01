@@ -197,7 +197,8 @@ export function isSameUTCDate(a: Date, b: Date): boolean {
  */
 export function formatDate(
   date: Date | string | undefined | null,
-  locale: Locale
+  locale: Locale,
+  timeZone?: string
 ): string {
   if (!date) return ""
 
@@ -215,8 +216,30 @@ export function formatDate(
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
-    timeZone: isUTCMidnight ? "UTC" : undefined,
+    timeZone: isUTCMidnight ? "UTC" : timeZone,
   }).format(d)
+}
+
+/**
+ * Normalizes today's calendar date in the specified timezone to UTC midnight.
+ */
+export function getTodayInTimezone(timeZone?: string): Date {
+  if (!timeZone) return localDateToUTCMidnight(new Date())
+
+  try {
+    // "en-CA" formats as ISO 8601 (YYYY-MM-DD),
+    // ensuring reliable parsing of year, month, and day.
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date())
+    const [year, month, day] = parts.split("-").map(Number)
+    return new Date(Date.UTC(year, month - 1, day))
+  } catch {
+    return localDateToUTCMidnight(new Date())
+  }
 }
 
 export function getUniqueYears(transactions: Transaction[]): number[] {

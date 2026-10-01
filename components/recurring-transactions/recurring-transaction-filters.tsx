@@ -36,7 +36,7 @@ export function RecurringTransactionFilters() {
   const [filterYear, setFilterYear] = useState<string>("all")
   const [filterType, setFilterType] = useState<string>("all")
   const [filterStatus, setFilterStatus] = useState<
-    "all" | "active" | "inactive"
+    "all" | "active" | "inactive" | "upcoming"
   >("all")
   const [filterCategoryKey, setFilterCategoryKey] = useState<string>("all")
   const t = useExtracted()
@@ -193,9 +193,9 @@ export function RecurringTransactionFilters() {
 
             <Select
               value={filterStatus}
-              onValueChange={(value: "all" | "active" | "inactive") =>
-                setFilterStatus(value)
-              }
+              onValueChange={(
+                value: "all" | "active" | "inactive" | "upcoming"
+              ) => setFilterStatus(value)}
             >
               <SelectTrigger
                 className={`w-full ${filterStatus !== "all" && "border-primary"}`}
@@ -207,6 +207,7 @@ export function RecurringTransactionFilters() {
                   <SelectItem value="all">{t("All Statuses")}</SelectItem>
                   <SelectSeparator />
                   <SelectItem value="active">{t("Active")}</SelectItem>
+                  <SelectItem value="upcoming">{t("Upcoming")}</SelectItem>
                   <SelectItem value="inactive">{t("Inactive")}</SelectItem>
                 </SelectGroup>
               </SelectContent>

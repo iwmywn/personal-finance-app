@@ -1,6 +1,6 @@
 "use client"
 
-import { useExtracted } from "next-intl"
+import { useExtracted, useTimeZone } from "next-intl"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
@@ -22,6 +22,7 @@ export function QuickStats() {
   const t = useExtracted()
   const { getCategoryLabel } = useCategory()
   const formatCurrency = useFormatCurrency()
+  const timeZone = useTimeZone()
 
   const {
     currentMonthCount,
@@ -31,14 +32,19 @@ export function QuickStats() {
     avgOutflow,
     savingsRate,
     popularCategory,
-  } = calculateQuickStats(transactions, undefined, user.currency as Currency)
+  } = calculateQuickStats(
+    transactions,
+    undefined,
+    user.currency as Currency,
+    timeZone
+  )
 
   return (
     <Card className="overflow-hidden py-0 pb-6">
       <CardHeader className="bg-card sticky top-0 pt-6">
         <CardTitle>{t("Quick Stats")}</CardTitle>
       </CardHeader>
-      <CardContent className="overflow-y-auto" suppressHydrationWarning>
+      <CardContent className="overflow-y-auto">
         <div className="quick-stats-content space-y-4">
           <Tooltip>
             <TooltipTrigger asChild>

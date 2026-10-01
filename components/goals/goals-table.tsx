@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react"
 import Link from "next/link"
 import { MoreVerticalIcon, TargetIcon } from "lucide-react"
-import { useExtracted } from "next-intl"
+import { useExtracted, useTimeZone } from "next-intl"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -61,8 +61,13 @@ export function GoalsTable({ filteredGoals }: GoalsTableProps) {
   const { getCategoryLabel, getCategoryDescription } = useCategory()
   const formatDate = useFormatDate()
   const formatCurrency = useFormatCurrency()
+  const timeZone = useTimeZone()
 
-  const goalsWithStats = calculateGoalsStats(filteredGoals, transactions)
+  const goalsWithStats = calculateGoalsStats(
+    filteredGoals,
+    transactions,
+    timeZone
+  )
 
   const inflowTransactions = useMemo(
     () => transactions.filter((t) => t.type === "inflow"),
@@ -108,12 +113,8 @@ export function GoalsTable({ filteredGoals }: GoalsTableProps) {
                   <TableBody>
                     {goalsWithStats.map((goal) => (
                       <TableRow key={goal._id} className="[&>td]:text-center">
-                        <TableCell suppressHydrationWarning>
-                          {formatDate(goal.startDate)}
-                        </TableCell>
-                        <TableCell suppressHydrationWarning>
-                          {formatDate(goal.endDate)}
-                        </TableCell>
+                        <TableCell>{formatDate(goal.startDate)}</TableCell>
+                        <TableCell>{formatDate(goal.endDate)}</TableCell>
                         <TableCell className="font-medium">
                           {goal.name}
                         </TableCell>
@@ -135,7 +136,7 @@ export function GoalsTable({ filteredGoals }: GoalsTableProps) {
                         <TableCell>
                           {formatCurrency(goal.accumulated, goal.currency)}
                         </TableCell>
-                        <TableCell suppressHydrationWarning>
+                        <TableCell>
                           <Badge
                             className={
                               goal.status === "expired"
@@ -152,10 +153,7 @@ export function GoalsTable({ filteredGoals }: GoalsTableProps) {
                                 : t("Upcoming")}
                           </Badge>
                         </TableCell>
-                        <TableCell
-                          className="min-w-32"
-                          suppressHydrationWarning
-                        >
+                        <TableCell className="min-w-32">
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Progress

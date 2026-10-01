@@ -64,18 +64,12 @@ export function RecentTransactions() {
                       <div className="text-sm wrap-anywhere">
                         {transaction.description}
                       </div>
-                      <div
-                        className="text-muted-foreground text-xs"
-                        suppressHydrationWarning
-                      >
+                      <div className="text-muted-foreground text-xs">
                         {formatDate(transaction.date)}
                       </div>
                     </div>
                   </div>
-                  <div
-                    className="max-w-2/4 text-right"
-                    suppressHydrationWarning
-                  >
+                  <div className="max-w-2/4 text-right">
                     <div
                       className={`text-sm wrap-anywhere ${
                         transaction.type === "inflow"

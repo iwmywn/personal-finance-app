@@ -4,6 +4,7 @@ import { NuqsAdapter } from "nuqs/adapters/next/app"
 
 import { signInRoute } from "@/routes"
 import { getSession } from "@/actions/session.actions"
+import { siteConfig } from "@/app/pfa.config"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { AppSidebar } from "@/components/layout/app-sidebar"
@@ -19,7 +20,8 @@ export default async function DashboardLayout({
     cookies(),
     getSession(),
   ])
-  const defaultOpen = cookieStore.get("sidebar_state")?.value === "true"
+  const defaultOpen =
+    cookieStore.get(siteConfig.cookies.sidebar)?.value === "true"
 
   const { user, session } = sessionResult
 

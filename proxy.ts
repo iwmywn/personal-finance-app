@@ -13,7 +13,7 @@ function redirectIfProtectedRoute(request: NextRequest) {
   const { pathname, search } = nextUrl
 
   const hasTwoFactorCookie = !!getSessionCookie(request, {
-    cookieName: "two_factor",
+    cookieName: siteConfig.cookies.twoFactor,
     cookiePrefix: siteConfig.name,
   })
 

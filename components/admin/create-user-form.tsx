@@ -77,7 +77,7 @@ export function CreateUserForm({ isOpen, setIsOpen }: CreateUserFormProps) {
         name: values.name,
         email: values.email,
         password: values.password,
-        role: "user",
+        role: values.role,
         data: {
           username: values.username,
           emailVerified: true,
@@ -193,6 +193,26 @@ export function CreateUserForm({ isOpen, setIsOpen }: CreateUserFormProps) {
                       placeholder="********"
                       autoComplete="new-password"
                       {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="role"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="form-role">{t("Role")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      id="form-role"
+                      readOnly
+                      disabled
+                      value={field.value === "user" ? t("User") : field.value}
+                      className="bg-muted cursor-not-allowed"
                     />
                   </FormControl>
                   <FormMessage />

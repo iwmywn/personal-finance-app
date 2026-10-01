@@ -140,9 +140,7 @@ export function TransactionsTable({
                         key={transaction._id.toString()}
                         className="[&>td]:text-center"
                       >
-                        <TableCell suppressHydrationWarning>
-                          {formatDate(transaction.date)}
-                        </TableCell>
+                        <TableCell>{formatDate(transaction.date)}</TableCell>
                         <TableCell className="max-w-md min-w-52 wrap-anywhere whitespace-normal">
                           {transaction.description}
                         </TableCell>
@@ -171,10 +169,7 @@ export function TransactionsTable({
                             </TooltipContent>
                           </Tooltip>
                         </TableCell>
-                        <TableCell
-                          className="min-w-38 wrap-anywhere whitespace-normal"
-                          suppressHydrationWarning
-                        >
+                        <TableCell className="min-w-38 wrap-anywhere whitespace-normal">
                           <div className="flex items-center justify-center gap-1.5">
                             <span
                               className={`font-semibold ${

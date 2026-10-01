@@ -508,6 +508,7 @@ msgstr "名前、メールアドレス、ユーザー名で検索..."
 
 #: components/admin/admin-filters.tsx
 #: components/admin/admin-table.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "1ZgrhW"
 msgid "Role"
 msgstr "ロール"
@@ -526,6 +527,7 @@ msgstr "管理者"
 
 #: components/admin/admin-filters.tsx
 #: components/admin/admin-table.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "EwRIOm"
 msgid "User"
 msgstr "ユーザー"
@@ -1256,17 +1258,19 @@ msgstr "すべてのステータス"
 #: components/budgets/budgets-table.tsx
 #: components/goals/goal-filters.tsx
 #: components/goals/goals-table.tsx
-msgctxt "RahCRH"
-msgid "Expired"
-msgstr "期限切れ"
+#: components/recurring-transactions/recurring-transaction-filters.tsx
+#: components/recurring-transactions/recurring-transactions-table.tsx
+msgctxt "6_aEFZ"
+msgid "Upcoming"
+msgstr "予定"
 
 #: components/budgets/budget-filters.tsx
 #: components/budgets/budgets-table.tsx
 #: components/goals/goal-filters.tsx
 #: components/goals/goals-table.tsx
-msgctxt "6_aEFZ"
-msgid "Upcoming"
-msgstr "予定"
+msgctxt "RahCRH"
+msgid "Expired"
+msgstr "期限切れ"
 
 #: components/budgets/budget-form.tsx
 msgctxt "2g82CP"
@@ -1955,14 +1959,14 @@ msgid "e.g. 15"
 msgstr "例：15"
 
 #: components/recurring-transactions/recurring-transaction-form.tsx
-msgctxt "InWqys"
-msgid "Optional"
-msgstr "オプション"
-
-#: components/recurring-transactions/recurring-transaction-form.tsx
 msgctxt "mpcI7I"
 msgid "No End Date"
 msgstr "終了日なし"
+
+#: components/recurring-transactions/recurring-transaction-form.tsx
+msgctxt "QieJOp"
+msgid "If left blank, it will run indefinitely."
+msgstr "空白のままにすると、無期限に実行されます。"
 
 #: components/recurring-transactions/recurring-transactions-page.tsx
 #: hooks/use-nav.ts

@@ -508,6 +508,7 @@ msgstr "Search by name, email or username..."
 
 #: components/admin/admin-filters.tsx
 #: components/admin/admin-table.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "1ZgrhW"
 msgid "Role"
 msgstr "Role"
@@ -526,6 +527,7 @@ msgstr "Admin"
 
 #: components/admin/admin-filters.tsx
 #: components/admin/admin-table.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "EwRIOm"
 msgid "User"
 msgstr "User"
@@ -1256,17 +1258,19 @@ msgstr "All Statuses"
 #: components/budgets/budgets-table.tsx
 #: components/goals/goal-filters.tsx
 #: components/goals/goals-table.tsx
-msgctxt "RahCRH"
-msgid "Expired"
-msgstr "Expired"
+#: components/recurring-transactions/recurring-transaction-filters.tsx
+#: components/recurring-transactions/recurring-transactions-table.tsx
+msgctxt "6_aEFZ"
+msgid "Upcoming"
+msgstr "Upcoming"
 
 #: components/budgets/budget-filters.tsx
 #: components/budgets/budgets-table.tsx
 #: components/goals/goal-filters.tsx
 #: components/goals/goals-table.tsx
-msgctxt "6_aEFZ"
-msgid "Upcoming"
-msgstr "Upcoming"
+msgctxt "RahCRH"
+msgid "Expired"
+msgstr "Expired"
 
 #: components/budgets/budget-form.tsx
 msgctxt "2g82CP"
@@ -1955,14 +1959,14 @@ msgid "e.g. 15"
 msgstr "e.g. 15"
 
 #: components/recurring-transactions/recurring-transaction-form.tsx
-msgctxt "InWqys"
-msgid "Optional"
-msgstr "Optional"
-
-#: components/recurring-transactions/recurring-transaction-form.tsx
 msgctxt "mpcI7I"
 msgid "No End Date"
 msgstr "No End Date"
+
+#: components/recurring-transactions/recurring-transaction-form.tsx
+msgctxt "QieJOp"
+msgid "If left blank, it will run indefinitely."
+msgstr "If left blank, it will run indefinitely."
 
 #: components/recurring-transactions/recurring-transactions-page.tsx
 #: hooks/use-nav.ts

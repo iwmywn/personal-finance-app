@@ -2,17 +2,18 @@ import Decimal from "decimal.js"
 
 import type { CategoryKey } from "@/lib/category"
 import type { Currency } from "@/lib/currency"
-import { localDateToUTCMidnight, normalizeToUTCMidnight } from "@/lib/date"
+import { getTodayInTimezone, normalizeToUTCMidnight } from "@/lib/date"
 import type { Budget, Goal, Transaction } from "@/lib/definitions"
 import { convertAmountWithRates, progressColorClass } from "@/lib/utils"
 
 export function getCurrentMonthTransactions(
   transactions: Transaction[],
-  today?: Date
+  today?: Date,
+  timeZone?: string
 ): Transaction[] {
   const todayUTC = today
     ? normalizeToUTCMidnight(today)
-    : localDateToUTCMidnight(new Date())
+    : getTodayInTimezone(timeZone)
   const currentMonth = todayUTC.getUTCMonth()
   const currentYear = todayUTC.getUTCFullYear()
 
@@ -68,11 +69,13 @@ function resolveTransactionAmount(
 export function calculateQuickStats(
   transactions: Transaction[],
   today?: Date,
-  targetCurrency?: Currency
+  targetCurrency?: Currency,
+  timeZone?: string
 ): QuickStats {
   const currentMonthTransactions = getCurrentMonthTransactions(
     transactions,
-    today
+    today,
+    timeZone
   )
 
   const currentMonthItems: { t: Transaction; amount: Decimal }[] = []
@@ -283,11 +286,12 @@ interface StatBaseConfig<TBase extends Budget | Goal> {
 function calculateStatsBase<TBase extends Budget | Goal>(
   base: TBase,
   transactions: Transaction[],
-  config: StatBaseConfig<TBase>
+  config: StatBaseConfig<TBase>,
+  timeZone?: string
 ) {
   const startDateOnly = normalizeToUTCMidnight(new Date(base.startDate))
   const endDateOnly = normalizeToUTCMidnight(new Date(base.endDate))
-  const nowDateOnly = localDateToUTCMidnight(new Date())
+  const nowDateOnly = getTodayInTimezone(timeZone)
 
   const filtered = transactions.filter((t) => {
     if (t.type !== config.type) return false
@@ -370,21 +374,27 @@ interface BudgetWithStats extends Budget {
 
 export function calculateBudgetsStats(
   budgets: Budget[],
-  transactions: Transaction[]
+  transactions: Transaction[],
+  timeZone?: string
 ): BudgetWithStats[] {
   return budgets.map((budget) => {
-    const stats = calculateStatsBase(budget, transactions, {
-      type: "outflow",
-      getBaseTargetAmount: (b) => b.allocatedAmount,
-      getBaseCurrency: (b) => b.currency,
-      getBaseCategoryKey: (b) => b.categoryKey,
-      pickColor: (percentage, has) => {
-        if (!has) return progressColorClass.gray
-        if (percentage < 75) return progressColorClass.green
-        if (percentage < 100) return progressColorClass.yellow
-        return progressColorClass.red
+    const stats = calculateStatsBase(
+      budget,
+      transactions,
+      {
+        type: "outflow",
+        getBaseTargetAmount: (b) => b.allocatedAmount,
+        getBaseCurrency: (b) => b.currency,
+        getBaseCategoryKey: (b) => b.categoryKey,
+        pickColor: (percentage, has) => {
+          if (!has) return progressColorClass.gray
+          if (percentage < 75) return progressColorClass.green
+          if (percentage < 100) return progressColorClass.yellow
+          return progressColorClass.red
+        },
       },
-    })
+      timeZone
+    )
 
     return {
       ...budget,
@@ -405,21 +415,27 @@ interface GoalWithStats extends Goal {
 
 export function calculateGoalsStats(
   goals: Goal[],
-  transactions: Transaction[]
+  transactions: Transaction[],
+  timeZone?: string
 ): GoalWithStats[] {
   return goals.map((goal) => {
-    const stats = calculateStatsBase(goal, transactions, {
-      type: "inflow",
-      getBaseTargetAmount: (g) => g.targetAmount,
-      getBaseCurrency: (g) => g.currency,
-      getBaseCategoryKey: (g) => g.categoryKey,
-      pickColor: (percentage, has) => {
-        if (!has) return progressColorClass.gray
-        if (percentage >= 100) return progressColorClass.green
-        if (percentage >= 75) return progressColorClass.yellow
-        return progressColorClass.red
+    const stats = calculateStatsBase(
+      goal,
+      transactions,
+      {
+        type: "inflow",
+        getBaseTargetAmount: (g) => g.targetAmount,
+        getBaseCurrency: (g) => g.currency,
+        getBaseCategoryKey: (g) => g.categoryKey,
+        pickColor: (percentage, has) => {
+          if (!has) return progressColorClass.gray
+          if (percentage >= 100) return progressColorClass.green
+          if (percentage >= 75) return progressColorClass.yellow
+          return progressColorClass.red
+        },
       },
-    })
+      timeZone
+    )
 
     return {
       ...goal,

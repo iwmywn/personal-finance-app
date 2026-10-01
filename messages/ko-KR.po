@@ -508,6 +508,7 @@ msgstr "이름, 이메일 또는 사용자 이름으로 검색..."
 
 #: components/admin/admin-filters.tsx
 #: components/admin/admin-table.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "1ZgrhW"
 msgid "Role"
 msgstr "역할"
@@ -526,6 +527,7 @@ msgstr "관리자"
 
 #: components/admin/admin-filters.tsx
 #: components/admin/admin-table.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "EwRIOm"
 msgid "User"
 msgstr "사용자"
@@ -1256,17 +1258,19 @@ msgstr "모든 상태"
 #: components/budgets/budgets-table.tsx
 #: components/goals/goal-filters.tsx
 #: components/goals/goals-table.tsx
-msgctxt "RahCRH"
-msgid "Expired"
-msgstr "만료됨"
+#: components/recurring-transactions/recurring-transaction-filters.tsx
+#: components/recurring-transactions/recurring-transactions-table.tsx
+msgctxt "6_aEFZ"
+msgid "Upcoming"
+msgstr "예정됨"
 
 #: components/budgets/budget-filters.tsx
 #: components/budgets/budgets-table.tsx
 #: components/goals/goal-filters.tsx
 #: components/goals/goals-table.tsx
-msgctxt "6_aEFZ"
-msgid "Upcoming"
-msgstr "예정됨"
+msgctxt "RahCRH"
+msgid "Expired"
+msgstr "만료됨"
 
 #: components/budgets/budget-form.tsx
 msgctxt "2g82CP"
@@ -1955,14 +1959,14 @@ msgid "e.g. 15"
 msgstr "예: 15"
 
 #: components/recurring-transactions/recurring-transaction-form.tsx
-msgctxt "InWqys"
-msgid "Optional"
-msgstr "선택사항"
-
-#: components/recurring-transactions/recurring-transaction-form.tsx
 msgctxt "mpcI7I"
 msgid "No End Date"
 msgstr "종료일 없음"
+
+#: components/recurring-transactions/recurring-transaction-form.tsx
+msgctxt "QieJOp"
+msgid "If left blank, it will run indefinitely."
+msgstr "비워두면 무기한으로 실행됩니다."
 
 #: components/recurring-transactions/recurring-transactions-page.tsx
 #: hooks/use-nav.ts

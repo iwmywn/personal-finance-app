@@ -5,6 +5,7 @@ import {
   formatDate,
   formatDateParts,
   getDaysInMonth,
+  getTodayInTimezone,
   isSameUTCDate,
   localDateToUTCMidnight,
   normalizeToUTCMidnight,
@@ -235,6 +236,51 @@ describe("lib/date.ts Unified Date Module", () => {
       expect(formatDate(null, "en" as Locale)).toBe("")
       expect(formatDate(undefined, "en" as Locale)).toBe("")
       expect(formatDate("invalid", "en" as Locale)).toBe("")
+    })
+  })
+
+  describe("getTodayInTimezone", () => {
+    it("should return localDateToUTCMidnight when timeZone is not provided", () => {
+      const fixedNow = new Date("2026-10-01T12:00:00.000Z")
+      vi.useFakeTimers()
+      vi.setSystemTime(fixedNow)
+
+      const result = getTodayInTimezone()
+      expect(result.toISOString()).toBe(
+        localDateToUTCMidnight(fixedNow).toISOString()
+      )
+    })
+
+    it("should correctly resolve calendar date across different timezones", () => {
+      // 23:30 UTC on Oct 1 -> Oct 1 in UTC, but Oct 2 in Tokyo (UTC+9)
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date("2026-10-01T23:30:00.000Z"))
+
+      const utcToday = getTodayInTimezone("UTC")
+      expect(utcToday.toISOString()).toBe("2026-10-01T00:00:00.000Z")
+
+      const tokyoToday = getTodayInTimezone("Asia/Tokyo")
+      expect(tokyoToday.toISOString()).toBe("2026-10-02T00:00:00.000Z")
+    })
+
+    it("should correctly resolve date behind UTC for negative timezone offsets", () => {
+      // 01:30 UTC on Oct 1 -> Oct 1 in UTC, but Sep 30 in New York (EDT, UTC-4)
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date("2026-10-01T01:30:00.000Z"))
+
+      const nyToday = getTodayInTimezone("America/New_York")
+      expect(nyToday.toISOString()).toBe("2026-09-30T00:00:00.000Z")
+    })
+
+    it("should fallback to localDateToUTCMidnight if timezone is invalid", () => {
+      const fixedNow = new Date("2026-10-01T12:00:00.000Z")
+      vi.useFakeTimers()
+      vi.setSystemTime(fixedNow)
+
+      const result = getTodayInTimezone("Invalid/Timezone")
+      expect(result.toISOString()).toBe(
+        localDateToUTCMidnight(fixedNow).toISOString()
+      )
     })
   })
 })
