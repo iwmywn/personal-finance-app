@@ -85,6 +85,9 @@ export function CreateUserForm({ isOpen, setIsOpen }: CreateUserFormProps) {
         fetchOptions: {
           onError: (ctx) => {
             switch (ctx.error.code as AuthErrorCode) {
+              case "USERNAME_IS_ALREADY_TAKEN":
+                toast.error(t("This username is already taken."))
+                break
               case "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL":
                 toast.error(t("This email is already in use."))
                 break

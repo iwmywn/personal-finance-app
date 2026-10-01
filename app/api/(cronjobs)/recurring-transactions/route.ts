@@ -114,52 +114,52 @@ export async function GET(request: NextRequest) {
           const scheduleCreatedIds: string[] = []
           const scheduleDatesToEnsure: number[] = []
 
-          await withTransaction(async (dbSession) => {
-            const existingTxDocs = await transactionsCollection
-              .find(
-                {
+          try {
+            await withTransaction(async (dbSession) => {
+              const existingTxDocs = await transactionsCollection
+                .find(
+                  {
+                    userId: rec.userId,
+                    type: rec.type,
+                    categoryKey: rec.categoryKey,
+                    amount: rec.amount,
+                    currency: rec.currency,
+                    description: rec.description,
+                    date: { $in: dueDates },
+                  },
+                  { session: dbSession }
+                )
+                .toArray()
+
+              const existingDateSet = new Set(
+                existingTxDocs.map((tx) => tx.date.getTime())
+              )
+
+              for (const targetDate of dueDates) {
+                if (existingDateSet.has(targetDate.getTime())) {
+                  skippedReason.push({
+                    id: rec._id.toString(),
+                    reason: "existing",
+                  })
+                  affectedUserIds.add(rec.userId.toString())
+                }
+              }
+
+              const datesToInsert = dueDates.filter(
+                (targetDate) => !existingDateSet.has(targetDate.getTime())
+              )
+
+              if (datesToInsert.length > 0) {
+                const transactionDocs = datesToInsert.map((targetDate) => ({
                   userId: rec.userId,
                   type: rec.type,
                   categoryKey: rec.categoryKey,
                   amount: rec.amount,
                   currency: rec.currency,
                   description: rec.description,
-                  date: { $in: dueDates },
-                },
-                { session: dbSession }
-              )
-              .toArray()
+                  date: targetDate,
+                }))
 
-            const existingDateSet = new Set(
-              existingTxDocs.map((tx) => tx.date.getTime())
-            )
-
-            for (const targetDate of dueDates) {
-              if (existingDateSet.has(targetDate.getTime())) {
-                skippedReason.push({
-                  id: rec._id.toString(),
-                  reason: "existing",
-                })
-                affectedUserIds.add(rec.userId.toString())
-              }
-            }
-
-            const datesToInsert = dueDates.filter(
-              (targetDate) => !existingDateSet.has(targetDate.getTime())
-            )
-
-            if (datesToInsert.length > 0) {
-              const transactionDocs = datesToInsert.map((targetDate) => ({
-                userId: rec.userId,
-                type: rec.type,
-                categoryKey: rec.categoryKey,
-                amount: rec.amount,
-                currency: rec.currency,
-                description: rec.description,
-                date: targetDate,
-              }))
-
-              try {
                 const insertResult = await transactionsCollection.insertMany(
                   transactionDocs,
                   { session: dbSession }
@@ -172,32 +172,31 @@ export async function GET(request: NextRequest) {
                 for (const targetDate of datesToInsert) {
                   scheduleDatesToEnsure.push(targetDate.getTime())
                 }
-              } catch (error) {
-                if (isDuplicateKeyError(error)) {
-                  skippedReason.push({
-                    id: rec._id.toString(),
-                    reason: "existing",
-                  })
-                  affectedUserIds.add(rec.userId.toString())
-                  const latestDate = dueDates[dueDates.length - 1]
-                  await recurringCollection.updateOne(
-                    { _id: rec._id },
-                    { $set: { lastGeneratedDate: latestDate } },
-                    { session: dbSession }
-                  )
-                  return
-                }
-                throw error
               }
-            }
 
-            const latestDate = dueDates[dueDates.length - 1]
-            await recurringCollection.updateOne(
-              { _id: rec._id },
-              { $set: { lastGeneratedDate: latestDate } },
-              { session: dbSession }
-            )
-          })
+              const latestDate = dueDates[dueDates.length - 1]
+              await recurringCollection.updateOne(
+                { _id: rec._id },
+                { $set: { lastGeneratedDate: latestDate } },
+                { session: dbSession }
+              )
+            })
+          } catch (error) {
+            if (isDuplicateKeyError(error)) {
+              skippedReason.push({
+                id: rec._id.toString(),
+                reason: "existing",
+              })
+              affectedUserIds.add(rec.userId.toString())
+              const latestDate = dueDates[dueDates.length - 1]
+              await recurringCollection.updateOne(
+                { _id: rec._id },
+                { $set: { lastGeneratedDate: latestDate } }
+              )
+              return
+            }
+            throw error
+          }
 
           if (scheduleCreatedIds.length > 0) {
             createdIds.push(...scheduleCreatedIds)

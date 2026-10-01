@@ -125,7 +125,10 @@ export function parseToUTCMidnight(val: unknown): Date | null {
     ) {
       return val
     }
-    return localDateToUTCMidnight(val)
+    if (typeof window !== "undefined") {
+      return localDateToUTCMidnight(val)
+    }
+    return normalizeToUTCMidnight(val)
   }
 
   return null

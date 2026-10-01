@@ -141,9 +141,23 @@ describe("lib/date.ts Unified Date Module", () => {
       expect(result?.toISOString()).toBe("2026-07-04T00:00:00.000Z")
     })
 
+    it("should preserve already UTC Midnight Date object", () => {
+      const date = new Date("2026-09-30T00:00:00.000Z")
+      const result = parseToUTCMidnight(date)
+      expect(result).toBe(date)
+      expect(result?.toISOString()).toBe("2026-09-30T00:00:00.000Z")
+    })
+
+    it("should normalize Date object with time on server without timezone shift", () => {
+      const date = new Date("2026-09-30T16:00:00.000Z")
+      const result = parseToUTCMidnight(date)
+      expect(result?.toISOString()).toBe("2026-09-30T00:00:00.000Z")
+    })
+
     it("should return null for invalid date inputs", () => {
       expect(parseToUTCMidnight("invalid")).toBeNull()
       expect(parseToUTCMidnight("2026-02-30")).toBeNull()
+      expect(parseToUTCMidnight(new Date("invalid"))).toBeNull()
       expect(parseToUTCMidnight(null)).toBeNull()
       expect(parseToUTCMidnight(undefined)).toBeNull()
     })

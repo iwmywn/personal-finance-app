@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -31,6 +31,7 @@ import { Input } from "@/components/ui/input"
 import { useUser } from "@/contexts/user-context"
 import { useSchemas } from "@/hooks/use-schemas"
 import { authClient } from "@/lib/auth-client"
+import type { AuthErrorCode } from "@/lib/definitions"
 import type { UsernameFormValues } from "@/schemas/types"
 
 export function ChangeUsernameForm() {
@@ -62,10 +63,17 @@ export function ChangeUsernameForm() {
         await authClient.updateUser({
           username: values.username,
           fetchOptions: {
-            onError: () => {
-              toast.error(
-                t("Failed to update username! Please try again later.")
-              )
+            onError: (ctx) => {
+              switch (ctx.error.code as AuthErrorCode) {
+                case "USERNAME_IS_ALREADY_TAKEN":
+                  toast.error(t("This username is already taken."))
+                  break
+                default:
+                  toast.error(
+                    t("Failed to update username! Please try again later.")
+                  )
+                  break
+              }
             },
             onSuccess: () => {
               setIsOpen(false)
