@@ -74,7 +74,6 @@ export async function createTransaction(
     after(async () => {
       try {
         await ensureExchangeRateForDate(parsedValues.data.date)
-        updateTag(`transactions-${user.id}`)
       } catch (error) {
         console.warn(
           "Could not ensure exchange rate for transaction date, enqueuing retry:",
@@ -171,7 +170,6 @@ export async function updateTransaction(
     after(async () => {
       try {
         await ensureExchangeRateForDate(parsedValues.data.date)
-        updateTag(`transactions-${user.id}`)
       } catch (error) {
         console.warn(
           "Could not ensure exchange rate for transaction date, enqueuing retry:",
