@@ -12,7 +12,7 @@ export async function getSchemaMessages() {
     amountRequired: t("Amount is required."),
     amountInvalidNumber: t("Amount must be a valid number."),
     amountMin: t("Amount must be greater than 0."),
-    amountMax: t("Maximum amount is 100 billion."),
+    amountMax: t("Maximum amount is 1 trillion."),
     usernameRequired: t("Username is required."),
     currentPasswordRequired: t("Current password is required."),
     newPasswordRequired: t("New password confirmation is required."),

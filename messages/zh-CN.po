@@ -2754,9 +2754,9 @@ msgid "Amount must be greater than 0."
 msgstr "金额必须大于 0。"
 
 #: schemas/messages.ts
-msgctxt "9I9BOz"
-msgid "Maximum amount is 100 billion."
-msgstr "最大金额为 1000 亿。"
+msgctxt "8DOOMU"
+msgid "Maximum amount is 1 trillion."
+msgstr "最大金额为 1 万亿。"
 
 #: schemas/messages.ts
 msgctxt "aAADUG"

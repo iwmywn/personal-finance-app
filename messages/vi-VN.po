@@ -2754,9 +2754,9 @@ msgid "Amount must be greater than 0."
 msgstr "Số tiền phải lớn hơn 0."
 
 #: schemas/messages.ts
-msgctxt "9I9BOz"
-msgid "Maximum amount is 100 billion."
-msgstr "Số tiền tối đa là 100 tỷ."
+msgctxt "8DOOMU"
+msgid "Maximum amount is 1 trillion."
+msgstr "Số tiền tối đa là 1.000 tỷ."
 
 #: schemas/messages.ts
 msgctxt "aAADUG"

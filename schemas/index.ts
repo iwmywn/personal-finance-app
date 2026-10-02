@@ -44,7 +44,7 @@ export function buildSchemas(messages: SchemaMessages) {
       .refine(
         (val) => {
           try {
-            return new Decimal(val).lte("100000000000")
+            return new Decimal(val).lte("1_000_000_000_000")
           } catch {
             return false
           }
