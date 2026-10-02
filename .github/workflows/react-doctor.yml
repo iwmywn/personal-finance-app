@@ -1,11 +1,10 @@
 name: React Doctor
 
 on:
-  push:
-    branches:
-      - master
   pull_request:
-    branches: ["*"]
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [master]
 
 permissions:
   contents: read
