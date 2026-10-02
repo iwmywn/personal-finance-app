@@ -43,7 +43,7 @@ async function fetchCurrencyApiRatesForDate(dateStr: string) {
   try {
     const response = await fetch(apiUrl, {
       headers: { apikey: serverEnv.CURRENCY_API_SECRET },
-      signal: AbortSignal.timeout(5000),
+      signal: AbortSignal.timeout(10000),
     })
     if (!response.ok) {
       throw new Error(

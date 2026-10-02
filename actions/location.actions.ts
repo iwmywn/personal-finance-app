@@ -34,7 +34,7 @@ async function fetchLocationCached(ipAddress: string) {
   try {
     const response = await fetch(
       `https://ipwho.is/${encodeURIComponent(ipAddress)}`,
-      { signal: AbortSignal.timeout(5000) }
+      { signal: AbortSignal.timeout(10000) }
     )
     if (!response.ok) return null
     const data = await response.json()
