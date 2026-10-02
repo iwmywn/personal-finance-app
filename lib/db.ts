@@ -45,24 +45,21 @@ export async function connect(): Promise<Db> {
 }
 
 export async function disconnect(): Promise<void> {
-  if (globalThis._mongoClient) {
-    try {
+  try {
+    if (globalThis._mongoClient) {
       await globalThis._mongoClient.close()
-    } catch {
-      // Ignore connection close interruptions during teardown
-    }
-    globalThis._mongoClient = undefined
-  } else if (globalThis._mongoClientPromise) {
-    try {
+    } else if (globalThis._mongoClientPromise) {
       const client = await globalThis._mongoClientPromise
       await client.close()
-    } catch {
-      // Ignore connection close interruptions during teardown
     }
+  } catch {
+    // Ignore connection close interruptions during teardown
+  } finally {
+    globalThis._mongoClient = undefined
+    globalThis._mongoClientPromise = undefined
+    db = undefined
+    resetIndexes()
   }
-  globalThis._mongoClientPromise = undefined
-  db = undefined
-  resetIndexes()
 }
 
 export async function collection<T>(
