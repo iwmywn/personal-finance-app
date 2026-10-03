@@ -1,6 +1,6 @@
-"use client"
+﻿"use client"
 
-import { useState } from "react"
+import { useTransition } from "react"
 import { useExtracted } from "next-intl"
 import { toast } from "sonner"
 
@@ -11,39 +11,43 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { useUser } from "@/context/user-context"
+import { useUser } from "@/contexts/user-context"
 import { authClient } from "@/lib/auth-client"
 import { CURRENCY_CONFIG } from "@/lib/currency"
-import type { AppCurrency } from "@/lib/currency"
+import type { Currency } from "@/lib/currency"
 
 export function CurrencySelector() {
   const t = useExtracted()
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isPending, startTransition] = useTransition()
   const { user } = useUser()
 
-  async function handleCurrencyChange(currency: AppCurrency) {
-    setIsLoading(true)
-
-    await authClient.updateUser({
-      currency,
-      fetchOptions: {
-        onError: () => {
-          toast.error(t("Failed to update currency! Please try again later."))
-        },
-        onSuccess: async () => {
-          window.location.reload()
-        },
-      },
+  function handleCurrencyChange(currency: Currency) {
+    startTransition(async () => {
+      try {
+        await authClient.updateUser({
+          currency,
+          fetchOptions: {
+            onError: () => {
+              toast.error(
+                t("Failed to update currency! Please try again later.")
+              )
+            },
+            onSuccess: async () => {
+              window.location.reload()
+            },
+          },
+        })
+      } catch {
+        toast.error(t("Failed to update currency! Please try again later."))
+      }
     })
-
-    setIsLoading(false)
   }
 
   return (
     <Select
       value={user.currency}
       onValueChange={handleCurrencyChange}
-      disabled={isLoading}
+      disabled={isPending}
     >
       <SelectTrigger>
         <SelectValue placeholder={t("Currency")} />

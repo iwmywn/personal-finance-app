@@ -5,17 +5,19 @@ import { ObjectId } from "mongodb"
 import { getExtracted } from "next-intl/server"
 
 import { getGoalsCollection } from "@/lib/collections"
-import type { Goal } from "@/lib/definitions"
+import type { ActionResponse, Goal } from "@/lib/definitions"
+import { isDuplicateKeyError } from "@/lib/indexes"
+import { isRateLimited, RATE_LIMIT_PRESETS } from "@/lib/rate-limit"
 import { getSchemas } from "@/schemas/server"
 import type { GoalFormValues } from "@/schemas/types"
 
-import { getCurrentSession } from "./session.actions"
+import { isValidUserCategory } from "./category.server"
+import { getSession } from "./session.actions"
 import { toDecimal128 } from "./utils"
 
-export async function createGoal(values: GoalFormValues): Promise<{
-  error?: string
-  success?: string
-}> {
+export async function createGoal(
+  values: GoalFormValues
+): Promise<ActionResponse> {
   const t = await getExtracted()
 
   try {
@@ -26,30 +28,32 @@ export async function createGoal(values: GoalFormValues): Promise<{
       return { error: t("Invalid data!") }
     }
 
-    const session = await getCurrentSession()
+    const { error, user, session } = await getSession()
 
-    if (!session) {
+    if (!user || !session) {
+      return { error }
+    }
+
+    if (await isRateLimited(`goal:${user.id}`, RATE_LIMIT_PRESETS.NORMAL)) {
       return {
-        error: t("Access denied! Please refresh the page and try again."),
+        error: t("Too many requests! Please slow down and try again later."),
       }
     }
 
-    const userId = session.user.id
-    const goalsCollection = await getGoalsCollection()
-    const existingGoal = await goalsCollection.findOne({
-      userId: new ObjectId(userId),
-      categoryKey: parsedValues.data.categoryKey,
-      currency: parsedValues.data.currency,
-      startDate: parsedValues.data.startDate,
-      endDate: parsedValues.data.endDate,
-    })
+    const isValidCategory = await isValidUserCategory(
+      user.id,
+      parsedValues.data.categoryKey,
+      "inflow"
+    )
 
-    if (existingGoal) {
-      return { error: t("This goal already exists!") }
+    if (!isValidCategory) {
+      return { error: t("Invalid category!") }
     }
 
+    const goalsCollection = await getGoalsCollection()
+
     await goalsCollection.insertOne({
-      userId: new ObjectId(userId),
+      userId: new ObjectId(user.id),
       categoryKey: parsedValues.data.categoryKey,
       name: parsedValues.data.name,
       targetAmount: toDecimal128(parsedValues.data.targetAmount),
@@ -58,24 +62,30 @@ export async function createGoal(values: GoalFormValues): Promise<{
       endDate: parsedValues.data.endDate,
     })
 
-    updateTag(`goals-${userId}`)
-    return { success: t("Goal has been added."), error: undefined }
+    updateTag(`goals-${user.id}`)
+    return { success: t("Goal has been created.") }
   } catch (error) {
+    if (isDuplicateKeyError(error)) {
+      return { error: t("This goal already exists!") }
+    }
     console.error("Error creating goal:", error)
-    return { error: t("Failed to add goal! Please try again later.") }
+    return { error: t("Failed to create goal! Please try again later.") }
   }
 }
 
 export async function updateGoal(
   goalId: string,
   values: GoalFormValues
-): Promise<{
-  error?: string
-  success?: string
-}> {
+): Promise<ActionResponse> {
   const t = await getExtracted()
 
   try {
+    if (!ObjectId.isValid(goalId)) {
+      return {
+        error: t("Invalid goal ID!"),
+      }
+    }
+
     const { createGoalSchema } = await getSchemas()
     const parsedValues = createGoalSchema().safeParse(values)
 
@@ -83,35 +93,31 @@ export async function updateGoal(
       return { error: t("Invalid data!") }
     }
 
-    const session = await getCurrentSession()
+    const { error, user, session } = await getSession()
 
-    if (!session) {
+    if (!user || !session) {
+      return { error }
+    }
+
+    if (await isRateLimited(`goal:${user.id}`, RATE_LIMIT_PRESETS.NORMAL)) {
       return {
-        error: t("Access denied! Please refresh the page and try again."),
+        error: t("Too many requests! Please slow down and try again later."),
       }
     }
 
-    if (!ObjectId.isValid(goalId)) {
-      return {
-        error: t("Invalid goal ID!"),
-      }
+    const isValidCategory = await isValidUserCategory(
+      user.id,
+      parsedValues.data.categoryKey,
+      "inflow"
+    )
+
+    if (!isValidCategory) {
+      return { error: t("Invalid category!") }
     }
 
-    const userId = session.user.id
     const goalsCollection = await getGoalsCollection()
-    const existingGoal = await goalsCollection.findOne({
-      _id: new ObjectId(goalId),
-      userId: new ObjectId(userId),
-    })
-
-    if (!existingGoal) {
-      return {
-        error: t("Goal not found or you don't have permission to edit!"),
-      }
-    }
-
-    await goalsCollection.updateOne(
-      { _id: new ObjectId(goalId), userId: new ObjectId(userId) },
+    const result = await goalsCollection.updateOne(
+      { _id: new ObjectId(goalId), userId: new ObjectId(user.id) },
       {
         $set: {
           categoryKey: parsedValues.data.categoryKey,
@@ -124,54 +130,58 @@ export async function updateGoal(
       }
     )
 
-    updateTag(`goals-${userId}`)
-    return { success: t("Goal has been updated."), error: undefined }
+    if (result.matchedCount === 0) {
+      return {
+        error: t("Goal not found or you don't have permission to edit!"),
+      }
+    }
+
+    updateTag(`goals-${user.id}`)
+    return { success: t("Goal has been updated.") }
   } catch (error) {
+    if (isDuplicateKeyError(error)) {
+      return { error: t("This goal already exists!") }
+    }
     console.error("Error updating goal:", error)
     return { error: t("Failed to update goal! Please try again later.") }
   }
 }
 
-export async function deleteGoal(goalId: string): Promise<{
-  error?: string
-  success?: string
-}> {
+export async function deleteGoal(goalId: string): Promise<ActionResponse> {
   const t = await getExtracted()
 
   try {
-    const session = await getCurrentSession()
-
-    if (!session) {
-      return {
-        error: t("Access denied! Please refresh the page and try again."),
-      }
-    }
-
     if (!ObjectId.isValid(goalId)) {
       return {
         error: t("Invalid goal ID!"),
       }
     }
 
-    const userId = session.user.id
+    const { error, user, session } = await getSession()
+
+    if (!user || !session) {
+      return { error }
+    }
+
+    if (await isRateLimited(`goal:${user.id}`, RATE_LIMIT_PRESETS.MODERATE)) {
+      return {
+        error: t("Too many requests! Please slow down and try again later."),
+      }
+    }
+
     const goalsCollection = await getGoalsCollection()
-    const existingGoal = await goalsCollection.findOne({
+    const result = await goalsCollection.deleteOne({
       _id: new ObjectId(goalId),
-      userId: new ObjectId(userId),
+      userId: new ObjectId(user.id),
     })
 
-    if (!existingGoal) {
+    if (result.deletedCount === 0) {
       return {
         error: t("Goal not found or you don't have permission to delete!"),
       }
     }
 
-    await goalsCollection.deleteOne({
-      _id: new ObjectId(goalId),
-      userId: new ObjectId(userId),
-    })
-
-    updateTag(`goals-${userId}`)
+    updateTag(`goals-${user.id}`)
     return { success: t("Goal has been deleted.") }
   } catch (error) {
     console.error("Error deleting goal:", error)
@@ -183,16 +193,13 @@ export async function getGoals(): Promise<{
   error?: string
   goals?: Goal[]
 }> {
-  const t = await getExtracted()
-  const session = await getCurrentSession()
+  const { error, user, session } = await getSession()
 
-  if (!session) {
-    return {
-      error: t("Access denied! Please refresh the page and try again."),
-    }
+  if (!user || !session) {
+    return { error }
   }
 
-  return getCachedGoals(session.user.id)
+  return getCachedGoals(user.id)
 }
 
 async function getCachedGoals(userId: string) {

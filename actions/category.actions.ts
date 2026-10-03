@@ -1,6 +1,5 @@
 "use server"
 
-import { randomBytes } from "crypto"
 import { cacheTag, updateTag } from "next/cache"
 import { ObjectId } from "mongodb"
 import { getExtracted } from "next-intl/server"
@@ -12,18 +11,18 @@ import {
   getRecurringTransactionsCollection,
   getTransactionsCollection,
 } from "@/lib/collections"
-import type { Category } from "@/lib/definitions"
+import { withTransaction } from "@/lib/db"
+import type { ActionResponse, Category } from "@/lib/definitions"
+import { isDuplicateKeyError } from "@/lib/indexes"
+import { isRateLimited, RATE_LIMIT_PRESETS } from "@/lib/rate-limit"
 import { getSchemas } from "@/schemas/server"
 import type { CategoryFormValues } from "@/schemas/types"
 
-import { getCurrentSession } from "./session.actions"
+import { getSession } from "./session.actions"
 
 export async function createCustomCategory(
   values: CategoryFormValues
-): Promise<{
-  error?: string
-  success?: string
-}> {
+): Promise<ActionResponse> {
   const t = await getExtracted()
 
   try {
@@ -34,64 +33,51 @@ export async function createCustomCategory(
       return { error: t("Invalid data!") }
     }
 
-    const session = await getCurrentSession()
+    const { error, user, session } = await getSession()
 
-    if (!session) {
+    if (!user || !session) {
+      return { error }
+    }
+
+    if (await isRateLimited(`category:${user.id}`, RATE_LIMIT_PRESETS.NORMAL)) {
       return {
-        error: t("Access denied! Please refresh the page and try again."),
+        error: t("Too many requests! Please slow down and try again later."),
       }
     }
 
-    const userId = session.user.id
     const categoriesCollection = await getCategoriesCollection()
-    const existingCategory = await categoriesCollection.findOne({
-      userId: new ObjectId(userId),
-      label: parsedValues.data.label,
-      type: parsedValues.data.type,
-    })
-
-    if (existingCategory) {
-      return { error: t("This category already exists!") }
-    }
-
-    const categoryKey = randomBytes(4).toString("hex")
-
-    const duplicateCategoryKey = await categoriesCollection.findOne({
-      categoryKey,
-    })
-
-    if (duplicateCategoryKey) {
-      return {
-        error: t("Error creating category key! Please try again later."),
-      }
-    }
 
     await categoriesCollection.insertOne({
-      userId: new ObjectId(userId),
-      categoryKey,
+      userId: new ObjectId(user.id),
       type: parsedValues.data.type,
       label: parsedValues.data.label,
       description: parsedValues.data.description,
     })
 
-    updateTag(`categories-${userId}`)
-    return { success: t("Category has been added."), error: undefined }
+    updateTag(`categories-${user.id}`)
+    return { success: t("Category has been created.") }
   } catch (error) {
+    if (isDuplicateKeyError(error)) {
+      return { error: t("This category already exists!") }
+    }
     console.error("Error creating custom category:", error)
-    return { error: t("Failed to add category! Please try again later.") }
+    return { error: t("Failed to create category! Please try again later.") }
   }
 }
 
 export async function updateCustomCategory(
   categoryId: string,
   values: CategoryFormValues
-): Promise<{
-  error?: string
-  success?: string
-}> {
+): Promise<ActionResponse> {
   const t = await getExtracted()
 
   try {
+    if (!ObjectId.isValid(categoryId)) {
+      return {
+        error: t("Invalid category ID!"),
+      }
+    }
+
     const { createCategorySchema } = await getSchemas()
     const parsedValues = createCategorySchema().safeParse(values)
 
@@ -99,102 +85,92 @@ export async function updateCustomCategory(
       return { error: t("Invalid data!") }
     }
 
-    const session = await getCurrentSession()
+    const { error, user, session } = await getSession()
 
-    if (!session) {
+    if (!user || !session) {
+      return { error }
+    }
+
+    if (await isRateLimited(`category:${user.id}`, RATE_LIMIT_PRESETS.NORMAL)) {
       return {
-        error: t("Access denied! Please refresh the page and try again."),
+        error: t("Too many requests! Please slow down and try again later."),
       }
     }
 
-    if (!ObjectId.isValid(categoryId)) {
-      return {
-        error: t("Invalid category ID!"),
+    const categoriesCollection = await getCategoriesCollection()
+
+    const result = await categoriesCollection.updateOne(
+      {
+        _id: new ObjectId(categoryId),
+        userId: new ObjectId(user.id),
+        type: parsedValues.data.type,
+      },
+      {
+        $set: {
+          label: parsedValues.data.label,
+          description: parsedValues.data.description,
+        },
       }
-    }
+    )
 
-    const userId = session.user.id
-    const [categoriesCollection, transactionsCollection] = await Promise.all([
-      getCategoriesCollection(),
-      getTransactionsCollection(),
-    ])
-    const existingCategory = await categoriesCollection.findOne({
-      _id: new ObjectId(categoryId),
-      userId: new ObjectId(userId),
-    })
+    if (result.matchedCount === 0) {
+      const existingCategory = await categoriesCollection.findOne(
+        {
+          _id: new ObjectId(categoryId),
+          userId: new ObjectId(user.id),
+        },
+        { projection: { type: 1 } }
+      )
 
-    if (!existingCategory) {
+      if (
+        existingCategory &&
+        existingCategory.type !== parsedValues.data.type
+      ) {
+        return {
+          error: t("Category type cannot be changed!"),
+        }
+      }
+
       return {
         error: t("Category not found or you don't have permission to edit!"),
       }
     }
 
-    const duplicateCategory = await categoriesCollection.findOne({
-      userId: new ObjectId(userId),
-      label: parsedValues.data.label,
-      type: parsedValues.data.type,
-      _id: { $ne: new ObjectId(categoryId) },
-    })
-
-    if (duplicateCategory) {
+    updateTag(`categories-${user.id}`)
+    return { success: t("Category has been updated.") }
+  } catch (error) {
+    if (isDuplicateKeyError(error)) {
       return { error: t("This category already exists!") }
     }
-
-    await Promise.all([
-      categoriesCollection.updateOne(
-        { _id: new ObjectId(categoryId), userId: new ObjectId(userId) },
-        {
-          $set: {
-            type: parsedValues.data.type,
-            label: parsedValues.data.label,
-            description: parsedValues.data.description,
-          },
-        }
-      ),
-      transactionsCollection.updateMany(
-        {
-          userId: new ObjectId(userId),
-          categoryKey: existingCategory.categoryKey,
-        },
-        {
-          $set: {
-            type: parsedValues.data.type,
-          },
-        }
-      ),
-    ])
-
-    updateTag(`categories-${userId}`)
-    updateTag(`transactions-${userId}`)
-    return { success: t("Category has been updated."), error: undefined }
-  } catch (error) {
     console.error("Error updating custom category:", error)
     return { error: t("Failed to update category! Please try again later.") }
   }
 }
 
-export async function deleteCustomCategory(categoryId: string): Promise<{
-  error?: string
-  success?: string
-}> {
+export async function deleteCustomCategory(
+  categoryId: string
+): Promise<ActionResponse> {
   const t = await getExtracted()
 
   try {
-    const session = await getCurrentSession()
-
-    if (!session) {
-      return {
-        error: t("Access denied! Please refresh the page and try again."),
-      }
-    }
-
     if (!ObjectId.isValid(categoryId)) {
       return {
         error: t("Invalid category ID!"),
       }
     }
 
-    const userId = session.user.id
+    const { error, user, session } = await getSession()
+
+    if (!user || !session) {
+      return { error }
+    }
+
+    if (await isRateLimited(`category:${user.id}`, RATE_LIMIT_PRESETS.STRICT)) {
+      return {
+        error: t("Too many requests! Please slow down and try again later."),
+      }
+    }
+
     const [
       categoriesCollection,
       transactionsCollection,
@@ -208,92 +184,120 @@ export async function deleteCustomCategory(categoryId: string): Promise<{
       getGoalsCollection(),
       getRecurringTransactionsCollection(),
     ])
-    const existingCategory = await categoriesCollection.findOne({
-      _id: new ObjectId(categoryId),
-      userId: new ObjectId(userId),
+
+    const result = await withTransaction(async (dbSession) => {
+      const existingCategory = await categoriesCollection.findOne(
+        {
+          _id: new ObjectId(categoryId),
+          userId: new ObjectId(user.id),
+        },
+        { session: dbSession }
+      )
+
+      if (!existingCategory) {
+        return {
+          error: t(
+            "Category not found or you don't have permission to delete!"
+          ),
+        }
+      }
+
+      const [
+        transactionCount,
+        budgetCount,
+        goalCount,
+        recurringTransactionCount,
+      ] = await Promise.all([
+        transactionsCollection.countDocuments(
+          {
+            userId: new ObjectId(user.id),
+            categoryKey: categoryId,
+          },
+          { session: dbSession }
+        ),
+        budgetsCollection.countDocuments(
+          {
+            userId: new ObjectId(user.id),
+            categoryKey: categoryId,
+          },
+          { session: dbSession }
+        ),
+        goalsCollection.countDocuments(
+          {
+            userId: new ObjectId(user.id),
+            categoryKey: categoryId,
+          },
+          { session: dbSession }
+        ),
+        recurringTransactionsCollection.countDocuments(
+          {
+            userId: new ObjectId(user.id),
+            categoryKey: categoryId,
+          },
+          { session: dbSession }
+        ),
+      ])
+
+      if (transactionCount > 0) {
+        return {
+          error: t(
+            "Cannot delete category. There are {count} transactions using this category. Please delete those transactions first.",
+            {
+              count: transactionCount.toString(),
+            }
+          ),
+        }
+      }
+
+      if (budgetCount > 0) {
+        return {
+          error: t(
+            "Cannot delete category. There are {count} budgets using this category. Please delete those budgets first.",
+            {
+              count: budgetCount.toString(),
+            }
+          ),
+        }
+      }
+
+      if (goalCount > 0) {
+        return {
+          error: t(
+            "Cannot delete category. There are {count} goals using this category. Please delete those goals first.",
+            {
+              count: goalCount.toString(),
+            }
+          ),
+        }
+      }
+
+      if (recurringTransactionCount > 0) {
+        return {
+          error: t(
+            "Cannot delete category. There are {count} recurring transactions using this category. Please delete those recurring transactions first.",
+            {
+              count: recurringTransactionCount.toString(),
+            }
+          ),
+        }
+      }
+
+      await categoriesCollection.deleteOne(
+        {
+          _id: new ObjectId(categoryId),
+          userId: new ObjectId(user.id),
+        },
+        { session: dbSession }
+      )
+
+      return { success: t("Category has been deleted.") }
     })
 
-    if (!existingCategory) {
-      return {
-        error: t("Category not found or you don't have permission to delete!"),
-      }
+    if (result.success) {
+      updateTag(`categories-${user.id}`)
     }
 
-    const [
-      transactionCount,
-      budgetCount,
-      goalCount,
-      recurringTransactionCount,
-    ] = await Promise.all([
-      transactionsCollection.countDocuments({
-        userId: new ObjectId(userId),
-        categoryKey: existingCategory.categoryKey,
-      }),
-      budgetsCollection.countDocuments({
-        userId: new ObjectId(userId),
-        categoryKey: existingCategory.categoryKey,
-      }),
-      goalsCollection.countDocuments({
-        userId: new ObjectId(userId),
-        categoryKey: existingCategory.categoryKey,
-      }),
-      recurringTransactionsCollection.countDocuments({
-        userId: new ObjectId(userId),
-        categoryKey: existingCategory.categoryKey,
-      }),
-    ])
-
-    if (transactionCount > 0) {
-      return {
-        error: t(
-          "Cannot delete category. There are {count} transactions using this category. Please delete those transactions first.",
-          {
-            count: transactionCount.toString(),
-          }
-        ),
-      }
-    }
-
-    if (budgetCount > 0) {
-      return {
-        error: t(
-          "Cannot delete category. There are {count} budgets using this category. Please delete those budgets first.",
-          {
-            count: budgetCount.toString(),
-          }
-        ),
-      }
-    }
-
-    if (goalCount > 0) {
-      return {
-        error: t(
-          "Cannot delete category. There are {count} goals using this category. Please delete those goals first.",
-          {
-            count: goalCount.toString(),
-          }
-        ),
-      }
-    }
-
-    if (recurringTransactionCount > 0) {
-      return {
-        error: t(
-          "Cannot delete category. There are {count} recurring transactions using this category. Please delete those recurring transactions first.",
-          {
-            count: recurringTransactionCount.toString(),
-          }
-        ),
-      }
-    }
-
-    await categoriesCollection.deleteOne({
-      _id: new ObjectId(categoryId),
-      userId: new ObjectId(userId),
-    })
-
-    updateTag(`categories-${userId}`)
-    return { success: t("Category has been deleted.") }
+    return result
   } catch (error) {
     console.error("Error deleting custom category:", error)
     return { error: t("Failed to delete category! Please try again later.") }
@@ -304,16 +308,13 @@ export async function getCustomCategories(): Promise<{
   error?: string
   customCategories?: Category[]
 }> {
-  const t = await getExtracted()
-  const session = await getCurrentSession()
+  const { error, user, session } = await getSession()
 
-  if (!session) {
-    return {
-      error: t("Access denied! Please refresh the page and try again."),
-    }
+  if (!user || !session) {
+    return { error }
   }
 
-  return getCachedCustomCategories(session.user.id)
+  return getCachedCustomCategories(user.id)
 }
 
 async function getCachedCustomCategories(userId: string) {

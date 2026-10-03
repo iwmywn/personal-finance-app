@@ -6,6 +6,7 @@ import {
   mockTransactions,
   mockUsers,
 } from "@/tests/shared/data"
+import type { User } from "@/lib/definitions"
 import {
   filterBudgets,
   filterCustomCategories,
@@ -81,6 +82,72 @@ describe("Filters", () => {
 
       // Month = 1, Year = 2025 -> Active!
       expect(isDateRangeOverlapping(start, end, 1, 2025)).toBe(true)
+    })
+
+    it("should correctly handle filtering by ONLY year (filterMonth is null)", () => {
+      const start = new Date("2024-03-01T00:00:00Z")
+      const end = new Date("2024-06-30T00:00:00Z")
+
+      // Range in 2024
+      expect(isDateRangeOverlapping(start, end, null, 2024)).toBe(true)
+      // Filter year is 2023 (ended before)
+      expect(isDateRangeOverlapping(start, end, null, 2023)).toBe(false)
+      // Filter year is 2025 (starts after)
+      expect(isDateRangeOverlapping(start, end, null, 2025)).toBe(false)
+
+      // Multi-year range (2023 to 2025) spans 2024
+      const multiYearStart = new Date("2023-06-01T00:00:00Z")
+      const multiYearEnd = new Date("2025-06-01T00:00:00Z")
+      expect(
+        isDateRangeOverlapping(multiYearStart, multiYearEnd, null, 2024)
+      ).toBe(true)
+
+      // Infinite end date
+      expect(isDateRangeOverlapping(start, null, null, 2024)).toBe(true)
+      expect(
+        isDateRangeOverlapping(
+          new Date("2025-01-01T00:00:00Z"),
+          null,
+          null,
+          2024
+        )
+      ).toBe(false)
+    })
+
+    it("should correctly handle filtering by ONLY month for same-year ranges (startM <= endM)", () => {
+      const start = new Date("2024-03-01T00:00:00Z")
+      const end = new Date("2024-06-30T00:00:00Z")
+
+      // Month 3 (start), Month 4 (middle), Month 6 (end) -> overlap
+      expect(isDateRangeOverlapping(start, end, 3, null)).toBe(true)
+      expect(isDateRangeOverlapping(start, end, 4, null)).toBe(true)
+      expect(isDateRangeOverlapping(start, end, 6, null)).toBe(true)
+
+      // Month 2 (before), Month 7 (after) -> do NOT overlap
+      expect(isDateRangeOverlapping(start, end, 2, null)).toBe(false)
+      expect(isDateRangeOverlapping(start, end, 7, null)).toBe(false)
+    })
+
+    it("should return true for any month when range duration is at least 11 months", () => {
+      const start = new Date("2023-01-01T00:00:00Z")
+      const end = new Date("2024-01-01T00:00:00Z")
+
+      expect(isDateRangeOverlapping(start, end, 7, null)).toBe(true)
+      expect(isDateRangeOverlapping(start, end, 12, null)).toBe(true)
+    })
+
+    it("should return false when range starts after or ends before the filtered month and year", () => {
+      const start = new Date("2024-03-01T00:00:00Z")
+      const end = new Date("2024-03-31T00:00:00Z")
+
+      // Filter is Feb 2024 (range starts after Feb)
+      expect(isDateRangeOverlapping(start, end, 2, 2024)).toBe(false)
+
+      const startJan = new Date("2024-01-01T00:00:00Z")
+      const endJan = new Date("2024-01-31T00:00:00Z")
+
+      // Filter is Feb 2024 (range ended before Feb)
+      expect(isDateRangeOverlapping(startJan, endJan, 2, 2024)).toBe(false)
     })
   })
 
@@ -227,6 +294,58 @@ describe("Filters", () => {
       expect(result).toHaveLength(3)
       expect(result.map((t) => t._id)).toEqual(["1", "2", "3"])
     })
+
+    it("should handle filterType 'all'", () => {
+      const result = filterTransactions(mockTransactions, { filterType: "all" })
+      expect(result).toHaveLength(mockTransactions.length)
+    })
+
+    it("should handle filterCategoryKey 'all'", () => {
+      const result = filterTransactions(mockTransactions, {
+        filterCategoryKey: "all",
+      })
+      expect(result).toHaveLength(mockTransactions.length)
+    })
+
+    it("should handle filterMonth 'all'", () => {
+      const result = filterTransactions(mockTransactions, {
+        filterMonth: "all",
+      })
+      expect(result).toHaveLength(mockTransactions.length)
+    })
+
+    it("should handle filterYear 'all'", () => {
+      const result = filterTransactions(mockTransactions, {
+        filterYear: "all",
+      })
+      expect(result).toHaveLength(mockTransactions.length)
+    })
+
+    it("should return all transactions when searchTerm is whitespace only", () => {
+      const result = filterTransactions(mockTransactions, { searchTerm: "   " })
+      expect(result).toHaveLength(mockTransactions.length)
+    })
+
+    it("should return empty array when searchTerm does not match any transaction", () => {
+      const result = filterTransactions(mockTransactions, {
+        searchTerm: "nonexistent-query",
+      })
+      expect(result).toEqual([])
+    })
+
+    it("should handle dateRange with undefined or null from/to", () => {
+      const result = filterTransactions(mockTransactions, {
+        dateRange: { from: null, to: null },
+      })
+      expect(result).toHaveLength(mockTransactions.length)
+    })
+
+    it("should return empty array when selectedDate does not match any transaction", () => {
+      const result = filterTransactions(mockTransactions, {
+        selectedDate: new Date("1990-01-01"),
+      })
+      expect(result).toEqual([])
+    })
   })
 
   describe("filterCustomCategories", () => {
@@ -296,6 +415,20 @@ describe("Filters", () => {
       })
 
       expect(result).toEqual([])
+    })
+
+    it("should handle filterType 'all'", () => {
+      const result = filterCustomCategories(mockCustomCategories, {
+        filterType: "all",
+      })
+      expect(result).toHaveLength(mockCustomCategories.length)
+    })
+
+    it("should return all categories when searchTerm is whitespace only", () => {
+      const result = filterCustomCategories(mockCustomCategories, {
+        searchTerm: "   ",
+      })
+      expect(result).toHaveLength(mockCustomCategories.length)
     })
   })
 
@@ -505,6 +638,63 @@ describe("Filters", () => {
 
       expect(result).toEqual([])
     })
+
+    it("should handle filterCategoryKey 'all'", () => {
+      const result = filterBudgets(
+        mockBudgets,
+        { filterCategoryKey: "all" },
+        mockTransactions
+      )
+      expect(result).toHaveLength(mockBudgets.length)
+    })
+
+    it("should handle filterMonth 'all'", () => {
+      const result = filterBudgets(
+        mockBudgets,
+        { filterMonth: "all" },
+        mockTransactions
+      )
+      expect(result).toHaveLength(mockBudgets.length)
+    })
+
+    it("should handle filterYear 'all'", () => {
+      const result = filterBudgets(
+        mockBudgets,
+        { filterYear: "all" },
+        mockTransactions
+      )
+      expect(result).toHaveLength(mockBudgets.length)
+    })
+
+    it("should combine filterStatus and filterProgress", () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date("2024-04-01"))
+
+      const result = filterBudgets(
+        mockBudgets,
+        {
+          filterStatus: "expired",
+          filterProgress: "gray",
+        },
+        mockTransactions
+      )
+
+      expect(result.map((b) => b._id)).toEqual(["4", "5"])
+
+      vi.useRealTimers()
+    })
+
+    it("should handle unknown filterProgress gracefully", () => {
+      const result = filterBudgets(
+        mockBudgets,
+        {
+          filterProgress: "unknown",
+        },
+        mockTransactions
+      )
+
+      expect(result).toHaveLength(mockBudgets.length)
+    })
   })
 
   describe("filterGoals", () => {
@@ -709,9 +899,104 @@ describe("Filters", () => {
 
       expect(result).toEqual([])
     })
+
+    it("should handle filterStatus 'all'", () => {
+      const result = filterGoals(
+        mockGoals,
+        { filterStatus: "all" },
+        mockTransactions
+      )
+      expect(result).toHaveLength(mockGoals.length)
+    })
+
+    it("should handle filterProgress 'all'", () => {
+      const result = filterGoals(
+        mockGoals,
+        { filterProgress: "all" },
+        mockTransactions
+      )
+      expect(result).toHaveLength(mockGoals.length)
+    })
+
+    it("should handle filterCategoryKey 'all'", () => {
+      const result = filterGoals(
+        mockGoals,
+        { filterCategoryKey: "all" },
+        mockTransactions
+      )
+      expect(result).toHaveLength(mockGoals.length)
+    })
+
+    it("should handle filterMonth 'all'", () => {
+      const result = filterGoals(
+        mockGoals,
+        { filterMonth: "all" },
+        mockTransactions
+      )
+      expect(result).toHaveLength(mockGoals.length)
+    })
+
+    it("should handle filterYear 'all'", () => {
+      const result = filterGoals(
+        mockGoals,
+        { filterYear: "all" },
+        mockTransactions
+      )
+      expect(result).toHaveLength(mockGoals.length)
+    })
+
+    it("should handle case insensitive search", () => {
+      const result = filterGoals(
+        mockGoals,
+        { searchTerm: "MOTORBIKE" },
+        mockTransactions
+      )
+      expect(result).toHaveLength(1)
+      expect(result[0].name).toBe("buy a motorbike")
+    })
+
+    it("should handle partial search matches", () => {
+      const result = filterGoals(
+        mockGoals,
+        { searchTerm: "motor" },
+        mockTransactions
+      )
+      expect(result).toHaveLength(1)
+      expect(result[0].name).toBe("buy a motorbike")
+    })
+
+    it("should return all goals when searchTerm is whitespace only", () => {
+      const result = filterGoals(
+        mockGoals,
+        { searchTerm: "   " },
+        mockTransactions
+      )
+      expect(result).toHaveLength(mockGoals.length)
+    })
+
+    it("should handle unknown filterProgress gracefully", () => {
+      const result = filterGoals(
+        mockGoals,
+        {
+          filterProgress: "unknown",
+        },
+        mockTransactions
+      )
+
+      expect(result).toHaveLength(mockGoals.length)
+    })
   })
 
   describe("filterRecurringTransactions", () => {
+    beforeEach(() => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date("2024-04-15T00:00:00.000Z"))
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
     it("should filter by search term", () => {
       const result = filterRecurringTransactions(mockRecurringTransactions, {
         searchTerm: "salary",
@@ -747,7 +1032,9 @@ describe("Filters", () => {
       })
 
       expect(result).toHaveLength(6)
-      expect(result.every((r) => r.isActive === true)).toBe(true)
+      expect(
+        result.every((r) => !r.endDate || new Date(r.endDate) >= new Date())
+      ).toBe(true)
       expect(result.map((r) => r._id)).toEqual(["1", "2", "3", "6", "7", "8"])
     })
 
@@ -757,8 +1044,33 @@ describe("Filters", () => {
       })
 
       expect(result).toHaveLength(2)
-      expect(result.every((r) => r.isActive === false)).toBe(true)
+      expect(
+        result.every((r) =>
+          Boolean(r.endDate && new Date(r.endDate) < new Date())
+        )
+      ).toBe(true)
       expect(result.map((r) => r._id)).toEqual(["4", "5"])
+    })
+
+    it("should filter by status - upcoming", () => {
+      const upcomingRec = {
+        ...mockRecurringTransactions[0],
+        _id: "upcoming-1",
+        startDate: new Date("2099-01-01"),
+        endDate: new Date("2099-12-31"),
+      }
+      const list = [...mockRecurringTransactions, upcomingRec]
+      const result = filterRecurringTransactions(list, {
+        filterStatus: "upcoming",
+      })
+
+      expect(result).toHaveLength(1)
+      expect(result[0]._id).toBe("upcoming-1")
+
+      const activeResult = filterRecurringTransactions(list, {
+        filterStatus: "active",
+      })
+      expect(activeResult.some((r) => r._id === "upcoming-1")).toBe(false)
     })
 
     it("should filter by month", () => {
@@ -876,12 +1188,33 @@ describe("Filters", () => {
 
       expect(result).toHaveLength(8)
     })
+
+    it("should handle filterMonth 'all'", () => {
+      const result = filterRecurringTransactions(mockRecurringTransactions, {
+        filterMonth: "all",
+      })
+      expect(result).toHaveLength(8)
+    })
+
+    it("should handle filterYear 'all'", () => {
+      const result = filterRecurringTransactions(mockRecurringTransactions, {
+        filterYear: "all",
+      })
+      expect(result).toHaveLength(8)
+    })
+
+    it("should return all recurring transactions when searchTerm is whitespace only", () => {
+      const result = filterRecurringTransactions(mockRecurringTransactions, {
+        searchTerm: "   ",
+      })
+      expect(result).toHaveLength(8)
+    })
   })
 
   describe("filterUsers", () => {
     it("should return all users when filters are default", () => {
       const result = filterUsers(mockUsers, {})
-      expect(result).toHaveLength(5)
+      expect(result).toHaveLength(4)
     })
 
     it("should search users by name", () => {
@@ -899,9 +1232,9 @@ describe("Filters", () => {
     })
 
     it("should search users by username", () => {
-      const result = filterUsers(mockUsers, { searchTerm: "superadmin" })
+      const result = filterUsers(mockUsers, { searchTerm: "admin" })
       expect(result).toHaveLength(1)
-      expect(result[0].id).toBe(mockUsers[3].id)
+      expect(result[0].id).toBe(mockUsers[2].id)
     })
 
     it("should filter users by role", () => {
@@ -909,38 +1242,210 @@ describe("Filters", () => {
       expect(adminResult).toHaveLength(1)
       expect(adminResult[0].id).toBe(mockUsers[2].id)
 
-      const superadminResult = filterUsers(mockUsers, {
-        filterRole: "superadmin",
-      })
-      expect(superadminResult).toHaveLength(1)
-      expect(superadminResult[0].id).toBe(mockUsers[3].id)
-
       const userResult = filterUsers(mockUsers, { filterRole: "user" })
       expect(userResult).toHaveLength(3)
     })
 
     it("should filter users by status", () => {
       const activeResult = filterUsers(mockUsers, { filterStatus: "active" })
-      expect(activeResult).toHaveLength(4)
+      expect(activeResult).toHaveLength(3)
 
       const bannedResult = filterUsers(mockUsers, { filterStatus: "banned" })
       expect(bannedResult).toHaveLength(1)
-      expect(bannedResult[0].id).toBe(mockUsers[4].id)
+      expect(bannedResult[0].id).toBe(mockUsers[3].id)
     })
 
     it("should combine search, role, and status filters", () => {
       const result = filterUsers(mockUsers, {
-        searchTerm: "Super",
-        filterRole: "superadmin",
+        searchTerm: "Admin",
+        filterRole: "admin",
         filterStatus: "active",
       })
       expect(result).toHaveLength(1)
-      expect(result[0].id).toBe(mockUsers[3].id)
+      expect(result[0].id).toBe(mockUsers[2].id)
     })
 
     it("should return empty array when no matches found", () => {
       const result = filterUsers(mockUsers, { searchTerm: "nonexistent" })
       expect(result).toHaveLength(0)
+    })
+
+    it("should handle filterRole 'all'", () => {
+      const result = filterUsers(mockUsers, { filterRole: "all" })
+      expect(result).toHaveLength(mockUsers.length)
+    })
+
+    it("should handle filterStatus 'all'", () => {
+      const result = filterUsers(mockUsers, { filterStatus: "all" })
+      expect(result).toHaveLength(mockUsers.length)
+    })
+
+    it("should handle empty users array", () => {
+      const result = filterUsers([], { searchTerm: "test" })
+      expect(result).toEqual([])
+    })
+
+    it("should handle case insensitive search", () => {
+      const result = filterUsers(mockUsers, { searchTerm: "ADMIN" })
+      expect(result).toHaveLength(1)
+      expect(result[0].id).toBe(mockUsers[2].id)
+    })
+
+    it("should handle partial search matches", () => {
+      const result = filterUsers(mockUsers, { searchTerm: "another" })
+      expect(result).toHaveLength(1)
+      expect(result[0].id).toBe(mockUsers[1].id)
+    })
+
+    it("should return all users when searchTerm is whitespace only", () => {
+      const result = filterUsers(mockUsers, { searchTerm: "   " })
+      expect(result).toHaveLength(mockUsers.length)
+    })
+
+    it("should treat user with banned: undefined as active", () => {
+      const userWithUndefinedBanned: User = {
+        ...mockUsers[0],
+        id: "user-undefined-banned",
+        banned: undefined,
+      }
+      const result = filterUsers([userWithUndefinedBanned], {
+        filterStatus: "active",
+      })
+      expect(result).toHaveLength(1)
+      expect(result[0].id).toBe("user-undefined-banned")
+
+      const bannedResult = filterUsers([userWithUndefinedBanned], {
+        filterStatus: "banned",
+      })
+      expect(bannedResult).toHaveLength(0)
+    })
+
+    it("should treat user with expired temporary ban as active", () => {
+      const userWithExpiredBan: User = {
+        ...mockUsers[0],
+        id: "user-expired-ban",
+        banned: true,
+        banExpires: new Date(Date.now() - 3600 * 1000), // 1 hour ago
+      }
+
+      const activeResult = filterUsers([userWithExpiredBan], {
+        filterStatus: "active",
+      })
+      expect(activeResult).toHaveLength(1)
+      expect(activeResult[0].id).toBe("user-expired-ban")
+
+      const bannedResult = filterUsers([userWithExpiredBan], {
+        filterStatus: "banned",
+      })
+      expect(bannedResult).toHaveLength(0)
+    })
+
+    it("should treat user with active temporary ban as banned", () => {
+      const userWithActiveBan: User = {
+        ...mockUsers[0],
+        id: "user-active-ban",
+        banned: true,
+        banExpires: new Date(Date.now() + 3600 * 1000), // 1 hour in future
+      }
+
+      const activeResult = filterUsers([userWithActiveBan], {
+        filterStatus: "active",
+      })
+      expect(activeResult).toHaveLength(0)
+
+      const bannedResult = filterUsers([userWithActiveBan], {
+        filterStatus: "banned",
+      })
+      expect(bannedResult).toHaveLength(1)
+      expect(bannedResult[0].id).toBe("user-active-ban")
+    })
+  })
+
+  describe("filterRecurringTransactions", () => {
+    const today = new Date("2026-06-15T12:00:00Z")
+
+    beforeEach(() => {
+      vi.useFakeTimers()
+      vi.setSystemTime(today)
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    const recurringList = [
+      {
+        _id: "rec-active-no-end",
+        userId: "user-1",
+        type: "outflow" as const,
+        categoryKey: "food_beverage" as const,
+        amount: "50000",
+        currency: "VND" as const,
+        description: "Lunch subscription",
+        frequency: "daily" as const,
+        startDate: new Date("2026-06-01T00:00:00Z"),
+      },
+      {
+        _id: "rec-active-ending-today",
+        userId: "user-1",
+        type: "outflow" as const,
+        categoryKey: "housing_utilities" as const,
+        amount: "100000",
+        currency: "VND" as const,
+        description: "Internet bill",
+        frequency: "monthly" as const,
+        startDate: new Date("2026-01-15T00:00:00Z"),
+        endDate: new Date("2026-06-15T00:00:00Z"), // Ends today
+      },
+      {
+        _id: "rec-expired-yesterday",
+        userId: "user-1",
+        type: "inflow" as const,
+        categoryKey: "salary_bonus" as const,
+        amount: "5000000",
+        currency: "VND" as const,
+        description: "Contract salary",
+        frequency: "monthly" as const,
+        startDate: new Date("2026-01-01T00:00:00Z"),
+        endDate: new Date("2026-06-14T00:00:00Z"), // Ended yesterday
+      },
+    ]
+
+    it("should consider a rule ending today as active and not inactive", () => {
+      const activeOnly = filterRecurringTransactions(recurringList, {
+        filterStatus: "active",
+      })
+      expect(activeOnly.map((r) => r._id)).toEqual([
+        "rec-active-no-end",
+        "rec-active-ending-today",
+      ])
+
+      const inactiveOnly = filterRecurringTransactions(recurringList, {
+        filterStatus: "inactive",
+      })
+      expect(inactiveOnly.map((r) => r._id)).toEqual(["rec-expired-yesterday"])
+    })
+
+    it("should filter recurring transactions by type and category", () => {
+      const inflowOnly = filterRecurringTransactions(recurringList, {
+        filterType: "inflow",
+      })
+      expect(inflowOnly.map((r) => r._id)).toEqual(["rec-expired-yesterday"])
+
+      const foodOnly = filterRecurringTransactions(recurringList, {
+        filterCategoryKey: "food_beverage",
+      })
+      expect(foodOnly.map((r) => r._id)).toEqual(["rec-active-no-end"])
+    })
+
+    it("should respect todayUTC passed from caller to prevent timezone mismatch", () => {
+      // If today is June 16, rec-active-ending-today (ends June 15) should be inactive
+      const customTodayUTC = new Date("2026-06-16T00:00:00Z")
+      const result = filterRecurringTransactions(recurringList, {
+        filterStatus: "active",
+        todayUTC: customTodayUTC,
+      })
+      expect(result.map((r) => r._id)).toEqual(["rec-active-no-end"])
     })
   })
 })

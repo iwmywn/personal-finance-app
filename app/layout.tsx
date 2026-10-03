@@ -6,19 +6,21 @@ import { NextIntlClientProvider } from "next-intl"
 import { getExtracted, getLocale } from "next-intl/server"
 
 import { nunito } from "@/app/fonts"
-import { siteConfig } from "@/app/pffa.config"
+import { siteConfig } from "@/app/pfa.config"
 import { Toaster } from "@/components/ui/sonner"
 import { ClientLang } from "@/components/layout/client-lang"
+import { ClientTimezone } from "@/components/layout/client-timezone"
+import { OfflineNotifier } from "@/components/layout/offline-notifier"
 import { ThemeProvider } from "@/components/layout/theme-provider"
 import { Logo } from "@/components/logo"
-import { SchemaMessagesProvider } from "@/context/schema-messages-context"
+import { SchemaMessagesContext } from "@/contexts/schema-messages-context"
 import { clientEnv } from "@/env/client"
 import { getSchemaMessages } from "@/schemas/messages"
 
 export async function generateMetadata(): Promise<Metadata> {
   const [locale, t] = await Promise.all([getLocale(), getExtracted()])
   const { name } = siteConfig
-  const description = t("Personal & Family Finance App")
+  const description = t("Personal Finance App")
 
   return {
     metadataBase: new URL(clientEnv.NEXT_PUBLIC_URL),
@@ -89,8 +91,10 @@ async function AppLayout({
 
   return (
     <NextIntlClientProvider>
-      <SchemaMessagesProvider messages={schemaMessages}>
+      <SchemaMessagesContext value={schemaMessages}>
         <ClientLang />
+        <ClientTimezone />
+        <OfflineNotifier />
         <Toaster richColors closeButton />
         <Suspense
           fallback={
@@ -101,7 +105,7 @@ async function AppLayout({
         >
           {children}
         </Suspense>
-      </SchemaMessagesProvider>
+      </SchemaMessagesContext>
     </NextIntlClientProvider>
   )
 }

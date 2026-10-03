@@ -1,18 +1,14 @@
-export const ROLES = ["user", "admin", "superadmin"] as const
-export type UserRole = (typeof ROLES)[number]
+export const ADMIN_ROLE = "admin"
+const USER_ROLE = "user"
 
-export const ADMIN_ROLES = ["admin", "superadmin"] as const
-export type AdminRole = (typeof ADMIN_ROLES)[number]
+/**
+ * Currently only supports creating regular user accounts.
+ */
+export const ASSIGNABLE_ROLES = [USER_ROLE] as const
+type AssignableRole = (typeof ASSIGNABLE_ROLES)[number]
 
-export const ASSIGNABLE_ROLES = ["user", "admin"] as const
-export type AssignableRole = (typeof ASSIGNABLE_ROLES)[number]
-
-export const DEFAULT_ROLE: AssignableRole = "user"
+export const DEFAULT_ROLE: AssignableRole = USER_ROLE
 
 export function isAdminRole(role: string): boolean {
-  return role === "admin" || role === "superadmin"
-}
-
-export function isSuperAdminRole(role: string): boolean {
-  return role === "superadmin"
+  return role === ADMIN_ROLE
 }

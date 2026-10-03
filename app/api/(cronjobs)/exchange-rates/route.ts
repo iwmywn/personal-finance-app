@@ -1,134 +1,189 @@
-"use server"
-
+import { updateTag } from "next/cache"
 import type { NextRequest } from "next/server"
 
-import { toDecimal128 } from "@/actions/utils"
-import { serverEnv } from "@/env/server"
-import { getExchangeRatesCollection } from "@/lib/collections"
-
-import { normalizeToUTCMidnight } from "./utils"
-
-type CurrencyAPIResponse = {
-  meta: {
-    last_updated_at: string
-  }
-  data: {
-    CNY: {
-      code: "CNY"
-      value: number
-    }
-    JPY: {
-      code: "JPY"
-      value: number
-    }
-    KRW: {
-      code: "KRW"
-      value: number
-    }
-    VND: {
-      code: "VND"
-      value: number
-    }
-  }
-}
+import {
+  enqueueMissingExchangeRateDate,
+  ensureExchangeRateForDate,
+} from "@/actions/exchange-rates.actions"
+import {
+  getExchangeRatesCollection,
+  getMissingExchangeRatesCollection,
+  getTransactionsCollection,
+} from "@/lib/collections"
+import { verifyCronAuth } from "@/lib/cron"
+import { CURRENCIES } from "@/lib/currency"
+import { addDays, normalizeToUTCMidnight } from "@/lib/date"
 
 // Vercel Cron Jobs only trigger HTTP GET requests.
 // [See official docs](https://vercel.com/docs/cron-jobs#how-cron-jobs-work)
+
+const MAX_DATES_PER_RUN = 5
+
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get("authorization")
-  if (authHeader !== `Bearer ${serverEnv.CRON_SECRET}`) {
+  if (!verifyCronAuth(authHeader)) {
     return new Response("Unauthorized", { status: 401 })
   }
 
   try {
-    const exchangeRatesCollection = await getExchangeRatesCollection()
+    const [missingRatesCollection, exchangeRatesCollection] = await Promise.all(
+      [getMissingExchangeRatesCollection(), getExchangeRatesCollection()]
+    )
 
-    const lastExchangeRate = await exchangeRatesCollection
-      .find({})
-      .sort({ date: -1 })
-      .limit(1)
+    const now = new Date()
+    const todayUTC = normalizeToUTCMidnight(now)
+    const yesterdayUTC = addDays(todayUTC, -1)
+
+    const datesToCheck = new Set<number>()
+    datesToCheck.add(yesterdayUTC.getTime())
+
+    // Only process queued docs that have not failed 6 times
+    const queuedDocs = await missingRatesCollection
+      .find({
+        status: { $ne: "failed" },
+        $or: [{ retryCount: { $lt: 6 } }, { retryCount: { $exists: false } }],
+      })
+      .sort({ createdAt: 1 })
+      .limit(MAX_DATES_PER_RUN)
       .toArray()
 
-    // if no exchange rates exist, we don't have a starting point
-    if (lastExchangeRate.length === 0) {
-      return Response.json({
-        success: true,
-        message:
-          "No existing exchange rates found. Please initialize manually.",
-        timestamp: new Date().toISOString(),
+    for (const doc of queuedDocs) {
+      if (doc?.date) {
+        datesToCheck.add(normalizeToUTCMidnight(new Date(doc.date)).getTime())
+      }
+    }
+
+    const nonUSDCurrencies = CURRENCIES.filter((c) => c !== "USD")
+    const checkDateObjs = Array.from(datesToCheck).map((ms) => new Date(ms))
+
+    const existingRates = await exchangeRatesCollection
+      .find({
+        date: { $in: checkDateObjs },
+      })
+      .toArray()
+
+    const existingMap = new Map(
+      existingRates.map((r) => [r.date.getTime(), r.rates])
+    )
+
+    const missingDates: Date[] = []
+    const resolvedDates: Date[] = []
+    for (const ms of datesToCheck) {
+      const rates = existingMap.get(ms)
+      const isMissing =
+        !rates || nonUSDCurrencies.some((c) => rates[c] === undefined)
+      if (isMissing) {
+        missingDates.push(new Date(ms))
+      } else {
+        resolvedDates.push(new Date(ms))
+      }
+    }
+
+    // Clean up any queued records whose exchange rates are already fully resolved
+    if (resolvedDates.length > 0) {
+      await missingRatesCollection.deleteMany({
+        date: { $in: resolvedDates },
       })
     }
 
-    const todayUTC = normalizeToUTCMidnight(new Date())
-    const lastDate = new Date(lastExchangeRate[0].date)
-    lastDate.setUTCDate(lastDate.getUTCDate() + 1)
-    const startDateUTC = normalizeToUTCMidnight(new Date(lastDate))
+    missingDates.sort((a, b) => a.getTime() - b.getTime())
+    const datesToSync = missingDates.slice(0, MAX_DATES_PER_RUN)
 
-    if (startDateUTC >= todayUTC) {
-      return Response.json({
-        success: true,
-        message: "No new rates to fetch.",
-        lastDate: lastExchangeRate.length > 0 ? lastExchangeRate[0].date : null,
-        timestamp: new Date().toISOString(),
-      })
-    }
-
-    const insertedDates: string[] = []
+    let syncedCount = 0
+    const successfullySyncedDates: Date[] = []
     const errors: { date: string; error: string }[] = []
 
-    const yesterday = new Date(todayUTC)
-    yesterday.setUTCDate(yesterday.getUTCDate() - 1)
-    const yesterdayUTC = normalizeToUTCMidnight(new Date(yesterday))
+    type SyncItemResult =
+      | { success: true; date: Date }
+      | { success: false; date: Date; error: string }
 
-    while (startDateUTC <= yesterdayUTC) {
-      const dateStr = startDateUTC.toISOString().split("T")[0] // YYYY-MM-DD
+    const syncResults = await Promise.allSettled(
+      datesToSync.map(async (d): Promise<SyncItemResult> => {
+        try {
+          await ensureExchangeRateForDate(d)
+          await missingRatesCollection.deleteOne({ date: d })
+          return { success: true, date: d }
+        } catch (error) {
+          const errorMsg =
+            error instanceof Error ? error.message : String(error ?? "")
+          await enqueueMissingExchangeRateDate(d, error, true)
+          return {
+            success: false,
+            date: d,
+            error: errorMsg,
+          }
+        }
+      })
+    )
 
-      try {
-        const apiUrl = `https://api.currencyapi.com/v3/historical?apikey=${serverEnv.CURRENCY_API_SECRET}&currencies=CNY%2CVND%2CJPY%2CKRW&date=${dateStr}`
-
-        const response = await fetch(apiUrl)
-
-        if (!response.ok) {
+    for (let i = 0; i < syncResults.length; i++) {
+      const res = syncResults[i]
+      const dateStr = datesToSync[i].toISOString().split("T")[0] as string
+      if (res.status === "fulfilled") {
+        if (res.value.success) {
+          syncedCount++
+          successfullySyncedDates.push(res.value.date)
+        } else {
           errors.push({
             date: dateStr,
-            error: `API returned ${response.status}!`,
+            error: res.value.error,
           })
-          startDateUTC.setUTCDate(startDateUTC.getUTCDate() + 1)
-          continue
         }
-
-        const data = (await response.json()) as CurrencyAPIResponse
-
-        await exchangeRatesCollection.insertOne({
-          date: normalizeToUTCMidnight(new Date(data.meta.last_updated_at)),
-          rates: {
-            CNY: toDecimal128(data.data.CNY.value.toString()),
-            JPY: toDecimal128(data.data.JPY.value.toString()),
-            KRW: toDecimal128(data.data.KRW.value.toString()),
-            VND: toDecimal128(data.data.VND.value.toString()),
-          },
-        })
-
-        insertedDates.push(dateStr)
-      } catch (error) {
+      } else {
+        const errorMsg =
+          res.reason instanceof Error
+            ? res.reason.message
+            : String(res.reason ?? "")
         errors.push({
           date: dateStr,
-          error: error instanceof Error ? error.message : "Unknown error!",
+          error: errorMsg,
         })
       }
-
-      startDateUTC.setUTCDate(startDateUTC.getUTCDate() + 1)
     }
+
+    // Invalidate transactions cache for all users having transactions on synced dates
+    if (successfullySyncedDates.length > 0) {
+      const transactionsCollection = await getTransactionsCollection()
+      const affectedTransactions = await transactionsCollection
+        .find(
+          { date: { $in: successfullySyncedDates } },
+          { projection: { userId: 1 } }
+        )
+        .toArray()
+
+      const affectedUserIds = new Set<string>()
+      for (const tx of affectedTransactions) {
+        if (tx.userId) {
+          affectedUserIds.add(tx.userId.toString())
+        }
+      }
+      for (const userId of affectedUserIds) {
+        updateTag(`transactions-${userId}`)
+      }
+    }
+
+    // Mark any dates that just reached retryCount >= 6 as failed
+    await missingRatesCollection.updateMany(
+      { retryCount: { $gte: 6 }, status: { $ne: "failed" } },
+      { $set: { status: "failed", failedAt: new Date() } }
+    )
+
+    const remainingQueueCount = await missingRatesCollection.countDocuments({
+      status: { $ne: "failed" },
+    })
 
     return Response.json({
       success: true,
-      inserted: insertedDates.length,
-      insertedDates,
-      errors: errors.length > 0 ? errors : undefined,
+      checkedCount: datesToCheck.size,
+      missingCount: missingDates.length,
+      batchCount: datesToSync.length,
+      syncedCount,
+      remainingCount: remainingQueueCount,
+      errors,
       timestamp: new Date().toISOString(),
     })
   } catch (error) {
-    console.error("CRON ERROR:", error)
-    return new Response("Cron failed", { status: 500 })
+    console.error("EXCHANGE RATES CRON ERROR:", error)
+    return new Response("Exchange rates cron failed", { status: 500 })
   }
 }

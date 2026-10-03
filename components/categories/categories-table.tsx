@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { MoreVerticalIcon, TagIcon } from "lucide-react"
@@ -28,9 +28,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { CategoryDialog } from "@/components/categories/category-dialog"
-import { DeleteCategoryDialog } from "@/components/categories/delete-category-dialog"
-import { useCategories } from "@/context/categories-context"
+import { CategoryForm } from "@/components/categories/category-form"
+import { DeleteCategory } from "@/components/categories/delete-category"
+import { useCategories } from "@/contexts/categories-context"
 import type { Category } from "@/lib/definitions"
 
 interface CategoriesTableProps {
@@ -143,17 +143,17 @@ export function CategoriesTable({ filteredCategories }: CategoriesTableProps) {
 
       {selectedCategory && (
         <>
-          <CategoryDialog
-            key={selectedCategory._id + "CategoryDialog"}
+          <CategoryForm
+            key={selectedCategory._id + "CategoryForm"}
             category={selectedCategory}
-            open={isEditOpen}
-            setOpen={setIsEditOpen}
+            isOpen={isEditOpen}
+            setIsOpen={setIsEditOpen}
           />
-          <DeleteCategoryDialog
-            key={selectedCategory._id + "DeleteCategoryDialog"}
+          <DeleteCategory
+            key={selectedCategory._id + "DeleteCategory"}
             categoryId={selectedCategory._id}
-            open={isDeleteOpen}
-            setOpen={setIsDeleteOpen}
+            isOpen={isDeleteOpen}
+            setIsOpen={setIsDeleteOpen}
           />
         </>
       )}

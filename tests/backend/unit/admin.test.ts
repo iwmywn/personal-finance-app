@@ -1,165 +1,490 @@
-import { ObjectId } from "mongodb"
+import { headers } from "next/headers"
+import { Collection, ObjectId } from "mongodb"
 
-import { insertTestUser } from "@/tests/backend/helpers/database"
+import {
+  insertTestBudget,
+  insertTestCategory,
+  insertTestGoal,
+  insertTestRecurringTransaction,
+  insertTestTransaction,
+  insertTestUser,
+} from "@/tests/backend/helpers/database"
 import {
   mockAuthenticatedAdmin,
-  mockAuthenticatedSuperAdmin,
   mockAuthenticatedUser,
   mockUnauthenticatedUser,
 } from "@/tests/backend/mocks/session.mock"
 import {
   mockAdminUser,
-  mockAnotherUser,
-  mockSuperAdminUser,
+  mockBannedUser,
+  mockDBAdminUser,
+  mockDBBudget,
+  mockDBCustomCategory,
+  mockDBGoal,
+  mockDBRecurringTransaction,
+  mockDBTransaction,
+  mockDBUser,
   mockUser,
+  mockUsers,
 } from "@/tests/shared/data"
-import { deleteUser, getAdminStats, listUsers } from "@/actions/admin.actions"
+import { deleteUser, getAdminData } from "@/actions/admin.actions"
+import { auth } from "@/lib/auth"
+import {
+  getBudgetsCollection,
+  getCategoriesCollection,
+  getGoalsCollection,
+  getRecurringTransactionsCollection,
+  getTransactionsCollection,
+  getUsersCollection,
+} from "@/lib/collections"
+import { connect } from "@/lib/db"
+import type { User } from "@/lib/definitions"
+import { triggerRateLimit } from "@/lib/rate-limit"
 
-vi.mock("next/headers", () => ({
-  headers: vi.fn().mockResolvedValue(new Headers()),
-}))
+type UserWithRole = NonNullable<
+  Awaited<ReturnType<typeof auth.api.listUsers>>
+>["users"][number]
 
-vi.mock("@/lib/auth", () => ({
-  auth: {
-    api: {
-      removeUser: vi.fn().mockResolvedValue({ status: true }),
-    },
-  },
-}))
+const toUserWithRole = (u: User): UserWithRole => ({
+  ...u,
+  banned: u.banned ?? null,
+})
 
-describe("Admin Actions", () => {
-  describe("getAdminStats", () => {
-    it("should return error when not authenticated", async () => {
-      mockUnauthenticatedUser()
+describe("Admin", () => {
+  describe("getAdminData", () => {
+    it("should handle error when headers() throws", async () => {
+      vi.mocked(headers).mockRejectedValueOnce(new Error("Headers unavailable"))
 
-      const result = await getAdminStats()
-
-      expect(result.stats).toBeUndefined()
-      expect(result.error).toBe("Access denied! Admin privileges required.")
-    })
-
-    it("should return error when user is not an admin", async () => {
-      mockAuthenticatedUser()
-
-      const result = await getAdminStats()
-
-      expect(result.stats).toBeUndefined()
-      expect(result.error).toBe("Access denied! Admin privileges required.")
-    })
-
-    it("should return correct stats when admin is authenticated", async () => {
-      mockAuthenticatedAdmin()
-
-      await Promise.all([
-        insertTestUser(mockUser),
-        insertTestUser(mockAnotherUser),
-      ])
-
-      const result = await getAdminStats()
-
-      expect(result.error).toBeUndefined()
-      expect(result.stats).toBeDefined()
-      expect(result.stats?.totalUsers).toBeGreaterThanOrEqual(2)
-      expect(result.stats?.activeUsers).toBeGreaterThanOrEqual(2)
-    })
-  })
-
-  describe("listUsers", () => {
-    it("should return error for non-admin user", async () => {
-      mockAuthenticatedUser()
-
-      const result = await listUsers()
+      const result = await getAdminData()
 
       expect(result.users).toBeUndefined()
-      expect(result.error).toBe("Access denied! Admin privileges required.")
+      expect(result.stats).toBeUndefined()
+      expect(result.error).toBe("Failed to list users! Please try again later.")
+      expect(auth.api.listUsers).not.toHaveBeenCalled()
     })
 
-    it("should return list of users for admin", async () => {
+    it("should return access denied error when not authenticated", async () => {
+      mockUnauthenticatedUser()
+
+      const result = await getAdminData()
+
+      expect(result.users).toBeUndefined()
+      expect(result.stats).toBeUndefined()
+      expect(result.error).toBe(
+        "Access denied! Please refresh the page and try again."
+      )
+      expect(auth.api.listUsers).not.toHaveBeenCalled()
+    })
+
+    it("should return access denied error when user is not an admin", async () => {
+      mockAuthenticatedUser()
+
+      const result = await getAdminData()
+
+      expect(result.users).toBeUndefined()
+      expect(result.stats).toBeUndefined()
+      expect(result.error).toBe("Access denied! Admin privileges required.")
+      expect(auth.api.listUsers).not.toHaveBeenCalled()
+    })
+
+    it("should return error when rate limit is exceeded in getAdminData", async () => {
+      mockAuthenticatedAdmin()
+      await triggerRateLimit(`admin:data:${mockAdminUser.id}`)
+
+      const result = await getAdminData()
+
+      expect(result.users).toBeUndefined()
+      expect(result.stats).toBeUndefined()
+      expect(result.error).toBe(
+        "Too many requests! Please slow down and try again later."
+      )
+    })
+
+    it("should handle error when auth.api.listUsers throws", async () => {
+      mockAuthenticatedAdmin()
+      vi.mocked(auth.api.listUsers).mockRejectedValueOnce(
+        new Error("Better Auth service error")
+      )
+
+      const result = await getAdminData()
+
+      expect(result.users).toBeUndefined()
+      expect(result.stats).toBeUndefined()
+      expect(result.error).toBe("Failed to list users! Please try again later.")
+    })
+
+    it("should handle null result from auth.api.listUsers", async () => {
+      mockAuthenticatedAdmin()
+      // @ts-expect-error - Testing null response
+      vi.mocked(auth.api.listUsers).mockResolvedValueOnce(null)
+
+      const result = await getAdminData()
+
+      expect(result.users).toBeUndefined()
+      expect(result.stats).toBeUndefined()
+      expect(result.error).toBe("Failed to list users! Please try again later.")
+    })
+
+    it("should successfully return users and calculated admin stats", async () => {
       mockAuthenticatedAdmin()
 
-      await insertTestUser(mockUser)
+      vi.mocked(headers).mockResolvedValue(new Headers())
 
-      const result = await listUsers()
+      vi.mocked(auth.api.listUsers).mockResolvedValueOnce({
+        users: mockUsers.map(toUserWithRole),
+        total: mockUsers.length,
+      })
+
+      const result = await getAdminData()
 
       expect(result.error).toBeUndefined()
-      expect(result.users).toBeDefined()
-      expect(Array.isArray(result.users)).toBe(true)
-      expect(result.total).toBeGreaterThanOrEqual(1)
-      expect(result.users?.some((u) => u.name === "Test User")).toBe(true)
+      expect(result.users).toEqual(mockUsers)
+      expect(result.stats).toEqual({
+        totalUsers: 4,
+        activeUsers: 3,
+        bannedUsers: 1,
+        adminUsers: 1,
+      })
+      expect(auth.api.listUsers).toHaveBeenCalledWith({
+        headers: expect.any(Headers),
+        query: {
+          sortBy: "createdAt",
+          sortDirection: "desc",
+        },
+      })
+    })
 
-      const foundUser = result.users?.find((u) => u.name === "Test User")
+    it("should correctly calculate stats when all users are active", async () => {
+      mockAuthenticatedAdmin()
 
-      expect(foundUser).toHaveProperty("id")
-      expect(foundUser).not.toHaveProperty("_id")
+      const activeUsers = [mockUser, mockAdminUser]
+      vi.mocked(auth.api.listUsers).mockResolvedValueOnce({
+        users: activeUsers.map(toUserWithRole),
+        total: activeUsers.length,
+      })
+
+      const result = await getAdminData()
+
+      expect(result.error).toBeUndefined()
+      expect(result.users).toEqual(activeUsers)
+      expect(result.stats).toEqual({
+        totalUsers: 2,
+        activeUsers: 2,
+        bannedUsers: 0,
+        adminUsers: 1,
+      })
+    })
+
+    it("should correctly calculate stats when all users are banned", async () => {
+      mockAuthenticatedAdmin()
+
+      const bannedUsers: User[] = [
+        mockBannedUser,
+        { ...mockUser, id: "user-banned-2", banned: true },
+      ]
+      vi.mocked(auth.api.listUsers).mockResolvedValueOnce({
+        users: bannedUsers.map(toUserWithRole),
+        total: bannedUsers.length,
+      })
+
+      const result = await getAdminData()
+
+      expect(result.error).toBeUndefined()
+      expect(result.stats).toEqual({
+        totalUsers: 2,
+        activeUsers: 0,
+        bannedUsers: 2,
+        adminUsers: 0,
+      })
+    })
+
+    it("should treat expired temporary bans as active users in stats", async () => {
+      mockAuthenticatedAdmin()
+
+      const users: User[] = [
+        mockUser,
+        {
+          ...mockBannedUser,
+          id: "user-expired-ban",
+          banned: true,
+          banExpires: new Date(Date.now() - 3600 * 1000),
+        },
+        {
+          ...mockBannedUser,
+          id: "user-active-ban",
+          banned: true,
+          banExpires: new Date(Date.now() + 3600 * 1000),
+        },
+      ]
+      vi.mocked(auth.api.listUsers).mockResolvedValueOnce({
+        users: users.map(toUserWithRole),
+        total: users.length,
+      })
+
+      const result = await getAdminData()
+
+      expect(result.error).toBeUndefined()
+      expect(result.stats).toEqual({
+        totalUsers: 3,
+        activeUsers: 2,
+        bannedUsers: 1,
+        adminUsers: 0,
+      })
+    })
+
+    it("should return empty stats when users array is empty", async () => {
+      mockAuthenticatedAdmin()
+
+      vi.mocked(auth.api.listUsers).mockResolvedValueOnce({
+        users: [],
+        total: 0,
+      })
+
+      const result = await getAdminData()
+
+      expect(result.error).toBeUndefined()
+      expect(result.users).toEqual([])
+      expect(result.stats).toEqual({
+        totalUsers: 0,
+        activeUsers: 0,
+        bannedUsers: 0,
+        adminUsers: 0,
+      })
     })
   })
 
   describe("deleteUser", () => {
-    it("should return error for invalid user ID", async () => {
-      mockAuthenticatedAdmin()
-
+    it("should return error when userId is invalid", async () => {
       const result = await deleteUser("invalid-id")
 
       expect(result.error).toBe("Invalid user ID!")
       expect(result.success).toBeUndefined()
     })
 
+    it("should return error when not authenticated", async () => {
+      mockUnauthenticatedUser()
+
+      const result = await deleteUser(new ObjectId().toString())
+
+      expect(result.error).toBe(
+        "Access denied! Please refresh the page and try again."
+      )
+      expect(result.success).toBeUndefined()
+    })
+
+    it("should return error when user is not an admin", async () => {
+      mockAuthenticatedUser()
+
+      const result = await deleteUser(new ObjectId().toString())
+
+      expect(result.error).toBe("Access denied! Admin privileges required.")
+      expect(result.success).toBeUndefined()
+    })
+
+    it("should return error when admin attempts to delete own account", async () => {
+      mockAuthenticatedAdmin()
+
+      const result = await deleteUser(mockDBAdminUser._id.toString())
+
+      expect(result.error).toBe("You cannot delete your own account!")
+      expect(result.success).toBeUndefined()
+    })
+
     it("should return error when target user is not found", async () => {
       mockAuthenticatedAdmin()
 
-      const nonExistentId = new ObjectId().toString()
-      const result = await deleteUser(nonExistentId)
+      const result = await deleteUser(new ObjectId().toString())
 
       expect(result.error).toBe("User not found!")
       expect(result.success).toBeUndefined()
     })
 
-    it("should prevent admin from deleting themselves", async () => {
+    it("should return error when admin attempts to delete another administrator account", async () => {
       mockAuthenticatedAdmin()
 
-      const result = await deleteUser("68f712e4cda4897217a05a99")
+      const otherAdminId = new ObjectId()
+      await insertTestUser({
+        ...mockDBAdminUser,
+        _id: otherAdminId,
+        email: "otheradmin@gmail.com",
+      })
 
-      expect(result.error).toBe("You cannot delete your own account!")
-    })
+      const result = await deleteUser(otherAdminId.toString())
 
-    it("should prevent admin from deleting superadmin account", async () => {
-      mockAuthenticatedAdmin()
-
-      await insertTestUser(mockSuperAdminUser)
-
-      const result = await deleteUser(mockSuperAdminUser._id.toString())
-      expect(result.error).toBe("Access denied! Admin privileges required.")
+      expect(result.error).toBe("Cannot delete another administrator account!")
       expect(result.success).toBeUndefined()
     })
 
-    it("should successfully delete target user", async () => {
+    it("should cascade delete all user and auth data atomically", async () => {
       mockAuthenticatedAdmin()
 
-      await insertTestUser(mockAnotherUser)
+      const targetUserId = new ObjectId()
+      const db = await connect()
 
-      const result = await deleteUser(mockAnotherUser._id.toString())
+      await Promise.all([
+        insertTestUser({ ...mockDBUser, _id: targetUserId }),
+        insertTestTransaction({
+          ...mockDBTransaction,
+          userId: targetUserId,
+        }),
+        insertTestCategory({
+          ...mockDBCustomCategory,
+          userId: targetUserId,
+        }),
+        insertTestBudget({
+          ...mockDBBudget,
+          userId: targetUserId,
+        }),
+        insertTestGoal({
+          ...mockDBGoal,
+          userId: targetUserId,
+        }),
+        insertTestRecurringTransaction({
+          ...mockDBRecurringTransaction,
+          userId: targetUserId,
+        }),
+        db.collection("sessions").insertOne({
+          userId: targetUserId.toString(),
+          token: "session-token-123",
+          expiresAt: new Date(),
+        }),
+        db.collection("accounts").insertOne({
+          userId: targetUserId.toString(),
+          providerId: "credential",
+          accountId: "account-123",
+        }),
+        db.collection("twoFactors").insertOne({
+          userId: targetUserId.toString(),
+          secret: "two-factor-secret",
+        }),
+        db.collection("verifications").insertOne({
+          identifier: "2fa-61Vu-KEnpelHAivKHqV4",
+          value: targetUserId.toString(),
+          expiresAt: new Date(),
+        }),
+        db.collection("verifications").insertOne({
+          identifier: "2fa-attempts-2fa-61Vu-KEnpelHAivKHqV4",
+          value: "0",
+          expiresAt: new Date(),
+        }),
+      ])
+
+      const result = await deleteUser(targetUserId.toString())
 
       expect(result.error).toBeUndefined()
       expect(result.success).toBe("User has been deleted.")
+
+      const [
+        usersColl,
+        transactionsColl,
+        categoriesColl,
+        budgetsColl,
+        goalsColl,
+        recurringColl,
+      ] = await Promise.all([
+        getUsersCollection(),
+        getTransactionsCollection(),
+        getCategoriesCollection(),
+        getBudgetsCollection(),
+        getGoalsCollection(),
+        getRecurringTransactionsCollection(),
+      ])
+
+      const [
+        userCount,
+        txCount,
+        catCount,
+        bgtCount,
+        goalCount,
+        recCount,
+        sessionCount,
+        accountCount,
+        twoFactorCount,
+        verificationCount,
+      ] = await Promise.all([
+        usersColl.countDocuments({ _id: targetUserId }),
+        transactionsColl.countDocuments({ userId: targetUserId }),
+        categoriesColl.countDocuments({ userId: targetUserId }),
+        budgetsColl.countDocuments({ userId: targetUserId }),
+        goalsColl.countDocuments({ userId: targetUserId }),
+        recurringColl.countDocuments({ userId: targetUserId }),
+        db.collection("sessions").countDocuments({
+          $or: [{ userId: targetUserId }, { userId: targetUserId.toString() }],
+        }),
+        db.collection("accounts").countDocuments({
+          $or: [{ userId: targetUserId }, { userId: targetUserId.toString() }],
+        }),
+        db.collection("twoFactors").countDocuments({
+          $or: [{ userId: targetUserId }, { userId: targetUserId.toString() }],
+        }),
+        db.collection("verifications").countDocuments({
+          $or: [
+            { value: targetUserId.toString() },
+            { identifier: "2fa-attempts-2fa-61Vu-KEnpelHAivKHqV4" },
+          ],
+        }),
+      ])
+
+      expect(userCount).toBe(0)
+      expect(txCount).toBe(0)
+      expect(catCount).toBe(0)
+      expect(bgtCount).toBe(0)
+      expect(goalCount).toBe(0)
+      expect(recCount).toBe(0)
+      expect(sessionCount).toBe(0)
+      expect(accountCount).toBe(0)
+      expect(twoFactorCount).toBe(0)
+      expect(verificationCount).toBe(0)
     })
 
-    it("should allow superadmin to delete an admin or user account", async () => {
-      mockAuthenticatedSuperAdmin()
+    it("should rollback all deletions if a failure occurs during transaction to prevent orphaned data", async () => {
+      mockAuthenticatedAdmin()
+
+      const targetUserId = new ObjectId()
 
       await Promise.all([
-        insertTestUser(mockAdminUser),
-        insertTestUser(mockAnotherUser),
+        insertTestUser({ ...mockDBUser, _id: targetUserId }),
+        insertTestTransaction({
+          ...mockDBTransaction,
+          userId: targetUserId,
+        }),
       ])
 
-      const [adminResult, userResult] = await Promise.all([
-        deleteUser(mockAdminUser._id.toString()),
-        deleteUser(mockAnotherUser._id.toString()),
-      ])
+      const usersColl = await getUsersCollection()
+      const transactionsColl = await getTransactionsCollection()
 
-      expect(adminResult.error).toBeUndefined()
-      expect(adminResult.success).toBe("User has been deleted.")
-      expect(userResult.error).toBeUndefined()
-      expect(userResult.success).toBe("User has been deleted.")
+      const deleteOneSpy = vi
+        .spyOn(Collection.prototype, "deleteOne")
+        .mockRejectedValueOnce(new Error("Database connection interrupted"))
+
+      const result = await deleteUser(targetUserId.toString())
+
+      expect(result.error).toBe(
+        "Failed to delete user! Please try again later."
+      )
+      expect(result.success).toBeUndefined()
+
+      const userCount = await usersColl.countDocuments({ _id: targetUserId })
+      const txCount = await transactionsColl.countDocuments({
+        userId: targetUserId,
+      })
+
+      expect(userCount).toBe(1)
+      expect(txCount).toBe(1)
+
+      deleteOneSpy.mockRestore()
+    })
+
+    it("should return error when rate limit is exceeded in deleteUser", async () => {
+      mockAuthenticatedAdmin()
+      await triggerRateLimit(`admin:delete:${mockAdminUser.id}`)
+
+      const result = await deleteUser("68f712e4cda4897217a05a1c")
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe(
+        "Too many requests! Please slow down and try again later."
+      )
     })
   })
 })

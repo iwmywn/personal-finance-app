@@ -1,8 +1,7 @@
-"use client"
+﻿"use client"
 
 import { buildSchemas } from "@/schemas"
-
-import { useSchemaMessages } from "@/context/schema-messages-context"
+import { useSchemaMessages } from "@/contexts/schema-messages-context"
 
 export function useSchemas() {
   const messages = useSchemaMessages()

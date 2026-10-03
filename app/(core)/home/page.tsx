@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { getExtracted } from "next-intl/server"
 
-import HomePage from "@/components/home/homepage"
+import HomePage from "@/components/home/home-page"
 import { PageDataProvider } from "@/components/layout/page-data-provider"
 
 export async function generateMetadata(): Promise<Metadata> {

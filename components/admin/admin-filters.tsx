@@ -96,7 +96,6 @@ export function AdminFilters({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">{t("All Roles")}</SelectItem>
-                <SelectItem value="superadmin">{t("Superadmin")}</SelectItem>
                 <SelectItem value="admin">{t("Admin")}</SelectItem>
                 <SelectItem value="user">{t("User")}</SelectItem>
               </SelectContent>
