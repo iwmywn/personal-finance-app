@@ -59,7 +59,7 @@ export function buildSchemas(messages: SchemaMessages) {
     fieldPath: string,
     ctx: z.RefinementCtx
   ) => {
-    const decimals = CURRENCY_CONFIG[currency]?.decimals ?? 2
+    const decimals = CURRENCY_CONFIG[currency].decimals
     try {
       const dec = new Decimal(amount)
       if (decimals === 0) {
