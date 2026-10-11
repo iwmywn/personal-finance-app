@@ -1,9 +1,9 @@
 import { ObjectId } from "mongodb"
 
 import { toDecimal128 } from "@/actions/utils"
-import { normalizeToUTCMidnight } from "@/app/api/(cronjobs)/exchange-rates/utils"
 import type { CategoryType } from "@/lib/category"
-import type { AppCurrency } from "@/lib/currency"
+import type { Currency } from "@/lib/currency"
+import { localDateToUTCMidnight, normalizeToUTCMidnight } from "@/lib/date"
 import type {
   Budget,
   Category,
@@ -16,12 +16,12 @@ import type {
   DBUser,
   Goal,
   RecurringTransaction,
+  Session,
   Transaction,
   User,
 } from "@/lib/definitions"
-import { localDateToUTCMidnight } from "@/lib/utils"
 
-export const mockUser: DBUser = {
+export const mockDBUser: DBUser = {
   _id: new ObjectId("68f712e4cda4897217a05a1c"),
   name: "Test User",
   email: "testuser@gmail.com",
@@ -38,7 +38,23 @@ export const mockUser: DBUser = {
   role: "user",
 }
 
-export const mockAnotherUser: DBUser = {
+export const mockUser: User = {
+  ...mockDBUser,
+  id: mockDBUser._id.toString(),
+}
+
+export const mockSession: Session = {
+  id: "session-1",
+  userId: mockUser.id,
+  expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+  token: "raw-secret-token-123",
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  ipAddress: "127.0.0.1",
+  userAgent: "Mozilla/5.0 Test Browser",
+}
+
+export const mockDBAnotherUser: DBUser = {
   _id: new ObjectId("690d2cdc200d6a719f9a438e"),
   name: "Another User",
   email: "anotheruser@gmail.com",
@@ -55,7 +71,12 @@ export const mockAnotherUser: DBUser = {
   role: "user",
 }
 
-export const mockAdminUser: DBUser = {
+export const mockAnotherUser: User = {
+  ...mockDBAnotherUser,
+  id: mockDBAnotherUser._id.toString(),
+}
+
+export const mockDBAdminUser: DBUser = {
   _id: new ObjectId("68f712e4cda4897217a05a99"),
   name: "Admin User",
   email: "admin@example.com",
@@ -72,24 +93,12 @@ export const mockAdminUser: DBUser = {
   role: "admin",
 }
 
-export const mockSuperAdminUser: DBUser = {
-  _id: new ObjectId("68f712e4cda4897217a05a98"),
-  name: "Super Admin",
-  email: "superadmin@example.com",
-  emailVerified: true,
-  image: undefined,
-  createdAt: new Date("2025-09-19T11:27:41.038Z"),
-  updatedAt: new Date("2025-09-19T12:50:48.129Z"),
-  username: "superadmin",
-  displayUsername: "superadmin",
-  locale: "en-US",
-  currency: "USD",
-  twoFactorEnabled: false,
-  banned: false,
-  role: "superadmin",
+export const mockAdminUser: User = {
+  ...mockDBAdminUser,
+  id: mockDBAdminUser._id.toString(),
 }
 
-export const mockBannedUser: DBUser = {
+export const mockDBBannedUser: DBUser = {
   _id: new ObjectId("690d2cdc200d6a719f9a438f"),
   name: "Banned User",
   email: "banned@gmail.com",
@@ -107,32 +116,21 @@ export const mockBannedUser: DBUser = {
   role: "user",
 }
 
+export const mockBannedUser: User = {
+  ...mockDBBannedUser,
+  id: mockDBBannedUser._id.toString(),
+}
+
 export const mockUsers: User[] = [
-  {
-    ...mockUser,
-    id: mockUser._id.toString(),
-  },
-  {
-    ...mockAnotherUser,
-    id: mockAnotherUser._id.toString(),
-  },
-  {
-    ...mockAdminUser,
-    id: mockAdminUser._id.toString(),
-  },
-  {
-    ...mockSuperAdminUser,
-    id: mockSuperAdminUser._id.toString(),
-  },
-  {
-    ...mockBannedUser,
-    id: mockBannedUser._id.toString(),
-  },
+  mockUser,
+  mockAnotherUser,
+  mockAdminUser,
+  mockBannedUser,
 ]
 
-export const mockTransaction: DBTransaction = {
+export const mockDBTransaction: DBTransaction = {
   _id: new ObjectId("68f73357357d93dcbaae8106"),
-  userId: mockUser._id,
+  userId: mockDBUser._id,
   type: "outflow" as CategoryType,
   categoryKey: "food_beverage",
   amount: toDecimal128("50000"),
@@ -141,18 +139,17 @@ export const mockTransaction: DBTransaction = {
   date: localDateToUTCMidnight(new Date("2024-01-15")),
 }
 
-export const mockCustomCategory: DBCategory = {
+export const mockDBCustomCategory: DBCategory = {
   _id: new ObjectId("68f732914e63e5aa249cc173"),
-  userId: mockUser._id,
-  categoryKey: "abcdef12",
+  userId: mockDBUser._id,
   type: "outflow" as CategoryType,
   label: "Entertainment",
   description: "Movies and games",
 }
 
-export const mockBudget: DBBudget = {
+export const mockDBBudget: DBBudget = {
   _id: new ObjectId("68f795d4bdcc3c9a30717988"),
-  userId: mockUser._id,
+  userId: mockDBUser._id,
   categoryKey: "food_beverage",
   allocatedAmount: toDecimal128("1000000"),
   currency: "VND",
@@ -160,9 +157,9 @@ export const mockBudget: DBBudget = {
   endDate: localDateToUTCMidnight(new Date("2024-01-31")),
 }
 
-export const mockGoal: DBGoal = {
+export const mockDBGoal: DBGoal = {
   _id: new ObjectId("68f896e5cda4897217a05a2d"),
-  userId: mockUser._id,
+  userId: mockDBUser._id,
   categoryKey: "salary_bonus",
   name: "buy a motorbike",
   targetAmount: toDecimal128("50000000"),
@@ -171,9 +168,9 @@ export const mockGoal: DBGoal = {
   endDate: localDateToUTCMidnight(new Date("2024-12-31")),
 }
 
-export const mockRecurringTransaction: DBRecurringTransaction = {
+export const mockDBRecurringTransaction: DBRecurringTransaction = {
   _id: new ObjectId("68f896e5cda4897217a05a3e"),
-  userId: mockUser._id,
+  userId: mockDBUser._id,
   type: "inflow" as CategoryType,
   categoryKey: "salary_bonus",
   amount: toDecimal128("5000000"),
@@ -183,11 +180,10 @@ export const mockRecurringTransaction: DBRecurringTransaction = {
   randomEveryXDays: undefined,
   startDate: localDateToUTCMidnight(new Date("2024-01-01")),
   endDate: localDateToUTCMidnight(new Date("2024-12-31")),
-  lastGenerated: undefined,
-  isActive: true,
+  lastGeneratedDate: undefined,
 }
 
-export const mockExchangeRates: DBExchangeRate[] = [
+export const mockDBExchangeRates: DBExchangeRate[] = [
   {
     _id: new ObjectId("68f800001234567890abcde1"),
     date: normalizeToUTCMidnight(new Date("2024-01-15T23:59:59Z")),
@@ -223,7 +219,7 @@ export const mockExchangeRates: DBExchangeRate[] = [
 export const mockValidTransactionValues = {
   type: "inflow" as CategoryType,
   categoryKey: "business_freelance",
-  currency: "VND" as AppCurrency,
+  currency: "VND" as Currency,
   amount: "2500000",
   description: "freelance project payment",
   date: localDateToUTCMidnight(new Date("2024-02-05")),
@@ -238,15 +234,15 @@ export const mockValidCategoryValues = {
 
 export const mockValidBudgetValues = {
   categoryKey: "food_beverage",
-  currency: "VND" as AppCurrency,
+  currency: "VND" as Currency,
   allocatedAmount: "1000000",
   startDate: localDateToUTCMidnight(new Date("2024-01-01")),
   endDate: localDateToUTCMidnight(new Date("2024-01-31")),
 }
 
 export const mockValidGoalValues = {
-  categoryKey: "food_beverage",
-  currency: "VND" as AppCurrency,
+  categoryKey: "salary_bonus",
+  currency: "VND" as Currency,
   name: "buy a motorbike",
   targetAmount: "50000000",
   startDate: localDateToUTCMidnight(new Date("2024-01-01")),
@@ -256,15 +252,13 @@ export const mockValidGoalValues = {
 export const mockValidRecurringTransactionValues = {
   type: "inflow" as CategoryType,
   categoryKey: "business_freelance",
-  currency: "VND" as AppCurrency,
+  currency: "VND" as Currency,
   amount: "2500000",
   description: "Freelance project payment",
   frequency: "monthly" as const,
   randomEveryXDays: undefined,
-  startDate: localDateToUTCMidnight(new Date("2024-02-01")),
+  startDate: localDateToUTCMidnight(new Date("2024-07-01")),
   endDate: localDateToUTCMidnight(new Date("2024-12-31")),
-  lastGenerated: undefined,
-  isActive: true,
 }
 
 export const mockTransactions: Transaction[] = [
@@ -321,7 +315,7 @@ export const mockTransactions: Transaction[] = [
   {
     _id: "6",
     userId: "68f712e4cda4897217a05a1c",
-    type: "outflow" as const,
+    type: "outflow",
     amount: "500000",
     currency: "VND",
     description: "Food outflow",
@@ -331,7 +325,7 @@ export const mockTransactions: Transaction[] = [
   {
     _id: "7",
     userId: "68f712e4cda4897217a05a1c",
-    type: "outflow" as const,
+    type: "outflow",
     amount: "400000",
     currency: "VND",
     description: "Transport outflow",
@@ -341,7 +335,7 @@ export const mockTransactions: Transaction[] = [
   {
     _id: "8",
     userId: "68f712e4cda4897217a05a1c",
-    type: "outflow" as const,
+    type: "outflow",
     amount: "2100000",
     currency: "VND",
     description: "Housing outflow",
@@ -351,7 +345,7 @@ export const mockTransactions: Transaction[] = [
   {
     _id: "9",
     userId: "68f712e4cda4897217a05a1c",
-    type: "inflow" as const,
+    type: "inflow",
     amount: "1000000",
     currency: "VND",
     description: "Salary",
@@ -364,7 +358,6 @@ export const mockCustomCategories: Category[] = [
   {
     _id: "1",
     userId: "68f712e4cda4897217a05a1c",
-    categoryKey: "abcdef12",
     type: "inflow",
     label: "Freelance Work",
     description: "Custom freelance category",
@@ -372,7 +365,6 @@ export const mockCustomCategories: Category[] = [
   {
     _id: "2",
     userId: "68f712e4cda4897217a05a1c",
-    categoryKey: "abcdef13",
     type: "outflow",
     label: "Restaurant",
     description: "Custom food category",
@@ -380,7 +372,6 @@ export const mockCustomCategories: Category[] = [
   {
     _id: "3",
     userId: "68f712e4cda4897217a05a1c",
-    categoryKey: "abcdef14",
     type: "outflow",
     label: "Taxi",
     description: "Custom transport category",
@@ -516,8 +507,7 @@ export const mockRecurringTransactions: RecurringTransaction[] = [
     randomEveryXDays: undefined,
     startDate: new Date("2024-01-01"),
     endDate: new Date("2024-12-31"),
-    lastGenerated: undefined,
-    isActive: true,
+    lastGeneratedDate: undefined,
   },
   {
     _id: "2",
@@ -531,8 +521,7 @@ export const mockRecurringTransactions: RecurringTransaction[] = [
     randomEveryXDays: undefined,
     startDate: new Date("2024-01-15"),
     endDate: new Date("2024-06-30"),
-    lastGenerated: undefined,
-    isActive: true,
+    lastGeneratedDate: undefined,
   },
   {
     _id: "3",
@@ -545,7 +534,6 @@ export const mockRecurringTransactions: RecurringTransaction[] = [
     frequency: "monthly",
     startDate: new Date("2024-02-01"),
     endDate: undefined,
-    isActive: true,
   },
   {
     _id: "4",
@@ -559,8 +547,7 @@ export const mockRecurringTransactions: RecurringTransaction[] = [
     randomEveryXDays: undefined,
     startDate: new Date("2024-03-01"),
     endDate: new Date("2024-03-31"),
-    lastGenerated: undefined,
-    isActive: false,
+    lastGeneratedDate: undefined,
   },
   {
     _id: "5",
@@ -574,8 +561,7 @@ export const mockRecurringTransactions: RecurringTransaction[] = [
     randomEveryXDays: undefined,
     startDate: new Date("2023-12-01"),
     endDate: new Date("2023-12-31"),
-    lastGenerated: undefined,
-    isActive: false,
+    lastGeneratedDate: undefined,
   },
   {
     _id: "6",
@@ -588,9 +574,8 @@ export const mockRecurringTransactions: RecurringTransaction[] = [
     frequency: "daily",
     randomEveryXDays: undefined,
     startDate: new Date("2024-01-10"),
-    endDate: new Date("2024-02-29"),
-    lastGenerated: undefined,
-    isActive: true,
+    endDate: new Date("2024-06-30"),
+    lastGeneratedDate: undefined,
   },
   {
     _id: "7",
@@ -604,8 +589,7 @@ export const mockRecurringTransactions: RecurringTransaction[] = [
     randomEveryXDays: 3,
     startDate: new Date("2024-04-01"),
     endDate: undefined,
-    lastGenerated: undefined,
-    isActive: true,
+    lastGeneratedDate: undefined,
   },
   {
     _id: "8",
@@ -618,8 +602,7 @@ export const mockRecurringTransactions: RecurringTransaction[] = [
     frequency: "monthly",
     randomEveryXDays: undefined,
     startDate: new Date("2023-11-01"),
-    endDate: new Date("2024-03-31"),
-    lastGenerated: undefined,
-    isActive: true,
+    endDate: new Date("2024-06-30"),
+    lastGeneratedDate: undefined,
   },
 ]

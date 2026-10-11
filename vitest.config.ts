@@ -5,6 +5,7 @@ import type { UserWorkspaceConfig } from "vitest/config"
 const baseTestConfig = {
   globals: true,
   environment: "node",
+  pool: "threads",
 }
 const baseResolveConfig = {
   alias: { "@": resolve(import.meta.dirname, "./") },

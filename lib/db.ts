@@ -1,7 +1,16 @@
+import "server-only"
+
 import { MongoClient } from "mongodb"
-import type { Collection, Db, MongoClientOptions, OptionalId } from "mongodb"
+import type {
+  ClientSession,
+  Collection,
+  Db,
+  MongoClientOptions,
+  OptionalId,
+} from "mongodb"
 
 import { serverEnv } from "@/env/server"
+import { initIndexes, resetIndexes } from "@/lib/indexes"
 
 declare global {
   var _mongoClientPromise: Promise<MongoClient> | undefined
@@ -10,7 +19,7 @@ declare global {
 
 let db: Db | undefined
 
-function getClientPromise() {
+export function getClientPromise(): Promise<MongoClient> {
   if (!globalThis._mongoClientPromise) {
     const options: MongoClientOptions = {}
     globalThis._mongoClientPromise = new MongoClient(
@@ -30,15 +39,26 @@ export async function connect(): Promise<Db> {
   db = client.db(serverEnv.DB_NAME)
   globalThis._mongoClient = client
 
+  await initIndexes(db)
+
   return db
 }
 
 export async function disconnect(): Promise<void> {
-  if (globalThis._mongoClient) {
-    await globalThis._mongoClient.close()
-    globalThis._mongoClientPromise = undefined
+  try {
+    if (globalThis._mongoClient) {
+      await globalThis._mongoClient.close()
+    } else if (globalThis._mongoClientPromise) {
+      const client = await globalThis._mongoClientPromise
+      await client.close()
+    }
+  } catch {
+    // Ignore connection close interruptions during teardown
+  } finally {
     globalThis._mongoClient = undefined
+    globalThis._mongoClientPromise = undefined
     db = undefined
+    resetIndexes()
   }
 }
 
@@ -47,4 +67,17 @@ export async function collection<T>(
 ): Promise<Collection<OptionalId<T>>> {
   const db = await connect()
   return db.collection<OptionalId<T>>(collectionName)
+}
+
+export async function withTransaction<T>(
+  callback: (session: ClientSession) => Promise<T>
+): Promise<T> {
+  const client = await getClientPromise()
+  const session = client.startSession()
+
+  try {
+    return await session.withTransaction(() => callback(session))
+  } finally {
+    await session.endSession()
+  }
 }

@@ -1,25 +1,30 @@
 "use server"
 
 import { cacheTag, updateTag } from "next/cache"
+import { after } from "next/server"
 import { ObjectId } from "mongodb"
 import { getExtracted } from "next-intl/server"
 
-import { convertTransactionsToCurrency } from "@/actions/exchange-rates.actions"
 import { getTransactionsCollection } from "@/lib/collections"
-import type { AppCurrency } from "@/lib/currency"
-import type { Transaction } from "@/lib/definitions"
+import type { Currency } from "@/lib/currency"
+import type { ActionResponse, Transaction } from "@/lib/definitions"
+import { isDuplicateKeyError } from "@/lib/indexes"
+import { isRateLimited, RATE_LIMIT_PRESETS } from "@/lib/rate-limit"
 import { getSchemas } from "@/schemas/server"
 import type { TransactionFormValues } from "@/schemas/types"
 
-import { getCurrentSession } from "./session.actions"
+import { isValidUserCategory } from "./category.server"
+import {
+  convertTransactionsToCurrency,
+  enqueueMissingExchangeRateDate,
+  ensureExchangeRateForDate,
+} from "./exchange-rates.actions"
+import { getSession } from "./session.actions"
 import { toDecimal128 } from "./utils"
 
 export async function createTransaction(
   values: TransactionFormValues
-): Promise<{
-  error?: string
-  success?: string
-}> {
+): Promise<ActionResponse> {
   const t = await getExtracted()
 
   try {
@@ -30,52 +35,82 @@ export async function createTransaction(
       return { error: t("Invalid data!") }
     }
 
-    const session = await getCurrentSession()
+    const { error, user, session } = await getSession()
 
-    if (!session) {
+    if (!user || !session) {
+      return { error }
+    }
+
+    if (
+      await isRateLimited(`transaction:${user.id}`, RATE_LIMIT_PRESETS.NORMAL)
+    ) {
       return {
-        error: t("Access denied! Please refresh the page and try again."),
+        error: t("Too many requests! Please slow down and try again later."),
       }
     }
 
-    const userId = session.user.id
+    const isValidCategory = await isValidUserCategory(
+      user.id,
+      parsedValues.data.categoryKey,
+      parsedValues.data.type
+    )
+
+    if (!isValidCategory) {
+      return { error: t("Invalid category!") }
+    }
+
     const transactionsCollection = await getTransactionsCollection()
-    const data = {
-      userId: new ObjectId(userId),
+
+    await transactionsCollection.insertOne({
+      userId: new ObjectId(user.id),
       type: parsedValues.data.type,
       categoryKey: parsedValues.data.categoryKey,
       amount: toDecimal128(parsedValues.data.amount),
       currency: parsedValues.data.currency,
       description: parsedValues.data.description,
       date: parsedValues.data.date,
-    }
+    })
 
-    const existingTransaction = await transactionsCollection.findOne(data)
+    after(async () => {
+      try {
+        await ensureExchangeRateForDate(parsedValues.data.date)
+      } catch (error) {
+        console.warn(
+          "Could not ensure exchange rate for transaction date, enqueuing retry:",
+          error
+        )
+        await enqueueMissingExchangeRateDate(parsedValues.data.date, error)
+      }
+    })
 
-    if (existingTransaction) {
-      return { error: t("This transaction has already been created today!") }
-    }
-
-    await transactionsCollection.insertOne(data)
-
-    updateTag(`transactions-${userId}`)
-    return { success: t("Transaction has been added."), error: undefined }
+    updateTag(`transactions-${user.id}`)
+    return { success: t("Transaction has been created.") }
   } catch (error) {
+    if (isDuplicateKeyError(error)) {
+      return {
+        error: t(
+          "This transaction already exists! Please merge transactions or add more details in the description."
+        ),
+      }
+    }
     console.error("Error creating transaction:", error)
-    return { error: t("Failed to add transaction! Please try again later.") }
+    return { error: t("Failed to create transaction! Please try again later.") }
   }
 }
 
 export async function updateTransaction(
   transactionId: string,
   values: TransactionFormValues
-): Promise<{
-  error?: string
-  success?: string
-}> {
+): Promise<ActionResponse> {
   const t = await getExtracted()
 
   try {
+    if (!ObjectId.isValid(transactionId)) {
+      return {
+        error: t("Invalid transaction ID!"),
+      }
+    }
+
     const { createTransactionSchema } = await getSchemas()
     const parsedValues = createTransactionSchema().safeParse(values)
 
@@ -83,37 +118,36 @@ export async function updateTransaction(
       return { error: t("Invalid data!") }
     }
 
-    const session = await getCurrentSession()
+    const { error, user, session } = await getSession()
 
-    if (!session) {
+    if (!user || !session) {
+      return { error }
+    }
+
+    if (
+      await isRateLimited(`transaction:${user.id}`, RATE_LIMIT_PRESETS.NORMAL)
+    ) {
       return {
-        error: t("Access denied! Please refresh the page and try again."),
+        error: t("Too many requests! Please slow down and try again later."),
       }
     }
 
-    if (!ObjectId.isValid(transactionId)) {
-      return {
-        error: t("Invalid transaction ID!"),
-      }
+    const isValidCategory = await isValidUserCategory(
+      user.id,
+      parsedValues.data.categoryKey,
+      parsedValues.data.type
+    )
+
+    if (!isValidCategory) {
+      return { error: t("Invalid category!") }
     }
 
-    const userId = session.user.id
     const transactionsCollection = await getTransactionsCollection()
-    const existingTransaction = await transactionsCollection.findOne({
-      _id: new ObjectId(transactionId),
-      userId: new ObjectId(userId),
-    })
 
-    if (!existingTransaction) {
-      return {
-        error: t("Transaction not found or you don't have permission to edit!"),
-      }
-    }
-
-    await transactionsCollection.updateOne(
+    const result = await transactionsCollection.updateOne(
       {
         _id: new ObjectId(transactionId),
-        userId: new ObjectId(userId),
+        userId: new ObjectId(user.id),
       },
       {
         $set: {
@@ -127,46 +161,74 @@ export async function updateTransaction(
       }
     )
 
-    updateTag(`transactions-${userId}`)
+    if (result.matchedCount === 0) {
+      return {
+        error: t("Transaction not found or you don't have permission to edit!"),
+      }
+    }
+
+    after(async () => {
+      try {
+        await ensureExchangeRateForDate(parsedValues.data.date)
+      } catch (error) {
+        console.warn(
+          "Could not ensure exchange rate for transaction date, enqueuing retry:",
+          error
+        )
+        await enqueueMissingExchangeRateDate(parsedValues.data.date, error)
+      }
+    })
+
+    updateTag(`transactions-${user.id}`)
     return {
       success: t("Transaction has been updated."),
-      error: undefined,
     }
   } catch (error) {
+    if (isDuplicateKeyError(error)) {
+      return {
+        error: t(
+          "This transaction already exists! Please merge transactions or add more details in the description."
+        ),
+      }
+    }
     console.error("Error updating transaction:", error)
     return { error: t("Failed to update transaction! Please try again later.") }
   }
 }
 
-export async function deleteTransaction(transactionId: string): Promise<{
-  error?: string
-  success?: string
-}> {
+export async function deleteTransaction(
+  transactionId: string
+): Promise<ActionResponse> {
   const t = await getExtracted()
 
   try {
-    const session = await getCurrentSession()
-
-    if (!session) {
-      return {
-        error: t("Access denied! Please refresh the page and try again."),
-      }
-    }
-
     if (!ObjectId.isValid(transactionId)) {
       return {
         error: t("Invalid transaction ID!"),
       }
     }
 
-    const userId = session.user.id
+    const { error, user, session } = await getSession()
+
+    if (!user || !session) {
+      return { error }
+    }
+
+    if (
+      await isRateLimited(`transaction:${user.id}`, RATE_LIMIT_PRESETS.MODERATE)
+    ) {
+      return {
+        error: t("Too many requests! Please slow down and try again later."),
+      }
+    }
+
     const transactionsCollection = await getTransactionsCollection()
-    const existingTransaction = await transactionsCollection.findOne({
+    const result = await transactionsCollection.deleteOne({
       _id: new ObjectId(transactionId),
-      userId: new ObjectId(userId),
+      userId: new ObjectId(user.id),
     })
 
-    if (!existingTransaction) {
+    if (result.deletedCount === 0) {
       return {
         error: t(
           "Transaction not found or you don't have permission to delete!"
@@ -174,12 +236,7 @@ export async function deleteTransaction(transactionId: string): Promise<{
       }
     }
 
-    await transactionsCollection.deleteOne({
-      _id: new ObjectId(transactionId),
-      userId: new ObjectId(userId),
-    })
-
-    updateTag(`transactions-${userId}`)
+    updateTag(`transactions-${user.id}`)
     return { success: t("Transaction has been deleted.") }
   } catch (error) {
     console.error("Error deleting transaction:", error)
@@ -191,25 +248,16 @@ export async function getTransactions(): Promise<{
   error?: string
   transactions?: Transaction[]
 }> {
-  const t = await getExtracted()
-  const session = await getCurrentSession()
+  const { error, user, session } = await getSession()
 
-  if (!session) {
-    return {
-      error: t("Access denied! Please refresh the page and try again."),
-    }
+  if (!user || !session) {
+    return { error }
   }
 
-  return getCachedTransactions(
-    session.user.id,
-    session.user.currency as AppCurrency
-  )
+  return getCachedTransactions(user.id, user.currency as Currency)
 }
 
-async function getCachedTransactions(
-  userId: string,
-  targetCurrency: AppCurrency
-) {
+async function getCachedTransactions(userId: string, targetCurrency: Currency) {
   "use cache: private"
   cacheTag(`transactions-${userId}`)
 

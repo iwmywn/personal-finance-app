@@ -1,6 +1,6 @@
 "use client"
 
-import { useExtracted } from "next-intl"
+import { useExtracted, useTimeZone } from "next-intl"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
@@ -9,25 +9,35 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { useTransactions } from "@/context/transactions-context"
+import { useTransactions } from "@/contexts/transactions-context"
+import { useUser } from "@/contexts/user-context"
 import { useCategory } from "@/hooks/use-category"
 import { useFormatCurrency } from "@/hooks/use-format-currency"
+import type { Currency } from "@/lib/currency"
 import { calculateQuickStats } from "@/lib/statistics"
 
 export function QuickStats() {
   const { transactions } = useTransactions()
+  const { user } = useUser()
   const t = useExtracted()
   const { getCategoryLabel } = useCategory()
   const formatCurrency = useFormatCurrency()
+  const timeZone = useTimeZone()
 
   const {
     currentMonthCount,
+    unconvertedCount,
     highestTransaction,
     lowestTransaction,
     avgOutflow,
     savingsRate,
     popularCategory,
-  } = calculateQuickStats(transactions)
+  } = calculateQuickStats(
+    transactions,
+    undefined,
+    user.currency as Currency,
+    timeZone
+  )
 
   return (
     <Card className="overflow-hidden py-0 pb-6">
@@ -40,7 +50,15 @@ export function QuickStats() {
             <TooltipTrigger asChild>
               <div className="row">
                 <div className="left">{t("Total Transactions")}:</div>
-                <div className="right">{currentMonthCount}</div>
+                <div className="right">
+                  {currentMonthCount}
+                  {unconvertedCount > 0 && (
+                    <span className="text-muted-foreground text-xs font-normal">
+                      {" "}
+                      (+{unconvertedCount})
+                    </span>
+                  )}
+                </div>
               </div>
             </TooltipTrigger>
             <TooltipContent>
@@ -64,7 +82,7 @@ export function QuickStats() {
                   }`}
                 >
                   {highestTransaction !== null
-                    ? `${highestTransaction.type === "inflow" ? "+" : "-"}${formatCurrency(highestTransaction.amount)}`
+                    ? `${highestTransaction.type === "inflow" ? "+" : "-"}${formatCurrency(highestTransaction.amount, highestTransaction.currency)}`
                     : t("No data")}
                 </div>
               </div>
@@ -92,7 +110,7 @@ export function QuickStats() {
                   }`}
                 >
                   {lowestTransaction !== null
-                    ? `${lowestTransaction.type === "inflow" ? "+" : "-"}${formatCurrency(lowestTransaction.amount)}`
+                    ? `${lowestTransaction.type === "inflow" ? "+" : "-"}${formatCurrency(lowestTransaction.amount, lowestTransaction.currency)}`
                     : t("No data")}
                 </div>
               </div>
@@ -157,7 +175,7 @@ export function QuickStats() {
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="row">
-                <div className="left">{t("Popular Category")}:</div>
+                <div className="left">{t("Popular Expense Category")}:</div>
                 <div className="right">
                   {popularCategory.length > 0
                     ? popularCategory
@@ -168,7 +186,9 @@ export function QuickStats() {
               </div>
             </TooltipTrigger>
             <TooltipContent>
-              {t("Category with the highest total amount in the month.")}
+              {t(
+                "Outflow category with the highest total amount in the month."
+              )}
             </TooltipContent>
           </Tooltip>
         </div>

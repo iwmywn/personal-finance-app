@@ -1,148 +1,82 @@
+import { updateTag } from "next/cache"
 import { NextRequest } from "next/server"
+import { ObjectId } from "mongodb"
 
-import { insertTestExchangeRate } from "@/tests/backend/helpers/database"
-import { mockExchangeRates } from "@/tests/shared/data"
+import {
+  insertTestMissingExchangeRate,
+  insertTestTransaction,
+} from "@/tests/backend/helpers/database"
+import { mockDBAnotherUser, mockDBUser } from "@/tests/shared/data"
+import * as exchangeRatesActions from "@/actions/exchange-rates.actions"
+import { toDecimal128 } from "@/actions/utils"
 import { GET } from "@/app/api/(cronjobs)/exchange-rates/route"
-import { normalizeToUTCMidnight } from "@/app/api/(cronjobs)/exchange-rates/utils"
-import { getExchangeRatesCollection } from "@/lib/collections"
+import * as collections from "@/lib/collections"
+import {
+  getExchangeRatesCollection,
+  getMissingExchangeRatesCollection,
+} from "@/lib/collections"
+import { addDays, normalizeToUTCMidnight } from "@/lib/date"
 
 const cronSecret = "test-cron-secret"
 const cronEndpoint = "http://localhost/api/exchange-rates"
 
-const mockCurrencyAPIResponse = [
-  {
-    meta: {
-      last_updated_at: "2024-12-22T23:59:59Z",
-    },
-    data: {
-      CNY: {
-        code: "CNY",
-        value: 7.0366009237,
-      },
-      JPY: {
-        code: "JPY",
-        value: 156.8850221257,
-      },
-      KRW: {
-        code: "KRW",
-        value: 1480.216265847,
-      },
-      VND: {
-        code: "VND",
-        value: 26310.003541037,
-      },
-    },
-  },
-  {
-    meta: {
-      last_updated_at: "2024-12-23T23:59:59Z",
-    },
-    data: {
-      CNY: {
-        code: "CNY",
-        value: 7.0280007505,
-      },
-      JPY: {
-        code: "JPY",
-        value: 156.1690311899,
-      },
-      KRW: {
-        code: "KRW",
-        value: 1480.9201782294,
-      },
-      VND: {
-        code: "VND",
-        value: 26330.00392171,
-      },
-    },
-  },
-]
-
 describe("Exchange Rates Cron Job", () => {
-  describe("normalizeToUTCMidnight", () => {
-    it("should strip time from UTC date", () => {
-      const date = new Date("2024-01-15T23:45:12Z")
-      const result = normalizeToUTCMidnight(date)
-      expect(result.toISOString()).toBe("2024-01-15T00:00:00.000Z")
-    })
-
-    it("should handle UTC boundary correctly", () => {
-      const date = new Date("2024-01-16T00:00:00Z")
-      const result = normalizeToUTCMidnight(date)
-      expect(result.toISOString()).toBe("2024-01-16T00:00:00.000Z")
-    })
-
-    it("should work correctly with dates having local timezone offset", () => {
-      // 2024-01-16T01:00:00+07:00 is 2024-01-15T18:00:00Z
-      const date = new Date("2024-01-16T01:00:00+07:00")
-      const result = normalizeToUTCMidnight(date)
-      expect(result.toISOString()).toBe("2024-01-15T00:00:00.000Z")
-    })
+  afterEach(() => {
+    vi.restoreAllMocks()
   })
 
   describe("Authorization", () => {
     it("should return 401 when authorization header is missing", async () => {
       const request = new NextRequest(cronEndpoint)
-
       const response = await GET(request)
-      const text = await response.text()
 
       expect(response.status).toBe(401)
-      expect(text).toBe("Unauthorized")
+      expect(await response.text()).toBe("Unauthorized")
     })
 
-    it("should return 401 when authorization header is invalid", async () => {
+    it("should return 401 when authorization header has invalid token", async () => {
       const request = new NextRequest(cronEndpoint, {
         headers: {
           authorization: "Bearer wrong-secret",
         },
       })
-
       const response = await GET(request)
-      const text = await response.text()
 
       expect(response.status).toBe(401)
-      expect(text).toBe("Unauthorized")
+      expect(await response.text()).toBe("Unauthorized")
     })
 
-    it("should return 401 when authorization header format is wrong", async () => {
+    it("should return 401 when authorization header format is invalid", async () => {
       const request = new NextRequest(cronEndpoint, {
         headers: {
-          authorization: `Invalid ${cronSecret}`,
+          authorization: "Basic some-credentials",
         },
       })
-
       const response = await GET(request)
-      const text = await response.text()
 
       expect(response.status).toBe(401)
-      expect(text).toBe("Unauthorized")
+      expect(await response.text()).toBe("Unauthorized")
     })
   })
 
-  describe("Successful execution", () => {
-    beforeEach(() => {
-      global.fetch = vi.fn()
-    })
+  describe("Cron execution", () => {
+    it("should fetch rates for yesterday when no rates exist", async () => {
+      const mockRatesResponse = {
+        meta: { last_updated_at: "2024-03-10T23:59:59Z" },
+        data: {
+          CNY: { code: "CNY", value: 7.18 },
+          JPY: { code: "JPY", value: 147.2 },
+          KRW: { code: "KRW", value: 1320.5 },
+          USD: { code: "USD", value: 1 },
+          VND: { code: "VND", value: 24600 },
+        },
+      }
 
-    it("should fetch and save exchange rates when last rate exists and needs update", async () => {
-      const twoDaysAgo = normalizeToUTCMidnight(
-        new Date("2024-12-22T23:59:59Z")
-      )
-
-      await insertTestExchangeRate({
-        ...mockExchangeRates[0],
-        date: twoDaysAgo,
-      })
-
-      vi.mocked(global.fetch).mockResolvedValue({
+      const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce({
         ok: true,
-        json: async () => mockCurrencyAPIResponse[1],
+        json: async () => mockRatesResponse,
       } as Response)
 
-      vi.useFakeTimers()
-      vi.setSystemTime(new Date("2024-12-24T12:00:00.000Z"))
-
       const request = new NextRequest(cronEndpoint, {
         headers: {
           authorization: `Bearer ${cronSecret}`,
@@ -150,50 +84,51 @@ describe("Exchange Rates Cron Job", () => {
       })
 
       const response = await GET(request)
-      const data = await response.json()
-
       expect(response.status).toBe(200)
-      expect(data.success).toBe(true)
-      expect(data.inserted).toBe(1)
-      expect(data.insertedDates).toHaveLength(1)
-      expect(data.insertedDates[0]).toBe("2024-12-23")
+
+      const json = await response.json()
+      expect(json.success).toBe(true)
+      expect(json.syncedCount).toBeGreaterThanOrEqual(1)
+      expect(fetchSpy).toHaveBeenCalledTimes(1)
+
+      const now = new Date()
+      const todayUTC = normalizeToUTCMidnight(now)
+      const yesterdayUTC = new Date(todayUTC.getTime() - 24 * 60 * 60 * 1000)
 
       const exchangeRatesCollection = await getExchangeRatesCollection()
-      const savedRate = await exchangeRatesCollection.findOne({
-        date: normalizeToUTCMidnight(new Date("2024-12-23T23:59:59Z")),
+      const saved = await exchangeRatesCollection.findOne({
+        date: yesterdayUTC,
       })
 
-      expect(savedRate).toBeDefined()
-      expect(savedRate?.rates.CNY.toString()).toBe("7.0280007505")
-      expect(savedRate?.rates.JPY.toString()).toBe("156.1690311899")
-      expect(savedRate?.rates.KRW.toString()).toBe("1480.9201782294")
-      expect(savedRate?.rates.VND.toString()).toBe("26330.00392171")
-
-      vi.useRealTimers()
+      expect(saved).not.toBeNull()
+      expect(saved?.rates.VND?.toString()).toBe("24600")
+      expect(saved?.rates.CNY?.toString()).toBe("7.18")
     })
 
-    it("should fetch multiple days when there are gaps", async () => {
-      const threeDaysAgo = normalizeToUTCMidnight(
-        new Date("2024-12-21T23:59:59Z")
-      )
-
-      await insertTestExchangeRate({
-        ...mockExchangeRates[0],
-        date: threeDaysAgo,
+    it("should fetch missing rates for queued dates from missingExchangeRates", async () => {
+      const pastDate = new Date("2024-01-15T00:00:00Z")
+      await insertTestMissingExchangeRate({
+        _id: new ObjectId(),
+        date: pastDate,
+        createdAt: new Date(),
+        retryCount: 0,
       })
 
-      vi.mocked(global.fetch)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => mockCurrencyAPIResponse[0],
-        } as Response)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => mockCurrencyAPIResponse[1],
-        } as Response)
+      const mockRatesResponse = {
+        meta: { last_updated_at: "2024-01-15T23:59:59Z" },
+        data: {
+          CNY: { code: "CNY", value: 7.15 },
+          JPY: { code: "JPY", value: 145.0 },
+          KRW: { code: "KRW", value: 1300.0 },
+          USD: { code: "USD", value: 1 },
+          VND: { code: "VND", value: 24500 },
+        },
+      }
 
-      vi.useFakeTimers()
-      vi.setSystemTime(new Date("2024-12-24T12:00:00.000Z"))
+      vi.spyOn(globalThis, "fetch").mockResolvedValue({
+        ok: true,
+        json: async () => mockRatesResponse,
+      } as Response)
 
       const request = new NextRequest(cronEndpoint, {
         headers: {
@@ -202,73 +137,55 @@ describe("Exchange Rates Cron Job", () => {
       })
 
       const response = await GET(request)
-      const data = await response.json()
-
       expect(response.status).toBe(200)
-      expect(data.success).toBe(true)
-      expect(data.inserted).toBe(2)
-      expect(data.insertedDates).toHaveLength(2)
-      expect(data.insertedDates).toContain("2024-12-22")
-      expect(data.insertedDates).toContain("2024-12-23")
+
+      const json = await response.json()
+      expect(json.success).toBe(true)
 
       const exchangeRatesCollection = await getExchangeRatesCollection()
-      const allRates = await exchangeRatesCollection
-        .find({
-          date: { $gte: threeDaysAgo },
-        })
-        .sort({ date: 1 })
-        .toArray()
+      const savedPast = await exchangeRatesCollection.findOne({
+        date: pastDate,
+      })
 
-      expect(allRates).toHaveLength(3) // original + 2 new
+      expect(savedPast).not.toBeNull()
+      expect(savedPast?.rates.VND?.toString()).toBe("24500")
 
-      vi.useRealTimers()
+      const missingRatesCollection = await getMissingExchangeRatesCollection()
+      const inQueue = await missingRatesCollection.findOne({
+        date: pastDate,
+      })
+      expect(inQueue).toBeNull()
     })
 
-    it("should return 'No new rates to fetch' when already up to date", async () => {
-      const yesterday = normalizeToUTCMidnight(new Date("2024-12-23T23:59:59Z"))
-
-      await insertTestExchangeRate({
-        ...mockExchangeRates[0],
-        date: yesterday,
-      })
-
-      vi.useFakeTimers()
-      vi.setSystemTime(new Date("2024-12-24T12:00:00.000Z"))
-
-      const request = new NextRequest(cronEndpoint, {
-        headers: {
-          authorization: `Bearer ${cronSecret}`,
-        },
-      })
-
-      const response = await GET(request)
-      const data = await response.json()
-
-      expect(response.status).toBe(200)
-      expect(data.success).toBe(true)
-      expect(data.message).toBe("No new rates to fetch.")
-      expect(data.lastDate).toBeDefined()
-
-      vi.useRealTimers()
-    })
-
-    it("should handle API errors gracefully", async () => {
-      const twoDaysAgo = normalizeToUTCMidnight(
-        new Date("2024-12-22T23:59:59Z")
-      )
-
-      await insertTestExchangeRate({
-        ...mockExchangeRates[0],
-        date: twoDaysAgo,
-      })
-
-      vi.mocked(global.fetch).mockResolvedValue({
+    it("should handle API failure gracefully without returning 500", async () => {
+      vi.spyOn(globalThis, "fetch").mockResolvedValue({
         ok: false,
-        status: 429,
+        status: 500,
+        statusText: "Internal Server Error",
       } as Response)
 
-      vi.useFakeTimers()
-      vi.setSystemTime(new Date("2024-12-24T12:00:00.000Z"))
+      const request = new NextRequest(cronEndpoint, {
+        headers: {
+          authorization: `Bearer ${cronSecret}`,
+        },
+      })
+
+      const response = await GET(request)
+      expect(response.status).toBe(200)
+
+      const json = await response.json()
+      expect(json.success).toBe(true)
+      expect(json.errors.length).toBeGreaterThan(0)
+    })
+
+    it("should mark records that have failed after 6 retries as status failed without deleting them", async () => {
+      const oldPoisonDate = new Date("1970-01-01T00:00:00Z")
+      await insertTestMissingExchangeRate({
+        _id: new ObjectId(),
+        date: oldPoisonDate,
+        createdAt: new Date(),
+        retryCount: 6,
+      })
 
       const request = new NextRequest(cronEndpoint, {
         headers: {
@@ -277,34 +194,53 @@ describe("Exchange Rates Cron Job", () => {
       })
 
       const response = await GET(request)
-      const data = await response.json()
-
       expect(response.status).toBe(200)
-      expect(data.success).toBe(true)
-      expect(data.inserted).toBe(0)
-      expect(data.errors).toBeDefined()
-      expect(data.errors).toHaveLength(1)
-      expect(data.errors[0].error).toContain("API returned 429")
 
-      vi.useRealTimers()
+      const missingRatesCollection = await getMissingExchangeRatesCollection()
+      const poisonDoc = await missingRatesCollection.findOne({
+        date: oldPoisonDate,
+      })
+      expect(poisonDoc).not.toBeNull()
+      expect(poisonDoc?.status).toBe("failed")
+      expect(poisonDoc?.failedAt).toBeDefined()
     })
 
-    it("should handle network errors gracefully", async () => {
-      const twoDaysAgo = normalizeToUTCMidnight(
-        new Date("2024-12-22T23:59:59Z")
-      )
+    it("should not increment retryCount when enqueueMissingExchangeRateDate is called multiple times for the same date", async () => {
+      const testDate = new Date("2024-05-20T00:00:00Z")
+      const { enqueueMissingExchangeRateDate } =
+        await import("@/actions/exchange-rates.actions")
 
-      await insertTestExchangeRate({
-        ...mockExchangeRates[0],
-        date: twoDaysAgo,
+      // Simulate 6 transactions being added on the same date with missing rate
+      for (let i = 0; i < 6; i++) {
+        await enqueueMissingExchangeRateDate(
+          testDate,
+          new Error(`Error on tx ${i}`)
+        )
+      }
+
+      const missingRatesCollection = await getMissingExchangeRatesCollection()
+      const doc = await missingRatesCollection.findOne({
+        date: normalizeToUTCMidnight(testDate),
       })
 
-      vi.mocked(global.fetch).mockRejectedValue(
-        new Error("Network request failed")
-      )
+      expect(doc).not.toBeNull()
+      expect(doc?.retryCount).toBe(0)
+    })
 
-      vi.useFakeTimers()
-      vi.setSystemTime(new Date("2024-12-24T12:00:00.000Z"))
+    it("should increment retryCount by 1 when cron job fails to fetch rate", async () => {
+      const testDate = new Date("2024-05-21T00:00:00Z")
+      await insertTestMissingExchangeRate({
+        _id: new ObjectId(),
+        date: testDate,
+        createdAt: new Date(),
+        retryCount: 0,
+      })
+
+      vi.spyOn(globalThis, "fetch").mockResolvedValue({
+        ok: false,
+        status: 500,
+        statusText: "Internal Server Error",
+      } as Response)
 
       const request = new NextRequest(cronEndpoint, {
         headers: {
@@ -313,110 +249,59 @@ describe("Exchange Rates Cron Job", () => {
       })
 
       const response = await GET(request)
-      const data = await response.json()
-
       expect(response.status).toBe(200)
-      expect(data.success).toBe(true)
-      expect(data.inserted).toBe(0)
-      expect(data.errors).toBeDefined()
-      expect(data.errors).toHaveLength(1)
-      expect(data.errors[0].error).toBe("Network request failed")
 
-      vi.useRealTimers()
-    })
-
-    it("should handle partial success (some days succeed, some fail)", async () => {
-      const threeDaysAgo = normalizeToUTCMidnight(
-        new Date("2024-12-21T23:59:59Z")
-      )
-
-      await insertTestExchangeRate({
-        ...mockExchangeRates[0],
-        date: threeDaysAgo,
+      const missingRatesCollection = await getMissingExchangeRatesCollection()
+      const doc = await missingRatesCollection.findOne({
+        date: testDate,
       })
 
-      vi.mocked(global.fetch)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => mockCurrencyAPIResponse[0],
-        } as Response)
-        .mockResolvedValueOnce({
-          ok: false,
-          status: 500,
-        } as Response)
+      expect(doc).not.toBeNull()
+      expect(doc?.retryCount).toBe(1)
+    })
 
-      vi.useFakeTimers()
-      vi.setSystemTime(new Date("2024-12-24T12:00:00.000Z"))
+    it("should invalidate transactions cache for affected users on synced dates", async () => {
+      const now = new Date()
+      const todayUTC = normalizeToUTCMidnight(now)
+      const yesterdayUTC = addDays(todayUTC, -1)
 
-      const request = new NextRequest(cronEndpoint, {
-        headers: {
-          authorization: `Bearer ${cronSecret}`,
+      // Insert transactions for two different users on yesterdayUTC
+      await insertTestTransaction({
+        _id: new ObjectId(),
+        userId: mockDBUser._id,
+        type: "outflow",
+        categoryKey: "food_beverage",
+        amount: toDecimal128("100"),
+        currency: "USD",
+        description: "User 1 lunch",
+        date: yesterdayUTC,
+      })
+      await insertTestTransaction({
+        _id: new ObjectId(),
+        userId: mockDBAnotherUser._id,
+        type: "inflow",
+        categoryKey: "salary_bonus",
+        amount: toDecimal128("2000"),
+        currency: "USD",
+        description: "User 2 salary",
+        date: yesterdayUTC,
+      })
+
+      const mockRatesResponse = {
+        meta: { last_updated_at: "2024-03-10T23:59:59Z" },
+        data: {
+          CNY: { code: "CNY", value: 7.18 },
+          JPY: { code: "JPY", value: 147.2 },
+          KRW: { code: "KRW", value: 1320.5 },
+          USD: { code: "USD", value: 1 },
+          VND: { code: "VND", value: 24600 },
         },
-      })
+      }
 
-      const response = await GET(request)
-      const data = await response.json()
-
-      expect(response.status).toBe(200)
-      expect(data.success).toBe(true)
-      expect(data.inserted).toBe(1)
-      expect(data.insertedDates).toContain("2024-12-22")
-      expect(data.errors).toBeDefined()
-      expect(data.errors).toHaveLength(1)
-      expect(data.errors[0].date).toBe("2024-12-23")
-
-      vi.useRealTimers()
-    })
-  })
-
-  describe("Edge cases", () => {
-    beforeEach(() => {
-      global.fetch = vi.fn()
-    })
-
-    afterEach(() => {
-      vi.restoreAllMocks()
-    })
-
-    it("should handle empty collection (no existing rates)", async () => {
-      vi.useFakeTimers()
-      vi.setSystemTime(new Date("2024-12-24T12:00:00.000Z"))
-
-      const request = new NextRequest(cronEndpoint, {
-        headers: {
-          authorization: `Bearer ${cronSecret}`,
-        },
-      })
-
-      const response = await GET(request)
-      const data = await response.json()
-
-      expect(response.status).toBe(200)
-      expect(data.success).toBe(true)
-      expect(data.message).toBe(
-        "No existing exchange rates found. Please initialize manually."
-      )
-
-      vi.useRealTimers()
-    })
-
-    it("should verify API URL is constructed correctly", async () => {
-      const twoDaysAgo = normalizeToUTCMidnight(
-        new Date("2024-12-22T23:59:59Z")
-      )
-
-      await insertTestExchangeRate({
-        ...mockExchangeRates[0],
-        date: twoDaysAgo,
-      })
-
-      vi.mocked(global.fetch).mockResolvedValue({
+      vi.spyOn(globalThis, "fetch").mockResolvedValue({
         ok: true,
-        json: async () => mockCurrencyAPIResponse,
+        json: async () => mockRatesResponse,
       } as Response)
-
-      vi.useFakeTimers()
-      vi.setSystemTime(new Date("2024-12-24T12:00:00.000Z"))
 
       const request = new NextRequest(cronEndpoint, {
         headers: {
@@ -424,19 +309,339 @@ describe("Exchange Rates Cron Job", () => {
         },
       })
 
-      await GET(request)
+      const response = await GET(request)
+      expect(response.status).toBe(200)
 
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining("https://api.currencyapi.com/v3/historical")
+      expect(updateTag).toHaveBeenCalledWith(`transactions-${mockDBUser._id}`)
+      expect(updateTag).toHaveBeenCalledWith(
+        `transactions-${mockDBAnotherUser._id}`
       )
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining("currencies=CNY%2CVND%2CJPY%2CKRW")
-      )
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining("date=2024-12-23")
-      )
+    })
 
-      vi.useRealTimers()
+    it("should not call updateTag when no transactions exist on synced dates", async () => {
+      const mockRatesResponse = {
+        meta: { last_updated_at: "2024-03-10T23:59:59Z" },
+        data: {
+          CNY: { code: "CNY", value: 7.18 },
+          JPY: { code: "JPY", value: 147.2 },
+          KRW: { code: "KRW", value: 1320.5 },
+          USD: { code: "USD", value: 1 },
+          VND: { code: "VND", value: 24600 },
+        },
+      }
+
+      vi.spyOn(globalThis, "fetch").mockResolvedValue({
+        ok: true,
+        json: async () => mockRatesResponse,
+      } as Response)
+
+      const request = new NextRequest(cronEndpoint, {
+        headers: {
+          authorization: `Bearer ${cronSecret}`,
+        },
+      })
+
+      const response = await GET(request)
+      expect(response.status).toBe(200)
+
+      expect(updateTag).not.toHaveBeenCalled()
+    })
+
+    it("should clean up queued dates from missingRatesCollection if exchange rates are already resolved", async () => {
+      const pastDate = new Date("2024-01-10T00:00:00Z")
+      await insertTestMissingExchangeRate({
+        _id: new ObjectId(),
+        date: pastDate,
+        createdAt: new Date(),
+        retryCount: 0,
+      })
+
+      // Insert complete exchange rates for pastDate in advance
+      const exchangeRatesCollection = await getExchangeRatesCollection()
+      await exchangeRatesCollection.insertOne({
+        date: pastDate,
+        rates: {
+          CNY: toDecimal128("7.15"),
+          JPY: toDecimal128("145.0"),
+          KRW: toDecimal128("1300.0"),
+          USD: toDecimal128("1"),
+          VND: toDecimal128("24500"),
+        },
+      })
+
+      // Also insert complete exchange rate for yesterday so only pastDate is tested
+      const now = new Date()
+      const todayUTC = normalizeToUTCMidnight(now)
+      const yesterdayUTC = addDays(todayUTC, -1)
+      await exchangeRatesCollection.insertOne({
+        date: yesterdayUTC,
+        rates: {
+          CNY: toDecimal128("7.18"),
+          JPY: toDecimal128("147.2"),
+          KRW: toDecimal128("1320.5"),
+          USD: toDecimal128("1"),
+          VND: toDecimal128("24600"),
+        },
+      })
+
+      const fetchSpy = vi.spyOn(globalThis, "fetch")
+
+      const request = new NextRequest(cronEndpoint, {
+        headers: {
+          authorization: `Bearer ${cronSecret}`,
+        },
+      })
+
+      const response = await GET(request)
+      expect(response.status).toBe(200)
+
+      const json = await response.json()
+      expect(json.success).toBe(true)
+      expect(json.missingCount).toBe(0)
+      expect(json.syncedCount).toBe(0)
+      expect(fetchSpy).not.toHaveBeenCalled()
+
+      // Verify pastDate was removed from missingRatesCollection
+      const missingRatesCollection = await getMissingExchangeRatesCollection()
+      const queued = await missingRatesCollection.findOne({ date: pastDate })
+      expect(queued).toBeNull()
+    })
+
+    it("should detect and fetch partial exchange rates when a non-USD currency is missing", async () => {
+      const pastDate = new Date("2024-02-15T00:00:00Z")
+      await insertTestMissingExchangeRate({
+        _id: new ObjectId(),
+        date: pastDate,
+        createdAt: new Date(),
+        retryCount: 0,
+      })
+
+      // Insert incomplete exchange rates (missing VND)
+      const exchangeRatesCollection = await getExchangeRatesCollection()
+      await exchangeRatesCollection.insertOne({
+        date: pastDate,
+        rates: {
+          CNY: toDecimal128("7.15"),
+          JPY: toDecimal128("145.0"),
+          KRW: toDecimal128("1300.0"),
+          USD: toDecimal128("1"),
+          // VND is missing
+        },
+      })
+
+      // Pre-insert yesterday rate so only pastDate is synced
+      const now = new Date()
+      const todayUTC = normalizeToUTCMidnight(now)
+      const yesterdayUTC = addDays(todayUTC, -1)
+      await exchangeRatesCollection.insertOne({
+        date: yesterdayUTC,
+        rates: {
+          CNY: toDecimal128("7.18"),
+          JPY: toDecimal128("147.2"),
+          KRW: toDecimal128("1320.5"),
+          USD: toDecimal128("1"),
+          VND: toDecimal128("24600"),
+        },
+      })
+
+      const mockRatesResponse = {
+        meta: { last_updated_at: "2024-02-15T23:59:59Z" },
+        data: {
+          CNY: { code: "CNY", value: 7.15 },
+          JPY: { code: "JPY", value: 145.0 },
+          KRW: { code: "KRW", value: 1300.0 },
+          USD: { code: "USD", value: 1 },
+          VND: { code: "VND", value: 24500 },
+        },
+      }
+
+      vi.spyOn(globalThis, "fetch").mockResolvedValue({
+        ok: true,
+        json: async () => mockRatesResponse,
+      } as Response)
+
+      const request = new NextRequest(cronEndpoint, {
+        headers: {
+          authorization: `Bearer ${cronSecret}`,
+        },
+      })
+
+      const response = await GET(request)
+      expect(response.status).toBe(200)
+
+      const updated = await exchangeRatesCollection.findOne({ date: pastDate })
+      expect(updated?.rates.VND?.toString()).toBe("24500")
+
+      const missingRatesCollection = await getMissingExchangeRatesCollection()
+      const queued = await missingRatesCollection.findOne({ date: pastDate })
+      expect(queued).toBeNull()
+    })
+
+    it("should limit processing to MAX_DATES_PER_RUN (5 dates) and correctly report remainingCount", async () => {
+      // Pre-insert yesterday rate so only queued dates are considered
+      const now = new Date()
+      const todayUTC = normalizeToUTCMidnight(now)
+      const yesterdayUTC = addDays(todayUTC, -1)
+
+      const exchangeRatesCollection = await getExchangeRatesCollection()
+      await exchangeRatesCollection.insertOne({
+        date: yesterdayUTC,
+        rates: {
+          CNY: toDecimal128("7.18"),
+          JPY: toDecimal128("147.2"),
+          KRW: toDecimal128("1320.5"),
+          USD: toDecimal128("1"),
+          VND: toDecimal128("24600"),
+        },
+      })
+
+      // Insert 7 missing rate dates
+      for (let i = 1; i <= 7; i++) {
+        await insertTestMissingExchangeRate({
+          _id: new ObjectId(),
+          date: new Date(`2024-01-0${i}T00:00:00Z`),
+          createdAt: new Date(`2024-01-0${i}T10:00:00Z`),
+          retryCount: 0,
+        })
+      }
+
+      const mockRatesResponse = {
+        meta: { last_updated_at: "2024-01-01T23:59:59Z" },
+        data: {
+          CNY: { code: "CNY", value: 7.15 },
+          JPY: { code: "JPY", value: 145.0 },
+          KRW: { code: "KRW", value: 1300.0 },
+          USD: { code: "USD", value: 1 },
+          VND: { code: "VND", value: 24500 },
+        },
+      }
+
+      vi.spyOn(globalThis, "fetch").mockResolvedValue({
+        ok: true,
+        json: async () => mockRatesResponse,
+      } as Response)
+
+      const request = new NextRequest(cronEndpoint, {
+        headers: {
+          authorization: `Bearer ${cronSecret}`,
+        },
+      })
+
+      const response = await GET(request)
+      expect(response.status).toBe(200)
+
+      const json = await response.json()
+      expect(json.success).toBe(true)
+      expect(json.batchCount).toBe(5)
+      expect(json.syncedCount).toBe(5)
+      expect(json.remainingCount).toBe(2)
+    })
+
+    it("should skip queued records that have status failed", async () => {
+      const failedDate = new Date("2024-01-20T00:00:00Z")
+      await insertTestMissingExchangeRate({
+        _id: new ObjectId(),
+        date: failedDate,
+        createdAt: new Date(),
+        retryCount: 6,
+        status: "failed",
+      })
+
+      // Pre-insert yesterday rate so no fetch is made
+      const now = new Date()
+      const todayUTC = normalizeToUTCMidnight(now)
+      const yesterdayUTC = addDays(todayUTC, -1)
+      const exchangeRatesCollection = await getExchangeRatesCollection()
+      await exchangeRatesCollection.insertOne({
+        date: yesterdayUTC,
+        rates: {
+          CNY: toDecimal128("7.18"),
+          JPY: toDecimal128("147.2"),
+          KRW: toDecimal128("1320.5"),
+          USD: toDecimal128("1"),
+          VND: toDecimal128("24600"),
+        },
+      })
+
+      const fetchSpy = vi.spyOn(globalThis, "fetch")
+
+      const request = new NextRequest(cronEndpoint, {
+        headers: {
+          authorization: `Bearer ${cronSecret}`,
+        },
+      })
+
+      const response = await GET(request)
+      expect(response.status).toBe(200)
+
+      const json = await response.json()
+      expect(json.remainingCount).toBe(0)
+      expect(fetchSpy).not.toHaveBeenCalled()
+    })
+
+    it("should handle unexpected rejected promises in syncResults gracefully", async () => {
+      const pastDate = new Date("2024-01-15T00:00:00Z")
+      await insertTestMissingExchangeRate({
+        _id: new ObjectId(),
+        date: pastDate,
+        createdAt: new Date(),
+        retryCount: 0,
+      })
+
+      // Cause ensureExchangeRateForDate to throw and enqueueMissingExchangeRateDate
+      //  to also throw (unhandled inside map)
+      vi.spyOn(
+        exchangeRatesActions,
+        "ensureExchangeRateForDate"
+      ).mockRejectedValueOnce(new Error("API network failure"))
+      vi.spyOn(
+        exchangeRatesActions,
+        "enqueueMissingExchangeRateDate"
+      ).mockRejectedValueOnce(new Error("Database write failure"))
+
+      const request = new NextRequest(cronEndpoint, {
+        headers: {
+          authorization: `Bearer ${cronSecret}`,
+        },
+      })
+
+      const response = await GET(request)
+      expect(response.status).toBe(200)
+
+      const json = await response.json()
+      expect(json.success).toBe(true)
+      expect(json.errors).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            error: "Database write failure",
+          }),
+        ])
+      )
+    })
+
+    it("should return 500 when an unexpected top-level error occurs", async () => {
+      vi.spyOn(
+        collections,
+        "getMissingExchangeRatesCollection"
+      ).mockRejectedValueOnce(new Error("Mongo connection drop"))
+
+      const consoleErrorSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {})
+
+      const request = new NextRequest(cronEndpoint, {
+        headers: {
+          authorization: `Bearer ${cronSecret}`,
+        },
+      })
+
+      const response = await GET(request)
+      expect(response.status).toBe(500)
+      expect(await response.text()).toBe("Exchange rates cron failed")
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "EXCHANGE RATES CRON ERROR:",
+        expect.any(Error)
+      )
     })
   })
 })

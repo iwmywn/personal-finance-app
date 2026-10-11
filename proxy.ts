@@ -1,22 +1,23 @@
 import type { NextURL } from "next/dist/server/web/next-url"
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
-import * as routes from "@/routes"
+import { getSessionCookie } from "better-auth/cookies"
 
-import { getCurrentSession } from "@/actions/session.actions"
-import { siteConfig } from "@/app/pffa.config"
+import * as routes from "@/routes"
+import { siteConfig } from "@/app/pfa.config"
+import { auth } from "@/lib/auth"
 import { isAdminRole } from "@/lib/role"
 
 function redirectIfProtectedRoute(request: NextRequest) {
   const { nextUrl } = request
-  const { pathname } = nextUrl
+  const { pathname, search } = nextUrl
 
-  if (
-    pathname === routes.twoFactorRoute &&
-    !request.cookies
-      .getAll()
-      .some((c) => c.name.endsWith(`${siteConfig.name}.two_factor`))
-  ) {
+  const hasTwoFactorCookie = !!getSessionCookie(request, {
+    cookieName: siteConfig.cookies.twoFactor,
+    cookiePrefix: siteConfig.name,
+  })
+
+  if (pathname === routes.twoFactorRoute && !hasTwoFactorCookie) {
     return redirectTo(routes.signInRoute, nextUrl)
   }
 
@@ -24,7 +25,7 @@ function redirectIfProtectedRoute(request: NextRequest) {
     const redirectUrl = new URL(routes.signInRoute, nextUrl)
 
     if (routes.protectedRoutes.some((route) => pathname.startsWith(route))) {
-      redirectUrl.searchParams.set("next", pathname)
+      redirectUrl.searchParams.set("next", pathname + search)
     }
 
     return NextResponse.redirect(redirectUrl)
@@ -41,7 +42,9 @@ export default async function proxy(request: NextRequest) {
   const { nextUrl } = request
   const { pathname } = nextUrl
 
-  const session = await getCurrentSession()
+  const session = await auth.api.getSession({
+    headers: request.headers,
+  })
 
   if (!session) {
     return redirectIfProtectedRoute(request)
@@ -54,7 +57,7 @@ export default async function proxy(request: NextRequest) {
     return redirectTo(routes.DEFAULT_SIGNIN_REDIRECT, nextUrl)
   }
 
-  if (pathname === "/admin" && !isAdminRole(session.user.role)) {
+  if (pathname.startsWith("/admin") && !isAdminRole(session.user.role)) {
     return redirectTo(routes.DEFAULT_SIGNIN_REDIRECT, nextUrl)
   }
 
@@ -63,6 +66,6 @@ export default async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!api|_next/static|_next/image|images|opengraph-image.png|icon.png|favicon.ico|sitemap.xml|robots.txt).*)",
+    "/((?!api|_next/static|_next/image|images|opengraph-image.png|apple-icon.png|icon.png|favicon.ico|sitemap.xml|robots.txt).*)",
   ],
 }

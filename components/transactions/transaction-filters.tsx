@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { ChevronDownIcon, SearchIcon, XIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 import { parseAsString, useQueryState } from "nuqs"
@@ -30,22 +30,15 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { TransactionsTable } from "@/components/transactions/transactions-table"
-import { useTransactions } from "@/context/transactions-context"
+import { useTransactions } from "@/contexts/transactions-context"
 import { useCategory } from "@/hooks/use-category"
 import { useFormatDate } from "@/hooks/use-format-date"
 import { useMonths } from "@/hooks/use-months"
-import type { Transaction } from "@/lib/definitions"
+import { getUniqueYears } from "@/lib/date"
 import { filterTransactions } from "@/lib/filters"
-import { parseAsLocalDate } from "@/lib/parsers"
-import { getUniqueYears } from "@/lib/utils"
+import { parseAsLocalDate } from "@/lib/parser"
 
-interface TransactionFiltersProps {
-  onFilteredTransactionsChange: (transactions: Transaction[]) => void
-}
-
-export function TransactionFilters({
-  onFilteredTransactionsChange,
-}: TransactionFiltersProps) {
+export function TransactionFilters() {
   const { transactions } = useTransactions()
   const t = useExtracted()
   const [isDatePickerOpen, setIsDatePickerOpen] = useState<boolean>(false)
@@ -166,6 +159,16 @@ export function TransactionFilters({
     }
   }
 
+  const handleTypeChange = (type: "all" | "inflow" | "outflow") => {
+    setFilterType(type)
+    if (type !== "all" && filterCategoryKey !== "all") {
+      const allowedCategories = getCategoriesByType(type)
+      if (!allowedCategories.some((c) => c.key === filterCategoryKey)) {
+        setFilterCategoryKey("all")
+      }
+    }
+  }
+
   const filteredTransactions = filterTransactions(transactions, {
     searchTerm,
     selectedDate,
@@ -175,10 +178,6 @@ export function TransactionFilters({
     filterType,
     filterCategoryKey,
   })
-
-  useEffect(() => {
-    onFilteredTransactionsChange(filteredTransactions)
-  }, [onFilteredTransactionsChange, filteredTransactions])
 
   return (
     <>
@@ -234,15 +233,7 @@ export function TransactionFilters({
               </PopoverContent>
             </Popover>
 
-            <Popover
-              open={isDateRangeOpen}
-              onOpenChange={(open) => {
-                if (!open && dateRange.from && !dateRange.to) {
-                  return
-                }
-                setIsDateRangeOpen(open)
-              }}
-            >
+            <Popover open={isDateRangeOpen} onOpenChange={setIsDateRangeOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
@@ -271,7 +262,7 @@ export function TransactionFilters({
                       autoFocus
                       mode="single"
                       selected={dateRange.from}
-                      defaultMonth={dateRange.from || new Date()}
+                      defaultMonth={dateRange.from}
                       captionLayout="dropdown"
                       onSelect={(date) => {
                         setDateRange({
@@ -290,15 +281,28 @@ export function TransactionFilters({
                       autoFocus
                       mode="single"
                       selected={dateRange.to}
-                      defaultMonth={dateRange.to || new Date()}
+                      defaultMonth={dateRange.to}
                       captionLayout="dropdown"
                       onSelect={(date) => {
-                        if (date && dateRange.from && date >= dateRange.from) {
-                          handleDateRangeChange({
-                            from: dateRange.from,
-                            to: date,
+                        if (!date) return
+                        if (!dateRange.from) {
+                          setDateRange({
+                            from: date,
+                            to: undefined,
                           })
+                          return
                         }
+                        if (date < dateRange.from) {
+                          handleDateRangeChange({
+                            from: date,
+                            to: dateRange.from,
+                          })
+                          return
+                        }
+                        handleDateRangeChange({
+                          from: dateRange.from,
+                          to: date,
+                        })
                       }}
                     />
                   </div>
@@ -344,12 +348,7 @@ export function TransactionFilters({
               </SelectContent>
             </Select>
 
-            <Select
-              value={filterType}
-              onValueChange={(value: "all" | "inflow" | "outflow") =>
-                setFilterType(value)
-              }
-            >
+            <Select value={filterType} onValueChange={handleTypeChange}>
               <SelectTrigger
                 className={`w-full md:row-start-4 lg:row-start-3 2xl:row-start-2 ${filterType !== "all" && "border-primary"}`}
               >
@@ -377,20 +376,42 @@ export function TransactionFilters({
               <SelectContent>
                 <SelectGroup>
                   <SelectItem value="all">{t("All Categories")}</SelectItem>
-                  <SelectSeparator />
-                  <SelectLabel>{t("Inflow")}</SelectLabel>
-                  {getCategoriesByType("inflow").map((category) => (
-                    <SelectItem key={category.key} value={category.key}>
-                      {category.label}
-                    </SelectItem>
-                  ))}
-                  <SelectSeparator />
-                  <SelectLabel>{t("Outflow")}</SelectLabel>
-                  {getCategoriesByType("outflow").map((category) => (
-                    <SelectItem key={category.key} value={category.key}>
-                      {category.label}
-                    </SelectItem>
-                  ))}
+                  {filterType === "inflow" ? (
+                    <>
+                      <SelectSeparator />
+                      {getCategoriesByType("inflow").map((category) => (
+                        <SelectItem key={category.key} value={category.key}>
+                          {category.label}
+                        </SelectItem>
+                      ))}
+                    </>
+                  ) : filterType === "outflow" ? (
+                    <>
+                      <SelectSeparator />
+                      {getCategoriesByType("outflow").map((category) => (
+                        <SelectItem key={category.key} value={category.key}>
+                          {category.label}
+                        </SelectItem>
+                      ))}
+                    </>
+                  ) : (
+                    <>
+                      <SelectSeparator />
+                      <SelectLabel>{t("Inflow")}</SelectLabel>
+                      {getCategoriesByType("inflow").map((category) => (
+                        <SelectItem key={category.key} value={category.key}>
+                          {category.label}
+                        </SelectItem>
+                      ))}
+                      <SelectSeparator />
+                      <SelectLabel>{t("Outflow")}</SelectLabel>
+                      {getCategoriesByType("outflow").map((category) => (
+                        <SelectItem key={category.key} value={category.key}>
+                          {category.label}
+                        </SelectItem>
+                      ))}
+                    </>
+                  )}
                 </SelectGroup>
               </SelectContent>
             </Select>
@@ -408,7 +429,10 @@ export function TransactionFilters({
         </CardContent>
       </Card>
 
-      <TransactionsTable filteredTransactions={filteredTransactions} />
+      <TransactionsTable
+        filteredTransactions={filteredTransactions}
+        filterKey={`${searchTerm ?? ""}_${selectedDateIso ?? ""}_${dateRangeFromIso ?? ""}_${dateRangeToIso ?? ""}_${filterMonth}_${filterYear}_${filterType}_${filterCategoryKey}`}
+      />
     </>
   )
 }

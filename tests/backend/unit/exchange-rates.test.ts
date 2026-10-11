@@ -1,6 +1,12 @@
 import { insertTestExchangeRates } from "@/tests/backend/helpers/database"
-import { mockExchangeRates, mockTransactions } from "@/tests/shared/data"
-import { convertTransactionsToCurrency } from "@/actions/exchange-rates.actions"
+import { mockDBExchangeRates, mockTransactions } from "@/tests/shared/data"
+import {
+  convertTransactionsToCurrency,
+  ensureExchangeRateForDate,
+} from "@/actions/exchange-rates.actions"
+import { toDecimal128 } from "@/actions/utils"
+import { getExchangeRatesCollection } from "@/lib/collections"
+import { normalizeToUTCMidnight } from "@/lib/date"
 import type { Transaction } from "@/lib/definitions"
 
 describe("convertTransactionsToCurrency", () => {
@@ -24,7 +30,7 @@ describe("convertTransactionsToCurrency", () => {
 
   describe("Currency conversion", () => {
     beforeEach(async () => {
-      await insertTestExchangeRates(mockExchangeRates)
+      await insertTestExchangeRates(mockDBExchangeRates)
     })
 
     it("should convert VND to USD using the correct exchange rate", async () => {
@@ -94,7 +100,7 @@ describe("convertTransactionsToCurrency", () => {
 
   describe("Multiple transactions with different dates", () => {
     beforeEach(async () => {
-      await insertTestExchangeRates(mockExchangeRates)
+      await insertTestExchangeRates(mockDBExchangeRates)
     })
 
     it("should use correct exchange rates based on transaction dates", async () => {
@@ -142,7 +148,7 @@ describe("convertTransactionsToCurrency", () => {
 
   describe("Multiple currencies in single batch", () => {
     beforeEach(async () => {
-      await insertTestExchangeRates(mockExchangeRates)
+      await insertTestExchangeRates(mockDBExchangeRates)
     })
 
     it("should convert transactions with different source currencies to same target", async () => {
@@ -191,7 +197,7 @@ describe("convertTransactionsToCurrency", () => {
 
   describe("Edge cases", () => {
     beforeEach(async () => {
-      await insertTestExchangeRates(mockExchangeRates)
+      await insertTestExchangeRates(mockDBExchangeRates)
     })
 
     it("should handle decimal amounts", async () => {
@@ -247,5 +253,266 @@ describe("convertTransactionsToCurrency", () => {
       expect(result[0].currency).toBe("VND")
       expect(result[0].amount).toBe("5000000")
     })
+
+    it("should convert transaction using nearest previous rate when transaction date is after all rates in database", async () => {
+      // Transaction date is 2024-03-01, but mockExchangeRates only has up to 2024-02-20 (VND: 25200)
+      const transactions: Transaction[] = [
+        {
+          ...mockTransactions[0],
+          amount: "25200",
+          currency: "VND",
+          date: new Date("2024-03-01"),
+        },
+      ]
+
+      const result = await convertTransactionsToCurrency(transactions, "USD")
+
+      expect(result).toHaveLength(1)
+      expect(result[0].currency).toBe("USD")
+      expect(result[0].amount).toBe("1")
+      expect(result[0].rates?.VND).toBe("25200")
+    })
+
+    it("should convert transaction using nearest future rate when transaction date is before all rates in database", async () => {
+      // Transaction date is 2024-01-01, but mockExchangeRates starts from 2024-01-15 (VND: 25000)
+      const transactions: Transaction[] = [
+        {
+          ...mockTransactions[0],
+          amount: "25000",
+          currency: "VND",
+          date: new Date("2024-01-01"),
+        },
+      ]
+
+      const result = await convertTransactionsToCurrency(transactions, "USD")
+
+      expect(result).toHaveLength(1)
+      expect(result[0].currency).toBe("USD")
+      expect(result[0].amount).toBe("1")
+      expect(result[0].rates?.VND).toBe("25000")
+    })
+
+    it("should pick the closer future date when closer to future than previous rate", async () => {
+      // 2024-01-24 is 1 day away from 2024-01-25 (VND: 25100) and 9 days away from 2024-01-15 (VND: 25000)
+      const transactions: Transaction[] = [
+        {
+          ...mockTransactions[0],
+          amount: "25100",
+          currency: "VND",
+          date: new Date("2024-01-24"),
+        },
+      ]
+
+      const result = await convertTransactionsToCurrency(transactions, "USD")
+
+      expect(result).toHaveLength(1)
+      expect(result[0].currency).toBe("USD")
+      expect(result[0].amount).toBe("1")
+      expect(result[0].rates?.VND).toBe("25100")
+    })
+
+    it("should pick the closer previous date when closer to previous than future rate", async () => {
+      // 2024-01-16 is 1 day away from 2024-01-15 (VND: 25000) and 9 days away from 2024-01-25 (VND: 25100)
+      const transactions: Transaction[] = [
+        {
+          ...mockTransactions[0],
+          amount: "25000",
+          currency: "VND",
+          date: new Date("2024-01-16"),
+        },
+      ]
+
+      const result = await convertTransactionsToCurrency(transactions, "USD")
+
+      expect(result).toHaveLength(1)
+      expect(result[0].currency).toBe("USD")
+      expect(result[0].amount).toBe("1")
+      expect(result[0].rates?.VND).toBe("25000")
+    })
+
+    it("should independently assign the closest rate to each transaction in a batch", async () => {
+      // Tx1 on 2024-01-16 (closest to 2024-01-15, VND: 25000)
+      // Tx2 on 2024-01-24 (closest to 2024-01-25, VND: 25100)
+      const transactions: Transaction[] = [
+        {
+          ...mockTransactions[0],
+          _id: "tx-1",
+          amount: "25000",
+          currency: "VND",
+          date: new Date("2024-01-16"),
+        },
+        {
+          ...mockTransactions[1],
+          _id: "tx-2",
+          amount: "25100",
+          currency: "VND",
+          date: new Date("2024-01-24"),
+        },
+      ]
+
+      const result = await convertTransactionsToCurrency(transactions, "USD")
+
+      expect(result).toHaveLength(2)
+      expect(result[0]._id).toBe("tx-1")
+      expect(result[0].rates?.VND).toBe("25000")
+      expect(result[0].amount).toBe("1")
+
+      expect(result[1]._id).toBe("tx-2")
+      expect(result[1].rates?.VND).toBe("25100")
+      expect(result[1].amount).toBe("1")
+    })
+  })
+})
+
+describe("ensureExchangeRateForDate", () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it("should not call fetch when exchange rate already exists with all currencies", async () => {
+    await insertTestExchangeRates(mockDBExchangeRates)
+    const fetchSpy = vi.spyOn(globalThis, "fetch")
+
+    await ensureExchangeRateForDate(mockDBExchangeRates[0].date)
+
+    expect(fetchSpy).not.toHaveBeenCalled()
+  })
+
+  it("should fetch rates from Currency API and insert into database when date does not exist", async () => {
+    const testDate = new Date("2024-03-10T00:00:00Z")
+    const mockRatesResponse = {
+      meta: { last_updated_at: "2024-03-10T23:59:59Z" },
+      data: {
+        CNY: { code: "CNY", value: 7.18 },
+        JPY: { code: "JPY", value: 147.2 },
+        KRW: { code: "KRW", value: 1320.5 },
+        USD: { code: "USD", value: 1 },
+        VND: { code: "VND", value: 24600 },
+      },
+    }
+
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockRatesResponse,
+    } as Response)
+
+    await ensureExchangeRateForDate(testDate)
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1)
+    expect(fetchSpy).toHaveBeenCalledWith(
+      expect.stringContaining("https://api.currencyapi.com/v3/historical"),
+      expect.objectContaining({
+        signal: expect.any(AbortSignal),
+      })
+    )
+
+    const collection = await getExchangeRatesCollection()
+    const saved = await collection.findOne({
+      date: normalizeToUTCMidnight(testDate),
+    })
+
+    expect(saved).not.toBeNull()
+    expect(saved?.rates.VND?.toString()).toBe("24600")
+    expect(saved?.rates.CNY?.toString()).toBe("7.18")
+  })
+
+  it("should fetch missing currencies and update document when partial rates exist", async () => {
+    const testDate = normalizeToUTCMidnight(new Date("2024-04-10T00:00:00Z"))
+    const collection = await getExchangeRatesCollection()
+    await collection.insertOne({
+      date: testDate,
+      rates: {
+        CNY: toDecimal128("7.18"),
+        JPY: toDecimal128("147.2"),
+        KRW: toDecimal128("1320.5"),
+        // VND is missing
+      },
+    })
+
+    const mockRatesResponse = {
+      meta: { last_updated_at: "2024-04-10T23:59:59Z" },
+      data: {
+        CNY: { code: "CNY", value: 7.18 },
+        JPY: { code: "JPY", value: 147.2 },
+        KRW: { code: "KRW", value: 1320.5 },
+        USD: { code: "USD", value: 1 },
+        VND: { code: "VND", value: 24700 },
+      },
+    }
+
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockRatesResponse,
+    } as Response)
+
+    await ensureExchangeRateForDate(testDate)
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1)
+    expect(fetchSpy).toHaveBeenCalledWith(
+      expect.stringContaining("https://api.currencyapi.com/v3/historical"),
+      expect.objectContaining({
+        signal: expect.any(AbortSignal),
+      })
+    )
+
+    const updated = await collection.findOne({ date: testDate })
+    expect(updated?.rates.VND?.toString()).toBe("24700")
+    expect(updated?.rates.CNY?.toString()).toBe("7.18")
+  })
+
+  it("should throw error when Currency API returns non-ok status", async () => {
+    const testDate = new Date("2024-05-10T00:00:00Z")
+
+    vi.spyOn(globalThis, "fetch").mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+    } as Response)
+
+    await expect(ensureExchangeRateForDate(testDate)).rejects.toThrow(
+      "Currency API returned status 500"
+    )
+  })
+
+  it("should handle exchange rate documents with null or undefined rates defensively", async () => {
+    const collection = await getExchangeRatesCollection()
+    // Insert document with null rates
+    await collection.insertOne({
+      date: new Date("2024-06-01T00:00:00Z"),
+      rates: null as never,
+    })
+
+    const transactions: Transaction[] = [
+      {
+        ...mockTransactions[0],
+        currency: "USD",
+        amount: "50",
+        date: new Date("2024-06-01T00:00:00Z"),
+      },
+    ]
+
+    // Should not throw TypeError: Cannot convert undefined or null to object
+    await expect(
+      convertTransactionsToCurrency(transactions, "USD")
+    ).resolves.not.toThrow()
+  })
+
+  it("should handle large transaction arrays without RangeError call stack exceeded", async () => {
+    // Array of 100,000 transactions would exceed call stack if Math.min(...timestamps) is used
+    const count = 100_000
+    const tx = mockTransactions[0]
+    const largeTransactions: Transaction[] = Array.from(
+      { length: count },
+      (_, i) => ({
+        ...tx,
+        _id: `large-tx-${i}`,
+        currency: "USD",
+        amount: "10",
+        date: new Date("2024-01-01T00:00:00Z"),
+      })
+    )
+
+    await expect(
+      convertTransactionsToCurrency(largeTransactions, "USD")
+    ).resolves.not.toThrow()
   })
 })

@@ -34,11 +34,13 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { useTransactions } from "@/context/transactions-context"
+import { useTransactions } from "@/contexts/transactions-context"
+import { useUser } from "@/contexts/user-context"
 import { useCategory } from "@/hooks/use-category"
 import { useFormatCurrency } from "@/hooks/use-format-currency"
+import type { Currency } from "@/lib/currency"
+import { serializeLocalDate } from "@/lib/date"
 import type { Transaction } from "@/lib/definitions"
-import { parseAsLocalDate } from "@/lib/parsers"
 import { calculateCategoriesStats } from "@/lib/statistics"
 
 interface TransactionBreakdownTableProps {
@@ -56,11 +58,15 @@ export function StatisticsTable({
   filterStates,
 }: TransactionBreakdownTableProps) {
   const { transactions } = useTransactions()
+  const { user } = useUser()
   const t = useExtracted()
   const { getCategoryLabel, getCategoryDescription } = useCategory()
   const formatCurrency = useFormatCurrency()
 
-  const categoryStats = calculateCategoriesStats(filteredTransactions)
+  const categoryStats = calculateCategoriesStats(
+    filteredTransactions,
+    user.currency as Currency
+  )
 
   const getTransactionsHref = (stat: {
     type: string
@@ -68,16 +74,13 @@ export function StatisticsTable({
   }): Route => {
     const params = new URLSearchParams()
     if (filterStates?.selectedDate) {
-      params.set("date", parseAsLocalDate.serialize(filterStates.selectedDate))
+      params.set("date", serializeLocalDate(filterStates.selectedDate))
     }
     if (filterStates?.dateRange?.from) {
-      params.set(
-        "from",
-        parseAsLocalDate.serialize(filterStates.dateRange.from)
-      )
+      params.set("from", serializeLocalDate(filterStates.dateRange.from))
     }
     if (filterStates?.dateRange?.to) {
-      params.set("to", parseAsLocalDate.serialize(filterStates.dateRange.to))
+      params.set("to", serializeLocalDate(filterStates.dateRange.to))
     }
     if (filterStates?.filterMonth && filterStates.filterMonth !== "all") {
       params.set("month", filterStates.filterMonth)

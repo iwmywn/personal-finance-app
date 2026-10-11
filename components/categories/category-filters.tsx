@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { SearchIcon, XIcon } from "lucide-react"
@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { CategoriesTable } from "@/components/categories/categories-table"
-import { useCategories } from "@/context/categories-context"
+import { useCategories } from "@/contexts/categories-context"
 import type { CategoryType } from "@/lib/category"
 import { filterCustomCategories } from "@/lib/filters"
 

@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import type { Route } from "next"
 import {
@@ -15,7 +15,7 @@ import {
 import type { LucideIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 
-import { useUser } from "@/context/user-context"
+import { useUser } from "@/contexts/user-context"
 import { isAdminRole } from "@/lib/role"
 
 type NavType = {

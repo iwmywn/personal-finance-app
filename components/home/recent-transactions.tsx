@@ -14,7 +14,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty"
 import { Separator } from "@/components/ui/separator"
-import { useTransactions } from "@/context/transactions-context"
+import { useTransactions } from "@/contexts/transactions-context"
 import { useCategory } from "@/hooks/use-category"
 import { useFormatCurrency } from "@/hooks/use-format-currency"
 import { useFormatDate } from "@/hooks/use-format-date"
@@ -78,7 +78,7 @@ export function RecentTransactions() {
                       }`}
                     >
                       {transaction.type === "inflow" ? "+" : "-"}
-                      {formatCurrency(transaction.amount)}
+                      {formatCurrency(transaction.amount, transaction.currency)}
                     </div>
                   </div>
                 </div>
