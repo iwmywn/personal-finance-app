@@ -8,7 +8,8 @@ import {
   mockUnauthenticatedUser,
 } from "@/tests/backend/mocks/session.mock"
 import {
-  mockTransaction,
+  mockDBTransaction,
+  mockDBUser,
   mockUser,
   mockValidTransactionValues,
 } from "@/tests/shared/data"
@@ -19,7 +20,8 @@ import {
   updateTransaction,
 } from "@/actions/transaction.actions"
 import { getTransactionsCollection } from "@/lib/collections"
-import { localDateToUTCMidnight } from "@/lib/utils"
+import { localDateToUTCMidnight } from "@/lib/date"
+import { triggerRateLimit } from "@/lib/rate-limit"
 
 describe("Transactions", async () => {
   describe("createTransaction", () => {
@@ -31,6 +33,19 @@ describe("Transactions", async () => {
       expect(result.error).toBe("Invalid data!")
     })
 
+    it("should return error when transaction date is in the future", async () => {
+      mockAuthenticatedUser()
+
+      const futureDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+      const result = await createTransaction({
+        ...mockValidTransactionValues,
+        date: futureDate,
+      })
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe("Invalid data!")
+    })
+
     it("should return error when not authenticated", async () => {
       mockUnauthenticatedUser()
 
@@ -42,20 +57,41 @@ describe("Transactions", async () => {
       )
     })
 
-    it("should return error when creating duplicate transaction on the same day", async () => {
+    it("should return error when rate limit is exceeded", async () => {
+      mockAuthenticatedUser()
+      await triggerRateLimit(`transaction:${mockUser.id}`)
+
+      const result = await createTransaction(mockValidTransactionValues)
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe(
+        "Too many requests! Please slow down and try again later."
+      )
+    })
+
+    it("should return error when categoryKey is invalid or does not belong to user", async () => {
       mockAuthenticatedUser()
 
-      const firstResult = await createTransaction(mockValidTransactionValues)
-      const duplicateResult = await createTransaction(
-        mockValidTransactionValues
-      )
+      const result = await createTransaction({
+        ...mockValidTransactionValues,
+        categoryKey: "non-existent-or-invalid-key",
+      })
 
-      expect(firstResult.success).toBe("Transaction has been added.")
-      expect(firstResult.error).toBeUndefined()
-      expect(duplicateResult.success).toBeUndefined()
-      expect(duplicateResult.error).toBe(
-        "This transaction has already been created today!"
-      )
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe("Invalid category!")
+    })
+
+    it("should return error when transaction type does not match category type", async () => {
+      mockAuthenticatedUser()
+
+      const result = await createTransaction({
+        ...mockValidTransactionValues,
+        type: "outflow",
+        categoryKey: "business_freelance",
+      })
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe("Invalid category!")
     })
 
     it("should successfully create transaction", async () => {
@@ -64,7 +100,7 @@ describe("Transactions", async () => {
       const result = await createTransaction(mockValidTransactionValues)
       const transactionsCollection = await getTransactionsCollection()
       const addedTransaction = await transactionsCollection.findOne({
-        userId: mockUser._id,
+        userId: mockDBUser._id,
       })
 
       expect(addedTransaction?.type).toBe("inflow")
@@ -74,8 +110,82 @@ describe("Transactions", async () => {
       expect(addedTransaction?.date.toISOString()).toBe(
         "2024-02-05T00:00:00.000Z"
       )
-      expect(result.success).toBe("Transaction has been added.")
+      expect(result.success).toBe("Transaction has been created.")
       expect(result.error).toBeUndefined()
+    })
+
+    it("should still save transaction when fetching exchange rate fails", async () => {
+      mockAuthenticatedUser()
+      const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        statusText: "Internal Server Error",
+      } as Response)
+
+      const testDate = localDateToUTCMidnight(new Date("2026-03-01"))
+      const result = await createTransaction({
+        ...mockValidTransactionValues,
+        date: testDate,
+      })
+
+      expect(result.error).toBeUndefined()
+      expect(result.success).toBe("Transaction has been created.")
+
+      const transactionsCollection = await getTransactionsCollection()
+      const found = await transactionsCollection.findOne({
+        date: testDate,
+      })
+      expect(found).not.toBeNull()
+
+      fetchSpy.mockRestore()
+    })
+
+    it("should return error when attempting to create duplicate transaction on the same day", async () => {
+      mockAuthenticatedUser()
+
+      const firstResult = await createTransaction(mockValidTransactionValues)
+      const secondResult = await createTransaction(mockValidTransactionValues)
+
+      expect(firstResult.success).toBe("Transaction has been created.")
+      expect(firstResult.error).toBeUndefined()
+      expect(secondResult.success).toBeUndefined()
+      expect(secondResult.error).toBe(
+        "This transaction already exists! Please merge transactions or add more details in the description."
+      )
+
+      const transactionsCollection = await getTransactionsCollection()
+      const count = await transactionsCollection.countDocuments({
+        userId: mockDBUser._id,
+      })
+      expect(count).toBe(1)
+    })
+
+    it("should reject concurrent duplicate transactions due to unique constraint", async () => {
+      mockAuthenticatedUser()
+
+      const [firstResult, secondResult] = await Promise.all([
+        createTransaction(mockValidTransactionValues),
+        createTransaction(mockValidTransactionValues),
+      ])
+
+      const results = [firstResult, secondResult]
+      const successes = results.filter(
+        (r) => r.success === "Transaction has been created."
+      )
+      const errors = results.filter(
+        (r) =>
+          r.error ===
+          "This transaction already exists! Please merge transactions or add more details in the description."
+      )
+
+      expect(successes).toHaveLength(1)
+      expect(errors).toHaveLength(1)
+
+      const transactionsCollection = await getTransactionsCollection()
+      const count = await transactionsCollection.countDocuments({
+        userId: mockDBUser._id,
+      })
+      expect(count).toBe(1)
     })
 
     it("should return error when database operation throws error", async () => {
@@ -86,34 +196,12 @@ describe("Transactions", async () => {
 
       expect(result.success).toBeUndefined()
       expect(result.error).toBe(
-        "Failed to add transaction! Please try again later."
+        "Failed to create transaction! Please try again later."
       )
     })
   })
 
   describe("updateTransaction", () => {
-    it("should return error when data is invalid", async () => {
-      // @ts-expect-error - Testing invalid data
-      const result = await updateTransaction(mockTransaction._id.toString(), {})
-
-      expect(result.success).toBeUndefined()
-      expect(result.error).toBe("Invalid data!")
-    })
-
-    it("should return error when not authenticated", async () => {
-      mockUnauthenticatedUser()
-
-      const result = await updateTransaction(
-        mockTransaction._id.toString(),
-        mockValidTransactionValues
-      )
-
-      expect(result.success).toBeUndefined()
-      expect(result.error).toBe(
-        "Access denied! Please refresh the page and try again."
-      )
-    })
-
     it("should return error with invalid transaction ID", async () => {
       mockAuthenticatedUser()
 
@@ -126,11 +214,76 @@ describe("Transactions", async () => {
       expect(result.error).toBe("Invalid transaction ID!")
     })
 
+    it("should return error when data is invalid", async () => {
+      const result = await updateTransaction(
+        mockDBTransaction._id.toString(),
+        // @ts-expect-error - Testing invalid data
+        {}
+      )
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe("Invalid data!")
+    })
+
+    it("should return error when not authenticated", async () => {
+      mockUnauthenticatedUser()
+
+      const result = await updateTransaction(
+        mockDBTransaction._id.toString(),
+        mockValidTransactionValues
+      )
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe(
+        "Access denied! Please refresh the page and try again."
+      )
+    })
+
+    it("should return error when rate limit is exceeded", async () => {
+      mockAuthenticatedUser()
+      await triggerRateLimit(`transaction:${mockUser.id}`)
+
+      const result = await updateTransaction(
+        mockDBTransaction._id.toString(),
+        mockValidTransactionValues
+      )
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe(
+        "Too many requests! Please slow down and try again later."
+      )
+    })
+
+    it("should return error when categoryKey is invalid or does not belong to user", async () => {
+      mockAuthenticatedUser()
+
+      const result = await updateTransaction(mockDBTransaction._id.toString(), {
+        ...mockValidTransactionValues,
+        categoryKey: "non-existent-or-invalid-key",
+      })
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe("Invalid category!")
+    })
+
+    it("should return error when transaction type does not match category type", async () => {
+      mockAuthenticatedUser()
+
+      const result = await updateTransaction(mockDBTransaction._id.toString(), {
+        ...mockValidTransactionValues,
+        type: "outflow",
+        categoryKey: "business_freelance",
+      })
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe("Invalid category!")
+    })
+
     it("should return error when transaction not found", async () => {
       mockAuthenticatedUser()
 
       const result = await updateTransaction(
-        mockTransaction._id.toString(),
+        mockDBTransaction._id.toString(),
         mockValidTransactionValues
       )
 
@@ -141,10 +294,10 @@ describe("Transactions", async () => {
     })
 
     it("should return error when another user tries to update", async () => {
-      await insertTestTransaction(mockTransaction)
+      await insertTestTransaction(mockDBTransaction)
       mockAuthenticatedAsAnotherUser()
 
-      const result = await updateTransaction(mockTransaction._id.toString(), {
+      const result = await updateTransaction(mockDBTransaction._id.toString(), {
         type: "outflow",
         categoryKey: "personal_care",
         amount: "100000",
@@ -154,7 +307,7 @@ describe("Transactions", async () => {
       })
       const transactionsCollection = await getTransactionsCollection()
       const unchangedTransaction = await transactionsCollection.findOne({
-        _id: mockTransaction._id,
+        _id: mockDBTransaction._id,
       })
 
       expect(result.success).toBeUndefined()
@@ -166,15 +319,16 @@ describe("Transactions", async () => {
 
     it("should successfully update transaction", async () => {
       await Promise.all([
-        insertTestTransaction(mockTransaction),
+        insertTestTransaction(mockDBTransaction),
         insertTestTransaction({
-          ...mockTransaction,
+          ...mockDBTransaction,
           _id: new ObjectId("690d2e5f7d5c36bf6c82ff1f"),
+          description: "pizza",
         }),
       ])
       mockAuthenticatedUser()
 
-      const result = await updateTransaction(mockTransaction._id.toString(), {
+      const result = await updateTransaction(mockDBTransaction._id.toString(), {
         type: "outflow",
         categoryKey: "personal_care",
         amount: "100000",
@@ -184,7 +338,7 @@ describe("Transactions", async () => {
       })
       const transactionsCollection = await getTransactionsCollection()
       const updatedTransaction = await transactionsCollection.findOne({
-        _id: mockTransaction._id,
+        _id: mockDBTransaction._id,
       })
       const unrelatedTransaction = await transactionsCollection.findOne({
         _id: new ObjectId("690d2e5f7d5c36bf6c82ff1f"),
@@ -200,9 +354,111 @@ describe("Transactions", async () => {
       expect(unrelatedTransaction?.type).toBe("outflow")
       expect(unrelatedTransaction?.categoryKey).toBe("food_beverage")
       expect(unrelatedTransaction?.amount.toString()).toBe("50000")
-      expect(unrelatedTransaction?.description).toBe("hamburger")
+      expect(unrelatedTransaction?.description).toBe("pizza")
       expect(result.success).toBe("Transaction has been updated.")
       expect(result.error).toBeUndefined()
+    })
+
+    it("should still update transaction when fetching exchange rate fails", async () => {
+      await insertTestTransaction(mockDBTransaction)
+      mockAuthenticatedUser()
+
+      const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        statusText: "Internal Server Error",
+      } as Response)
+
+      const newDate = localDateToUTCMidnight(new Date("2026-03-01"))
+      const result = await updateTransaction(mockDBTransaction._id.toString(), {
+        type: mockDBTransaction.type,
+        categoryKey: mockDBTransaction.categoryKey,
+        amount: mockDBTransaction.amount.toString(),
+        currency: mockDBTransaction.currency,
+        description: "attempted new description",
+        date: newDate,
+      })
+
+      expect(result.error).toBeUndefined()
+      expect(result.success).toBe("Transaction has been updated.")
+
+      const transactionsCollection = await getTransactionsCollection()
+      const current = await transactionsCollection.findOne({
+        _id: mockDBTransaction._id,
+      })
+      expect(current?.description).toBe("attempted new description")
+      expect(current?.date.toISOString()).toBe(newDate.toISOString())
+
+      fetchSpy.mockRestore()
+    })
+
+    it("should return error when updating transaction to have identical details as another transaction on the same date", async () => {
+      await Promise.all([
+        insertTestTransaction(mockDBTransaction),
+        insertTestTransaction({
+          ...mockDBTransaction,
+          _id: new ObjectId("690d2e5f7d5c36bf6c82ff1f"),
+          description: "pizza",
+        }),
+      ])
+      mockAuthenticatedUser()
+
+      const result = await updateTransaction("690d2e5f7d5c36bf6c82ff1f", {
+        type: mockDBTransaction.type,
+        categoryKey: mockDBTransaction.categoryKey,
+        amount: mockDBTransaction.amount.toString(),
+        currency: mockDBTransaction.currency,
+        description: mockDBTransaction.description,
+        date: mockDBTransaction.date,
+      })
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe(
+        "This transaction already exists! Please merge transactions or add more details in the description."
+      )
+    })
+
+    it("should reject concurrent updates resulting in identical transactions", async () => {
+      await Promise.all([
+        insertTestTransaction({
+          ...mockDBTransaction,
+          _id: new ObjectId("690d2e5f7d5c36bf6c82ff1e"),
+          description: "pizza 1",
+        }),
+        insertTestTransaction({
+          ...mockDBTransaction,
+          _id: new ObjectId("690d2e5f7d5c36bf6c82ff1f"),
+          description: "pizza 2",
+        }),
+      ])
+      mockAuthenticatedUser()
+
+      const targetValues = {
+        type: mockDBTransaction.type,
+        categoryKey: mockDBTransaction.categoryKey,
+        amount: mockDBTransaction.amount.toString(),
+        currency: mockDBTransaction.currency,
+        description: "target pizza",
+        date: mockDBTransaction.date,
+      }
+
+      const [firstResult, secondResult] = await Promise.all([
+        updateTransaction("690d2e5f7d5c36bf6c82ff1e", targetValues),
+        updateTransaction("690d2e5f7d5c36bf6c82ff1f", targetValues),
+      ])
+
+      const results = [firstResult, secondResult]
+      const successes = results.filter(
+        (r) => r.success === "Transaction has been updated."
+      )
+      const errors = results.filter(
+        (r) =>
+          r.error ===
+          "This transaction already exists! Please merge transactions or add more details in the description."
+      )
+
+      expect(successes).toHaveLength(1)
+      expect(errors).toHaveLength(1)
     })
 
     it("should return error when database operation throws error", async () => {
@@ -210,7 +466,7 @@ describe("Transactions", async () => {
       mockTransactionCollectionError()
 
       const result = await updateTransaction(
-        mockTransaction._id.toString(),
+        mockDBTransaction._id.toString(),
         mockValidTransactionValues
       )
 
@@ -222,17 +478,6 @@ describe("Transactions", async () => {
   })
 
   describe("deleteTransaction", () => {
-    it("should return error when not authenticated", async () => {
-      mockUnauthenticatedUser()
-
-      const result = await deleteTransaction(mockTransaction._id.toString())
-
-      expect(result.success).toBeUndefined()
-      expect(result.error).toBe(
-        "Access denied! Please refresh the page and try again."
-      )
-    })
-
     it("should return error with invalid transaction ID", async () => {
       mockAuthenticatedUser()
 
@@ -242,10 +487,33 @@ describe("Transactions", async () => {
       expect(result.error).toBe("Invalid transaction ID!")
     })
 
+    it("should return error when not authenticated", async () => {
+      mockUnauthenticatedUser()
+
+      const result = await deleteTransaction(mockDBTransaction._id.toString())
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe(
+        "Access denied! Please refresh the page and try again."
+      )
+    })
+
+    it("should return error when rate limit is exceeded", async () => {
+      mockAuthenticatedUser()
+      await triggerRateLimit(`transaction:${mockUser.id}`)
+
+      const result = await deleteTransaction(mockDBTransaction._id.toString())
+
+      expect(result.success).toBeUndefined()
+      expect(result.error).toBe(
+        "Too many requests! Please slow down and try again later."
+      )
+    })
+
     it("should return error when transaction not found", async () => {
       mockAuthenticatedUser()
 
-      const result = await deleteTransaction(mockTransaction._id.toString())
+      const result = await deleteTransaction(mockDBTransaction._id.toString())
 
       expect(result.success).toBeUndefined()
       expect(result.error).toBe(
@@ -254,13 +522,13 @@ describe("Transactions", async () => {
     })
 
     it("should return error when another user tries to delete", async () => {
-      await insertTestTransaction(mockTransaction)
+      await insertTestTransaction(mockDBTransaction)
       mockAuthenticatedAsAnotherUser()
 
-      const result = await deleteTransaction(mockTransaction._id.toString())
+      const result = await deleteTransaction(mockDBTransaction._id.toString())
       const transactionsCollection = await getTransactionsCollection()
       const unchangedTransaction = await transactionsCollection.findOne({
-        _id: mockTransaction._id,
+        _id: mockDBTransaction._id,
       })
 
       expect(result.success).toBeUndefined()
@@ -271,13 +539,13 @@ describe("Transactions", async () => {
     })
 
     it("should successfully delete transaction", async () => {
-      await insertTestTransaction(mockTransaction)
+      await insertTestTransaction(mockDBTransaction)
       mockAuthenticatedUser()
 
-      const result = await deleteTransaction(mockTransaction._id.toString())
+      const result = await deleteTransaction(mockDBTransaction._id.toString())
       const transactionsCollection = await getTransactionsCollection()
       const deletedTransaction = await transactionsCollection.findOne({
-        _id: mockTransaction._id,
+        _id: mockDBTransaction._id,
       })
 
       expect(deletedTransaction).toBe(null)
@@ -289,7 +557,7 @@ describe("Transactions", async () => {
       mockAuthenticatedUser()
       mockTransactionCollectionError()
 
-      const result = await deleteTransaction(mockTransaction._id.toString())
+      const result = await deleteTransaction(mockDBTransaction._id.toString())
 
       expect(result.success).toBeUndefined()
       expect(result.error).toBe(
@@ -320,7 +588,7 @@ describe("Transactions", async () => {
     })
 
     it("should return transactions list", async () => {
-      await insertTestTransaction(mockTransaction)
+      await insertTestTransaction(mockDBTransaction)
       mockAuthenticatedUser()
 
       const result = await getTransactions()
@@ -333,18 +601,21 @@ describe("Transactions", async () => {
 
     it("should return transactions sorted by date and _id descending", async () => {
       const transaction1 = {
-        ...mockTransaction,
+        ...mockDBTransaction,
         _id: new ObjectId("68f73357357d93dcbaae8106"),
+        description: "hamburger 1",
         date: localDateToUTCMidnight(new Date("2024-01-15")),
       }
       const transaction2 = {
-        ...mockTransaction,
+        ...mockDBTransaction,
         _id: new ObjectId("68f73357357d93dcbaae8107"),
+        description: "hamburger 2",
         date: localDateToUTCMidnight(new Date("2024-01-15")),
       }
       const transaction3 = {
-        ...mockTransaction,
+        ...mockDBTransaction,
         _id: new ObjectId("68f73357357d93dcbaae8108"),
+        description: "hamburger 3",
         date: localDateToUTCMidnight(new Date("2024-02-15")),
       }
 
@@ -358,7 +629,7 @@ describe("Transactions", async () => {
       const result = await getTransactions()
 
       expect(result.transactions).toHaveLength(3)
-      // Should be sorted by date descendinghen _id descending
+      // Should be sorted by date descending, then _id descending
       expect(result.transactions?.[0].date.toISOString()).toBe(
         "2024-02-15T00:00:00.000Z"
       )

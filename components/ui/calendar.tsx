@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { cn } from "cn"
 import {
   ChevronDownIcon,
   ChevronLeftIcon,
@@ -12,7 +13,7 @@ import type { DayButton } from "react-day-picker"
 
 import { Button, buttonVariants } from "@/components/ui/button"
 import { LOCALE_CONFIG } from "@/i18n/config"
-import { cn } from "@/lib/utils"
+import { serializeLocalDate } from "@/lib/date"
 
 function Calendar({
   className,
@@ -34,9 +35,9 @@ function Calendar({
       locale={LOCALE_CONFIG[locale].dateLocale}
       showOutsideDays={showOutsideDays}
       className={cn(
-        "group/calendar bg-background p-3 [--cell-size:--spacing(8)] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
-        String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
-        String.raw`rtl:**:[.rdp-button\_previous>svg]:rotate-180`,
+        "group/calendar bg-background p-3 [--cell-size:--spacing(8)] in-data-[slot=card-content]:bg-transparent in-data-[slot=popover-content]:bg-transparent",
+        "rtl:**:[.rdp-button\\_next>svg]:rotate-180",
+        "rtl:**:[.rdp-button\\_previous>svg]:rotate-180",
         className
       )}
       captionLayout={captionLayout}
@@ -200,7 +201,7 @@ function CalendarDayButton({
       ref={ref}
       variant="ghost"
       size="icon"
-      data-day={day.date.toLocaleDateString()}
+      data-day={serializeLocalDate(day.date)}
       data-selected-single={
         modifiers.selected &&
         !modifiers.range_start &&

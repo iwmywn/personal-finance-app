@@ -42,15 +42,14 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { BanUserDialog } from "@/components/admin/ban-user-dialog"
-import { ChangeRoleDialog } from "@/components/admin/change-role-dialog"
-import { DeleteUserDialog } from "@/components/admin/delete-user-dialog"
-import { SetPasswordDialog } from "@/components/admin/set-password-dialog"
-import { useUser } from "@/context/user-context"
+import { BanUserForm } from "@/components/admin/ban-user-form"
+import { DeleteUser } from "@/components/admin/delete-user"
+import { SetUserPasswordForm } from "@/components/admin/set-user-password-form"
+import { useUser } from "@/contexts/user-context"
 import { useFormatDate } from "@/hooks/use-format-date"
 import { authClient } from "@/lib/auth-client"
-import type { User } from "@/lib/definitions"
-import { isSuperAdminRole } from "@/lib/role"
+import type { AuthErrorCode, User } from "@/lib/definitions"
+import { isUserBanned } from "@/lib/utils"
 
 interface AdminTableProps {
   filteredUsers: User[]
@@ -67,7 +66,6 @@ export function AdminTable({
   const formatDate = useFormatDate()
   const [impersonatingId, setImpersonatingId] = useState<string | null>(null)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
-  const [isRoleOpen, setIsRoleOpen] = useState<boolean>(false)
   const [isBanOpen, setIsBanOpen] = useState<boolean>(false)
   const [isPasswordOpen, setIsPasswordOpen] = useState<boolean>(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false)
@@ -75,24 +73,33 @@ export function AdminTable({
   async function handleImpersonate(targetUser: User) {
     setImpersonatingId(targetUser.id)
 
-    authClient.admin.impersonateUser({
-      userId: targetUser.id,
-      fetchOptions: {
-        onError: (ctx) => {
-          if (ctx.error.code === "BANNED_USER")
-            toast.error(t("This user has been banned."))
-          else
-            toast.error(
-              t("Failed to impersonate user! Please try again later.")
-            )
+    try {
+      await authClient.admin.impersonateUser({
+        userId: targetUser.id,
+        fetchOptions: {
+          onError: (ctx) => {
+            switch (ctx.error.code as AuthErrorCode) {
+              case "BANNED_USER":
+                toast.error(t("This user has been banned."))
+                break
+              default:
+                toast.error(
+                  t("Failed to impersonate user! Please try again later.")
+                )
+                break
+            }
+          },
+          onSuccess: () => {
+            router.push("/home")
+            router.refresh()
+            toast.success(t("Now impersonating") + ` ${targetUser.name}`)
+          },
         },
-        onSuccess: () => {
-          router.push("/home")
-          router.refresh()
-          toast.success(t("Now impersonating") + ` ${targetUser.name}`)
-        },
-      },
-    })
+      })
+    } catch {
+      toast.error(t("Failed to impersonate user! Please try again later."))
+      setImpersonatingId(null)
+    }
 
     setImpersonatingId(null)
   }
@@ -131,31 +138,17 @@ export function AdminTable({
                 <TableBody>
                   {filteredUsers.map((u) => {
                     const isSelf = u.id === currentUser.id
-                    const isBanned = Boolean(u.banned)
-                    const isCurrentSuperAdmin = isSuperAdminRole(
-                      currentUser.role
-                    )
-                    const isCurrentAdmin = currentUser.role === "admin"
-                    const isTargetSuperAdmin = isSuperAdminRole(u.role)
+                    const isBanned = isUserBanned(u)
                     const isTargetAdmin = u.role === "admin"
 
-                    const hideMenu =
-                      (isCurrentSuperAdmin && isSelf) ||
-                      (isCurrentAdmin && isTargetSuperAdmin)
+                    const hideMenu = isSelf || isTargetAdmin
 
                     const canImpersonate =
-                      !isSelf &&
-                      impersonatingId !== u.id &&
-                      (isCurrentSuperAdmin ||
-                        (isCurrentAdmin &&
-                          !isTargetAdmin &&
-                          !isTargetSuperAdmin))
+                      !isSelf && !isTargetAdmin && impersonatingId !== u.id
 
-                    const canBan =
-                      !isSelf && (isCurrentSuperAdmin || !isTargetAdmin)
-
-                    const canDelete =
-                      !isSelf && (isCurrentSuperAdmin || !isTargetAdmin)
+                    const canBan = !isSelf && !isTargetAdmin
+                    const canDelete = !isSelf && !isTargetAdmin
+                    const canSetPassword = !isSelf && !isTargetAdmin
 
                     return (
                       <TableRow key={u.id} className="[&>td]:text-center">
@@ -206,12 +199,7 @@ export function AdminTable({
                         </TableCell>
 
                         <TableCell>
-                          {isSuperAdminRole(u.role) ? (
-                            <Badge className="border-amber-600/40 bg-amber-600/15 text-amber-700 dark:text-amber-300">
-                              <ShieldAlertIcon className="mr-1 size-3" />
-                              {t("Superadmin")}
-                            </Badge>
-                          ) : u.role === "admin" ? (
+                          {u.role === "admin" ? (
                             <Badge className="border-purple-600/40 bg-purple-600/15 text-purple-700 dark:text-purple-300">
                               <ShieldAlertIcon className="mr-1 size-3" />
                               {t("Admin")}
@@ -237,10 +225,7 @@ export function AdminTable({
                                   </p>
                                   {u.banExpires && (
                                     <p className="text-muted-foreground">
-                                      {t("Expires")}:{" "}
-                                      {new Date(
-                                        u.banExpires
-                                      ).toLocaleDateString()}
+                                      {t("Expires")}: {formatDate(u.banExpires)}
                                     </p>
                                   )}
                                 </div>
@@ -286,18 +271,9 @@ export function AdminTable({
                                   className="cursor-pointer"
                                   onClick={() => {
                                     setSelectedUser(u)
-                                    setIsRoleOpen(true)
-                                  }}
-                                >
-                                  {t("Change Role")}
-                                </DropdownMenuItem>
-
-                                <DropdownMenuItem
-                                  className="cursor-pointer"
-                                  onClick={() => {
-                                    setSelectedUser(u)
                                     setIsPasswordOpen(true)
                                   }}
+                                  disabled={!canSetPassword}
                                 >
                                   {t("Reset Password")}
                                 </DropdownMenuItem>
@@ -337,34 +313,29 @@ export function AdminTable({
               </Table>
             </div>
           )}
+          {/* Note: Pagination is intentionally omitted for the admin user list as the current low volume of users does not require it. */}
         </CardContent>
       </Card>
 
       {selectedUser && (
         <>
-          <ChangeRoleDialog
-            key={selectedUser.id + "ChangeRoleDialog"}
+          <BanUserForm
+            key={selectedUser.id + "BanUserForm"}
             user={selectedUser}
-            open={isRoleOpen}
-            setOpen={setIsRoleOpen}
+            isOpen={isBanOpen}
+            setIsOpen={setIsBanOpen}
           />
-          <BanUserDialog
-            key={selectedUser.id + "BanUserDialog"}
+          <SetUserPasswordForm
+            key={selectedUser.id + "SetUserPasswordForm"}
             user={selectedUser}
-            open={isBanOpen}
-            setOpen={setIsBanOpen}
+            isOpen={isPasswordOpen}
+            setIsOpen={setIsPasswordOpen}
           />
-          <SetPasswordDialog
-            key={selectedUser.id + "SetPasswordDialog"}
+          <DeleteUser
+            key={selectedUser.id + "DeleteUser"}
             user={selectedUser}
-            open={isPasswordOpen}
-            setOpen={setIsPasswordOpen}
-          />
-          <DeleteUserDialog
-            key={selectedUser.id + "DeleteUserDialog"}
-            user={selectedUser}
-            open={isDeleteOpen}
-            setOpen={setIsDeleteOpen}
+            isOpen={isDeleteOpen}
+            setIsOpen={setIsDeleteOpen}
           />
         </>
       )}

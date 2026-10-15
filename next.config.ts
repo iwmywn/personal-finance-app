@@ -4,7 +4,7 @@ import "./env/server"
 import type { NextConfig } from "next"
 import createNextIntlPlugin from "next-intl/plugin"
 
-import { LOCALES, SOURCE_LOCALE } from "./i18n/config"
+import { LOCALES, SOURCE_LOCALE } from "@/i18n/config"
 
 const withNextIntl = createNextIntlPlugin({
   experimental: {
@@ -34,14 +34,15 @@ const nextConfig: NextConfig = {
   experimental: {
     turbopackRustReactCompiler: true,
     scrollRestoration: true,
+    useOffline: true,
     cpus: 1,
-    inlineCss: true,
     staleTimes: {
       dynamic: 300,
       static: 180,
     },
   },
   cacheComponents: true,
+  partialPrefetching: true,
   reactCompiler: true,
   typedRoutes: true,
 }

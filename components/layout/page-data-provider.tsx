@@ -6,13 +6,13 @@ import { getGoals } from "@/actions/goal.actions"
 import { getRecurringTransactions } from "@/actions/recurring.actions"
 import { getTransactions } from "@/actions/transaction.actions"
 import { ErrorEmptyState } from "@/components/layout/error-empty-state"
-import { BudgetsProvider } from "@/context/budgets-context"
-import { CategoriesProvider } from "@/context/categories-context"
-import { GoalsProvider } from "@/context/goals-context"
-import { RecurringProvider } from "@/context/recurring-context"
-import { TransactionsProvider } from "@/context/transactions-context"
+import { BudgetsContext } from "@/contexts/budgets-context"
+import { CategoriesContext } from "@/contexts/categories-context"
+import { GoalsContext } from "@/contexts/goals-context"
+import { RecurringContext } from "@/contexts/recurring-context"
+import { TransactionsContext } from "@/contexts/transactions-context"
 
-export type PageDataProviderProps = {
+type PageDataProviderProps = {
   children: React.ReactNode
   transactions?: boolean
   categories?: boolean
@@ -94,39 +94,49 @@ export async function PageDataProvider({
 
   if (transactions && transactionsResult?.transactions) {
     content = (
-      <TransactionsProvider transactions={transactionsResult.transactions}>
+      <TransactionsContext
+        value={{ transactions: transactionsResult.transactions }}
+      >
         {content}
-      </TransactionsProvider>
+      </TransactionsContext>
     )
   }
 
   if (categories && categoriesResult?.customCategories) {
     content = (
-      <CategoriesProvider customCategories={categoriesResult.customCategories}>
+      <CategoriesContext
+        value={{ customCategories: categoriesResult.customCategories }}
+      >
         {content}
-      </CategoriesProvider>
+      </CategoriesContext>
     )
   }
 
   if (budgets && budgetsResult?.budgets) {
     content = (
-      <BudgetsProvider budgets={budgetsResult.budgets}>
+      <BudgetsContext value={{ budgets: budgetsResult.budgets }}>
         {content}
-      </BudgetsProvider>
+      </BudgetsContext>
     )
   }
 
   if (goals && goalsResult?.goals) {
-    content = <GoalsProvider goals={goalsResult.goals}>{content}</GoalsProvider>
+    content = (
+      <GoalsContext value={{ goals: goalsResult.goals }}>
+        {content}
+      </GoalsContext>
+    )
   }
 
   if (recurring && recurringResult?.recurringTransactions) {
     content = (
-      <RecurringProvider
-        recurringTransactions={recurringResult.recurringTransactions}
+      <RecurringContext
+        value={{
+          recurringTransactions: recurringResult.recurringTransactions,
+        }}
       >
         {content}
-      </RecurringProvider>
+      </RecurringContext>
     )
   }
 

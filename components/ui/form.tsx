@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
+import { cn } from "cn"
 import type { Label as LabelPrimitive } from "radix-ui"
 import { Slot } from "radix-ui"
 import {
@@ -15,7 +16,6 @@ import type { ControllerProps, FieldPath, FieldValues } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
-import { cn } from "@/lib/utils"
 
 const Form = FormProvider
 

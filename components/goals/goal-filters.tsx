@@ -22,12 +22,12 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { GoalsTable } from "@/components/goals/goals-table"
-import { useGoals } from "@/context/goals-context"
-import { useTransactions } from "@/context/transactions-context"
+import { useGoals } from "@/contexts/goals-context"
+import { useTransactions } from "@/contexts/transactions-context"
 import { useCategory } from "@/hooks/use-category"
 import { useMonths } from "@/hooks/use-months"
+import { getUniqueDateRangeYears } from "@/lib/date"
 import { filterGoals } from "@/lib/filters"
-import { getUniqueYears } from "@/lib/utils"
 
 export function GoalFilters() {
   const { goals } = useGoals()
@@ -46,7 +46,7 @@ export function GoalFilters() {
   const { getCategoriesByType } = useCategory()
 
   const allMonths = useMonths()
-  const allYears = getUniqueYears(transactions)
+  const allYears = getUniqueDateRangeYears(goals)
 
   const hasActiveFilters =
     searchTerm !== "" ||
@@ -207,9 +207,9 @@ export function GoalFilters() {
                 <SelectGroup>
                   <SelectItem value="all">{t("All Statuses")}</SelectItem>
                   <SelectSeparator />
-                  <SelectItem value="expired">{t("Expired")}</SelectItem>
                   <SelectItem value="active">{t("Active")}</SelectItem>
                   <SelectItem value="upcoming">{t("Upcoming")}</SelectItem>
+                  <SelectItem value="expired">{t("Expired")}</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>

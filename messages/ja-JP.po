@@ -7,19 +7,20 @@ msgstr ""
 "X-Message-Key: msgctxt\n"
 
 #: actions/admin.actions.ts
-msgctxt "fyjUn0"
-msgid "Access denied! Admin privileges required."
-msgstr "アクセスが拒否されました！管理者権限が必要です。"
+#: actions/budget.actions.ts
+#: actions/category.actions.ts
+#: actions/goal.actions.ts
+#: actions/recurring.actions.ts
+#: actions/session.actions.ts
+#: actions/transaction.actions.ts
+msgctxt "OYzwyU"
+msgid "Too many requests! Please slow down and try again later."
+msgstr "リクエストが多すぎます！少し時間を置いてから再度お試しください。"
 
 #: actions/admin.actions.ts
-msgctxt "gREMXx"
-msgid "Failed to fetch admin stats! Please try again later."
-msgstr "管理者統計情報の取得に失敗しました！後でもう一度お試しください。"
-
-#: actions/admin.actions.ts
-msgctxt "fVUGHi"
-msgid "Failed to load users! Please try again later."
-msgstr "ユーザーの読み込みに失敗しました！後でもう一度お試しください。"
+msgctxt "gfVKAY"
+msgid "Failed to list users! Please try again later."
+msgstr "ユーザー一覧の取得に失敗しました！後でもう一度お試しください。"
 
 #: actions/admin.actions.ts
 msgctxt "GBsD3h"
@@ -37,11 +38,17 @@ msgid "User not found!"
 msgstr "ユーザーが見つかりません！"
 
 #: actions/admin.actions.ts
+msgctxt "Wt-dMj"
+msgid "Cannot delete another administrator account!"
+msgstr "他の管理者アカウントを削除することはできません！"
+
+#: actions/admin.actions.ts
 msgctxt "7l4h1s"
 msgid "User has been deleted."
 msgstr "ユーザーが削除されました。"
 
 #: actions/admin.actions.ts
+#: components/admin/delete-user.tsx
 msgctxt "xkkfdF"
 msgid "Failed to delete user! Please try again later."
 msgstr "ユーザーの削除に失敗しました！後でもう一度お試しください。"
@@ -56,13 +63,17 @@ msgid "Invalid data!"
 msgstr "無効なデータです！"
 
 #: actions/budget.actions.ts
-#: actions/category.actions.ts
 #: actions/goal.actions.ts
 #: actions/recurring.actions.ts
 #: actions/transaction.actions.ts
-msgctxt "QWvB5t"
-msgid "Access denied! Please refresh the page and try again."
-msgstr "アクセスが拒否されました！ページを更新してもう一度お試しください。"
+msgctxt "IViGC5"
+msgid "Invalid category!"
+msgstr "カテゴリが無効です！"
+
+#: actions/budget.actions.ts
+msgctxt "sW3_mQ"
+msgid "Budget has been created."
+msgstr "予算が作成されました。"
 
 #: actions/budget.actions.ts
 msgctxt "kwvIdb"
@@ -70,14 +81,10 @@ msgid "This budget already exists!"
 msgstr "この予算は既に存在します！"
 
 #: actions/budget.actions.ts
-msgctxt "hcutYI"
-msgid "Budget has been added."
-msgstr "予算が追加されました。"
-
-#: actions/budget.actions.ts
-msgctxt "ge_1ga"
-msgid "Failed to add budget! Please try again later."
-msgstr "予算の追加に失敗しました！後でもう一度お試しください。"
+#: components/budgets/budget-form.tsx
+msgctxt "LiEvhU"
+msgid "Failed to create budget! Please try again later."
+msgstr "予算の作成に失敗しました！後でもう一度お試しください。"
 
 #: actions/budget.actions.ts
 msgctxt "3pMkv5"
@@ -95,6 +102,7 @@ msgid "Budget has been updated."
 msgstr "予算が更新されました。"
 
 #: actions/budget.actions.ts
+#: components/budgets/budget-form.tsx
 msgctxt "ZUfwUz"
 msgid "Failed to update budget! Please try again later."
 msgstr "予算の更新に失敗しました！後でもう一度お試しください。"
@@ -110,6 +118,7 @@ msgid "Budget has been deleted."
 msgstr "予算が削除されました。"
 
 #: actions/budget.actions.ts
+#: components/budgets/delete-budget.tsx
 msgctxt "niO8qC"
 msgid "Failed to delete budget! Please try again later."
 msgstr "予算の削除に失敗しました！後でもう一度お試しください。"
@@ -120,29 +129,30 @@ msgid "Failed to load budgets! Please try again later."
 msgstr "予算の読み込みに失敗しました！後でもう一度お試しください。"
 
 #: actions/category.actions.ts
+msgctxt "L2hi0Y"
+msgid "Category has been created."
+msgstr "カテゴリが作成されました。"
+
+#: actions/category.actions.ts
 msgctxt "LzesyV"
 msgid "This category already exists!"
 msgstr "このカテゴリは既に存在します！"
 
 #: actions/category.actions.ts
-msgctxt "G0Twr1"
-msgid "Error creating category key! Please try again later."
-msgstr "カテゴリキーの作成エラー！後でもう一度お試しください。"
-
-#: actions/category.actions.ts
-msgctxt "Jfen4M"
-msgid "Category has been added."
-msgstr "カテゴリが追加されました。"
-
-#: actions/category.actions.ts
-msgctxt "OQ79b6"
-msgid "Failed to add category! Please try again later."
-msgstr "カテゴリの追加に失敗しました！後でもう一度お試しください。"
+#: components/categories/category-form.tsx
+msgctxt "mFVjx4"
+msgid "Failed to create category! Please try again later."
+msgstr "カテゴリの作成に失敗しました！後でもう一度お試しください。"
 
 #: actions/category.actions.ts
 msgctxt "TgxdcM"
 msgid "Invalid category ID!"
 msgstr "カテゴリIDが無効です！"
+
+#: actions/category.actions.ts
+msgctxt "cLveqK"
+msgid "Category type cannot be changed!"
+msgstr "カテゴリのタイプは変更できません！"
 
 #: actions/category.actions.ts
 msgctxt "Jau5xo"
@@ -155,6 +165,7 @@ msgid "Category has been updated."
 msgstr "カテゴリが更新されました。"
 
 #: actions/category.actions.ts
+#: components/categories/category-form.tsx
 msgctxt "PoUgbk"
 msgid "Failed to update category! Please try again later."
 msgstr "カテゴリの更新に失敗しました！後でもう一度お試しください。"
@@ -190,6 +201,7 @@ msgid "Category has been deleted."
 msgstr "カテゴリが削除されました。"
 
 #: actions/category.actions.ts
+#: components/categories/delete-category.tsx
 msgctxt "XWfgXI"
 msgid "Failed to delete category! Please try again later."
 msgstr "カテゴリの削除に失敗しました！後でもう一度お試しください。"
@@ -200,19 +212,20 @@ msgid "Failed to load custom categories! Please try again later."
 msgstr "カスタムカテゴリの読み込みに失敗しました！後でもう一度お試しください。"
 
 #: actions/goal.actions.ts
+msgctxt "lUO2O7"
+msgid "Goal has been created."
+msgstr "目標が作成されました。"
+
+#: actions/goal.actions.ts
 msgctxt "3SCa_T"
 msgid "This goal already exists!"
 msgstr "この目標は既に存在します！"
 
 #: actions/goal.actions.ts
-msgctxt "J-nrjG"
-msgid "Goal has been added."
-msgstr "目標が追加されました。"
-
-#: actions/goal.actions.ts
-msgctxt "9Buhj_"
-msgid "Failed to add goal! Please try again later."
-msgstr "目標の追加に失敗しました！後でもう一度お試しください。"
+#: components/goals/goal-form.tsx
+msgctxt "2Csc1b"
+msgid "Failed to create goal! Please try again later."
+msgstr "目標の作成に失敗しました！後でもう一度お試しください。"
 
 #: actions/goal.actions.ts
 msgctxt "7UB8uM"
@@ -230,6 +243,7 @@ msgid "Goal has been updated."
 msgstr "目標が更新されました。"
 
 #: actions/goal.actions.ts
+#: components/goals/goal-form.tsx
 msgctxt "Lmu8yS"
 msgid "Failed to update goal! Please try again later."
 msgstr "目標の更新に失敗しました！後でもう一度お試しください。"
@@ -245,6 +259,7 @@ msgid "Goal has been deleted."
 msgstr "目標が削除されました。"
 
 #: actions/goal.actions.ts
+#: components/goals/delete-goal.tsx
 msgctxt "uwewg6"
 msgid "Failed to delete goal! Please try again later."
 msgstr "目標の削除に失敗しました！後でもう一度お試しください。"
@@ -255,39 +270,25 @@ msgid "Failed to load goals! Please try again later."
 msgstr "目標の読み込みに失敗しました！後でもう一度お試しください。"
 
 #: actions/recurring.actions.ts
+msgctxt "vgquXw"
+msgid "Recurring transaction has been created."
+msgstr "定期取引が作成されました。"
+
+#: actions/recurring.actions.ts
 msgctxt "-HBMWc"
 msgid "This recurring transaction already exists!"
 msgstr "この定期取引は既に存在します！"
 
 #: actions/recurring.actions.ts
-msgctxt "5Mtoe5"
-msgid "Recurring transaction has been added."
-msgstr "定期取引が追加されました。"
-
-#: actions/recurring.actions.ts
-msgctxt "FLPmpu"
-msgid "Failed to add recurring transaction! Please try again later."
-msgstr "定期取引の追加に失敗しました！後でもう一度お試しください。"
+#: components/recurring-transactions/recurring-transaction-form.tsx
+msgctxt "zQczG6"
+msgid "Failed to create recurring transaction! Please try again later."
+msgstr "定期取引の作成に失敗しました！後でもう一度お試しください。"
 
 #: actions/recurring.actions.ts
 msgctxt "Yamhgo"
 msgid "Invalid recurring transaction ID!"
 msgstr "定期取引IDが無効です！"
-
-#: actions/recurring.actions.ts
-msgctxt "oyoqPq"
-msgid "Recurring transaction not found or you don't have permission to edit."
-msgstr "定期取引が見つからないか、編集権限がありません。"
-
-#: actions/recurring.actions.ts
-msgctxt "FgrcGc"
-msgid "Recurring transaction has been updated."
-msgstr "定期取引が更新されました。"
-
-#: actions/recurring.actions.ts
-msgctxt "qlYMTi"
-msgid "Failed to update recurring transaction! Please try again later."
-msgstr "定期取引の更新に失敗しました！後でもう一度お試しください。"
 
 #: actions/recurring.actions.ts
 msgctxt "TJXAsr"
@@ -300,6 +301,7 @@ msgid "Recurring transaction has been deleted."
 msgstr "定期取引が削除されました。"
 
 #: actions/recurring.actions.ts
+#: components/recurring-transactions/delete-recurring-transaction.tsx
 msgctxt "9p5fYg"
 msgid "Failed to delete recurring transaction! Please try again later."
 msgstr "定期取引の削除に失敗しました！後でもう一度お試しください。"
@@ -309,20 +311,53 @@ msgctxt "D92YlY"
 msgid "Failed to load recurring transactions! Please try again later."
 msgstr "定期取引の読み込みに失敗しました！後でもう一度お試しください。"
 
-#: actions/transaction.actions.ts
-msgctxt "v-aP8j"
-msgid "This transaction has already been created today!"
-msgstr "この取引は既に今日作成されています！"
+#: actions/session.actions.ts
+msgctxt "QWvB5t"
+msgid "Access denied! Please refresh the page and try again."
+msgstr "アクセスが拒否されました！ページを更新してもう一度お試しください。"
+
+#: actions/session.actions.ts
+msgctxt "fyjUn0"
+msgid "Access denied! Admin privileges required."
+msgstr "アクセスが拒否されました！管理者権限が必要です。"
+
+#: actions/session.actions.ts
+msgctxt "sc5uVX"
+msgid "Failed to get session! Please try again later."
+msgstr "セッションの取得に失敗しました！後でもう一度お試しください。"
+
+#: actions/session.actions.ts
+msgctxt "vra063"
+msgid "Session not found."
+msgstr "セッションが見つかりません。"
+
+#: actions/session.actions.ts
+#: components/settings/active-sessions-manager.tsx
+msgctxt "tNzaek"
+msgid "Session terminated."
+msgstr "セッションが終了しました。"
+
+#: actions/session.actions.ts
+#: components/settings/active-sessions-manager.tsx
+msgctxt "M3ZAZv"
+msgid "Failed to terminate session! Please try again later."
+msgstr "セッションの終了に失敗しました！後でもう一度お試しください。"
 
 #: actions/transaction.actions.ts
-msgctxt "pU1r4y"
-msgid "Transaction has been added."
-msgstr "取引が追加されました。"
+msgctxt "JSmQV_"
+msgid "Transaction has been created."
+msgstr "取引が作成されました。"
 
 #: actions/transaction.actions.ts
-msgctxt "zb35o3"
-msgid "Failed to add transaction! Please try again later."
-msgstr "取引の追加に失敗しました！後でもう一度お試しください。"
+msgctxt "SkAC63"
+msgid "This transaction already exists! Please merge transactions or add more details in the description."
+msgstr "この取引は既に存在します！取引を統合するか、説明に詳細を追加してください。"
+
+#: actions/transaction.actions.ts
+#: components/transactions/transaction-form.tsx
+msgctxt "8rBc81"
+msgid "Failed to create transaction! Please try again later."
+msgstr "取引の作成に失敗しました！後でもう一度お試しください。"
 
 #: actions/transaction.actions.ts
 msgctxt "w_J6M7"
@@ -340,6 +375,7 @@ msgid "Transaction has been updated."
 msgstr "取引が更新されました。"
 
 #: actions/transaction.actions.ts
+#: components/transactions/transaction-form.tsx
 msgctxt "A9rBEo"
 msgid "Failed to update transaction! Please try again later."
 msgstr "取引の更新に失敗しました！後でもう一度お試しください。"
@@ -355,6 +391,7 @@ msgid "Transaction has been deleted."
 msgstr "取引が削除されました。"
 
 #: actions/transaction.actions.ts
+#: components/transactions/delete-transaction.tsx
 msgctxt "DcqDur"
 msgid "Failed to delete transaction! Please try again later."
 msgstr "取引の削除に失敗しました！後でもう一度お試しください。"
@@ -370,21 +407,12 @@ msgctxt "Ub-AGc"
 msgid "Sign In"
 msgstr "サインイン"
 
-#: app/(auth)/signin/page.tsx
-msgctxt "gvGdmL"
-msgid "Enter your username and password to sign in to your account."
-msgstr "アカウントにサインインするには、ユーザー名とパスワードを入力してください。"
-
 #: app/(auth)/two-factor/page.tsx
+#: components/auth/two-factor-form.tsx
 #: components/settings/settings-page.tsx
 msgctxt "AJyYQz"
 msgid "Two-Factor Authentication"
 msgstr "二要素認証"
-
-#: app/(auth)/two-factor/page.tsx
-msgctxt "PsYaj1"
-msgid "Enter the code from your authenticator app."
-msgstr "認証アプリからコードを入力してください。"
 
 #: app/(core)/[...not-found]/page.tsx
 #: components/layout/header.tsx
@@ -392,32 +420,11 @@ msgctxt "k1s9UW"
 msgid "Not Found"
 msgstr "見つかりません"
 
-#: app/(core)/[...not-found]/page.tsx
-msgctxt "QRccCM"
-msgid "Page not found"
-msgstr "ページが見つかりません"
-
-#: app/(core)/[...not-found]/page.tsx
-msgctxt "yAbaof"
-msgid "The page you are looking for does not exist."
-msgstr "お探しのページは存在しません。"
-
-#: app/(core)/[...not-found]/page.tsx
-#: app/error.tsx
-msgctxt "kfoc7z"
-msgid "Back to Home"
-msgstr "ホームに戻る"
-
 #: app/(core)/admin/page.tsx
 #: components/admin/admin-page.tsx
 msgctxt "cH9uli"
 msgid "Admin Management"
 msgstr "管理者管理"
-
-#: app/(core)/admin/page.tsx
-msgctxt "tt-u4j"
-msgid "CANNOT FETCH ADMIN STATS DATA"
-msgstr "管理者統計データを取得できません"
 
 #: app/(core)/admin/page.tsx
 msgctxt "8O4Aqk"
@@ -482,11 +489,17 @@ msgctxt "_WMCDd"
 msgid "Something went wrong!"
 msgstr "問題が発生しました！"
 
+#: app/error.tsx
+#: components/layout/not-found-page.tsx
+msgctxt "kfoc7z"
+msgid "Back to Home"
+msgstr "ホームに戻る"
+
 #: app/layout.tsx
 #: components/layout/app-sidebar.tsx
-msgctxt "hyu_OZ"
-msgid "Personal & Family Finance App"
-msgstr "個人・家族向け財務アプリ"
+msgctxt "r-TCHM"
+msgid "Personal Finance App"
+msgstr "個人向け財務アプリ"
 
 #: components/admin/admin-filters.tsx
 msgctxt "OhG9l2"
@@ -495,8 +508,7 @@ msgstr "名前、メールアドレス、ユーザー名で検索..."
 
 #: components/admin/admin-filters.tsx
 #: components/admin/admin-table.tsx
-#: components/admin/change-role-dialog.tsx
-#: components/admin/create-user-dialog.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "1ZgrhW"
 msgid "Role"
 msgstr "ロール"
@@ -508,14 +520,6 @@ msgstr "すべてのロール"
 
 #: components/admin/admin-filters.tsx
 #: components/admin/admin-table.tsx
-msgctxt "MipOkg"
-msgid "Superadmin"
-msgstr "スーパー管理者"
-
-#: components/admin/admin-filters.tsx
-#: components/admin/admin-table.tsx
-#: components/admin/change-role-dialog.tsx
-#: components/admin/create-user-dialog.tsx
 #: hooks/use-nav.ts
 msgctxt "iHN12u"
 msgid "Admin"
@@ -523,8 +527,7 @@ msgstr "管理者"
 
 #: components/admin/admin-filters.tsx
 #: components/admin/admin-table.tsx
-#: components/admin/change-role-dialog.tsx
-#: components/admin/create-user-dialog.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "EwRIOm"
 msgid "User"
 msgstr "ユーザー"
@@ -535,8 +538,7 @@ msgstr "ユーザー"
 #: components/budgets/budgets-table.tsx
 #: components/goals/goal-filters.tsx
 #: components/goals/goals-table.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
 #: components/recurring-transactions/recurring-transactions-table.tsx
 msgctxt "tzMNF3"
 msgid "Status"
@@ -553,8 +555,7 @@ msgstr "すべてのステータス"
 #: components/budgets/budgets-table.tsx
 #: components/goals/goal-filters.tsx
 #: components/goals/goals-table.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
 #: components/recurring-transactions/recurring-transactions-table.tsx
 msgctxt "3a5wL8"
 msgid "Active"
@@ -570,7 +571,7 @@ msgstr "BAN済み"
 #: components/budgets/budget-filters.tsx
 #: components/categories/category-filters.tsx
 #: components/goals/goal-filters.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
 #: components/statistics/statistics-filters.tsx
 #: components/transactions/transaction-filters.tsx
 msgctxt "jm_spn"
@@ -583,7 +584,7 @@ msgid "Manage application users, system roles, bans, sessions, and security."
 msgstr "アプリケーションのユーザー、システムロール、BAN、セッション、セキュリティを管理します。"
 
 #: components/admin/admin-page.tsx
-#: components/admin/create-user-dialog.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "VzzYJk"
 msgid "Create"
 msgstr "作成"
@@ -659,7 +660,7 @@ msgid "No users match the selected search query or filters."
 msgstr "選択した検索条件またはフィルターに一致するユーザーはいません。"
 
 #: components/admin/admin-table.tsx
-#: components/admin/create-user-dialog.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "sy-pv5"
 msgid "Email"
 msgstr "メールアドレス"
@@ -716,313 +717,345 @@ msgid "Impersonate"
 msgstr "なりすまし"
 
 #: components/admin/admin-table.tsx
-msgctxt "RXkfY1"
-msgid "Change Role"
-msgstr "ロールを変更"
-
-#: components/admin/admin-table.tsx
 msgctxt "xl27nc"
 msgid "Reset Password"
 msgstr "パスワードをリセット"
 
 #: components/admin/admin-table.tsx
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "6U4eIn"
 msgid "Unban"
 msgstr "BAN解除"
 
 #: components/admin/admin-table.tsx
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "XtUrMc"
 msgid "Ban"
 msgstr "BAN"
 
 #: components/admin/admin-table.tsx
-#: components/admin/delete-user-dialog.tsx
+#: components/admin/delete-user.tsx
 #: components/budgets/budgets-table.tsx
-#: components/budgets/delete-budget-dialog.tsx
+#: components/budgets/delete-budget.tsx
 #: components/categories/categories-table.tsx
-#: components/categories/delete-category-dialog.tsx
-#: components/goals/delete-goal-dialog.tsx
+#: components/categories/delete-category.tsx
+#: components/goals/delete-goal.tsx
 #: components/goals/goals-table.tsx
-#: components/recurring-transactions/delete-recurring-transaction-dialog.tsx
+#: components/recurring-transactions/delete-recurring-transaction.tsx
 #: components/recurring-transactions/recurring-transactions-table.tsx
-#: components/transactions/delete-transaction-dialog.tsx
+#: components/transactions/delete-transaction.tsx
 #: components/transactions/transactions-table.tsx
 msgctxt "K3r6DQ"
 msgid "Delete"
 msgstr "削除"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "aRQh8u"
 msgid "Failed to update ban status! Please try again later."
 msgstr "BAN状態の更新に失敗しました！後でもう一度お試しください。"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "tLY3l1"
 msgid "User has been unbanned."
 msgstr "ユーザーのBANが解除されました。"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "ViifPP"
 msgid "Failed to ban user! Please try again later."
 msgstr "ユーザーのBANに失敗しました！後でもう一度お試しください。"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "bcm8Ks"
 msgid "User has been banned."
 msgstr "ユーザーがBANされました。"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "aFpb8P"
 msgid "Unban User"
 msgstr "ユーザーのBANを解除"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "Ro3EXO"
 msgid "Ban User"
 msgstr "ユーザーをBAN"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "bZ5A9F"
 msgid "Restore access for"
 msgstr "アクセス権を復元:"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "fJtO6z"
 msgid "Prevent this user from signing in and revoke all active sessions."
 msgstr "このユーザーのサインインを防ぎ、すべてのアクティブセッションを取り消します。"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "4pV2cx"
 msgid "Current ban reason"
 msgstr "現在のBAN理由"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "09AU_2"
 msgid "No reason specified"
 msgstr "理由が指定されていません"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "0t4WRs"
 msgid "Expires on"
 msgstr "有効期限:"
 
-#: components/admin/ban-user-dialog.tsx
-#: components/admin/change-role-dialog.tsx
-#: components/admin/create-user-dialog.tsx
-#: components/admin/delete-user-dialog.tsx
-#: components/admin/set-password-dialog.tsx
-#: components/budgets/budget-dialog.tsx
-#: components/budgets/delete-budget-dialog.tsx
-#: components/categories/category-dialog.tsx
-#: components/categories/delete-category-dialog.tsx
-#: components/goals/delete-goal-dialog.tsx
-#: components/goals/goal-dialog.tsx
-#: components/layout/impersonation-indicator.tsx
-#: components/layout/secondary-nav.tsx
-#: components/recurring-transactions/delete-recurring-transaction-dialog.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-#: components/settings/change-name-dialog.tsx
-#: components/settings/change-password-dialog.tsx
-#: components/settings/change-username-dialog.tsx
-#: components/transactions/delete-transaction-dialog.tsx
-#: components/transactions/transaction-dialog.tsx
+#: components/admin/ban-user-form.tsx
+#: components/admin/create-user-form.tsx
+#: components/admin/delete-user.tsx
+#: components/admin/set-user-password-form.tsx
+#: components/admin/stop-impersonation.tsx
+#: components/auth/sign-out-button.tsx
+#: components/budgets/budget-form.tsx
+#: components/budgets/delete-budget.tsx
+#: components/categories/category-form.tsx
+#: components/categories/delete-category.tsx
+#: components/goals/delete-goal.tsx
+#: components/goals/goal-form.tsx
+#: components/recurring-transactions/delete-recurring-transaction.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/settings/change-name-form.tsx
+#: components/settings/change-password-form.tsx
+#: components/settings/change-username-form.tsx
+#: components/transactions/delete-transaction.tsx
+#: components/transactions/transaction-form.tsx
 msgctxt "47FYwb"
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "VGVk-h"
 msgid "Ban Reason"
 msgstr "BAN理由"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "8ob5gg"
 msgid "e.g. Violation of terms of service"
 msgstr "例: 利用規約違反"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "IuFETn"
 msgid "Duration"
 msgstr "期間"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "StRQjB"
 msgid "Select ban duration"
 msgstr "BAN期間を選択"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "o2jbDD"
 msgid "Permanent"
 msgstr "無期限"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "Jw7b8T"
 msgid "24 Hours"
 msgstr "24時間"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "WhQqi2"
 msgid "7 Days"
 msgstr "7日間"
 
-#: components/admin/ban-user-dialog.tsx
+#: components/admin/ban-user-form.tsx
 msgctxt "vgJsLx"
 msgid "30 Days"
 msgstr "30日間"
 
-#: components/admin/change-role-dialog.tsx
-msgctxt "jNvbw7"
-msgid "Failed to update user role! Please try again later."
-msgstr "ユーザーロールの更新に失敗しました！後でもう一度お試しください。"
-
-#: components/admin/change-role-dialog.tsx
-msgctxt "ayfthF"
-msgid "User role has been updated."
-msgstr "ユーザーロールが更新されました。"
-
-#: components/admin/change-role-dialog.tsx
-msgctxt "ho_b8x"
-msgid "Change User Role"
-msgstr "ユーザーロールの変更"
-
-#: components/admin/change-role-dialog.tsx
-msgctxt "EK8gb2"
-msgid "Assign a new system role to"
-msgstr "新しいシステムロールを割り当て:"
-
-#: components/admin/change-role-dialog.tsx
-#: components/admin/create-user-dialog.tsx
-msgctxt "iaCoRs"
-msgid "Select role"
-msgstr "ロールを選択"
-
-#: components/admin/change-role-dialog.tsx
-#: components/settings/change-name-dialog.tsx
-#: components/settings/change-password-dialog.tsx
-#: components/settings/change-username-dialog.tsx
-msgctxt "jvo0vs"
-msgid "Save"
-msgstr "保存"
-
-#: components/admin/create-user-dialog.tsx
-#: components/settings/change-username-dialog.tsx
+#: components/admin/create-user-form.tsx
+#: components/settings/change-username-form.tsx
 msgctxt "K3OKU5"
 msgid "Failed to check username availability! Please try again later."
 msgstr "ユーザー名の利用可能性の確認に失敗しました！後でもう一度お試しください。"
 
-#: components/admin/create-user-dialog.tsx
-#: components/settings/change-username-dialog.tsx
+#: components/admin/create-user-form.tsx
+#: components/settings/change-username-form.tsx
 msgctxt "wb3MSp"
 msgid "This username is already taken."
 msgstr "このユーザー名は既に使用されています。"
 
-#: components/admin/create-user-dialog.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "-OyBM6"
 msgid "This email is already in use."
 msgstr "このメールアドレスはすでに使用されています。"
 
-#: components/admin/create-user-dialog.tsx
-#: components/auth/signin-form.tsx
-msgctxt "b8-mgZ"
-msgid "Failed to sign in! Please try again later."
-msgstr "サインインに失敗しました！後でもう一度お試しください。"
+#: components/admin/create-user-form.tsx
+msgctxt "74JxeG"
+msgid "Failed to create user! Please try again later."
+msgstr "ユーザーの作成に失敗しました！後でもう一度お試しください。"
 
-#: components/admin/create-user-dialog.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "wUmmPh"
 msgid "User has been created."
 msgstr "ユーザーが作成されました。"
 
-#: components/admin/create-user-dialog.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "xWI3D2"
 msgid "Create New User"
 msgstr "新しいユーザーを作成"
 
-#: components/admin/create-user-dialog.tsx
-msgctxt "xWyHPB"
-msgid "Add a new user account with credentials and role."
-msgstr "認証情報とロールを持つ新しいユーザーアカウントを追加します。"
+#: components/admin/create-user-form.tsx
+msgctxt "k30S3R"
+msgid "Add a new user account with credentials."
+msgstr "認証情報を持つ新しいユーザーアカウントを追加します。"
 
-#: components/admin/create-user-dialog.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "TemVby"
 msgid "Full Name"
 msgstr "氏名"
 
-#: components/admin/create-user-dialog.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "zUQhAm"
 msgid "e.g. John Doe"
 msgstr "例: 山田 太郎"
 
-#: components/admin/create-user-dialog.tsx
+#: components/admin/create-user-form.tsx
 #: components/auth/signin-form.tsx
-#: components/settings/change-username-dialog.tsx
+#: components/settings/change-username-form.tsx
 msgctxt "JCIgkj"
 msgid "Username"
 msgstr "ユーザー名"
 
-#: components/admin/create-user-dialog.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "c3e6FL"
 msgid "e.g. johndoe"
 msgstr "例: johndoe"
 
-#: components/admin/create-user-dialog.tsx
+#: components/admin/create-user-form.tsx
 msgctxt "8EHM66"
 msgid "e.g. john@example.com"
 msgstr "例: john@example.com"
 
-#: components/admin/create-user-dialog.tsx
+#: components/admin/create-user-form.tsx
 #: components/auth/signin-form.tsx
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "5sg7KC"
 msgid "Password"
 msgstr "パスワード"
 
-#: components/admin/delete-user-dialog.tsx
+#: components/admin/delete-user.tsx
 msgctxt "6z5Ebr"
 msgid "Delete User Account"
 msgstr "ユーザーアカウントを削除"
 
-#: components/admin/delete-user-dialog.tsx
+#: components/admin/delete-user.tsx
 msgctxt "ZzCNg8"
 msgid "Are you sure you want to permanently delete this user account?"
 msgstr "このユーザーアカウントを完全に削除してもよろしいですか？"
 
-#: components/admin/delete-user-dialog.tsx
-msgctxt "uon94C"
-msgid "All associated data including transactions, budgets, and goals will be permanently deleted. This action cannot be undone."
-msgstr "取引、予算、目標を含むすべての関連データが完全に削除されます。この操作は元に戻せません。"
+#: components/admin/delete-user.tsx
+msgctxt "qSy-Lo"
+msgid "All associated data will be permanently deleted. This action cannot be undone."
+msgstr "関連するすべてのデータは完全に削除されます。この操作は元に戻せません。"
 
-#: components/admin/set-password-dialog.tsx
+#: components/admin/set-user-password-form.tsx
 msgctxt "VvoQv7"
 msgid "Failed to set user password! Please try again later."
 msgstr "ユーザーパスワードの設定に失敗しました！後でもう一度お試しください。"
 
-#: components/admin/set-password-dialog.tsx
+#: components/admin/set-user-password-form.tsx
 msgctxt "ygB8SA"
 msgid "Password has been updated."
 msgstr "パスワードが更新されました。"
 
-#: components/admin/set-password-dialog.tsx
+#: components/admin/set-user-password-form.tsx
 msgctxt "ArEJTr"
 msgid "Reset User Password"
 msgstr "ユーザーパスワードをリセット"
 
-#: components/admin/set-password-dialog.tsx
+#: components/admin/set-user-password-form.tsx
 msgctxt "SxSUYZ"
 msgid "Set a new password for"
 msgstr "新しいパスワードを設定:"
 
-#: components/admin/set-password-dialog.tsx
-#: components/settings/change-password-dialog.tsx
+#: components/admin/set-user-password-form.tsx
+#: components/settings/change-password-form.tsx
 msgctxt "Ev6SEF"
 msgid "New Password"
 msgstr "新しいパスワード"
 
-#: components/admin/set-password-dialog.tsx
+#: components/admin/set-user-password-form.tsx
 msgctxt "ZTYUJe"
 msgid "Update Password"
 msgstr "パスワードを更新"
+
+#: components/admin/stop-impersonation.tsx
+msgctxt "H1m7wl"
+msgid "Failed to stop impersonating! Please try again later."
+msgstr "なりすましの停止に失敗しました！後でもう一度お試しください。"
+
+#: components/admin/stop-impersonation.tsx
+msgctxt "IF-3KJ"
+msgid "Stopped impersonation session."
+msgstr "なりすましセッションを停止しました。"
+
+#: components/admin/stop-impersonation.tsx
+msgctxt "LKxCOb"
+msgid "Impersonating"
+msgstr "なりすまし中"
+
+#: components/admin/stop-impersonation.tsx
+msgctxt "fA8c13"
+msgid "Stop impersonating this user?"
+msgstr "このユーザーのなりすましを停止しますか？"
+
+#: components/admin/stop-impersonation.tsx
+msgctxt "AB6aDn"
+msgid "You are currently impersonating"
+msgstr "現在なりすましを行っています:"
+
+#: components/admin/stop-impersonation.tsx
+msgctxt "eybH_m"
+msgid "Stopping will restore your admin session and redirect you back to the admin panel."
+msgstr "停止すると管理者セッションが復元され、管理パネルにリダイレクトされます。"
+
+#: components/admin/stop-impersonation.tsx
+msgctxt "d0A6B0"
+msgid "Stop Impersonating"
+msgstr "なりすましを停止"
+
+#: components/auth/language-selector.tsx
+#: components/settings/language-selector.tsx
+msgctxt "Ax3Nmj"
+msgid "Failed to update language! Please try again later."
+msgstr "言語の更新に失敗しました！後でもう一度お試しください。"
+
+#: components/auth/language-selector.tsx
+#: components/settings/language-selector.tsx
+#: components/settings/settings-page.tsx
+msgctxt "y1Z3or"
+msgid "Language"
+msgstr "言語"
+
+#: components/auth/sign-out-button.tsx
+msgctxt "XuxYAf"
+msgid "Failed to sign out! Please try again later."
+msgstr "サインアウトに失敗しました！後でもう一度お試しください。"
+
+#: components/auth/sign-out-button.tsx
+msgctxt "hlp8qc"
+msgid "Signed out."
+msgstr "サインアウトしました。"
+
+#: components/auth/sign-out-button.tsx
+msgctxt "F62y-K"
+msgid "Sign Out"
+msgstr "サインアウト"
+
+#: components/auth/sign-out-button.tsx
+msgctxt "BHBJUz"
+msgid "Are you sure you want to sign out?"
+msgstr "サインアウトしてもよろしいですか？"
+
+#: components/auth/sign-out-button.tsx
+msgctxt "naYgGy"
+msgid "You will need to sign in again to access your account."
+msgstr "アカウントにアクセスするには、再度サインインする必要があります。"
 
 #: components/auth/signin-form.tsx
 msgctxt "ExP2LI"
@@ -1050,24 +1083,56 @@ msgid "Your account has been banned. Please contact support if you believe this 
 msgstr "アカウントがBANされました。誤りと思われる場合はサポートにお問い合わせください。"
 
 #: components/auth/signin-form.tsx
+#: components/settings/change-password-form.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "zR1TB7"
 msgid "Rate limit exceeded! Retry after {seconds} seconds."
 msgstr "レート制限を超えました！{seconds}秒後に再試行してください。"
 
+#: components/auth/signin-form.tsx
+msgctxt "b8-mgZ"
+msgid "Failed to sign in! Please try again later."
+msgstr "サインインに失敗しました！後でもう一度お試しください。"
+
+#: components/auth/signin-form.tsx
+msgctxt "gvGdmL"
+msgid "Enter your username and password to sign in to your account."
+msgstr "アカウントにサインインするには、ユーザー名とパスワードを入力してください。"
+
 #: components/auth/two-factor-form.tsx
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "FCVHwe"
 msgid "Invalid authentication code!"
 msgstr "認証コードが無効です！"
 
 #: components/auth/two-factor-form.tsx
-#: components/settings/two-factor-manager-dialog.tsx
+msgctxt "HtVpsQ"
+msgid "Too many attempts. Please sign in again."
+msgstr "試行回数が多すぎます。もう一度サインインしてください。"
+
+#: components/auth/two-factor-form.tsx
+msgctxt "j_5SEQ"
+msgid "Two-factor session has expired. Please sign in again."
+msgstr "二要素認証セッションの有効期限が切れました。もう一度サインインしてください。"
+
+#: components/auth/two-factor-form.tsx
+msgctxt "H5i_uh"
+msgid "Your account is temporarily locked due to too many failed attempts. Please try again later."
+msgstr "試行失敗回数が多すぎるため、アカウントは一時的にロックされています。後でもう一度お試しください。"
+
+#: components/auth/two-factor-form.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "02Huvd"
 msgid "Failed to verify 2FA code! Please try again later."
 msgstr "2FAコードの確認に失敗しました！後でもう一度お試しください。"
 
 #: components/auth/two-factor-form.tsx
-#: components/settings/two-factor-manager-dialog.tsx
+msgctxt "PsYaj1"
+msgid "Enter the code from your authenticator app."
+msgstr "認証アプリからコードを入力してください。"
+
+#: components/auth/two-factor-form.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "Tjv3UC"
 msgid "Verification Code"
 msgstr "確認コード"
@@ -1083,109 +1148,14 @@ msgid "Don't ask for 2FA code on this device for 30 days."
 msgstr "このデバイスでは30日間2FAコードを要求しない。"
 
 #: components/auth/two-factor-form.tsx
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "q5Xl0M"
 msgid "Verify"
 msgstr "確認"
 
-#: components/budgets/budget-dialog.tsx
-msgctxt "2g82CP"
-msgid "Edit Budget"
-msgstr "予算を編集"
-
-#: components/budgets/budget-dialog.tsx
-msgctxt "zMoeFN"
-msgid "Add Budget"
-msgstr "予算を追加"
-
-#: components/budgets/budget-dialog.tsx
-msgctxt "zSiCkT"
-msgid "Update budget information."
-msgstr "予算情報を更新します。"
-
-#: components/budgets/budget-dialog.tsx
-msgctxt "PVSBse"
-msgid "Create a budget for a category to track your spending."
-msgstr "支出を追跡するために、カテゴリの予算を作成します。"
-
-#: components/budgets/budget-dialog.tsx
-#: components/goals/goal-dialog.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-#: components/settings/currency-selector.tsx
-#: components/settings/settings-page.tsx
-#: components/transactions/transaction-dialog.tsx
-msgctxt "55hdQy"
-msgid "Currency"
-msgstr "通貨"
-
-#: components/budgets/budget-dialog.tsx
-#: components/budgets/budgets-table.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-#: components/recurring-transactions/recurring-transactions-table.tsx
-#: components/transactions/export-button.tsx
-#: components/transactions/transaction-dialog.tsx
-#: components/transactions/transactions-table.tsx
-msgctxt "_0TOL5"
-msgid "Amount"
-msgstr "金額"
-
-#: components/budgets/budget-dialog.tsx
-#: components/budgets/budgets-table.tsx
-#: components/goals/goal-dialog.tsx
-#: components/goals/goals-table.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-#: components/recurring-transactions/recurring-transactions-table.tsx
-msgctxt "QirE3M"
-msgid "Start Date"
-msgstr "開始日"
-
-#: components/budgets/budget-dialog.tsx
-#: components/goals/goal-dialog.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-#: components/statistics/statistics-filters.tsx
-#: components/transactions/transaction-dialog.tsx
-#: components/transactions/transaction-filters.tsx
-msgctxt "ftg7GK"
-msgid "Select Date"
-msgstr "日付を選択"
-
-#: components/budgets/budget-dialog.tsx
-#: components/budgets/budgets-table.tsx
-#: components/goals/goal-dialog.tsx
-#: components/goals/goals-table.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-#: components/recurring-transactions/recurring-transactions-table.tsx
-msgctxt "T4GOiX"
-msgid "End Date"
-msgstr "終了日"
-
-#: components/budgets/budget-dialog.tsx
-#: components/categories/category-dialog.tsx
-#: components/goals/goal-dialog.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-#: components/transactions/transaction-dialog.tsx
-msgctxt "BWpuKl"
-msgid "Update"
-msgstr "更新"
-
-#: components/budgets/budget-dialog.tsx
-#: components/budgets/budgets-page.tsx
-#: components/categories/categories-page.tsx
-#: components/categories/category-dialog.tsx
-#: components/goals/goal-dialog.tsx
-#: components/goals/goals-page.tsx
-#: components/home/homepage.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-#: components/recurring-transactions/recurring-transactions-page.tsx
-#: components/transactions/transaction-dialog.tsx
-#: components/transactions/transactions-page.tsx
-msgctxt "2_2yg-"
-msgid "Add"
-msgstr "追加"
-
 #: components/budgets/budget-filters.tsx
 #: components/goals/goal-filters.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
 #: components/statistics/statistics-filters.tsx
 #: components/transactions/transaction-filters.tsx
 msgctxt "TBovrx"
@@ -1194,7 +1164,7 @@ msgstr "月"
 
 #: components/budgets/budget-filters.tsx
 #: components/goals/goal-filters.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
 #: components/statistics/statistics-filters.tsx
 #: components/transactions/transaction-filters.tsx
 msgctxt "O-ZfC8"
@@ -1203,7 +1173,7 @@ msgstr "すべての月"
 
 #: components/budgets/budget-filters.tsx
 #: components/goals/goal-filters.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
 #: components/statistics/statistics-filters.tsx
 #: components/transactions/transaction-filters.tsx
 msgctxt "IFo1oo"
@@ -1212,7 +1182,7 @@ msgstr "年"
 
 #: components/budgets/budget-filters.tsx
 #: components/goals/goal-filters.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
 #: components/statistics/statistics-filters.tsx
 #: components/transactions/transaction-filters.tsx
 msgctxt "5JGC4V"
@@ -1224,7 +1194,7 @@ msgstr "すべての年"
 #: components/category-form-select.tsx
 #: components/goals/goal-filters.tsx
 #: components/goals/goals-table.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
 #: components/recurring-transactions/recurring-transactions-table.tsx
 #: components/statistics/statistics-table.tsx
 #: components/transactions/export-button.tsx
@@ -1236,7 +1206,7 @@ msgstr "カテゴリ"
 
 #: components/budgets/budget-filters.tsx
 #: components/goals/goal-filters.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
 #: components/transactions/transaction-filters.tsx
 msgctxt "1X6HtI"
 msgid "All Categories"
@@ -1279,10 +1249,20 @@ msgstr "超過（≥ 100%）"
 
 #: components/budgets/budget-filters.tsx
 #: components/goals/goal-filters.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
 msgctxt "tADQQm"
 msgid "All Statuses"
 msgstr "すべてのステータス"
+
+#: components/budgets/budget-filters.tsx
+#: components/budgets/budgets-table.tsx
+#: components/goals/goal-filters.tsx
+#: components/goals/goals-table.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
+#: components/recurring-transactions/recurring-transactions-table.tsx
+msgctxt "6_aEFZ"
+msgid "Upcoming"
+msgstr "予定"
 
 #: components/budgets/budget-filters.tsx
 #: components/budgets/budgets-table.tsx
@@ -1292,13 +1272,100 @@ msgctxt "RahCRH"
 msgid "Expired"
 msgstr "期限切れ"
 
-#: components/budgets/budget-filters.tsx
+#: components/budgets/budget-form.tsx
+msgctxt "2g82CP"
+msgid "Edit Budget"
+msgstr "予算を編集"
+
+#: components/budgets/budget-form.tsx
+msgctxt "zMoeFN"
+msgid "Add Budget"
+msgstr "予算を追加"
+
+#: components/budgets/budget-form.tsx
+msgctxt "zSiCkT"
+msgid "Update budget information."
+msgstr "予算情報を更新します。"
+
+#: components/budgets/budget-form.tsx
+msgctxt "PVSBse"
+msgid "Create a budget for a category to track your spending."
+msgstr "支出を追跡するために、カテゴリの予算を作成します。"
+
+#: components/budgets/budget-form.tsx
+#: components/goals/goal-form.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/settings/currency-selector.tsx
+#: components/settings/settings-page.tsx
+#: components/transactions/export-button.tsx
+#: components/transactions/transaction-form.tsx
+msgctxt "55hdQy"
+msgid "Currency"
+msgstr "通貨"
+
+#: components/budgets/budget-form.tsx
 #: components/budgets/budgets-table.tsx
-#: components/goals/goal-filters.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/recurring-transactions/recurring-transactions-table.tsx
+#: components/transactions/export-button.tsx
+#: components/transactions/transaction-form.tsx
+#: components/transactions/transactions-table.tsx
+msgctxt "_0TOL5"
+msgid "Amount"
+msgstr "金額"
+
+#: components/budgets/budget-form.tsx
+#: components/budgets/budgets-table.tsx
+#: components/goals/goal-form.tsx
 #: components/goals/goals-table.tsx
-msgctxt "6_aEFZ"
-msgid "Upcoming"
-msgstr "予定"
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/recurring-transactions/recurring-transactions-table.tsx
+msgctxt "QirE3M"
+msgid "Start Date"
+msgstr "開始日"
+
+#: components/budgets/budget-form.tsx
+#: components/goals/goal-form.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/statistics/statistics-filters.tsx
+#: components/transactions/transaction-filters.tsx
+#: components/transactions/transaction-form.tsx
+msgctxt "ftg7GK"
+msgid "Select Date"
+msgstr "日付を選択"
+
+#: components/budgets/budget-form.tsx
+#: components/budgets/budgets-table.tsx
+#: components/goals/goal-form.tsx
+#: components/goals/goals-table.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/recurring-transactions/recurring-transactions-table.tsx
+msgctxt "T4GOiX"
+msgid "End Date"
+msgstr "終了日"
+
+#: components/budgets/budget-form.tsx
+#: components/categories/category-form.tsx
+#: components/goals/goal-form.tsx
+#: components/transactions/transaction-form.tsx
+msgctxt "BWpuKl"
+msgid "Update"
+msgstr "更新"
+
+#: components/budgets/budget-form.tsx
+#: components/budgets/budgets-page.tsx
+#: components/categories/categories-page.tsx
+#: components/categories/category-form.tsx
+#: components/goals/goal-form.tsx
+#: components/goals/goals-page.tsx
+#: components/home/home-page.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/recurring-transactions/recurring-transactions-page.tsx
+#: components/transactions/transaction-form.tsx
+#: components/transactions/transactions-page.tsx
+msgctxt "2_2yg-"
+msgid "Add"
+msgstr "追加"
 
 #: components/budgets/budgets-page.tsx
 msgctxt "3fGt__"
@@ -1341,18 +1408,17 @@ msgstr "表示"
 #: components/budgets/budgets-table.tsx
 #: components/categories/categories-table.tsx
 #: components/goals/goals-table.tsx
-#: components/recurring-transactions/recurring-transactions-table.tsx
 #: components/transactions/transactions-table.tsx
 msgctxt "wEQDC6"
 msgid "Edit"
 msgstr "編集"
 
-#: components/budgets/delete-budget-dialog.tsx
+#: components/budgets/delete-budget.tsx
 msgctxt "q6vl7b"
 msgid "Delete Budget"
 msgstr "予算を削除"
 
-#: components/budgets/delete-budget-dialog.tsx
+#: components/budgets/delete-budget.tsx
 msgctxt "x1Tqbe"
 msgid "Are you sure you want to delete this budget? This action cannot be undone."
 msgstr "この予算を削除してもよろしいですか？この操作は元に戻せません。"
@@ -1378,17 +1444,17 @@ msgid "No categories found matching your filters."
 msgstr "フィルターに一致するカテゴリが見つかりませんでした。"
 
 #: components/categories/categories-table.tsx
-#: components/categories/category-dialog.tsx
+#: components/categories/category-form.tsx
 msgctxt "vEYtiq"
 msgid "Category Name"
 msgstr "カテゴリ名"
 
 #: components/categories/categories-table.tsx
-#: components/categories/category-dialog.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
+#: components/categories/category-form.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
 #: components/recurring-transactions/recurring-transactions-table.tsx
 #: components/transactions/export-button.tsx
-#: components/transactions/transaction-dialog.tsx
+#: components/transactions/transaction-form.tsx
 #: components/transactions/transactions-table.tsx
 msgctxt "Q8Qw5B"
 msgid "Description"
@@ -1396,7 +1462,7 @@ msgstr "説明"
 
 #: components/categories/categories-table.tsx
 #: components/categories/category-filters.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
 #: components/recurring-transactions/recurring-transactions-table.tsx
 #: components/statistics/statistics-table.tsx
 #: components/transactions/export-button.tsx
@@ -1407,65 +1473,34 @@ msgid "Type"
 msgstr "タイプ"
 
 #: components/categories/categories-table.tsx
-#: components/categories/category-dialog.tsx
 #: components/categories/category-filters.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
+#: components/categories/category-form.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
 #: components/recurring-transactions/recurring-transactions-table.tsx
 #: components/statistics/statistics-table.tsx
 #: components/transactions/export-button.tsx
-#: components/transactions/transaction-dialog.tsx
 #: components/transactions/transaction-filters.tsx
+#: components/transactions/transaction-form.tsx
 #: components/transactions/transactions-table.tsx
 msgctxt "PqYX1W"
 msgid "Inflow"
 msgstr "流入"
 
 #: components/categories/categories-table.tsx
-#: components/categories/category-dialog.tsx
 #: components/categories/category-filters.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
+#: components/categories/category-form.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
 #: components/recurring-transactions/recurring-transactions-table.tsx
 #: components/statistics/statistics-table.tsx
 #: components/transactions/export-button.tsx
-#: components/transactions/transaction-dialog.tsx
 #: components/transactions/transaction-filters.tsx
+#: components/transactions/transaction-form.tsx
 #: components/transactions/transactions-table.tsx
 msgctxt "KKrCi6"
 msgid "Outflow"
 msgstr "流出"
-
-#: components/categories/category-dialog.tsx
-msgctxt "THThZY"
-msgid "Edit Category"
-msgstr "カテゴリを編集"
-
-#: components/categories/category-dialog.tsx
-msgctxt "5Fs4aA"
-msgid "Add Category"
-msgstr "カテゴリを追加"
-
-#: components/categories/category-dialog.tsx
-msgctxt "1VRDDQ"
-msgid "Update custom category information."
-msgstr "カスタムカテゴリ情報を更新します。"
-
-#: components/categories/category-dialog.tsx
-msgctxt "0jMR1h"
-msgid "Create a custom category for your transactions."
-msgstr "取引用のカスタムカテゴリを作成します。"
-
-#: components/categories/category-dialog.tsx
-msgctxt "TxCpcX"
-msgid "e.g. Salary, Groceries"
-msgstr "例：給与、食料品"
-
-#: components/categories/category-dialog.tsx
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-msgctxt "s0F42g"
-msgid "Enter a description..."
-msgstr "説明を入力..."
 
 #: components/categories/category-filters.tsx
 msgctxt "T83iU7"
@@ -1473,18 +1508,49 @@ msgid "Search categories..."
 msgstr "カテゴリを検索..."
 
 #: components/categories/category-filters.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
 #: components/transactions/transaction-filters.tsx
 msgctxt "UjTL-F"
 msgid "All Types"
 msgstr "すべてのタイプ"
 
-#: components/categories/delete-category-dialog.tsx
+#: components/categories/category-form.tsx
+msgctxt "THThZY"
+msgid "Edit Category"
+msgstr "カテゴリを編集"
+
+#: components/categories/category-form.tsx
+msgctxt "5Fs4aA"
+msgid "Add Category"
+msgstr "カテゴリを追加"
+
+#: components/categories/category-form.tsx
+msgctxt "1VRDDQ"
+msgid "Update custom category information."
+msgstr "カスタムカテゴリ情報を更新します。"
+
+#: components/categories/category-form.tsx
+msgctxt "0jMR1h"
+msgid "Create a custom category for your transactions."
+msgstr "取引用のカスタムカテゴリを作成します。"
+
+#: components/categories/category-form.tsx
+msgctxt "TxCpcX"
+msgid "e.g. Salary, Groceries"
+msgstr "例：給与、食料品"
+
+#: components/categories/category-form.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
+msgctxt "s0F42g"
+msgid "Enter a description..."
+msgstr "説明を入力..."
+
+#: components/categories/delete-category.tsx
 msgctxt "JtR9Fg"
 msgid "Delete Category"
 msgstr "カテゴリを削除"
 
-#: components/categories/delete-category-dialog.tsx
+#: components/categories/delete-category.tsx
 msgctxt "qjLKlD"
 msgid "Are you sure you want to delete this category? This action cannot be undone."
 msgstr "このカテゴリを削除してもよろしいですか？この操作は元に戻せません。"
@@ -1504,52 +1570,15 @@ msgctxt "PmRC5G"
 msgid "Create Custom Category"
 msgstr "カスタムカテゴリを作成"
 
-#: components/goals/delete-goal-dialog.tsx
+#: components/goals/delete-goal.tsx
 msgctxt "F3XA9-"
 msgid "Delete Goal"
 msgstr "目標を削除"
 
-#: components/goals/delete-goal-dialog.tsx
+#: components/goals/delete-goal.tsx
 msgctxt "EwRebq"
 msgid "Are you sure you want to delete this goal? This action cannot be undone."
 msgstr "この目標を削除してもよろしいですか？この操作は元に戻せません。"
-
-#: components/goals/goal-dialog.tsx
-msgctxt "sOXElg"
-msgid "Edit Goal"
-msgstr "目標を編集"
-
-#: components/goals/goal-dialog.tsx
-msgctxt "5WuADX"
-msgid "Add Goal"
-msgstr "目標を追加"
-
-#: components/goals/goal-dialog.tsx
-msgctxt "_kQug4"
-msgid "Update goal information."
-msgstr "目標情報を更新します。"
-
-#: components/goals/goal-dialog.tsx
-msgctxt "dzmlX3"
-msgid "Create a new financial goal."
-msgstr "新しい財務目標を作成します。"
-
-#: components/goals/goal-dialog.tsx
-#: components/goals/goals-table.tsx
-msgctxt "gQxxlw"
-msgid "Goal Name"
-msgstr "目標名"
-
-#: components/goals/goal-dialog.tsx
-msgctxt "rH4tSt"
-msgid "e.g. Save for vacation"
-msgstr "例：休暇のための貯蓄"
-
-#: components/goals/goal-dialog.tsx
-#: components/goals/goals-table.tsx
-msgctxt "MPOzul"
-msgid "Target Amount"
-msgstr "目標金額"
 
 #: components/goals/goal-filters.tsx
 msgctxt "-xHZ7x"
@@ -1570,6 +1599,43 @@ msgstr "低い（75-100%）"
 msgctxt "7IAF5Y"
 msgid "Warning (< 75%)"
 msgstr "警告（< 75%）"
+
+#: components/goals/goal-form.tsx
+msgctxt "sOXElg"
+msgid "Edit Goal"
+msgstr "目標を編集"
+
+#: components/goals/goal-form.tsx
+msgctxt "5WuADX"
+msgid "Add Goal"
+msgstr "目標を追加"
+
+#: components/goals/goal-form.tsx
+msgctxt "_kQug4"
+msgid "Update goal information."
+msgstr "目標情報を更新します。"
+
+#: components/goals/goal-form.tsx
+msgctxt "dzmlX3"
+msgid "Create a new financial goal."
+msgstr "新しい財務目標を作成します。"
+
+#: components/goals/goal-form.tsx
+#: components/goals/goals-table.tsx
+msgctxt "gQxxlw"
+msgid "Goal Name"
+msgstr "目標名"
+
+#: components/goals/goal-form.tsx
+msgctxt "rH4tSt"
+msgid "e.g. Save for vacation"
+msgstr "例：休暇のための貯蓄"
+
+#: components/goals/goal-form.tsx
+#: components/goals/goals-table.tsx
+msgctxt "MPOzul"
+msgid "Target Amount"
+msgstr "目標金額"
 
 #: components/goals/goals-page.tsx
 msgctxt "6rbe1E"
@@ -1596,12 +1662,12 @@ msgctxt "GkiQMs"
 msgid "Accumulated"
 msgstr "累計"
 
-#: components/home/homepage.tsx
+#: components/home/home-page.tsx
 msgctxt "UKxoV8"
 msgid "Welcome back"
 msgstr "おかえりなさい"
 
-#: components/home/homepage.tsx
+#: components/home/home-page.tsx
 msgctxt "9A7jRV"
 msgid "Here's what's happening with your finances this month."
 msgstr "今月の財務状況をご紹介します。"
@@ -1668,14 +1734,14 @@ msgid "The percentage of money you save compared to inflow ((Inflow - Outflow) /
 msgstr "流入に対して節約したお金の割合（(流入 - 流出) / 流入 × 100%）。"
 
 #: components/home/quick-stats.tsx
-msgctxt "O8QihK"
-msgid "Popular Category"
-msgstr "人気カテゴリ"
+msgctxt "Kls-XI"
+msgid "Popular Expense Category"
+msgstr "人気の支出カテゴリー"
 
 #: components/home/quick-stats.tsx
-msgctxt "wEyaDt"
-msgid "Category with the highest total amount in the month."
-msgstr "月間で総額が最も高いカテゴリ。"
+msgctxt "HS4zWl"
+msgid "Outflow category with the highest total amount in the month."
+msgstr "月内で合計金額が最も高い支出カテゴリー。"
 
 #: components/home/recent-transactions.tsx
 msgctxt "GMkXVd"
@@ -1748,48 +1814,25 @@ msgctxt "EjH-J3"
 msgid "Please try again later."
 msgstr "後でもう一度お試しください。"
 
-#: components/layout/impersonation-indicator.tsx
-#: components/settings/active-sessions-dialog.tsx
-msgctxt "hLR6s0"
-msgid "Stopping impersonation..."
-msgstr "なりすましを停止しています..."
+#: components/layout/not-found-page.tsx
+msgctxt "QRccCM"
+msgid "Page not found"
+msgstr "ページが見つかりません"
 
-#: components/layout/impersonation-indicator.tsx
-#: components/settings/active-sessions-dialog.tsx
-msgctxt "IF-3KJ"
-msgid "Stopped impersonation session."
-msgstr "なりすましセッションを停止しました。"
+#: components/layout/not-found-page.tsx
+msgctxt "yAbaof"
+msgid "The page you are looking for does not exist."
+msgstr "お探しのページは存在しません。"
 
-#: components/layout/impersonation-indicator.tsx
-#: components/settings/active-sessions-dialog.tsx
-msgctxt "H1m7wl"
-msgid "Failed to stop impersonating! Please try again later."
-msgstr "なりすましの停止に失敗しました！後でもう一度お試しください。"
+#: components/layout/offline-notifier.tsx
+msgctxt "W-XYsV"
+msgid "You are currently offline."
+msgstr "現在オフラインです。"
 
-#: components/layout/impersonation-indicator.tsx
-msgctxt "LKxCOb"
-msgid "Impersonating"
-msgstr "なりすまし中"
-
-#: components/layout/impersonation-indicator.tsx
-msgctxt "fA8c13"
-msgid "Stop impersonating this user?"
-msgstr "このユーザーのなりすましを停止しますか？"
-
-#: components/layout/impersonation-indicator.tsx
-msgctxt "AB6aDn"
-msgid "You are currently impersonating"
-msgstr "現在なりすましを行っています:"
-
-#: components/layout/impersonation-indicator.tsx
-msgctxt "eybH_m"
-msgid "Stopping will restore your admin session and redirect you back to the admin panel."
-msgstr "停止すると管理者セッションが復元され、管理パネルにリダイレクトされます。"
-
-#: components/layout/impersonation-indicator.tsx
-msgctxt "d0A6B0"
-msgid "Stop Impersonating"
-msgstr "なりすましを停止"
+#: components/layout/offline-notifier.tsx
+msgctxt "f_mGkR"
+msgid "You are back online."
+msgstr "オンラインに戻りました。"
 
 #: components/layout/page-data-provider.tsx
 msgctxt "iKuJb1"
@@ -1816,36 +1859,6 @@ msgctxt "3aju6V"
 msgid "CANNOT FETCH RECURRING TRANSACTIONS DATA"
 msgstr "定期取引データを取得できません"
 
-#: components/layout/secondary-nav.tsx
-msgctxt "oj0aXj"
-msgid "Signing out..."
-msgstr "サインアウト中..."
-
-#: components/layout/secondary-nav.tsx
-msgctxt "hlp8qc"
-msgid "Signed out."
-msgstr "サインアウトしました。"
-
-#: components/layout/secondary-nav.tsx
-msgctxt "XuxYAf"
-msgid "Failed to sign out! Please try again later."
-msgstr "サインアウトに失敗しました！後でもう一度お試しください。"
-
-#: components/layout/secondary-nav.tsx
-msgctxt "F62y-K"
-msgid "Sign Out"
-msgstr "サインアウト"
-
-#: components/layout/secondary-nav.tsx
-msgctxt "BHBJUz"
-msgid "Are you sure you want to sign out?"
-msgstr "サインアウトしてもよろしいですか？"
-
-#: components/layout/secondary-nav.tsx
-msgctxt "naYgGy"
-msgid "You will need to sign in again to access your account."
-msgstr "アカウントにアクセスするには、再度サインインする必要があります。"
-
 #: components/password-input.tsx
 msgctxt "K3fWTv"
 msgid "Hide password"
@@ -1856,115 +1869,104 @@ msgctxt "JHTwdB"
 msgid "Show password"
 msgstr "パスワードを表示"
 
-#: components/recurring-transactions/delete-recurring-transaction-dialog.tsx
+#: components/recurring-transactions/delete-recurring-transaction.tsx
 msgctxt "mwZmom"
 msgid "Delete Recurring Transaction"
 msgstr "定期取引を削除"
 
-#: components/recurring-transactions/delete-recurring-transaction-dialog.tsx
+#: components/recurring-transactions/delete-recurring-transaction.tsx
 msgctxt "B58bFw"
 msgid "Are you sure you want to delete this recurring transaction? This action cannot be undone."
 msgstr "この定期取引を削除してもよろしいですか？この操作は元に戻せません。"
 
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-msgctxt "5nuO2v"
-msgid "Edit Recurring Transaction"
-msgstr "定期取引を編集"
+#: components/recurring-transactions/recurring-transaction-filters.tsx
+msgctxt "jZimtU"
+msgid "Search recurring transactions..."
+msgstr "定期取引を検索..."
 
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-msgctxt "sYXY5N"
-msgid "Add Recurring Transaction"
-msgstr "定期取引を追加"
-
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-msgctxt "gKA6Xf"
-msgid "Update recurring transaction information."
-msgstr "定期取引情報を更新します。"
-
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-msgctxt "adePxB"
-msgid "Create a recurring transaction."
-msgstr "定期取引を作成します。"
-
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-#: components/recurring-transactions/recurring-transactions-table.tsx
-msgctxt "vAW30j"
-msgid "Frequency"
-msgstr "頻度"
-
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-#: components/recurring-transactions/recurring-transactions-table.tsx
-msgctxt "zxvhnE"
-msgid "Daily"
-msgstr "日次"
-
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-#: components/recurring-transactions/recurring-transactions-table.tsx
-msgctxt "_clOBU"
-msgid "Weekly"
-msgstr "週次"
-
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-#: components/recurring-transactions/recurring-transactions-table.tsx
-msgctxt "03X4YH"
-msgid "Bi-Weekly"
-msgstr "隔週"
-
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-#: components/recurring-transactions/recurring-transactions-table.tsx
-msgctxt "wYsv4Z"
-msgid "Monthly"
-msgstr "月次"
-
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-#: components/recurring-transactions/recurring-transactions-table.tsx
-msgctxt "b1Ou36"
-msgid "Quarterly"
-msgstr "四半期"
-
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-#: components/recurring-transactions/recurring-transactions-table.tsx
-msgctxt "dqD39h"
-msgid "Yearly"
-msgstr "年次"
-
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-#: components/recurring-transactions/recurring-transactions-table.tsx
-msgctxt "D9n-q2"
-msgid "Random"
-msgstr "ランダム"
-
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-msgctxt "CpM7W_"
-msgid "Every X Days"
-msgstr "X日ごと"
-
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-msgctxt "FP2XQQ"
-msgid "e.g. 15"
-msgstr "例：15"
-
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-msgctxt "InWqys"
-msgid "Optional"
-msgstr "オプション"
-
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-msgctxt "mpcI7I"
-msgid "No End Date"
-msgstr "終了日なし"
-
-#: components/recurring-transactions/recurring-transaction-dialog.tsx
-#: components/recurring-transactions/recurring-transactions-filters.tsx
+#: components/recurring-transactions/recurring-transaction-filters.tsx
 #: components/recurring-transactions/recurring-transactions-table.tsx
 msgctxt "6Tps09"
 msgid "Inactive"
 msgstr "非アクティブ"
 
-#: components/recurring-transactions/recurring-transactions-filters.tsx
-msgctxt "jZimtU"
-msgid "Search recurring transactions..."
-msgstr "定期取引を検索..."
+#: components/recurring-transactions/recurring-transaction-form.tsx
+msgctxt "sYXY5N"
+msgid "Add Recurring Transaction"
+msgstr "定期取引を追加"
+
+#: components/recurring-transactions/recurring-transaction-form.tsx
+msgctxt "adePxB"
+msgid "Create a recurring transaction."
+msgstr "定期取引を作成します。"
+
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/recurring-transactions/recurring-transactions-table.tsx
+msgctxt "vAW30j"
+msgid "Frequency"
+msgstr "頻度"
+
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/recurring-transactions/recurring-transactions-table.tsx
+msgctxt "zxvhnE"
+msgid "Daily"
+msgstr "日次"
+
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/recurring-transactions/recurring-transactions-table.tsx
+msgctxt "_clOBU"
+msgid "Weekly"
+msgstr "週次"
+
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/recurring-transactions/recurring-transactions-table.tsx
+msgctxt "03X4YH"
+msgid "Bi-Weekly"
+msgstr "隔週"
+
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/recurring-transactions/recurring-transactions-table.tsx
+msgctxt "wYsv4Z"
+msgid "Monthly"
+msgstr "月次"
+
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/recurring-transactions/recurring-transactions-table.tsx
+msgctxt "b1Ou36"
+msgid "Quarterly"
+msgstr "四半期"
+
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/recurring-transactions/recurring-transactions-table.tsx
+msgctxt "dqD39h"
+msgid "Yearly"
+msgstr "年次"
+
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/recurring-transactions/recurring-transactions-table.tsx
+msgctxt "D9n-q2"
+msgid "Random"
+msgstr "ランダム"
+
+#: components/recurring-transactions/recurring-transaction-form.tsx
+msgctxt "CpM7W_"
+msgid "Every X Days"
+msgstr "X日ごと"
+
+#: components/recurring-transactions/recurring-transaction-form.tsx
+msgctxt "FP2XQQ"
+msgid "e.g. 15"
+msgstr "例：15"
+
+#: components/recurring-transactions/recurring-transaction-form.tsx
+msgctxt "mpcI7I"
+msgid "No End Date"
+msgstr "終了日なし"
+
+#: components/recurring-transactions/recurring-transaction-form.tsx
+msgctxt "QieJOp"
+msgid "If left blank, it will run indefinitely."
+msgstr "空白のままにすると、無期限に実行されます。"
 
 #: components/recurring-transactions/recurring-transactions-page.tsx
 #: hooks/use-nav.ts
@@ -2007,160 +2009,162 @@ msgctxt "b-8NFf"
 msgid "Next: {date}"
 msgstr "次回：{date}"
 
-#: components/settings/active-sessions-dialog.tsx
-msgctxt "M3ZAZv"
-msgid "Failed to terminate session! Please try again later."
-msgstr "セッションの終了に失敗しました！後でもう一度お試しください。"
-
-#: components/settings/active-sessions-dialog.tsx
-msgctxt "tNzaek"
-msgid "Session terminated."
-msgstr "セッションが終了しました。"
-
-#: components/settings/active-sessions-dialog.tsx
+#: components/settings/active-sessions-manager.tsx
 msgctxt "HuQudj"
 msgid "Failed to terminate all sessions! Please try again later."
 msgstr "すべてのセッションの終了に失敗しました！後でもう一度お試しください。"
 
-#: components/settings/active-sessions-dialog.tsx
+#: components/settings/active-sessions-manager.tsx
 msgctxt "i3aVwj"
 msgid "All sessions terminated."
 msgstr "すべてのセッションが終了しました。"
 
-#: components/settings/active-sessions-dialog.tsx
+#: components/settings/active-sessions-manager.tsx
 msgctxt "h_tqwp"
 msgid "View Active Sessions"
 msgstr "アクティブセッションを表示"
 
-#: components/settings/active-sessions-dialog.tsx
+#: components/settings/active-sessions-manager.tsx
 #: components/settings/settings-page.tsx
 msgctxt "V3ka34"
 msgid "Active Sessions"
 msgstr "アクティブセッション"
 
-#: components/settings/active-sessions-dialog.tsx
+#: components/settings/active-sessions-manager.tsx
 #: components/settings/settings-page.tsx
 msgctxt "xLvLBD"
 msgid "Manage your active sessions."
 msgstr "アクティブセッションを管理します。"
 
-#: components/settings/active-sessions-dialog.tsx
+#: components/settings/active-sessions-manager.tsx
+msgctxt "-E02To"
+msgid "Unknown Device"
+msgstr "不明なデバイス"
+
+#: components/settings/active-sessions-manager.tsx
 msgctxt "fF376U"
 msgid "Current"
 msgstr "現在"
 
-#: components/settings/active-sessions-dialog.tsx
+#: components/settings/active-sessions-manager.tsx
 msgctxt "bLQmWN"
 msgid "Unknown Location"
 msgstr "不明な場所"
 
-#: components/settings/active-sessions-dialog.tsx
+#: components/settings/active-sessions-manager.tsx
 msgctxt "oA2uW_"
 msgid "Terminate"
 msgstr "終了"
 
-#: components/settings/active-sessions-dialog.tsx
+#: components/settings/active-sessions-manager.tsx
 msgctxt "DC_DQF"
 msgid "Terminate All"
 msgstr "すべて終了"
 
-#: components/settings/change-name-dialog.tsx
+#: components/settings/change-name-form.tsx
 msgctxt "pdaEmb"
 msgid "Failed to update name! Please try again later."
 msgstr "名前の更新に失敗しました！後でもう一度お試しください。"
 
-#: components/settings/change-name-dialog.tsx
+#: components/settings/change-name-form.tsx
 msgctxt "oALrPz"
 msgid "Your name has been updated."
 msgstr "名前が更新されました。"
 
-#: components/settings/change-name-dialog.tsx
+#: components/settings/change-name-form.tsx
 #: components/settings/settings-page.tsx
 msgctxt "r5LPv0"
 msgid "Change Name"
 msgstr "名前を変更"
 
-#: components/settings/change-name-dialog.tsx
+#: components/settings/change-name-form.tsx
 #: components/settings/settings-page.tsx
 msgctxt "z7OVdl"
 msgid "Update your display name."
 msgstr "表示名を更新します。"
 
-#: components/settings/change-name-dialog.tsx
+#: components/settings/change-name-form.tsx
 msgctxt "HAlOn1"
 msgid "Name"
 msgstr "名前"
 
-#: components/settings/change-name-dialog.tsx
+#: components/settings/change-name-form.tsx
 msgctxt "g4FbZ5"
 msgid "Enter your name..."
 msgstr "名前を入力..."
 
-#: components/settings/change-password-dialog.tsx
+#: components/settings/change-name-form.tsx
+#: components/settings/change-password-form.tsx
+#: components/settings/change-username-form.tsx
+msgctxt "jvo0vs"
+msgid "Save"
+msgstr "保存"
+
+#: components/settings/change-password-form.tsx
 msgctxt "UR3aU3"
 msgid "Current password is incorrect!"
 msgstr "現在のパスワードが正しくありません！"
 
-#: components/settings/change-password-dialog.tsx
+#: components/settings/change-password-form.tsx
 msgctxt "I-C2uX"
 msgid "Failed to update password! Please try again later."
 msgstr "パスワードの更新に失敗しました！後でもう一度お試しください。"
 
-#: components/settings/change-password-dialog.tsx
+#: components/settings/change-password-form.tsx
 msgctxt "kgHPAz"
 msgid "Your password has been changed."
 msgstr "パスワードが変更されました。"
 
-#: components/settings/change-password-dialog.tsx
+#: components/settings/change-password-form.tsx
 #: components/settings/settings-page.tsx
 msgctxt "QiKKFz"
 msgid "Change Password"
 msgstr "パスワードを変更"
 
-#: components/settings/change-password-dialog.tsx
+#: components/settings/change-password-form.tsx
 #: components/settings/settings-page.tsx
 msgctxt "luD-rc"
 msgid "Update your password."
 msgstr "パスワードを更新します。"
 
-#: components/settings/change-password-dialog.tsx
+#: components/settings/change-password-form.tsx
 msgctxt "GretYf"
 msgid "Current Password"
 msgstr "現在のパスワード"
 
-#: components/settings/change-password-dialog.tsx
+#: components/settings/change-password-form.tsx
 msgctxt "vfG-nh"
 msgid "Confirm Password"
 msgstr "パスワードを確認"
 
-#: components/settings/change-password-dialog.tsx
+#: components/settings/change-password-form.tsx
 msgctxt "zFD28X"
 msgid "Sign out from all other devices."
 msgstr "他のすべてのデバイスからサインアウトします。"
 
-#: components/settings/change-username-dialog.tsx
+#: components/settings/change-username-form.tsx
 msgctxt "IaZaQX"
 msgid "Failed to update username! Please try again later."
 msgstr "ユーザー名の更新に失敗しました！後でもう一度お試しください。"
 
-#: components/settings/change-username-dialog.tsx
+#: components/settings/change-username-form.tsx
 msgctxt "8KK2w-"
 msgid "Your username has been changed."
 msgstr "ユーザー名が変更されました。"
 
-#: components/settings/change-username-dialog.tsx
+#: components/settings/change-username-form.tsx
 #: components/settings/settings-page.tsx
 msgctxt "19mdX0"
 msgid "Change Username"
 msgstr "ユーザー名を変更"
 
-#: components/settings/change-username-dialog.tsx
+#: components/settings/change-username-form.tsx
 #: components/settings/settings-page.tsx
 msgctxt "TXe4LX"
 msgid "Update your unique username."
 msgstr "一意のユーザー名を更新します。"
 
-#: components/settings/change-username-dialog.tsx
+#: components/settings/change-username-form.tsx
 msgctxt "v60thv"
 msgid "Enter your username..."
 msgstr "ユーザー名を入力..."
@@ -2169,17 +2173,6 @@ msgstr "ユーザー名を入力..."
 msgctxt "d6wGcQ"
 msgid "Failed to update currency! Please try again later."
 msgstr "通貨の更新に失敗しました！後でもう一度お試しください。"
-
-#: components/settings/language-selector.tsx
-msgctxt "Ax3Nmj"
-msgid "Failed to update language! Please try again later."
-msgstr "言語の更新に失敗しました！後でもう一度お試しください。"
-
-#: components/settings/language-selector.tsx
-#: components/settings/settings-page.tsx
-msgctxt "y1Z3or"
-msgid "Language"
-msgstr "言語"
 
 #: components/settings/settings-page.tsx
 msgctxt "1iEPTM"
@@ -2236,62 +2229,62 @@ msgctxt "EQpyb8"
 msgid "Toggle theme"
 msgstr "テーマを切り替え"
 
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "e7Db3T"
 msgid "Disable 2FA"
 msgstr "2FAを無効化"
 
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "ZhrNZz"
 msgid "Enable 2FA"
 msgstr "2FAを有効化"
 
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "deAXlH"
 msgid "Enable Two-Factor Authentication"
 msgstr "二要素認証を有効化"
 
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "VNORmj"
 msgid "Scan the QR code with your authenticator app."
 msgstr "認証アプリでQRコードをスキャンしてください。"
 
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "JHBmG8"
 msgid "Secret Key"
 msgstr "シークレットキー"
 
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "0onqf3"
 msgid "Disable Two-Factor Authentication"
 msgstr "二要素認証を無効化"
 
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "fUrrOz"
 msgid "Enter your password to disable 2FA."
 msgstr "2FAを無効化するには、パスワードを入力してください。"
 
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "6vQ8Z2"
 msgid "Invalid password."
 msgstr "パスワードが無効です。"
 
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "Lq08V_"
 msgid "Failed to enable 2FA! Please try again later."
 msgstr "2FAの有効化に失敗しました！後でもう一度お試しください。"
 
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "FSRmm9"
 msgid "Two-factor authentication is now enabled."
 msgstr "二要素認証が有効になりました。"
 
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "Y1o_zZ"
 msgid "Failed to disable 2FA! Please try again later."
 msgstr "2FAの無効化に失敗しました！後でもう一度お試しください。"
 
-#: components/settings/two-factor-manager-dialog.tsx
+#: components/settings/two-factor-manager.tsx
 msgctxt "BBb4xb"
 msgid "Two-factor authentication is now disabled."
 msgstr "二要素認証が無効になりました。"
@@ -2352,22 +2345,32 @@ msgctxt "CDTMW3"
 msgid "Total Amount"
 msgstr "総額"
 
-#: components/transactions/delete-transaction-dialog.tsx
+#: components/transactions/delete-transaction.tsx
 msgctxt "nPfy7y"
 msgid "Delete Transaction"
 msgstr "取引を削除"
 
-#: components/transactions/delete-transaction-dialog.tsx
+#: components/transactions/delete-transaction.tsx
 msgctxt "cj6kmp"
 msgid "Are you sure you want to delete this transaction? This action cannot be undone."
 msgstr "この取引を削除してもよろしいですか？この操作は元に戻せません。"
 
 #: components/transactions/export-button.tsx
-#: components/transactions/transaction-dialog.tsx
+#: components/transactions/transaction-form.tsx
 #: components/transactions/transactions-table.tsx
 msgctxt "P7PLVj"
 msgid "Date"
 msgstr "日付"
+
+#: components/transactions/export-button.tsx
+msgctxt "bW1-Mh"
+msgid "Original Amount"
+msgstr "元の金額"
+
+#: components/transactions/export-button.tsx
+msgctxt "CeWvK9"
+msgid "Original Currency"
+msgstr "元の通貨"
 
 #: components/transactions/export-button.tsx
 msgctxt "jRf7yh"
@@ -2380,49 +2383,105 @@ msgid "Failed to export data! Please try again later."
 msgstr "データのエクスポートに失敗しました！後でもう一度お試しください。"
 
 #: components/transactions/export-button.tsx
-msgctxt "hTOF-7"
-msgid "Export Transactions"
-msgstr "取引をエクスポート"
-
-#: components/transactions/export-button.tsx
-msgctxt "0S1jq_"
-msgid "Export transactions with current filters applied"
-msgstr "現在のフィルターを適用して取引をエクスポート"
-
-#: components/transactions/transaction-dialog.tsx
-msgctxt "P5C72A"
-msgid "Edit Transaction"
-msgstr "取引を編集"
-
-#: components/transactions/transaction-dialog.tsx
-msgctxt "DJIUi0"
-msgid "Add Transaction"
-msgstr "取引を追加"
-
-#: components/transactions/transaction-dialog.tsx
-msgctxt "ET95oG"
-msgid "Update transaction information."
-msgstr "取引情報を更新します。"
-
-#: components/transactions/transaction-dialog.tsx
-msgctxt "GAJmZB"
-msgid "Add your inflow or outflow to track your personal finances."
-msgstr "個人の財務を追跡するために流入または流出を追加します。"
-
-#: components/transactions/transaction-dialog.tsx
-msgctxt "9WG2aE"
-msgid "Enter a description for the transaction..."
-msgstr "取引の説明を入力..."
+msgctxt "GGrENy"
+msgid "Export transactions with current filters applied."
+msgstr "現在のフィルターを適用して取引をエクスポート。"
 
 #: components/transactions/transaction-filters.tsx
 msgctxt "gD5509"
 msgid "Search transactions..."
 msgstr "取引を検索..."
 
+#: components/transactions/transaction-form.tsx
+msgctxt "P5C72A"
+msgid "Edit Transaction"
+msgstr "取引を編集"
+
+#: components/transactions/transaction-form.tsx
+msgctxt "DJIUi0"
+msgid "Add Transaction"
+msgstr "取引を追加"
+
+#: components/transactions/transaction-form.tsx
+msgctxt "ET95oG"
+msgid "Update transaction information."
+msgstr "取引情報を更新します。"
+
+#: components/transactions/transaction-form.tsx
+msgctxt "GAJmZB"
+msgid "Add your inflow or outflow to track your personal finances."
+msgstr "個人の財務を追跡するために流入または流出を追加します。"
+
+#: components/transactions/transaction-form.tsx
+msgctxt "9WG2aE"
+msgid "Enter a description for the transaction..."
+msgstr "取引の説明を入力..."
+
 #: components/transactions/transactions-page.tsx
 msgctxt "MBywHq"
 msgid "Manage cash inflows and outflows to track your personal finances."
 msgstr "個人の財務を追跡するために現金の流入と流出を管理します。"
+
+#: components/transactions/transactions-table.tsx
+msgctxt "iRMvlA"
+msgid "Exchange rate pending"
+msgstr "為替レート保留中"
+
+#: components/transactions/unconverted-transactions-alert.tsx
+msgctxt "bBbh-Z"
+msgid "Some transactions are pending exchange rates and are displayed in their original currency."
+msgstr "一部の取引は為替レートが保留中のため、元の通貨で表示されています。"
+
+#: components/ui/breadcrumb.tsx
+msgctxt "I5NMJ8"
+msgid "More"
+msgstr "その他"
+
+#: components/ui/dialog.tsx
+#: components/ui/sheet.tsx
+msgctxt "rbrahO"
+msgid "Close"
+msgstr "閉じる"
+
+#: components/ui/pagination.tsx
+msgctxt "NYErt1"
+msgid "Go to previous page"
+msgstr "前のページへ"
+
+#: components/ui/pagination.tsx
+msgctxt "JJNc3c"
+msgid "Previous"
+msgstr "前へ"
+
+#: components/ui/pagination.tsx
+msgctxt "nkDaFL"
+msgid "Go to next page"
+msgstr "次のページへ"
+
+#: components/ui/pagination.tsx
+msgctxt "9-Ddtu"
+msgid "Next"
+msgstr "次へ"
+
+#: components/ui/pagination.tsx
+msgctxt "shDN4n"
+msgid "More pages"
+msgstr "その他のページ"
+
+#: components/ui/sidebar.tsx
+msgctxt "JZy6jo"
+msgid "Sidebar"
+msgstr "サイドバー"
+
+#: components/ui/sidebar.tsx
+msgctxt "O8JL7S"
+msgid "Displays the mobile sidebar."
+msgstr "モバイルサイドバーを表示します。"
+
+#: components/ui/sidebar.tsx
+msgctxt "kh4wt0"
+msgid "Toggle Sidebar"
+msgstr "サイドバーを切り替え"
 
 #: hooks/use-category.ts
 msgctxt "7MY_4L"
@@ -2695,9 +2754,9 @@ msgid "Amount must be greater than 0."
 msgstr "金額は0より大きい必要があります。"
 
 #: schemas/messages.ts
-msgctxt "9I9BOz"
-msgid "Maximum amount is 100 billion."
-msgstr "最大金額は1000億です。"
+msgctxt "8DOOMU"
+msgid "Maximum amount is 1 trillion."
+msgstr "最大金額は1兆です。"
 
 #: schemas/messages.ts
 msgctxt "aAADUG"
@@ -2795,6 +2854,11 @@ msgid "Date is required."
 msgstr "日付は必須です。"
 
 #: schemas/messages.ts
+msgctxt "4zNmm0"
+msgid "Transaction date cannot be in the future."
+msgstr "取引日は未来の日付にすることはできません。"
+
+#: schemas/messages.ts
 msgctxt "goeMxG"
 msgid "Type is required."
 msgstr "タイプは必須です。"
@@ -2813,6 +2877,11 @@ msgstr "カテゴリ名は最大50文字です。"
 msgctxt "C3kWKK"
 msgid "Start date is required."
 msgstr "開始日は必須です。"
+
+#: schemas/messages.ts
+msgctxt "Z75W2Q"
+msgid "Start date must be in the future."
+msgstr "開始日は未来の日付である必要があります。"
 
 #: schemas/messages.ts
 msgctxt "1uO2me"

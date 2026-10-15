@@ -4,16 +4,11 @@ import { useState } from "react"
 import { useExtracted } from "next-intl"
 
 import { Button } from "@/components/ui/button"
-import { ExportButton } from "@/components/transactions/export-button"
-import { TransactionDialog } from "@/components/transactions/transaction-dialog"
 import { TransactionFilters } from "@/components/transactions/transaction-filters"
-import type { Transaction } from "@/lib/definitions"
+import { TransactionForm } from "@/components/transactions/transaction-form"
 
 export default function TransactionsPage() {
   const [isOpen, setIsOpen] = useState<boolean>(false)
-  const [filteredTransactions, setFilteredTransactions] = useState<
-    Transaction[]
-  >([])
   const t = useExtracted()
 
   return (
@@ -28,18 +23,13 @@ export default function TransactionsPage() {
               )}
             </div>
           </div>
-          <div className="flex gap-2">
-            <ExportButton filteredTransactions={filteredTransactions} />
-            <Button onClick={() => setIsOpen(true)}>{t("Add")}</Button>
-          </div>
+          <Button onClick={() => setIsOpen(true)}>{t("Add")}</Button>
         </div>
 
-        <TransactionFilters
-          onFilteredTransactionsChange={setFilteredTransactions}
-        />
+        <TransactionFilters />
       </div>
 
-      <TransactionDialog open={isOpen} setOpen={setIsOpen} />
+      <TransactionForm isOpen={isOpen} setIsOpen={setIsOpen} />
     </>
   )
 }

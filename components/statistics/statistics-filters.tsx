@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { ChevronDownIcon } from "lucide-react"
@@ -23,11 +23,11 @@ import {
 } from "@/components/ui/select"
 import { StatisticsSummary } from "@/components/statistics/statistics-summary"
 import { StatisticsTable } from "@/components/statistics/statistics-table"
-import { useTransactions } from "@/context/transactions-context"
+import { useTransactions } from "@/contexts/transactions-context"
 import { useFormatDate } from "@/hooks/use-format-date"
 import { useMonths } from "@/hooks/use-months"
+import { getUniqueYears } from "@/lib/date"
 import { filterTransactions } from "@/lib/filters"
-import { getUniqueYears } from "@/lib/utils"
 
 export function StatisticsFilters() {
   const { transactions } = useTransactions()
@@ -137,15 +137,7 @@ export function StatisticsFilters() {
               </PopoverContent>
             </Popover>
 
-            <Popover
-              open={isDateRangeOpen}
-              onOpenChange={(open) => {
-                if (!open && dateRange.from && !dateRange.to) {
-                  return
-                }
-                setIsDateRangeOpen(open)
-              }}
-            >
+            <Popover open={isDateRangeOpen} onOpenChange={setIsDateRangeOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
@@ -174,7 +166,7 @@ export function StatisticsFilters() {
                       autoFocus
                       mode="single"
                       selected={dateRange.from}
-                      defaultMonth={dateRange.from || new Date()}
+                      defaultMonth={dateRange.from}
                       captionLayout="dropdown"
                       onSelect={(date) => {
                         setDateRange((prev) => ({
@@ -193,15 +185,28 @@ export function StatisticsFilters() {
                       autoFocus
                       mode="single"
                       selected={dateRange.to}
-                      defaultMonth={dateRange.to || new Date()}
+                      defaultMonth={dateRange.to}
                       captionLayout="dropdown"
                       onSelect={(date) => {
-                        if (date && dateRange.from && date >= dateRange.from) {
-                          handleDateRangeChange({
-                            from: dateRange.from,
-                            to: date,
+                        if (!date) return
+                        if (!dateRange.from) {
+                          setDateRange({
+                            from: date,
+                            to: undefined,
                           })
+                          return
                         }
+                        if (date < dateRange.from) {
+                          handleDateRangeChange({
+                            from: date,
+                            to: dateRange.from,
+                          })
+                          return
+                        }
+                        handleDateRangeChange({
+                          from: dateRange.from,
+                          to: date,
+                        })
                       }}
                     />
                   </div>
