@@ -142,21 +142,6 @@
 }
 
 @layer components {
-  .bprogress .bar {
-    background: linear-gradient(
-      to right,
-      oklch(87.1% 0.15 154.449),
-      oklch(62.3% 0.214 259.815),
-      oklch(55.8% 0.288 302.321)
-    ) !important;
-    position: fixed;
-    z-index: var(--bprogress-z-index);
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: var(--bprogress-height);
-  }
-
   .center {
     @apply flex h-full items-center justify-center;
   }
