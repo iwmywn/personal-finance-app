@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -13,6 +13,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -66,14 +67,15 @@ export function TwoFactorManager() {
             ) : (
               <div className="space-y-4">
                 <div className="flex justify-center">
-                  <QRCode value={totpURI} />
+                  <div className="border bg-white p-3">
+                    <QRCode value={totpURI} />
+                  </div>
                 </div>
                 <div className="grid gap-2">
                   <Label>{t("Secret Key")}</Label>
                   <Input
                     value={secret}
                     readOnly
-                    className="font-mono text-xs"
                     onFocus={(event) => event.target.select()}
                   />
                 </div>
@@ -174,12 +176,11 @@ function EnableTwoFactorForm({ setTotpURI }: EnableTwoFactorFormProps) {
           )}
         />
 
-        <FormButton
-          isSubmitting={form.formState.isSubmitting}
-          className="w-full"
-        >
-          {t("Enable 2FA")}
-        </FormButton>
+        <DialogFooter showCancelButton>
+          <FormButton isSubmitting={form.formState.isSubmitting}>
+            {t("Enable 2FA")}
+          </FormButton>
+        </DialogFooter>
       </form>
     </Form>
   )
@@ -267,12 +268,11 @@ function VerifyTwoFactorForm({
           )}
         />
 
-        <FormButton
-          isSubmitting={form.formState.isSubmitting}
-          className="w-full"
-        >
-          {t("Verify")}
-        </FormButton>
+        <DialogFooter showCancelButton>
+          <FormButton isSubmitting={form.formState.isSubmitting}>
+            {t("Verify")}
+          </FormButton>
+        </DialogFooter>
       </form>
     </Form>
   )
@@ -352,12 +352,11 @@ function DisableTwoFactorForm({ setIsOpen }: DisableTwoFactorFormProps) {
           )}
         />
 
-        <FormButton
-          isSubmitting={form.formState.isSubmitting}
-          className="w-full"
-        >
-          {t("Disable 2FA")}
-        </FormButton>
+        <DialogFooter showCancelButton>
+          <FormButton isSubmitting={form.formState.isSubmitting}>
+            {t("Disable 2FA")}
+          </FormButton>
+        </DialogFooter>
       </form>
     </Form>
   )

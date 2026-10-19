@@ -6,10 +6,8 @@ import { useExtracted } from "next-intl"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
-import { Button } from "@/components/ui/button"
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -110,12 +108,9 @@ export function SetUserPasswordForm({
               )}
             />
 
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline">{t("Cancel")}</Button>
-              </DialogClose>
+            <DialogFooter showCancelButton>
               <FormButton isSubmitting={form.formState.isSubmitting}>
-                {t("Update Password")}
+                {t("Update")}
               </FormButton>
             </DialogFooter>
           </form>

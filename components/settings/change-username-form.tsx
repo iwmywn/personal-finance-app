@@ -10,7 +10,6 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -123,10 +122,7 @@ export function ChangeUsernameForm() {
               )}
             />
 
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline">{t("Cancel")}</Button>
-              </DialogClose>
+            <DialogFooter showCancelButton>
               <FormButton isSubmitting={form.formState.isSubmitting}>
                 {t("Save")}
               </FormButton>

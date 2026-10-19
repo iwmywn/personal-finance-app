@@ -6,3 +6,5 @@ allowBuilds:
 
 saveExact: true
 savePrefix: ""
+
+minimumReleaseAge: 0

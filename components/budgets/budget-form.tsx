@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -212,7 +211,7 @@ export function BudgetForm({ budget, isOpen, setIsOpen }: BudgetFormProps) {
                           variant="outline"
                           className={cn(
                             "w-full justify-between font-normal",
-                            !startDate && "text-muted-foreground"
+                            !startDate && "text-secondary"
                           )}
                         >
                           {startDate ? (
@@ -262,7 +261,7 @@ export function BudgetForm({ budget, isOpen, setIsOpen }: BudgetFormProps) {
                           variant="outline"
                           className={cn(
                             "w-full justify-between font-normal",
-                            !endDate && "text-muted-foreground"
+                            !endDate && "text-secondary"
                           )}
                         >
                           {endDate ? (
@@ -296,10 +295,7 @@ export function BudgetForm({ budget, isOpen, setIsOpen }: BudgetFormProps) {
               )}
             />
 
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline">{t("Cancel")}</Button>
-              </DialogClose>
+            <DialogFooter showCancelButton>
               <FormButton isSubmitting={form.formState.isSubmitting}>
                 {budget ? t("Update") : t("Add")}
               </FormButton>

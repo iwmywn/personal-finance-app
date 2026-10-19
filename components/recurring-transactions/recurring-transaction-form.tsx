@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -246,7 +245,7 @@ export function RecurringTransactionForm({
                         {...field}
                       />
                       <InputGroupAddon align="block-end">
-                        <InputGroupText className="text-muted-foreground text-xs">
+                        <InputGroupText className="text-secondary text-xs">
                           {field.value?.length || 0}/200
                         </InputGroupText>
                       </InputGroupAddon>
@@ -346,7 +345,7 @@ export function RecurringTransactionForm({
                           variant="outline"
                           className={cn(
                             "w-full justify-between font-normal",
-                            !startDate && "text-muted-foreground"
+                            !startDate && "text-secondary"
                           )}
                         >
                           {startDate ? (
@@ -402,7 +401,7 @@ export function RecurringTransactionForm({
                           variant="outline"
                           className={cn(
                             "w-full justify-between font-normal",
-                            !endDate && "text-muted-foreground"
+                            !endDate && "text-secondary"
                           )}
                           onClick={() => {
                             if (!endDate) {
@@ -451,11 +450,7 @@ export function RecurringTransactionForm({
               )}
             />
 
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline">{t("Cancel")}</Button>
-              </DialogClose>
-
+            <DialogFooter showCancelButton>
               <FormButton isSubmitting={form.formState.isSubmitting}>
                 {t("Add")}
               </FormButton>

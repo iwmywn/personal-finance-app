@@ -1,9 +1,17 @@
-import { Nunito } from "next/font/google"
+import { Archivo, IBM_Plex_Mono } from "next/font/google"
 
-const nunito = Nunito({
+const fontDisplay = Archivo({
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin", "vietnamese"],
   display: "swap",
-  fallback: ["var(--font-sans)"],
+  variable: "--font-display",
 })
 
-export { nunito }
+const fontMono = IBM_Plex_Mono({
+  weight: ["400", "500", "600", "700"],
+  subsets: ["latin", "vietnamese"],
+  display: "swap",
+  variable: "--font-mono",
+})
+
+export { fontDisplay, fontMono }

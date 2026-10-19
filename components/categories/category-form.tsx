@@ -11,10 +11,8 @@ import {
   createCustomCategory,
   updateCustomCategory,
 } from "@/actions/category.actions"
-import { Button } from "@/components/ui/button"
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -178,7 +176,7 @@ export function CategoryForm({
                         {...field}
                       />
                       <InputGroupAddon align="block-end">
-                        <InputGroupText className="text-muted-foreground text-xs">
+                        <InputGroupText className="text-secondary text-xs">
                           {field.value?.length || 0}/200
                         </InputGroupText>
                       </InputGroupAddon>
@@ -189,10 +187,7 @@ export function CategoryForm({
               )}
             />
 
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline">{t("Cancel")}</Button>
-              </DialogClose>
+            <DialogFooter showCancelButton>
               <FormButton isSubmitting={form.formState.isSubmitting}>
                 {category ? t("Update") : t("Add")}
               </FormButton>

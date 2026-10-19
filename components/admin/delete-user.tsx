@@ -73,7 +73,7 @@ export function DeleteUser({ user, isOpen, setIsOpen }: DeleteUserProps) {
             {t("Cancel")}
           </AlertDialogCancel>
           <AlertDialogAction
-            className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+            variant="destructive"
             onClick={handleDelete}
             disabled={isPending}
           >

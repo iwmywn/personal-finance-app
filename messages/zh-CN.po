@@ -420,6 +420,21 @@ msgctxt "k1s9UW"
 msgid "Not Found"
 msgstr "未找到"
 
+#: app/(core)/[...not-found]/page.tsx
+msgctxt "QRccCM"
+msgid "Page not found"
+msgstr "页面未找到"
+
+#: app/(core)/[...not-found]/page.tsx
+msgctxt "yAbaof"
+msgid "The page you are looking for does not exist."
+msgstr "您正在查找的页面不存在。"
+
+#: app/(core)/[...not-found]/page.tsx
+msgctxt "kfoc7z"
+msgid "Back to Home"
+msgstr "返回首页"
+
 #: app/(core)/admin/page.tsx
 #: components/admin/admin-page.tsx
 msgctxt "cH9uli"
@@ -427,9 +442,16 @@ msgid "Admin Management"
 msgstr "管理员管理"
 
 #: app/(core)/admin/page.tsx
-msgctxt "8O4Aqk"
-msgid "CANNOT FETCH USERS DATA"
+msgctxt "-s5duM"
+msgid "Cannot fetch users data"
 msgstr "无法获取用户数据"
+
+#: app/(core)/admin/page.tsx
+#: app/error.tsx
+#: components/layout/page-data-provider.tsx
+msgctxt "EjH-J3"
+msgid "Please try again later."
+msgstr "请稍后再试。"
 
 #: app/(core)/budgets/page.tsx
 #: components/budgets/budgets-page.tsx
@@ -465,6 +487,7 @@ msgid "Recurring Transactions"
 msgstr "定期交易"
 
 #: app/(core)/settings/page.tsx
+#: components/settings/settings-page.tsx
 #: hooks/use-nav.ts
 msgctxt "D3idYv"
 msgid "Settings"
@@ -490,10 +513,9 @@ msgid "Something went wrong!"
 msgstr "出了点问题！"
 
 #: app/error.tsx
-#: components/layout/not-found-page.tsx
-msgctxt "kfoc7z"
-msgid "Back to Home"
-msgstr "返回首页"
+msgctxt "FazwRl"
+msgid "Try again"
+msgstr "重试"
 
 #: app/layout.tsx
 #: components/layout/app-sidebar.tsx
@@ -585,9 +607,20 @@ msgstr "管理应用程序用户、系统角色、封禁、会话和安全性。
 
 #: components/admin/admin-page.tsx
 #: components/admin/create-user-form.tsx
-msgctxt "VzzYJk"
-msgid "Create"
-msgstr "创建"
+#: components/budgets/budget-form.tsx
+#: components/budgets/budgets-page.tsx
+#: components/categories/categories-page.tsx
+#: components/categories/category-form.tsx
+#: components/goals/goal-form.tsx
+#: components/goals/goals-page.tsx
+#: components/home/home-page.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/recurring-transactions/recurring-transactions-page.tsx
+#: components/transactions/transaction-form.tsx
+#: components/transactions/transactions-page.tsx
+msgctxt "2_2yg-"
+msgid "Add"
+msgstr "添加"
 
 #: components/admin/admin-summary.tsx
 msgctxt "_VwiLT"
@@ -805,29 +838,6 @@ msgid "Expires on"
 msgstr "过期时间于"
 
 #: components/admin/ban-user-form.tsx
-#: components/admin/create-user-form.tsx
-#: components/admin/delete-user.tsx
-#: components/admin/set-user-password-form.tsx
-#: components/admin/stop-impersonation.tsx
-#: components/auth/sign-out-button.tsx
-#: components/budgets/budget-form.tsx
-#: components/budgets/delete-budget.tsx
-#: components/categories/category-form.tsx
-#: components/categories/delete-category.tsx
-#: components/goals/delete-goal.tsx
-#: components/goals/goal-form.tsx
-#: components/recurring-transactions/delete-recurring-transaction.tsx
-#: components/recurring-transactions/recurring-transaction-form.tsx
-#: components/settings/change-name-form.tsx
-#: components/settings/change-password-form.tsx
-#: components/settings/change-username-form.tsx
-#: components/transactions/delete-transaction.tsx
-#: components/transactions/transaction-form.tsx
-msgctxt "47FYwb"
-msgid "Cancel"
-msgstr "取消"
-
-#: components/admin/ban-user-form.tsx
 msgctxt "VGVk-h"
 msgid "Ban Reason"
 msgstr "封禁原因"
@@ -953,6 +963,19 @@ msgctxt "qSy-Lo"
 msgid "All associated data will be permanently deleted. This action cannot be undone."
 msgstr "所有相关数据将被永久删除。此操作无法撤销。"
 
+#: components/admin/delete-user.tsx
+#: components/admin/stop-impersonation.tsx
+#: components/auth/sign-out-button.tsx
+#: components/budgets/delete-budget.tsx
+#: components/categories/delete-category.tsx
+#: components/goals/delete-goal.tsx
+#: components/recurring-transactions/delete-recurring-transaction.tsx
+#: components/transactions/delete-transaction.tsx
+#: components/ui/dialog.tsx
+msgctxt "47FYwb"
+msgid "Cancel"
+msgstr "取消"
+
 #: components/admin/set-user-password-form.tsx
 msgctxt "VvoQv7"
 msgid "Failed to set user password! Please try again later."
@@ -980,9 +1003,13 @@ msgid "New Password"
 msgstr "新密码"
 
 #: components/admin/set-user-password-form.tsx
-msgctxt "ZTYUJe"
-msgid "Update Password"
-msgstr "更新密码"
+#: components/budgets/budget-form.tsx
+#: components/categories/category-form.tsx
+#: components/goals/goal-form.tsx
+#: components/transactions/transaction-form.tsx
+msgctxt "BWpuKl"
+msgid "Update"
+msgstr "更新"
 
 #: components/admin/stop-impersonation.tsx
 msgctxt "H1m7wl"
@@ -1343,29 +1370,6 @@ msgstr "选择日期"
 msgctxt "T4GOiX"
 msgid "End Date"
 msgstr "结束日期"
-
-#: components/budgets/budget-form.tsx
-#: components/categories/category-form.tsx
-#: components/goals/goal-form.tsx
-#: components/transactions/transaction-form.tsx
-msgctxt "BWpuKl"
-msgid "Update"
-msgstr "更新"
-
-#: components/budgets/budget-form.tsx
-#: components/budgets/budgets-page.tsx
-#: components/categories/categories-page.tsx
-#: components/categories/category-form.tsx
-#: components/goals/goal-form.tsx
-#: components/goals/goals-page.tsx
-#: components/home/home-page.tsx
-#: components/recurring-transactions/recurring-transaction-form.tsx
-#: components/recurring-transactions/recurring-transactions-page.tsx
-#: components/transactions/transaction-form.tsx
-#: components/transactions/transactions-page.tsx
-msgctxt "2_2yg-"
-msgid "Add"
-msgstr "添加"
 
 #: components/budgets/budgets-page.tsx
 msgctxt "3fGt__"
@@ -1809,21 +1813,6 @@ msgctxt "sfXkQG"
 msgid "compared to inflow"
 msgstr "与流入相比"
 
-#: components/layout/error-empty-state.tsx
-msgctxt "EjH-J3"
-msgid "Please try again later."
-msgstr "请稍后再试。"
-
-#: components/layout/not-found-page.tsx
-msgctxt "QRccCM"
-msgid "Page not found"
-msgstr "页面未找到"
-
-#: components/layout/not-found-page.tsx
-msgctxt "yAbaof"
-msgid "The page you are looking for does not exist."
-msgstr "您正在查找的页面不存在。"
-
 #: components/layout/offline-notifier.tsx
 msgctxt "W-XYsV"
 msgid "You are currently offline."
@@ -1835,28 +1824,28 @@ msgid "You are back online."
 msgstr "您已恢复在线状态。"
 
 #: components/layout/page-data-provider.tsx
-msgctxt "iKuJb1"
-msgid "CANNOT FETCH TRANSACTIONS DATA"
+msgctxt "qQ2hvR"
+msgid "Cannot fetch transactions data"
 msgstr "无法获取交易数据"
 
 #: components/layout/page-data-provider.tsx
-msgctxt "pvUtk6"
-msgid "CANNOT FETCH CATEGORIES DATA"
+msgctxt "DXCaHw"
+msgid "Cannot fetch categories data"
 msgstr "无法获取分类数据"
 
 #: components/layout/page-data-provider.tsx
-msgctxt "iriWHm"
-msgid "CANNOT FETCH BUDGETS DATA"
+msgctxt "gd9l_c"
+msgid "Cannot fetch budgets data"
 msgstr "无法获取预算数据"
 
 #: components/layout/page-data-provider.tsx
-msgctxt "V9Jq49"
-msgid "CANNOT FETCH GOALS DATA"
+msgctxt "dxzQVM"
+msgid "Cannot fetch goals data"
 msgstr "无法获取目标数据"
 
 #: components/layout/page-data-provider.tsx
-msgctxt "3aju6V"
-msgid "CANNOT FETCH RECURRING TRANSACTIONS DATA"
+msgctxt "bIJw2X"
+msgid "Cannot fetch recurring transactions data"
 msgstr "无法获取定期交易数据"
 
 #: components/password-input.tsx
@@ -2173,6 +2162,11 @@ msgstr "输入您的用户名..."
 msgctxt "d6wGcQ"
 msgid "Failed to update currency! Please try again later."
 msgstr "更新货币失败！请稍后再试。"
+
+#: components/settings/settings-page.tsx
+msgctxt "E7W-hd"
+msgid "Manage your account and application preferences."
+msgstr "管理您的帐户和应用程序偏好设置。"
 
 #: components/settings/settings-page.tsx
 msgctxt "1iEPTM"

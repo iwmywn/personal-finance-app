@@ -78,7 +78,7 @@ export function SignOutButton() {
           <AlertDialogCancel disabled={isPending}>
             {t("Cancel")}
           </AlertDialogCancel>
-          <AlertDialogAction onClick={onSignOut}>
+          <AlertDialogAction onClick={onSignOut} disabled={isPending}>
             {isPending && <Spinner />}
             {t("Sign Out")}
           </AlertDialogAction>

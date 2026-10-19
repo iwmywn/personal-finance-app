@@ -148,7 +148,7 @@ export function TwoFactorForm() {
               control={form.control}
               name="trustDevice"
               render={({ field }) => (
-                <FormItem className="flex flex-row space-y-0 space-x-3 border p-3">
+                <FormItem className="flex">
                   <FormControl>
                     <Checkbox
                       id="form-trust-this-device"
@@ -156,7 +156,7 @@ export function TwoFactorForm() {
                       onCheckedChange={field.onChange}
                     />
                   </FormControl>
-                  <div className="space-y-1 leading-none">
+                  <div className="space-y-1">
                     <FormLabel htmlFor="form-trust-this-device">
                       {t("Trust this device")}
                     </FormLabel>

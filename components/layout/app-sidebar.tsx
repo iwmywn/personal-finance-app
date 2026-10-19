@@ -27,8 +27,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenuButton size="lg" tooltip={t("Personal Finance App")}>
           <Logo loading="eager" />
-          <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-semibold">{siteConfig.name}</span>
+          <div className="grid flex-1 text-left leading-tight">
+            <span className="font-display text-primary truncate text-sm font-bold tracking-tight">
+              {siteConfig.name}
+            </span>
           </div>
         </SidebarMenuButton>
       </SidebarHeader>

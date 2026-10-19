@@ -1,9 +1,12 @@
 import { Suspense } from "react"
 import type { Metadata } from "next"
+import Link from "next/link"
 import { connection } from "next/server"
+import { GhostIcon } from "lucide-react"
 import { getExtracted } from "next-intl/server"
 
-import { NotFoundPage } from "@/components/layout/not-found-page"
+import { Button } from "@/components/ui/button"
+import { EmptyState } from "@/components/empty-state"
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getExtracted()
@@ -18,10 +21,22 @@ async function DynamicMarker() {
   return null
 }
 
-export default function page() {
+export default async function page() {
+  const t = await getExtracted()
+
   return (
     <>
-      <NotFoundPage />
+      <EmptyState
+        className="mt-3"
+        icon={<GhostIcon />}
+        title={t("Page not found")}
+        description={t("The page you are looking for does not exist.")}
+        action={
+          <Button asChild>
+            <Link href="/home">{t("Back to Home")}</Link>
+          </Button>
+        }
+      />
       <Suspense>
         <DynamicMarker />
       </Suspense>

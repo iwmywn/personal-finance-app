@@ -1,6 +1,7 @@
-﻿"use client"
+"use client"
 
 import { useState } from "react"
+import { cn } from "cn"
 import { ChevronDownIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 
@@ -110,17 +111,21 @@ export function StatisticsFilters() {
       <Card>
         <CardContent>
           <div
-            className={`grid grid-cols-1 sm:grid-cols-2 ${
+            className={cn(
+              "grid grid-cols-1 gap-3 sm:grid-cols-2",
               hasActiveFilters
                 ? "lg:grid-cols-[1fr_1fr_1fr_1fr_auto]"
                 : "lg:grid-cols-[1fr_1fr_1fr_1fr]"
-            } gap-4`}
+            )}
           >
             <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className={`w-full justify-between font-normal ${selectedDate && "border-primary!"}`}
+                  className={cn(
+                    "w-full justify-between font-normal",
+                    selectedDate && "border-primary!"
+                  )}
                 >
                   {selectedDate ? formatDate(selectedDate) : t("Select Date")}
                   <ChevronDownIcon />
@@ -141,7 +146,10 @@ export function StatisticsFilters() {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className={`w-full justify-between font-normal ${dateRange.from && "border-primary!"}`}
+                  className={cn(
+                    "w-full justify-between font-normal",
+                    dateRange.from && "border-primary!"
+                  )}
                 >
                   {dateRange.from ? (
                     dateRange.to ? (
@@ -216,7 +224,10 @@ export function StatisticsFilters() {
 
             <Select value={filterMonth} onValueChange={handleMonthChange}>
               <SelectTrigger
-                className={`w-full ${filterMonth !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full",
+                  filterMonth !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Month")} />
               </SelectTrigger>
@@ -235,7 +246,10 @@ export function StatisticsFilters() {
 
             <Select value={filterYear} onValueChange={handleYearChange}>
               <SelectTrigger
-                className={`w-full ${filterYear !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full",
+                  filterYear !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Year")} />
               </SelectTrigger>

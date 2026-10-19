@@ -420,6 +420,21 @@ msgctxt "k1s9UW"
 msgid "Not Found"
 msgstr "Không tìm thấy"
 
+#: app/(core)/[...not-found]/page.tsx
+msgctxt "QRccCM"
+msgid "Page not found"
+msgstr "Trang không tìm thấy"
+
+#: app/(core)/[...not-found]/page.tsx
+msgctxt "yAbaof"
+msgid "The page you are looking for does not exist."
+msgstr "Trang bạn đang tìm kiếm không tồn tại."
+
+#: app/(core)/[...not-found]/page.tsx
+msgctxt "kfoc7z"
+msgid "Back to Home"
+msgstr "Về trang chủ"
+
 #: app/(core)/admin/page.tsx
 #: components/admin/admin-page.tsx
 msgctxt "cH9uli"
@@ -427,9 +442,16 @@ msgid "Admin Management"
 msgstr "Quản trị hệ thống"
 
 #: app/(core)/admin/page.tsx
-msgctxt "8O4Aqk"
-msgid "CANNOT FETCH USERS DATA"
-msgstr "KHÔNG THỂ LẤY DỮ LIỆU NGƯỜI DÙNG"
+msgctxt "-s5duM"
+msgid "Cannot fetch users data"
+msgstr "Không thể lấy dữ liệu người dùng"
+
+#: app/(core)/admin/page.tsx
+#: app/error.tsx
+#: components/layout/page-data-provider.tsx
+msgctxt "EjH-J3"
+msgid "Please try again later."
+msgstr "Vui lòng thử lại sau."
 
 #: app/(core)/budgets/page.tsx
 #: components/budgets/budgets-page.tsx
@@ -465,6 +487,7 @@ msgid "Recurring Transactions"
 msgstr "Giao dịch định kỳ"
 
 #: app/(core)/settings/page.tsx
+#: components/settings/settings-page.tsx
 #: hooks/use-nav.ts
 msgctxt "D3idYv"
 msgid "Settings"
@@ -490,10 +513,9 @@ msgid "Something went wrong!"
 msgstr "Đã xảy ra lỗi!"
 
 #: app/error.tsx
-#: components/layout/not-found-page.tsx
-msgctxt "kfoc7z"
-msgid "Back to Home"
-msgstr "Về trang chủ"
+msgctxt "FazwRl"
+msgid "Try again"
+msgstr "Thử lại"
 
 #: app/layout.tsx
 #: components/layout/app-sidebar.tsx
@@ -585,9 +607,20 @@ msgstr "Quản lý người dùng ứng dụng, vai trò hệ thống, lệnh c�
 
 #: components/admin/admin-page.tsx
 #: components/admin/create-user-form.tsx
-msgctxt "VzzYJk"
-msgid "Create"
-msgstr "Tạo"
+#: components/budgets/budget-form.tsx
+#: components/budgets/budgets-page.tsx
+#: components/categories/categories-page.tsx
+#: components/categories/category-form.tsx
+#: components/goals/goal-form.tsx
+#: components/goals/goals-page.tsx
+#: components/home/home-page.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/recurring-transactions/recurring-transactions-page.tsx
+#: components/transactions/transaction-form.tsx
+#: components/transactions/transactions-page.tsx
+msgctxt "2_2yg-"
+msgid "Add"
+msgstr "Thêm"
 
 #: components/admin/admin-summary.tsx
 msgctxt "_VwiLT"
@@ -805,29 +838,6 @@ msgid "Expires on"
 msgstr "Hết hạn vào"
 
 #: components/admin/ban-user-form.tsx
-#: components/admin/create-user-form.tsx
-#: components/admin/delete-user.tsx
-#: components/admin/set-user-password-form.tsx
-#: components/admin/stop-impersonation.tsx
-#: components/auth/sign-out-button.tsx
-#: components/budgets/budget-form.tsx
-#: components/budgets/delete-budget.tsx
-#: components/categories/category-form.tsx
-#: components/categories/delete-category.tsx
-#: components/goals/delete-goal.tsx
-#: components/goals/goal-form.tsx
-#: components/recurring-transactions/delete-recurring-transaction.tsx
-#: components/recurring-transactions/recurring-transaction-form.tsx
-#: components/settings/change-name-form.tsx
-#: components/settings/change-password-form.tsx
-#: components/settings/change-username-form.tsx
-#: components/transactions/delete-transaction.tsx
-#: components/transactions/transaction-form.tsx
-msgctxt "47FYwb"
-msgid "Cancel"
-msgstr "Hủy"
-
-#: components/admin/ban-user-form.tsx
 msgctxt "VGVk-h"
 msgid "Ban Reason"
 msgstr "Lý do cấm"
@@ -953,6 +963,19 @@ msgctxt "qSy-Lo"
 msgid "All associated data will be permanently deleted. This action cannot be undone."
 msgstr "Tất cả dữ liệu liên quan sẽ bị xóa vĩnh viễn. Hành động này không thể hoàn tác."
 
+#: components/admin/delete-user.tsx
+#: components/admin/stop-impersonation.tsx
+#: components/auth/sign-out-button.tsx
+#: components/budgets/delete-budget.tsx
+#: components/categories/delete-category.tsx
+#: components/goals/delete-goal.tsx
+#: components/recurring-transactions/delete-recurring-transaction.tsx
+#: components/transactions/delete-transaction.tsx
+#: components/ui/dialog.tsx
+msgctxt "47FYwb"
+msgid "Cancel"
+msgstr "Hủy"
+
 #: components/admin/set-user-password-form.tsx
 msgctxt "VvoQv7"
 msgid "Failed to set user password! Please try again later."
@@ -980,9 +1003,13 @@ msgid "New Password"
 msgstr "Mật khẩu mới"
 
 #: components/admin/set-user-password-form.tsx
-msgctxt "ZTYUJe"
-msgid "Update Password"
-msgstr "Cập nhật mật khẩu"
+#: components/budgets/budget-form.tsx
+#: components/categories/category-form.tsx
+#: components/goals/goal-form.tsx
+#: components/transactions/transaction-form.tsx
+msgctxt "BWpuKl"
+msgid "Update"
+msgstr "Cập nhật"
 
 #: components/admin/stop-impersonation.tsx
 msgctxt "H1m7wl"
@@ -1343,29 +1370,6 @@ msgstr "Chọn ngày"
 msgctxt "T4GOiX"
 msgid "End Date"
 msgstr "Ngày kết thúc"
-
-#: components/budgets/budget-form.tsx
-#: components/categories/category-form.tsx
-#: components/goals/goal-form.tsx
-#: components/transactions/transaction-form.tsx
-msgctxt "BWpuKl"
-msgid "Update"
-msgstr "Cập nhật"
-
-#: components/budgets/budget-form.tsx
-#: components/budgets/budgets-page.tsx
-#: components/categories/categories-page.tsx
-#: components/categories/category-form.tsx
-#: components/goals/goal-form.tsx
-#: components/goals/goals-page.tsx
-#: components/home/home-page.tsx
-#: components/recurring-transactions/recurring-transaction-form.tsx
-#: components/recurring-transactions/recurring-transactions-page.tsx
-#: components/transactions/transaction-form.tsx
-#: components/transactions/transactions-page.tsx
-msgctxt "2_2yg-"
-msgid "Add"
-msgstr "Thêm"
 
 #: components/budgets/budgets-page.tsx
 msgctxt "3fGt__"
@@ -1809,21 +1813,6 @@ msgctxt "sfXkQG"
 msgid "compared to inflow"
 msgstr "so với dòng tiền vào"
 
-#: components/layout/error-empty-state.tsx
-msgctxt "EjH-J3"
-msgid "Please try again later."
-msgstr "Vui lòng thử lại sau."
-
-#: components/layout/not-found-page.tsx
-msgctxt "QRccCM"
-msgid "Page not found"
-msgstr "Trang không tìm thấy"
-
-#: components/layout/not-found-page.tsx
-msgctxt "yAbaof"
-msgid "The page you are looking for does not exist."
-msgstr "Trang bạn đang tìm kiếm không tồn tại."
-
 #: components/layout/offline-notifier.tsx
 msgctxt "W-XYsV"
 msgid "You are currently offline."
@@ -1835,29 +1824,29 @@ msgid "You are back online."
 msgstr "Bạn đã trực tuyến trở lại."
 
 #: components/layout/page-data-provider.tsx
-msgctxt "iKuJb1"
-msgid "CANNOT FETCH TRANSACTIONS DATA"
-msgstr "KHÔNG THỂ TẢI DỮ LIỆU GIAO DỊCH"
+msgctxt "qQ2hvR"
+msgid "Cannot fetch transactions data"
+msgstr "Không thể lấy dữ liệu giao dịch"
 
 #: components/layout/page-data-provider.tsx
-msgctxt "pvUtk6"
-msgid "CANNOT FETCH CATEGORIES DATA"
-msgstr "KHÔNG THỂ TẢI DỮ LIỆU DANH MỤC"
+msgctxt "DXCaHw"
+msgid "Cannot fetch categories data"
+msgstr "Không thể lấy dữ liệu danh mục"
 
 #: components/layout/page-data-provider.tsx
-msgctxt "iriWHm"
-msgid "CANNOT FETCH BUDGETS DATA"
-msgstr "KHÔNG THỂ TẢI DỮ LIỆU NGÂN SÁCH"
+msgctxt "gd9l_c"
+msgid "Cannot fetch budgets data"
+msgstr "Không thể lấy dữ liệu ngân sách"
 
 #: components/layout/page-data-provider.tsx
-msgctxt "V9Jq49"
-msgid "CANNOT FETCH GOALS DATA"
-msgstr "KHÔNG THỂ TẢI DỮ LIỆU MỤC TIÊU"
+msgctxt "dxzQVM"
+msgid "Cannot fetch goals data"
+msgstr "Không thể lấy dữ liệu mục tiêu"
 
 #: components/layout/page-data-provider.tsx
-msgctxt "3aju6V"
-msgid "CANNOT FETCH RECURRING TRANSACTIONS DATA"
-msgstr "KHÔNG THỂ TẢI DỮ LIỆU GIAO DỊCH ĐỊNH KỲ"
+msgctxt "bIJw2X"
+msgid "Cannot fetch recurring transactions data"
+msgstr "Không thể lấy dữ liệu giao dịch định kỳ"
 
 #: components/password-input.tsx
 msgctxt "K3fWTv"
@@ -2173,6 +2162,11 @@ msgstr "Nhập tên đăng nhập của bạn..."
 msgctxt "d6wGcQ"
 msgid "Failed to update currency! Please try again later."
 msgstr "Cập nhật tiền tệ thất bại! Vui lòng thử lại sau."
+
+#: components/settings/settings-page.tsx
+msgctxt "E7W-hd"
+msgid "Manage your account and application preferences."
+msgstr "Quản lý tài khoản và tùy chọn ứng dụng của bạn."
 
 #: components/settings/settings-page.tsx
 msgctxt "1iEPTM"

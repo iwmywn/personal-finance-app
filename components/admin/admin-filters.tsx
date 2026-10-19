@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { cn } from "cn"
 import { SearchIcon, XIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 
@@ -59,14 +60,18 @@ export function AdminFilters({
       <Card>
         <CardContent>
           <div
-            className={`grid grid-cols-1 sm:grid-cols-2 ${
+            className={cn(
+              "grid grid-cols-1 gap-3 sm:grid-cols-2",
               hasActiveFilters
                 ? "lg:grid-cols-[1fr_1fr_1fr_auto]"
                 : "lg:grid-cols-[1fr_1fr_1fr]"
-            } gap-4`}
+            )}
           >
             <InputGroup
-              className={`sm:col-span-full lg:col-auto ${searchTerm !== "" && "border-primary"}`}
+              className={cn(
+                "sm:col-span-full lg:col-auto",
+                searchTerm !== "" && "border-primary"
+              )}
             >
               <InputGroupAddon>
                 <SearchIcon />
@@ -90,7 +95,10 @@ export function AdminFilters({
 
             <Select value={filterRole} onValueChange={setFilterRole}>
               <SelectTrigger
-                className={`w-full ${filterRole !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full",
+                  filterRole !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Role")} />
               </SelectTrigger>
@@ -103,7 +111,10 @@ export function AdminFilters({
 
             <Select value={filterStatus} onValueChange={setFilterStatus}>
               <SelectTrigger
-                className={`w-full ${filterStatus !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full",
+                  filterStatus !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Status")} />
               </SelectTrigger>

@@ -17,7 +17,6 @@ import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -265,7 +264,7 @@ export function TransactionForm({
                         {...field}
                       />
                       <InputGroupAddon align="block-end">
-                        <InputGroupText className="text-muted-foreground text-xs">
+                        <InputGroupText className="text-secondary text-xs">
                           {field.value?.length || 0}/200
                         </InputGroupText>
                       </InputGroupAddon>
@@ -289,7 +288,7 @@ export function TransactionForm({
                           variant="outline"
                           className={cn(
                             "w-full justify-between font-normal",
-                            !selectedDate && "text-muted-foreground"
+                            !selectedDate && "text-secondary"
                           )}
                         >
                           {selectedDate ? (
@@ -323,10 +322,7 @@ export function TransactionForm({
               )}
             />
 
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline">{t("Cancel")}</Button>
-              </DialogClose>
+            <DialogFooter showCancelButton>
               <FormButton isSubmitting={form.formState.isSubmitting}>
                 {transaction ? t("Update") : t("Add")}
               </FormButton>

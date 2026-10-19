@@ -7,6 +7,7 @@ import type { AdminStats } from "@/actions/admin.actions"
 import { Button } from "@/components/ui/button"
 import { AdminFilters } from "@/components/admin/admin-filters"
 import { CreateUserForm } from "@/components/admin/create-user-form"
+import { PageLayout } from "@/components/layout/page-layout"
 import type { User } from "@/lib/definitions"
 
 interface AdminPageProps {
@@ -23,21 +24,15 @@ export default function AdminPage({
 
   return (
     <>
-      <div className="page-content md:h-auto lg:h-[calc(100vh-4.375rem)]">
-        <div className="header">
-          <div>
-            <div className="title">{t("Admin Management")}</div>
-            <div className="description">
-              {t(
-                "Manage application users, system roles, bans, sessions, and security."
-              )}
-            </div>
-          </div>
-          <Button onClick={() => setIsOpen(true)}>{t("Create")}</Button>
-        </div>
-
+      <PageLayout
+        title={t("Admin Management")}
+        description={t(
+          "Manage application users, system roles, bans, sessions, and security."
+        )}
+        action={<Button onClick={() => setIsOpen(true)}>{t("Add")}</Button>}
+      >
         <AdminFilters initialStats={initialStats} initialUsers={initialUsers} />
-      </div>
+      </PageLayout>
 
       <CreateUserForm isOpen={isOpen} setIsOpen={setIsOpen} />
     </>

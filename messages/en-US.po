@@ -420,6 +420,21 @@ msgctxt "k1s9UW"
 msgid "Not Found"
 msgstr "Not Found"
 
+#: app/(core)/[...not-found]/page.tsx
+msgctxt "QRccCM"
+msgid "Page not found"
+msgstr "Page not found"
+
+#: app/(core)/[...not-found]/page.tsx
+msgctxt "yAbaof"
+msgid "The page you are looking for does not exist."
+msgstr "The page you are looking for does not exist."
+
+#: app/(core)/[...not-found]/page.tsx
+msgctxt "kfoc7z"
+msgid "Back to Home"
+msgstr "Back to Home"
+
 #: app/(core)/admin/page.tsx
 #: components/admin/admin-page.tsx
 msgctxt "cH9uli"
@@ -427,9 +442,16 @@ msgid "Admin Management"
 msgstr "Admin Management"
 
 #: app/(core)/admin/page.tsx
-msgctxt "8O4Aqk"
-msgid "CANNOT FETCH USERS DATA"
-msgstr "CANNOT FETCH USERS DATA"
+msgctxt "-s5duM"
+msgid "Cannot fetch users data"
+msgstr "Cannot fetch users data"
+
+#: app/(core)/admin/page.tsx
+#: app/error.tsx
+#: components/layout/page-data-provider.tsx
+msgctxt "EjH-J3"
+msgid "Please try again later."
+msgstr "Please try again later."
 
 #: app/(core)/budgets/page.tsx
 #: components/budgets/budgets-page.tsx
@@ -465,6 +487,7 @@ msgid "Recurring Transactions"
 msgstr "Recurring Transactions"
 
 #: app/(core)/settings/page.tsx
+#: components/settings/settings-page.tsx
 #: hooks/use-nav.ts
 msgctxt "D3idYv"
 msgid "Settings"
@@ -490,10 +513,9 @@ msgid "Something went wrong!"
 msgstr "Something went wrong!"
 
 #: app/error.tsx
-#: components/layout/not-found-page.tsx
-msgctxt "kfoc7z"
-msgid "Back to Home"
-msgstr "Back to Home"
+msgctxt "FazwRl"
+msgid "Try again"
+msgstr "Try again"
 
 #: app/layout.tsx
 #: components/layout/app-sidebar.tsx
@@ -585,9 +607,20 @@ msgstr "Manage application users, system roles, bans, sessions, and security."
 
 #: components/admin/admin-page.tsx
 #: components/admin/create-user-form.tsx
-msgctxt "VzzYJk"
-msgid "Create"
-msgstr "Create"
+#: components/budgets/budget-form.tsx
+#: components/budgets/budgets-page.tsx
+#: components/categories/categories-page.tsx
+#: components/categories/category-form.tsx
+#: components/goals/goal-form.tsx
+#: components/goals/goals-page.tsx
+#: components/home/home-page.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/recurring-transactions/recurring-transactions-page.tsx
+#: components/transactions/transaction-form.tsx
+#: components/transactions/transactions-page.tsx
+msgctxt "2_2yg-"
+msgid "Add"
+msgstr "Add"
 
 #: components/admin/admin-summary.tsx
 msgctxt "_VwiLT"
@@ -805,29 +838,6 @@ msgid "Expires on"
 msgstr "Expires on"
 
 #: components/admin/ban-user-form.tsx
-#: components/admin/create-user-form.tsx
-#: components/admin/delete-user.tsx
-#: components/admin/set-user-password-form.tsx
-#: components/admin/stop-impersonation.tsx
-#: components/auth/sign-out-button.tsx
-#: components/budgets/budget-form.tsx
-#: components/budgets/delete-budget.tsx
-#: components/categories/category-form.tsx
-#: components/categories/delete-category.tsx
-#: components/goals/delete-goal.tsx
-#: components/goals/goal-form.tsx
-#: components/recurring-transactions/delete-recurring-transaction.tsx
-#: components/recurring-transactions/recurring-transaction-form.tsx
-#: components/settings/change-name-form.tsx
-#: components/settings/change-password-form.tsx
-#: components/settings/change-username-form.tsx
-#: components/transactions/delete-transaction.tsx
-#: components/transactions/transaction-form.tsx
-msgctxt "47FYwb"
-msgid "Cancel"
-msgstr "Cancel"
-
-#: components/admin/ban-user-form.tsx
 msgctxt "VGVk-h"
 msgid "Ban Reason"
 msgstr "Ban Reason"
@@ -953,6 +963,19 @@ msgctxt "qSy-Lo"
 msgid "All associated data will be permanently deleted. This action cannot be undone."
 msgstr "All associated data will be permanently deleted. This action cannot be undone."
 
+#: components/admin/delete-user.tsx
+#: components/admin/stop-impersonation.tsx
+#: components/auth/sign-out-button.tsx
+#: components/budgets/delete-budget.tsx
+#: components/categories/delete-category.tsx
+#: components/goals/delete-goal.tsx
+#: components/recurring-transactions/delete-recurring-transaction.tsx
+#: components/transactions/delete-transaction.tsx
+#: components/ui/dialog.tsx
+msgctxt "47FYwb"
+msgid "Cancel"
+msgstr "Cancel"
+
 #: components/admin/set-user-password-form.tsx
 msgctxt "VvoQv7"
 msgid "Failed to set user password! Please try again later."
@@ -980,9 +1003,13 @@ msgid "New Password"
 msgstr "New Password"
 
 #: components/admin/set-user-password-form.tsx
-msgctxt "ZTYUJe"
-msgid "Update Password"
-msgstr "Update Password"
+#: components/budgets/budget-form.tsx
+#: components/categories/category-form.tsx
+#: components/goals/goal-form.tsx
+#: components/transactions/transaction-form.tsx
+msgctxt "BWpuKl"
+msgid "Update"
+msgstr "Update"
 
 #: components/admin/stop-impersonation.tsx
 msgctxt "H1m7wl"
@@ -1343,29 +1370,6 @@ msgstr "Select Date"
 msgctxt "T4GOiX"
 msgid "End Date"
 msgstr "End Date"
-
-#: components/budgets/budget-form.tsx
-#: components/categories/category-form.tsx
-#: components/goals/goal-form.tsx
-#: components/transactions/transaction-form.tsx
-msgctxt "BWpuKl"
-msgid "Update"
-msgstr "Update"
-
-#: components/budgets/budget-form.tsx
-#: components/budgets/budgets-page.tsx
-#: components/categories/categories-page.tsx
-#: components/categories/category-form.tsx
-#: components/goals/goal-form.tsx
-#: components/goals/goals-page.tsx
-#: components/home/home-page.tsx
-#: components/recurring-transactions/recurring-transaction-form.tsx
-#: components/recurring-transactions/recurring-transactions-page.tsx
-#: components/transactions/transaction-form.tsx
-#: components/transactions/transactions-page.tsx
-msgctxt "2_2yg-"
-msgid "Add"
-msgstr "Add"
 
 #: components/budgets/budgets-page.tsx
 msgctxt "3fGt__"
@@ -1809,21 +1813,6 @@ msgctxt "sfXkQG"
 msgid "compared to inflow"
 msgstr "compared to inflow"
 
-#: components/layout/error-empty-state.tsx
-msgctxt "EjH-J3"
-msgid "Please try again later."
-msgstr "Please try again later."
-
-#: components/layout/not-found-page.tsx
-msgctxt "QRccCM"
-msgid "Page not found"
-msgstr "Page not found"
-
-#: components/layout/not-found-page.tsx
-msgctxt "yAbaof"
-msgid "The page you are looking for does not exist."
-msgstr "The page you are looking for does not exist."
-
 #: components/layout/offline-notifier.tsx
 msgctxt "W-XYsV"
 msgid "You are currently offline."
@@ -1835,29 +1824,29 @@ msgid "You are back online."
 msgstr "You are back online."
 
 #: components/layout/page-data-provider.tsx
-msgctxt "iKuJb1"
-msgid "CANNOT FETCH TRANSACTIONS DATA"
-msgstr "CANNOT FETCH TRANSACTIONS DATA"
+msgctxt "qQ2hvR"
+msgid "Cannot fetch transactions data"
+msgstr "Cannot fetch transactions data"
 
 #: components/layout/page-data-provider.tsx
-msgctxt "pvUtk6"
-msgid "CANNOT FETCH CATEGORIES DATA"
-msgstr "CANNOT FETCH CATEGORIES DATA"
+msgctxt "DXCaHw"
+msgid "Cannot fetch categories data"
+msgstr "Cannot fetch categories data"
 
 #: components/layout/page-data-provider.tsx
-msgctxt "iriWHm"
-msgid "CANNOT FETCH BUDGETS DATA"
-msgstr "CANNOT FETCH BUDGETS DATA"
+msgctxt "gd9l_c"
+msgid "Cannot fetch budgets data"
+msgstr "Cannot fetch budgets data"
 
 #: components/layout/page-data-provider.tsx
-msgctxt "V9Jq49"
-msgid "CANNOT FETCH GOALS DATA"
-msgstr "CANNOT FETCH GOALS DATA"
+msgctxt "dxzQVM"
+msgid "Cannot fetch goals data"
+msgstr "Cannot fetch goals data"
 
 #: components/layout/page-data-provider.tsx
-msgctxt "3aju6V"
-msgid "CANNOT FETCH RECURRING TRANSACTIONS DATA"
-msgstr "CANNOT FETCH RECURRING TRANSACTIONS DATA"
+msgctxt "bIJw2X"
+msgid "Cannot fetch recurring transactions data"
+msgstr "Cannot fetch recurring transactions data"
 
 #: components/password-input.tsx
 msgctxt "K3fWTv"
@@ -2173,6 +2162,11 @@ msgstr "Enter your username..."
 msgctxt "d6wGcQ"
 msgid "Failed to update currency! Please try again later."
 msgstr "Failed to update currency! Please try again later."
+
+#: components/settings/settings-page.tsx
+msgctxt "E7W-hd"
+msgid "Manage your account and application preferences."
+msgstr "Manage your account and application preferences."
 
 #: components/settings/settings-page.tsx
 msgctxt "1iEPTM"

@@ -10,7 +10,6 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -137,22 +136,19 @@ export function BanUserForm({ user, isOpen, setIsOpen }: BanUserFormProps) {
 
         {isBanned ? (
           <div className="space-y-4">
-            <div className="bg-muted/50 rounded-lg p-3 text-sm">
-              <p className="text-muted-foreground">
+            <div className="bg-secondary/15 border p-3 text-sm">
+              <p className="text-secondary">
                 {t("Current ban reason")}:{" "}
                 {user.banReason || t("No reason specified")}
               </p>
               {user.banExpires && (
-                <p className="text-muted-foreground mt-1">
+                <p className="text-secondary mt-1">
                   {t("Expires on")}: {formatDate(user.banExpires)}
                 </p>
               )}
             </div>
 
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline">{t("Cancel")}</Button>
-              </DialogClose>
+            <DialogFooter showCancelButton>
               <Button onClick={handleUnban} disabled={isSubmitting}>
                 {isSubmitting && <Spinner />}
                 {t("Unban")}
@@ -210,10 +206,7 @@ export function BanUserForm({ user, isOpen, setIsOpen }: BanUserFormProps) {
                 )}
               />
 
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button variant="outline">{t("Cancel")}</Button>
-                </DialogClose>
+              <DialogFooter showCancelButton>
                 <FormButton variant="destructive" isSubmitting={isSubmitting}>
                   {t("Ban")}
                 </FormButton>

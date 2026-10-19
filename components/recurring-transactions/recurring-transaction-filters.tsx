@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { cn } from "cn"
 import { SearchIcon, XIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 
@@ -79,13 +80,17 @@ export function RecurringTransactionFilters() {
       <Card>
         <CardContent>
           <div
-            className={`grid md:grid-cols-[1fr_1fr] md:grid-rows-3 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr] lg:grid-rows-2 2xl:grid-cols-[1fr_1fr_1fr_1fr_1fr] 2xl:grid-rows-2 ${
+            className={cn(
+              "grid gap-3 md:grid-cols-[1fr_1fr] md:grid-rows-3 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr] lg:grid-rows-2 2xl:grid-cols-[1fr_1fr_1fr_1fr_1fr] 2xl:grid-rows-2",
               hasActiveFilters &&
-              "md:grid-rows-3 lg:grid-rows-2 2xl:grid-cols-[1fr_1fr_1fr_1fr_1fr_auto]"
-            } gap-4`}
+                "md:grid-rows-3 lg:grid-rows-2 2xl:grid-cols-[1fr_1fr_1fr_1fr_1fr_auto]"
+            )}
           >
             <InputGroup
-              className={`col-span-full ${searchTerm !== "" && "border-primary"}`}
+              className={cn(
+                "col-span-full",
+                searchTerm !== "" && "border-primary"
+              )}
             >
               <InputGroupAddon>
                 <SearchIcon />
@@ -109,7 +114,10 @@ export function RecurringTransactionFilters() {
 
             <Select value={filterMonth} onValueChange={setFilterMonth}>
               <SelectTrigger
-                className={`w-full justify-between font-normal ${filterMonth !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full",
+                  filterMonth !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Month")} />
               </SelectTrigger>
@@ -128,7 +136,10 @@ export function RecurringTransactionFilters() {
 
             <Select value={filterYear} onValueChange={setFilterYear}>
               <SelectTrigger
-                className={`w-full ${filterYear !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full",
+                  filterYear !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Year")} />
               </SelectTrigger>
@@ -147,7 +158,10 @@ export function RecurringTransactionFilters() {
 
             <Select value={filterType} onValueChange={setFilterType}>
               <SelectTrigger
-                className={`w-full ${filterType !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full",
+                  filterType !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Type")} />
               </SelectTrigger>
@@ -166,7 +180,10 @@ export function RecurringTransactionFilters() {
               onValueChange={setFilterCategoryKey}
             >
               <SelectTrigger
-                className={`w-full ${filterCategoryKey !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full",
+                  filterCategoryKey !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Category")} />
               </SelectTrigger>
@@ -198,7 +215,10 @@ export function RecurringTransactionFilters() {
               ) => setFilterStatus(value)}
             >
               <SelectTrigger
-                className={`w-full ${filterStatus !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full",
+                  filterStatus !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Status")} />
               </SelectTrigger>

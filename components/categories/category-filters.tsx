@@ -1,6 +1,7 @@
-﻿"use client"
+"use client"
 
 import { useState } from "react"
+import { cn } from "cn"
 import { SearchIcon, XIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 
@@ -50,13 +51,14 @@ export function CategoryFilters() {
       <Card>
         <CardContent>
           <div
-            className={`grid grid-cols-1 ${
+            className={cn(
+              "grid grid-cols-1 gap-3",
               hasActiveFilters
                 ? "md:grid-cols-[1fr_auto_auto]"
                 : "md:grid-cols-[1fr_auto]"
-            } gap-4`}
+            )}
           >
-            <InputGroup className={`${searchTerm !== "" && "border-primary"}`}>
+            <InputGroup className={cn(searchTerm !== "" && "border-primary")}>
               <InputGroupAddon>
                 <SearchIcon />
               </InputGroupAddon>
@@ -83,7 +85,10 @@ export function CategoryFilters() {
               }
             >
               <SelectTrigger
-                className={`w-full md:w-fit ${filterType !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full md:w-fit",
+                  filterType !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Type")} />
               </SelectTrigger>

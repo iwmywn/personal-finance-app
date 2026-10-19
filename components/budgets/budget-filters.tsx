@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { cn } from "cn"
 import { useExtracted } from "next-intl"
 
 import { Button } from "@/components/ui/button"
@@ -72,14 +73,18 @@ export function BudgetFilters() {
       <Card>
         <CardContent>
           <div
-            className={`grid md:grid-cols-[1fr_1fr] md:grid-rows-2 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr] lg:grid-rows-1 2xl:grid-cols-[1fr_1fr_1fr_1fr_1fr] 2xl:grid-rows-1 ${
+            className={cn(
+              "grid gap-3 md:grid-cols-[1fr_1fr] md:grid-rows-2 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr] lg:grid-rows-1 2xl:grid-cols-[1fr_1fr_1fr_1fr_1fr] 2xl:grid-rows-1",
               hasActiveFilters &&
-              "md:grid-rows-2 lg:grid-rows-1 2xl:grid-cols-[1fr_1fr_1fr_1fr_1fr_auto]"
-            } gap-4`}
+                "md:grid-rows-2 lg:grid-rows-1 2xl:grid-cols-[1fr_1fr_1fr_1fr_1fr_auto]"
+            )}
           >
             <Select value={filterMonth} onValueChange={setFilterMonth}>
               <SelectTrigger
-                className={`w-full ${filterMonth !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full",
+                  filterMonth !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Month")} />
               </SelectTrigger>
@@ -98,7 +103,10 @@ export function BudgetFilters() {
 
             <Select value={filterYear} onValueChange={setFilterYear}>
               <SelectTrigger
-                className={`w-full ${filterYear !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full",
+                  filterYear !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Year")} />
               </SelectTrigger>
@@ -120,7 +128,10 @@ export function BudgetFilters() {
               onValueChange={setFilterCategoryKey}
             >
               <SelectTrigger
-                className={`w-full ${filterCategoryKey !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full",
+                  filterCategoryKey !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Category")} />
               </SelectTrigger>
@@ -142,7 +153,10 @@ export function BudgetFilters() {
               ) => setFilterProgress(value)}
             >
               <SelectTrigger
-                className={`w-full ${filterProgress !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full",
+                  filterProgress !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Progress")} />
               </SelectTrigger>
@@ -167,7 +181,10 @@ export function BudgetFilters() {
               ) => setFilterStatus(value)}
             >
               <SelectTrigger
-                className={`w-full ${filterStatus !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full",
+                  filterStatus !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Status")} />
               </SelectTrigger>

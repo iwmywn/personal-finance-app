@@ -15,13 +15,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty"
-import {
   Table,
   TableBody,
   TableCell,
@@ -34,6 +27,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { EmptyState } from "@/components/empty-state"
 import { DeleteRecurringTransaction } from "@/components/recurring-transactions/delete-recurring-transaction"
 import { useRecurring } from "@/contexts/recurring-context"
 import { useCategory } from "@/hooks/use-category"
@@ -82,167 +76,148 @@ export function RecurringTransactionsTable({
 
   return (
     <>
-      <Card className="flex-1 overflow-auto">
-        <CardContent className="h-full">
+      <Card>
+        <CardContent>
           {filteredRecurring.length === 0 ? (
-            <Empty className="h-full border">
-              <EmptyHeader>
-                <EmptyMedia variant="icon">
-                  <RepeatIcon />
-                </EmptyMedia>
-                <EmptyTitle>{t("No recurring transactions found")}</EmptyTitle>
-                <EmptyDescription>
-                  {recurringTransactions.length === 0
-                    ? t("You haven't created any recurring transactions yet.")
-                    : t(
-                        "No recurring transactions found matching your filters."
-                      )}
-                </EmptyDescription>
-              </EmptyHeader>
-            </Empty>
+            <EmptyState
+              icon={<RepeatIcon />}
+              title={t("No recurring transactions found")}
+              description={
+                recurringTransactions.length === 0
+                  ? t("You haven't created any recurring transactions yet.")
+                  : t("No recurring transactions found matching your filters.")
+              }
+            />
           ) : (
-            <div className="table-wrapper">
-              <Table>
-                <TableHeader className="bg-muted sticky top-0 z-1">
-                  <TableRow className="[&>th]:text-center">
-                    <TableHead>{t("Start Date")}</TableHead>
-                    <TableHead>{t("End Date")}</TableHead>
-                    <TableHead>{t("Description")}</TableHead>
-                    <TableHead>{t("Type")}</TableHead>
-                    <TableHead>{t("Category")}</TableHead>
-                    <TableHead>{t("Amount")}</TableHead>
-                    <TableHead>{t("Frequency")}</TableHead>
-                    <TableHead>{t("Status")}</TableHead>
-                    <TableHead></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredRecurring.map((recurring) => {
-                    const isUpcoming = Boolean(
-                      recurring.startDate &&
-                      new Date(recurring.startDate) > todayUTC
-                    )
-                    const isEnded = Boolean(
-                      recurring.endDate &&
-                      todayUTC > new Date(recurring.endDate)
-                    )
+            <Table>
+              <TableHeader>
+                <TableRow className="[&>th]:text-center">
+                  <TableHead>{t("Start Date")}</TableHead>
+                  <TableHead>{t("End Date")}</TableHead>
+                  <TableHead>{t("Description")}</TableHead>
+                  <TableHead>{t("Type")}</TableHead>
+                  <TableHead>{t("Category")}</TableHead>
+                  <TableHead>{t("Amount")}</TableHead>
+                  <TableHead>{t("Frequency")}</TableHead>
+                  <TableHead>{t("Status")}</TableHead>
+                  <TableHead></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredRecurring.map((recurring) => {
+                  const isUpcoming = Boolean(
+                    recurring.startDate &&
+                    new Date(recurring.startDate) > todayUTC
+                  )
+                  const isEnded = Boolean(
+                    recurring.endDate && todayUTC > new Date(recurring.endDate)
+                  )
 
-                    const nextDate = getNextDate(recurring, todayUTC)
+                  const nextDate = getNextDate(recurring, todayUTC)
 
-                    return (
-                      <TableRow
-                        key={recurring._id}
-                        className="[&>td]:text-center"
-                      >
-                        <TableCell>{formatDate(recurring.startDate)}</TableCell>
-                        <TableCell>
-                          {recurring.endDate
-                            ? formatDate(recurring.endDate)
-                            : t("No end date")}
-                        </TableCell>
-                        <TableCell>{recurring.description}</TableCell>
-                        <TableCell>
-                          <Badge
-                            className={
-                              recurring.type === "inflow"
-                                ? "badge-green"
-                                : "badge-red"
-                            }
-                          >
-                            {recurring.type === "inflow"
-                              ? t("Inflow")
-                              : t("Outflow")}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Badge variant="outline">
-                                {getCategoryLabel(recurring.categoryKey)}
-                              </Badge>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              {getCategoryDescription(recurring.categoryKey)}
-                            </TooltipContent>
-                          </Tooltip>
-                        </TableCell>
-                        <TableCell>
-                          {formatCurrency(recurring.amount, recurring.currency)}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex flex-col gap-1">
-                            <span>
-                              {getFrequencyLabel(recurring.frequency)}
+                  return (
+                    <TableRow
+                      key={recurring._id}
+                      className="[&>td]:text-center"
+                    >
+                      <TableCell>{formatDate(recurring.startDate)}</TableCell>
+                      <TableCell>
+                        {recurring.endDate
+                          ? formatDate(recurring.endDate)
+                          : t("No end date")}
+                      </TableCell>
+                      <TableCell>{recurring.description}</TableCell>
+                      <TableCell>
+                        <Badge
+                          className={
+                            recurring.type === "inflow"
+                              ? "badge-green"
+                              : "badge-red"
+                          }
+                        >
+                          {recurring.type === "inflow"
+                            ? t("Inflow")
+                            : t("Outflow")}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Badge variant="outline">
+                              {getCategoryLabel(recurring.categoryKey)}
+                            </Badge>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {getCategoryDescription(recurring.categoryKey)}
+                          </TooltipContent>
+                        </Tooltip>
+                      </TableCell>
+                      <TableCell>
+                        {formatCurrency(recurring.amount, recurring.currency)}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col gap-1">
+                          <span>{getFrequencyLabel(recurring.frequency)}</span>
+                          {recurring.frequency === "random" ? (
+                            <span className="text-secondary text-xs">
+                              {t("Every {days} days", {
+                                days:
+                                  recurring.randomEveryXDays?.toString() ?? "—",
+                              })}
                             </span>
-                            {recurring.frequency === "random" ? (
-                              <span className="text-muted-foreground text-xs">
-                                {t("Every {days} days", {
-                                  days:
-                                    recurring.randomEveryXDays?.toString() ??
-                                    "—",
-                                })}
-                              </span>
-                            ) : null}
-                            {!isEnded && nextDate ? (
-                              <span className="text-muted-foreground text-xs">
-                                {t("Next: {date}", {
-                                  date: formatDate(nextDate),
-                                })}
-                              </span>
-                            ) : null}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            className={
-                              isEnded
-                                ? "badge-gray"
-                                : isUpcoming
-                                  ? "badge-yellow"
-                                  : "badge-green"
-                            }
-                          >
-                            {isEnded
-                              ? t("Inactive")
+                          ) : null}
+                          {!isEnded && nextDate ? (
+                            <span className="text-secondary text-xs">
+                              {t("Next: {date}", {
+                                date: formatDate(nextDate),
+                              })}
+                            </span>
+                          ) : null}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          className={
+                            isEnded
+                              ? "badge-gray"
                               : isUpcoming
-                                ? t("Upcoming")
-                                : t("Active")}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                className="dark:hover:bg-input/50"
-                                variant="ghost"
-                                size="icon"
-                              >
-                                <MoreVerticalIcon />
-                                <span className="sr-only">
-                                  {t("Open menu")}
-                                </span>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                              <DropdownMenuItem
-                                className="cursor-pointer"
-                                variant="destructive"
-                                onClick={() => {
-                                  setSelectedRecurring(recurring)
-                                  setIsDeleteOpen(true)
-                                }}
-                              >
-                                {t("Delete")}
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
-                </TableBody>
-              </Table>
-            </div>
+                                ? "badge-yellow"
+                                : "badge-green"
+                          }
+                        >
+                          {isEnded
+                            ? t("Inactive")
+                            : isUpcoming
+                              ? t("Upcoming")
+                              : t("Active")}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreVerticalIcon />
+                              <span className="sr-only">{t("Open menu")}</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem
+                              variant="destructive"
+                              onClick={() => {
+                                setSelectedRecurring(recurring)
+                                setIsDeleteOpen(true)
+                              }}
+                            >
+                              {t("Delete")}
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
           )}
         </CardContent>
       </Card>

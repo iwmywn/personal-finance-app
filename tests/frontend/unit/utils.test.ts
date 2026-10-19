@@ -4,8 +4,11 @@ import { formatCurrency } from "@/lib/currency"
 import { getUniqueDateRangeYears, getUniqueYears } from "@/lib/date"
 import {
   convertAmountWithRates,
+  getBalanceColorClass,
+  getFlowColorClass,
   getSafeCallbackUrl,
   isUserBanned,
+  progressColorClass,
 } from "@/lib/utils"
 
 describe("Utils", () => {
@@ -362,6 +365,51 @@ describe("Utils", () => {
 
     it("should escape double quotes properly", () => {
       expect(sanitizeCSVField('Hello "World"')).toBe(`"Hello ""World"""`)
+    })
+  })
+
+  describe("getFlowColorClass", () => {
+    it("should return text-green for inflow", () => {
+      expect(getFlowColorClass("inflow")).toBe("text-green")
+    })
+
+    it("should return text-red for outflow", () => {
+      expect(getFlowColorClass("outflow")).toBe("text-red")
+    })
+
+    it("should return empty string for undefined or null or other values", () => {
+      expect(getFlowColorClass(undefined)).toBe("")
+      expect(getFlowColorClass(null)).toBe("")
+      expect(getFlowColorClass("")).toBe("")
+    })
+  })
+
+  describe("getBalanceColorClass", () => {
+    it("should return text-green for positive values", () => {
+      expect(getBalanceColorClass(100)).toBe("text-green")
+      expect(getBalanceColorClass("50000")).toBe("text-green")
+    })
+
+    it("should return text-red for negative values", () => {
+      expect(getBalanceColorClass(-100)).toBe("text-red")
+      expect(getBalanceColorClass("-50000")).toBe("text-red")
+    })
+
+    it("should return empty string for zero, invalid, or empty values", () => {
+      expect(getBalanceColorClass(0)).toBe("")
+      expect(getBalanceColorClass("0")).toBe("")
+      expect(getBalanceColorClass(null)).toBe("")
+      expect(getBalanceColorClass(undefined)).toBe("")
+      expect(getBalanceColorClass("invalid")).toBe("")
+    })
+  })
+
+  describe("progressColorClass", () => {
+    it("should map semantic progress colors to CSS classes", () => {
+      expect(progressColorClass.gray).toBe("progress-gray")
+      expect(progressColorClass.green).toBe("progress-green")
+      expect(progressColorClass.yellow).toBe("progress-yellow")
+      expect(progressColorClass.red).toBe("progress-red")
     })
   })
 })

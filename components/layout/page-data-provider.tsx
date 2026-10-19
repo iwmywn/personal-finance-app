@@ -1,3 +1,4 @@
+import { GhostIcon } from "lucide-react"
 import { getExtracted } from "next-intl/server"
 
 import { getBudgets } from "@/actions/budget.actions"
@@ -5,7 +6,7 @@ import { getCustomCategories } from "@/actions/category.actions"
 import { getGoals } from "@/actions/goal.actions"
 import { getRecurringTransactions } from "@/actions/recurring.actions"
 import { getTransactions } from "@/actions/transaction.actions"
-import { ErrorEmptyState } from "@/components/layout/error-empty-state"
+import { EmptyState } from "@/components/empty-state"
 import { BudgetsContext } from "@/contexts/budgets-context"
 import { CategoriesContext } from "@/contexts/categories-context"
 import { GoalsContext } from "@/contexts/goals-context"
@@ -45,47 +46,60 @@ export async function PageDataProvider({
     recurring ? getRecurringTransactions() : Promise.resolve(null),
   ])
 
+  const Icon = <GhostIcon />
+  const fallbackDescription = t("Please try again later.")
+
   if (transactions && !transactionsResult?.transactions) {
     return (
-      <ErrorEmptyState
-        title={t("CANNOT FETCH TRANSACTIONS DATA")}
-        description={transactionsResult?.error}
+      <EmptyState
+        className="mt-3"
+        icon={Icon}
+        title={t("Cannot fetch transactions data")}
+        description={transactionsResult?.error ?? fallbackDescription}
       />
     )
   }
 
   if (categories && !categoriesResult?.customCategories) {
     return (
-      <ErrorEmptyState
-        title={t("CANNOT FETCH CATEGORIES DATA")}
-        description={categoriesResult?.error}
+      <EmptyState
+        className="mt-3"
+        icon={Icon}
+        title={t("Cannot fetch categories data")}
+        description={categoriesResult?.error ?? fallbackDescription}
       />
     )
   }
 
   if (budgets && !budgetsResult?.budgets) {
     return (
-      <ErrorEmptyState
-        title={t("CANNOT FETCH BUDGETS DATA")}
-        description={budgetsResult?.error}
+      <EmptyState
+        className="mt-3"
+        icon={Icon}
+        title={t("Cannot fetch budgets data")}
+        description={budgetsResult?.error ?? fallbackDescription}
       />
     )
   }
 
   if (goals && !goalsResult?.goals) {
     return (
-      <ErrorEmptyState
-        title={t("CANNOT FETCH GOALS DATA")}
-        description={goalsResult?.error}
+      <EmptyState
+        className="mt-3"
+        icon={Icon}
+        title={t("Cannot fetch goals data")}
+        description={goalsResult?.error ?? fallbackDescription}
       />
     )
   }
 
   if (recurring && !recurringResult?.recurringTransactions) {
     return (
-      <ErrorEmptyState
-        title={t("CANNOT FETCH RECURRING TRANSACTIONS DATA")}
-        description={recurringResult?.error}
+      <EmptyState
+        className="mt-3"
+        icon={Icon}
+        title={t("Cannot fetch recurring transactions data")}
+        description={recurringResult?.error ?? fallbackDescription}
       />
     )
   }

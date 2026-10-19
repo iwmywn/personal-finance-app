@@ -60,7 +60,7 @@ export function CategoryFormSelect<
                 <SelectItem key={c.key} value={c.key}>
                   <div className="flex flex-col">
                     <span className="font-medium">{c.label}</span>
-                    <span className="text-muted-foreground wrap-anywhere">
+                    <span className="text-secondary wrap-anywhere">
                       {c.description}
                     </span>
                   </div>
@@ -71,7 +71,7 @@ export function CategoryFormSelect<
           {showDescription && (
             <FormDescription>
               {t("Cannot find a suitable category?")}{" "}
-              <FormLink href="/categories" className="text-foreground/85">
+              <FormLink href="/categories">
                 {t("Create Custom Category")}
               </FormLink>
             </FormDescription>

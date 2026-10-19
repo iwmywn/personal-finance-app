@@ -1,7 +1,7 @@
 "use client"
 
 import { useTransition } from "react"
-import { Download } from "lucide-react"
+import { DownloadIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 import { toast } from "sonner"
 
@@ -139,11 +139,10 @@ export function ExportButton({ filteredTransactions }: ExportButtonProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="dark:hover:bg-input/50"
           onClick={handleExport}
           disabled={isPending}
         >
-          {isPending ? <Spinner /> : <Download />}
+          {isPending ? <Spinner /> : <DownloadIcon />}
           <span className="sr-only">
             {t("Export transactions with current filters applied.")}
           </span>

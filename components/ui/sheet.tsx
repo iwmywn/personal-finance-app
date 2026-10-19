@@ -36,7 +36,7 @@ function SheetOverlay({
     <SheetPrimitive.Overlay
       data-slot="sheet-overlay"
       className={cn(
-        "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50",
+        "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 bg-background/50 fixed inset-0 z-50 backdrop-blur-xs backdrop-saturate-150",
         className
       )}
       {...props}
@@ -62,7 +62,7 @@ function SheetContent({
       <SheetPrimitive.Content
         data-slot="sheet-content"
         className={cn(
-          "bg-background data-[state=closed]:animate-out data-[state=open]:animate-in fixed z-50 flex flex-col gap-4 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
+          "bg-background text-primary data-[state=closed]:animate-out data-[state=open]:animate-in fixed z-50 flex flex-col gap-4 rounded-none shadow-none transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-400",
           side === "right" &&
             "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm",
           side === "left" &&
@@ -77,7 +77,7 @@ function SheetContent({
       >
         {children}
         {showCloseButton && (
-          <SheetPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-secondary absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none">
+          <SheetPrimitive.Close className="text-secondary hover:bg-primary hover:text-background focus-visible:ring-ring absolute top-4 right-4 flex size-7 items-center justify-center rounded-none border transition-colors outline-none focus-visible:ring-1 disabled:pointer-events-none">
             <XIcon className="size-4" />
             <span className="sr-only">{t("Close")}</span>
           </SheetPrimitive.Close>
@@ -91,7 +91,7 @@ function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="sheet-header"
-      className={cn("flex flex-col gap-1.5 p-4", className)}
+      className={cn("flex flex-col gap-1.5 border-b p-5", className)}
       {...props}
     />
   )
@@ -101,7 +101,7 @@ function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="sheet-footer"
-      className={cn("mt-auto flex flex-col gap-2 p-4", className)}
+      className={cn("mt-auto flex flex-col gap-2 border-t p-5", className)}
       {...props}
     />
   )
@@ -114,7 +114,10 @@ function SheetTitle({
   return (
     <SheetPrimitive.Title
       data-slot="sheet-title"
-      className={cn("text-foreground font-semibold", className)}
+      className={cn(
+        "font-display text-primary text-base font-semibold tracking-tight",
+        className
+      )}
       {...props}
     />
   )
@@ -127,7 +130,7 @@ function SheetDescription({
   return (
     <SheetPrimitive.Description
       data-slot="sheet-description"
-      className={cn("text-muted-foreground text-sm", className)}
+      className={cn("text-secondary text-xs", className)}
       {...props}
     />
   )

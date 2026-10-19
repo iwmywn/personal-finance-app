@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { cn } from "cn"
 import { ChevronDownIcon, SearchIcon, XIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 import { parseAsString, useQueryState } from "nuqs"
@@ -184,13 +185,17 @@ export function TransactionFilters() {
       <Card>
         <CardContent>
           <div
-            className={`grid md:grid-cols-[1fr_1fr] md:grid-rows-4 lg:grid-cols-[1fr_1fr_1fr] lg:grid-rows-3 2xl:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] 2xl:grid-rows-2 ${
+            className={cn(
+              "grid gap-3 md:grid-cols-[1fr_1fr] md:grid-rows-4 lg:grid-cols-[1fr_1fr_1fr] lg:grid-rows-3 2xl:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr] 2xl:grid-rows-2",
               hasActiveFilters &&
-              "md:grid-rows-5 lg:grid-rows-4 2xl:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto]"
-            } gap-4`}
+                "md:grid-rows-5 lg:grid-rows-4 2xl:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto]"
+            )}
           >
             <InputGroup
-              className={`col-span-full ${searchTerm !== "" && "border-primary"}`}
+              className={cn(
+                "col-span-full",
+                searchTerm !== "" && "border-primary"
+              )}
             >
               <InputGroupAddon>
                 <SearchIcon />
@@ -216,7 +221,10 @@ export function TransactionFilters() {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className={`w-full justify-between font-normal md:row-start-2 ${selectedDate && "border-primary!"}`}
+                  className={cn(
+                    "w-full justify-between font-normal md:row-start-2",
+                    selectedDate && "border-primary!"
+                  )}
                 >
                   {selectedDate ? formatDate(selectedDate) : t("Select Date")}
                   <ChevronDownIcon />
@@ -237,7 +245,10 @@ export function TransactionFilters() {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className={`w-full justify-between font-normal md:row-start-2 ${dateRange.from && "border-primary!"}`}
+                  className={cn(
+                    "w-full justify-between font-normal md:row-start-2",
+                    dateRange.from && "border-primary!"
+                  )}
                 >
                   {dateRange.from ? (
                     dateRange.to ? (
@@ -312,7 +323,10 @@ export function TransactionFilters() {
 
             <Select value={filterMonth} onValueChange={handleMonthChange}>
               <SelectTrigger
-                className={`w-full md:row-start-3 lg:row-start-2 ${filterMonth !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full md:row-start-3 lg:row-start-2",
+                  filterMonth !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Month")} />
               </SelectTrigger>
@@ -331,7 +345,10 @@ export function TransactionFilters() {
 
             <Select value={filterYear} onValueChange={handleYearChange}>
               <SelectTrigger
-                className={`w-full md:row-start-3 2xl:row-start-2 ${filterYear !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full md:row-start-3 2xl:row-start-2",
+                  filterYear !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Year")} />
               </SelectTrigger>
@@ -350,7 +367,10 @@ export function TransactionFilters() {
 
             <Select value={filterType} onValueChange={handleTypeChange}>
               <SelectTrigger
-                className={`w-full md:row-start-4 lg:row-start-3 2xl:row-start-2 ${filterType !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full md:row-start-4 lg:row-start-3 2xl:row-start-2",
+                  filterType !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Type")} />
               </SelectTrigger>
@@ -369,7 +389,10 @@ export function TransactionFilters() {
               onValueChange={setFilterCategoryKey}
             >
               <SelectTrigger
-                className={`w-full md:row-start-4 lg:row-start-3 2xl:row-start-2 ${filterCategoryKey !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full md:row-start-4 lg:row-start-3 2xl:row-start-2",
+                  filterCategoryKey !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Category")} />
               </SelectTrigger>

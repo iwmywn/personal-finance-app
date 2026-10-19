@@ -5,11 +5,31 @@ import { DEFAULT_SIGNIN_REDIRECT } from "@/routes"
 import type { Currency } from "@/lib/currency"
 
 export const progressColorClass = {
-  gray: "[&>[data-slot=progress-indicator]]:bg-gray-600",
-  green: "[&>[data-slot=progress-indicator]]:bg-green-600",
-  yellow: "[&>[data-slot=progress-indicator]]:bg-yellow-600",
-  red: "[&>[data-slot=progress-indicator]]:bg-red-600",
+  gray: "progress-gray",
+  green: "progress-green",
+  yellow: "progress-yellow",
+  red: "progress-red",
 } as const
+
+export function getFlowColorClass(
+  type?: "inflow" | "outflow" | string | null
+): string {
+  if (type === "inflow") return "text-green"
+  if (type === "outflow") return "text-red"
+  return ""
+}
+
+export function getBalanceColorClass(balance?: Decimal.Value | null): string {
+  if (balance === undefined || balance === null || balance === "") return ""
+  try {
+    const dec = new Decimal(balance)
+    if (dec.greaterThan(0)) return "text-green"
+    if (dec.lessThan(0)) return "text-red"
+  } catch {
+    return ""
+  }
+  return ""
+}
 
 export function toDecimal(value: string): Decimal {
   return new Decimal(value)

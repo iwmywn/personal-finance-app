@@ -14,13 +14,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty"
 import { Progress } from "@/components/ui/progress"
 import {
   Table,
@@ -37,6 +30,7 @@ import {
 } from "@/components/ui/tooltip"
 import { BudgetForm } from "@/components/budgets/budget-form"
 import { DeleteBudget } from "@/components/budgets/delete-budget"
+import { EmptyState } from "@/components/empty-state"
 import { UnconvertedTransactionsAlert } from "@/components/transactions/unconverted-transactions-alert"
 import { useBudgets } from "@/contexts/budgets-context"
 import { useTransactions } from "@/contexts/transactions-context"
@@ -77,156 +71,141 @@ export function BudgetsTable({ filteredBudgets }: BudgetsTableProps) {
 
   return (
     <>
-      <Card className="flex-1 overflow-auto">
-        <CardContent className="h-full">
+      <Card>
+        <CardContent>
           {filteredBudgets.length === 0 ? (
-            <Empty className="h-full border">
-              <EmptyHeader>
-                <EmptyMedia variant="icon">
-                  <PiggyBankIcon />
-                </EmptyMedia>
-                <EmptyTitle>{t("No budgets found")}</EmptyTitle>
-                <EmptyDescription>
-                  {budgets.length === 0
-                    ? t("You haven't created any budgets yet.")
-                    : t("No budgets found matching your filters.")}
-                </EmptyDescription>
-              </EmptyHeader>
-            </Empty>
+            <EmptyState
+              icon={<PiggyBankIcon />}
+              title={t("No budgets found")}
+              description={
+                budgets.length === 0
+                  ? t("You haven't created any budgets yet.")
+                  : t("No budgets found matching your filters.")
+              }
+            />
           ) : (
-            <div className="flex h-full flex-col gap-4">
+            <div className="flex h-full flex-col gap-3">
               <UnconvertedTransactionsAlert
                 transactions={outflowTransactions}
               />
-              <div className="table-wrapper min-h-0 flex-1">
-                <Table>
-                  <TableHeader className="bg-muted sticky top-0 z-1">
-                    <TableRow className="[&>th]:text-center">
-                      <TableHead>{t("Start Date")}</TableHead>
-                      <TableHead>{t("End Date")}</TableHead>
-                      <TableHead>{t("Category")}</TableHead>
-                      <TableHead>{t("Amount")}</TableHead>
-                      <TableHead>{t("Spent")}</TableHead>
-                      <TableHead>{t("Balance")}</TableHead>
-                      <TableHead>{t("Status")}</TableHead>
-                      <TableHead>{t("Progress")}</TableHead>
-                      <TableHead></TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {budgetsWithSpent.map((budget) => (
-                      <TableRow key={budget._id} className="[&>td]:text-center">
-                        <TableCell>{formatDate(budget.startDate)}</TableCell>
-                        <TableCell>{formatDate(budget.endDate)}</TableCell>
-                        <TableCell>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Badge variant="outline">
-                                {getCategoryLabel(budget.categoryKey)}
-                              </Badge>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              {getCategoryDescription(budget.categoryKey)}
-                            </TooltipContent>
-                          </Tooltip>
-                        </TableCell>
-                        <TableCell>
-                          {formatCurrency(
-                            budget.allocatedAmount,
-                            budget.currency
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {formatCurrency(budget.spent, budget.currency)}
-                        </TableCell>
-                        <TableCell>
-                          {formatCurrency(
-                            toDecimal(budget.allocatedAmount)
-                              .minus(toDecimal(budget.spent))
-                              .toString(),
-                            budget.currency
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            className={
-                              budget.status === "expired"
-                                ? "badge-red"
-                                : budget.status === "active"
-                                  ? "badge-green"
-                                  : "badge-yellow"
-                            }
-                          >
-                            {budget.status === "expired"
-                              ? t("Expired")
+              <Table>
+                <TableHeader>
+                  <TableRow className="[&>th]:text-center">
+                    <TableHead>{t("Start Date")}</TableHead>
+                    <TableHead>{t("End Date")}</TableHead>
+                    <TableHead>{t("Category")}</TableHead>
+                    <TableHead>{t("Amount")}</TableHead>
+                    <TableHead>{t("Spent")}</TableHead>
+                    <TableHead>{t("Balance")}</TableHead>
+                    <TableHead>{t("Status")}</TableHead>
+                    <TableHead>{t("Progress")}</TableHead>
+                    <TableHead></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {budgetsWithSpent.map((budget) => (
+                    <TableRow key={budget._id} className="[&>td]:text-center">
+                      <TableCell>{formatDate(budget.startDate)}</TableCell>
+                      <TableCell>{formatDate(budget.endDate)}</TableCell>
+                      <TableCell>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Badge variant="outline">
+                              {getCategoryLabel(budget.categoryKey)}
+                            </Badge>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {getCategoryDescription(budget.categoryKey)}
+                          </TooltipContent>
+                        </Tooltip>
+                      </TableCell>
+                      <TableCell>
+                        {formatCurrency(
+                          budget.allocatedAmount,
+                          budget.currency
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {formatCurrency(budget.spent, budget.currency)}
+                      </TableCell>
+                      <TableCell>
+                        {formatCurrency(
+                          toDecimal(budget.allocatedAmount)
+                            .minus(toDecimal(budget.spent))
+                            .toString(),
+                          budget.currency
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          className={
+                            budget.status === "expired"
+                              ? "badge-red"
                               : budget.status === "active"
-                                ? t("Active")
-                                : t("Upcoming")}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="min-w-32">
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Progress
-                                value={Math.min(100, budget.percentage)}
-                                className={`flex-1 ${budget.progressColorClass}`}
-                              />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              {budget.percentage.toFixed(1)}%
-                            </TooltipContent>
-                          </Tooltip>
-                        </TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                className="dark:hover:bg-input/50"
-                                variant="ghost"
-                                size="icon"
+                                ? "badge-green"
+                                : "badge-yellow"
+                          }
+                        >
+                          {budget.status === "expired"
+                            ? t("Expired")
+                            : budget.status === "active"
+                              ? t("Active")
+                              : t("Upcoming")}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="min-w-32">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Progress
+                              value={Math.min(100, budget.percentage)}
+                              className={`flex-1 ${budget.progressColorClass}`}
+                            />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {budget.percentage.toFixed(1)}%
+                          </TooltipContent>
+                        </Tooltip>
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreVerticalIcon />
+                              <span className="sr-only">{t("Open menu")}</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem asChild>
+                              <Link
+                                href={`/transactions?from=${serializeUTCDate(budget.startDate)}&to=${serializeUTCDate(budget.endDate)}&type=outflow&category=${budget.categoryKey}`}
                               >
-                                <MoreVerticalIcon />
-                                <span className="sr-only">
-                                  {t("Open menu")}
-                                </span>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                              <DropdownMenuItem asChild>
-                                <Link
-                                  href={`/transactions?from=${serializeUTCDate(budget.startDate)}&to=${serializeUTCDate(budget.endDate)}&type=outflow&category=${budget.categoryKey}`}
-                                  className="cursor-pointer"
-                                >
-                                  {t("View")}
-                                </Link>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                className="cursor-pointer"
-                                onClick={() => {
-                                  setSelectedBudget(budget)
-                                  setIsEditOpen(true)
-                                }}
-                              >
-                                {t("Edit")}
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                className="cursor-pointer"
-                                variant="destructive"
-                                onClick={() => {
-                                  setSelectedBudget(budget)
-                                  setIsDeleteOpen(true)
-                                }}
-                              >
-                                {t("Delete")}
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                                {t("View")}
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setSelectedBudget(budget)
+                                setIsEditOpen(true)
+                              }}
+                            >
+                              {t("Edit")}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              variant="destructive"
+                              onClick={() => {
+                                setSelectedBudget(budget)
+                                setIsDeleteOpen(true)
+                              }}
+                            >
+                              {t("Delete")}
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
           )}
         </CardContent>

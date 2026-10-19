@@ -72,7 +72,11 @@ export function DeleteRecurringTransaction({
           <AlertDialogCancel disabled={isPending}>
             {t("Cancel")}
           </AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} disabled={isPending}>
+          <AlertDialogAction
+            variant="destructive"
+            onClick={handleDelete}
+            disabled={isPending}
+          >
             {isPending && <Spinner />} {t("Delete")}
           </AlertDialogAction>
         </AlertDialogFooter>

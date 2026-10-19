@@ -6,10 +6,8 @@ import { useExtracted } from "next-intl"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
-import { Button } from "@/components/ui/button"
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -212,7 +210,7 @@ export function CreateUserForm({ isOpen, setIsOpen }: CreateUserFormProps) {
                       readOnly
                       disabled
                       value={field.value === "user" ? t("User") : field.value}
-                      className="bg-muted cursor-not-allowed"
+                      className="bg-secondary/15 cursor-not-allowed"
                     />
                   </FormControl>
                   <FormMessage />
@@ -220,12 +218,9 @@ export function CreateUserForm({ isOpen, setIsOpen }: CreateUserFormProps) {
               )}
             />
 
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline">{t("Cancel")}</Button>
-              </DialogClose>
+            <DialogFooter showCancelButton>
               <FormButton isSubmitting={form.formState.isSubmitting}>
-                {t("Create")}
+                {t("Add")}
               </FormButton>
             </DialogFooter>
           </form>

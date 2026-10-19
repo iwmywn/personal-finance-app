@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react"
 import { useOffline } from "next/offline"
-import { WifiOff } from "lucide-react"
+import { WifiOffIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 import { toast } from "sonner"
 
@@ -15,7 +15,7 @@ export function OfflineNotifier() {
     if (isOffline) {
       toastId.current = toast.warning(t("You are currently offline."), {
         duration: Infinity,
-        icon: <WifiOff className="size-4" />,
+        icon: <WifiOffIcon className="size-4" />,
       })
     } else if (toastId.current !== undefined) {
       toast.dismiss(toastId.current)

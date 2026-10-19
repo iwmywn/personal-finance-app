@@ -6,6 +6,7 @@ import { useExtracted } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { BudgetFilters } from "@/components/budgets/budget-filters"
 import { BudgetForm } from "@/components/budgets/budget-form"
+import { PageLayout } from "@/components/layout/page-layout"
 
 export default function BudgetsPage() {
   const [isOpen, setIsOpen] = useState<boolean>(false)
@@ -13,19 +14,13 @@ export default function BudgetsPage() {
 
   return (
     <>
-      <div className="page-content">
-        <div className="header">
-          <div>
-            <div className="title">{t("Budgets")}</div>
-            <div className="description">
-              {t("Set and manage budgets for your outflow categories.")}
-            </div>
-          </div>
-          <Button onClick={() => setIsOpen(true)}>{t("Add")}</Button>
-        </div>
-
+      <PageLayout
+        title={t("Budgets")}
+        description={t("Set and manage budgets for your outflow categories.")}
+        action={<Button onClick={() => setIsOpen(true)}>{t("Add")}</Button>}
+      >
         <BudgetFilters />
-      </div>
+      </PageLayout>
 
       <BudgetForm isOpen={isOpen} setIsOpen={setIsOpen} />
     </>

@@ -5,7 +5,7 @@ import type { Metadata } from "next"
 import { NextIntlClientProvider } from "next-intl"
 import { getExtracted, getLocale } from "next-intl/server"
 
-import { nunito } from "@/app/fonts"
+import { fontDisplay, fontMono } from "@/app/fonts"
 import { siteConfig } from "@/app/pfa.config"
 import { Toaster } from "@/components/ui/sonner"
 import { ClientLang } from "@/components/layout/client-lang"
@@ -63,7 +63,7 @@ export default function RootLayout({
       lang="vi-VN"
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      className={nunito.className}
+      className={`${fontDisplay.variable} ${fontMono.variable} ${fontMono.className}`}
     >
       <body>
         <ThemeProvider>

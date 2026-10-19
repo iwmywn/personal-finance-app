@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -130,7 +129,7 @@ export function GoalForm({ goal, isOpen, setIsOpen }: GoalFormProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="max-h-[85vh] overflow-y-auto">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{goal ? t("Edit Goal") : t("Add Goal")}</DialogTitle>
           <DialogDescription>
@@ -234,7 +233,7 @@ export function GoalForm({ goal, isOpen, setIsOpen }: GoalFormProps) {
                           variant="outline"
                           className={cn(
                             "w-full justify-between font-normal",
-                            !startDate && "text-muted-foreground"
+                            !startDate && "text-secondary"
                           )}
                         >
                           {startDate ? (
@@ -284,7 +283,7 @@ export function GoalForm({ goal, isOpen, setIsOpen }: GoalFormProps) {
                           variant="outline"
                           className={cn(
                             "w-full justify-between font-normal",
-                            !endDate && "text-muted-foreground"
+                            !endDate && "text-secondary"
                           )}
                         >
                           {endDate ? (
@@ -318,10 +317,7 @@ export function GoalForm({ goal, isOpen, setIsOpen }: GoalFormProps) {
               )}
             />
 
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline">{t("Cancel")}</Button>
-              </DialogClose>
+            <DialogFooter showCancelButton>
               <FormButton isSubmitting={form.formState.isSubmitting}>
                 {goal ? t("Update") : t("Add")}
               </FormButton>

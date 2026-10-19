@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { Laptop, Smartphone } from "lucide-react"
+import { LaptopIcon, SmartphoneIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 import { toast } from "sonner"
 import { UAParser } from "ua-parser-js"
@@ -15,6 +15,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -232,12 +233,12 @@ export function ActiveSessionsManager() {
               const location = locations[s.id]
 
               return (
-                <Item key={s.id} variant="outline">
+                <Item key={s.id}>
                   <ItemMedia variant="icon">
                     {device.type === "mobile" ? (
-                      <Smartphone className="text-muted-foreground h-5 w-5" />
+                      <SmartphoneIcon />
                     ) : (
-                      <Laptop className="text-muted-foreground h-5 w-5" />
+                      <LaptopIcon />
                     )}
                   </ItemMedia>
                   <ItemContent>
@@ -249,7 +250,7 @@ export function ActiveSessionsManager() {
                       {isCurrentSession && (
                         <>
                           <div>&middot;</div>
-                          <div className="text-green-500">{t("Current")}</div>
+                          <div className="text-green">{t("Current")}</div>
                         </>
                       )}
                     </ItemTitle>
@@ -277,12 +278,15 @@ export function ActiveSessionsManager() {
             })}
           </div>
         )}
-        <Button
-          onClick={handleRevokeAllSessions}
-          disabled={isRevokingAll || isTerminating !== undefined}
-        >
-          {isRevokingAll && <Spinner />} {t("Terminate All")}
-        </Button>
+        <DialogFooter>
+          <Button
+            onClick={handleRevokeAllSessions}
+            disabled={isRevokingAll || isTerminating !== undefined}
+            className="w-full"
+          >
+            {isRevokingAll && <Spinner />} {t("Terminate All")}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )
