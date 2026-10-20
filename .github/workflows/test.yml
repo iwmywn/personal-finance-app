@@ -25,7 +25,6 @@ jobs:
 
       - name: Install pnpm
         uses: pnpm/action-setup@v6
-        id: pnpm-install
         with:
           version: 12.14.0
           run_install: false
@@ -55,7 +54,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run tests with coverage
-        run: pnpm test-coverage
+        run: pnpm test:coverage
 
       - name: Upload coverage report
         if: always()

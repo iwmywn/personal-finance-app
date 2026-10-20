@@ -43,4 +43,4 @@ next-env.d.ts
 
 # skills
 .agents/skills/*
-skills-lock.json
+!.agents/skills/precision-hud/

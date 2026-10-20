@@ -1,57 +1,48 @@
-# AGENTS.MD
+# AGENTS.md
 
-## 1. Project Overview & Tech Stack
+Repository guidelines and architectural invariants for personal-finance-app.
 
-- **Type**: Web Application (Full-stack).
-- **Core**: TypeScript, Next.js 16 (App Router), React 19.
-- **Auth**: `better-auth` (with MongoDB adapter).
-- **Database**: `mongodb` (raw Node.js driver).
-- **UI/Styling**: `tailwindcss` (v4), `shadcn/ui` / `radix-ui`, `lucide-react`, `class-variance-authority`.
-- **Forms & Validation**: `react-hook-form`, `@hookform/resolvers`, `zod`.
-- **i18n**: `next-intl`.
-- **Testing**: `vitest`, `mongodb-memory-server`.
-- **Code Health & Audit**: `react-doctor`.
-- **Package Manager**: `pnpm`.
+## Environment & Verification
 
-## 2. Directory Structure
+Run all package commands with `pnpm`:
 
-- `actions/`: Next.js Server Actions for backend data mutations.
-- `app/`: Next.js App Router pages, layouts, and API routes.
-- `components/`: Reusable React components (UI primitives and domain-specific).
-- `contexts/`: React context providers for global state.
-- `env/`: Environment variable validation.
-- `hooks/`: Custom React hooks.
-- `i18n/`: Internationalization config.
-- `lib/`: Utility functions, helpers, and integration setup.
-- `messages/`: Translation files for internationalization.
-- `public/`: Static assets.
-- `schemas/`: Zod validation schemas for forms and APIs.
-- `scripts/`: Custom utility and automation scripts.
-- `tests/`: Vitest test suites.
+- **Audit React Code**: `pnpm react-doctor` — verifies React 19 compiler compatibility, hooks hygiene, and hydration safety.
+- **Run Frontend Tests**: `pnpm test:fe` — UI component tests (`happy-dom`).
+- **Run Backend Tests**: `pnpm test:be` — integration tests (`node` + in-memory MongoDB replica set).
+- **Run Test Coverage**: `pnpm test:coverage` — enforces 90% coverage threshold (85% branches).
+- **Validate Translations**: `pnpm check:po` — checks for untranslated strings in `messages/*.po`.
+- **Sync Agent Skills**: `pnpm skills:install` — restores community skills from `skills-lock.json`.
 
-## 3. Coding Guidelines
+## Architectural Invariants
 
-- **Style Guide**: Enforced via ESLint (`eslint-config-next`) and Prettier (with Tailwind and import sorting plugins).
-- **Naming Conventions**:
-  - Standard Next.js conventions (`page.tsx`, `layout.tsx`).
-  - Follow kebab-case for file naming conventions.
-- **Component Rules**: Keep components modular and isolated. No database calls directly from UI components; always invoke Server Actions.
-- **TypeScript**: Strict mode is enabled; ensure strong typing and explicit types where necessary.
+### 1. Data Layer & Server Boundaries
 
-## 4. Common Commands
+- **Database Access**: Raw MongoDB Node.js driver (no ORM). Retrieve typed collections via factory functions in `lib/collections.ts`. Wrap multi-document mutations in `withTransaction` (`lib/db.ts`).
+- **Server Boundaries**: Isolate server code with `import "server-only"`.
+- **Data Mutations**: Route all state mutations strictly through Server Actions in `actions/` marked with `"use server"`. UI components remain pure presenters.
+- **Validation & Rate Limiting**: Validate Server Action inputs with Zod schemas from `schemas/server.ts`. Protect sensitive endpoints with `isRateLimited` (`lib/rate-limit.ts`).
 
-- **Run Dev Server**: `pnpm dev`
-- **Build for Production**: `pnpm build`
-- **Start Production Server**: `pnpm start`
-- **Lint**: `pnpm lint` / `pnpm lint-fix`
-- **Format Code**: `pnpm format`
-- **Audit React Code**: `pnpm react-doctor`
-- **Test**: `pnpm test` (or `test-fe`, `test-be`, `test-coverage`)
-- **Diagnose Vitest Performance**: `pnpm test-doctor`
+### 2. Environment Configuration
 
-## 5. Notes / Constraints
+- Access environment variables exclusively via typed helpers in `@/env/client` or `@/env/server` (`@t3-oss/env-nextjs`). Never access `process.env` directly in application code.
 
-- **Commands**: Always use pnpm.
-- **Environment Variables**: Managed strictly via `@t3-oss/env-nextjs` in the `env/` folder. Do not use `process.env` directly if possible.
-- **React Doctor**: Configured in `doctor.config.mjs` to audit React code health, enforce React Compiler compatibility, prevent SSR hydration mismatches, and maintain clean component architecture.
-- **i18n / Localization**: Do not modify data in `messages/en-US.po` manually; it is automatically extracted from the source code by `next-intl`.
+### 3. Internationalization (`next-intl`)
+
+- Base strings live directly in source code (`actions/`, `app/`, `components/`, `hooks/`, `lib/`, `schemas/`). `next build` / `next dev` extracts them into `messages/en-US.po`.
+- Keep `messages/en-US.po` strictly as auto-generated output (never edit it manually).
+- Provide localized translations in target files (`vi-VN.po`, `ja-JP.po`, `ko-KR.po`, `zh-CN.po`) and run `pnpm check:po` to verify completeness.
+
+### 4. Code Conventions
+
+- **File Naming**: Use `kebab-case.ts(x)` for all files.
+- **Module Resolution**: Use `@/*` alias for root-relative imports.
+
+## Context Pointers
+
+Load specialized skills when entering these distinct workflow branches:
+
+- **UI & HUD Design System**: [.agents/skills/precision-hud/SKILL.md](.agents/skills/precision-hud/SKILL.md) — When designing, building, or styling pages, forms, tables, dashboards, cards, or dialogs according to the Technical Instrument & Precision HUD design language.
+- **Test-Driven Development**: [.agents/skills/tdd/SKILL.md](.agents/skills/tdd/SKILL.md) — When developing features or fixing bugs test-first with unit or integration tests.
+- **Bug Diagnosis**: [.agents/skills/diagnosing-bugs/SKILL.md](.agents/skills/diagnosing-bugs/SKILL.md) — When troubleshooting unexpected errors, memory leaks, or flaky tests.
+- **Code Review**: [.agents/skills/code-review/SKILL.md](.agents/skills/code-review/SKILL.md) — When evaluating branch changes against repo standards and functional specs.
+- **Deep Module Architecture**: [.agents/skills/codebase-design/SKILL.md](.agents/skills/codebase-design/SKILL.md) — When designing interface seams, modularizing logic, or refactoring services.
