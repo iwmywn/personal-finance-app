@@ -14,7 +14,7 @@ export function PageLayout({
   children,
 }: PageLayoutProps) {
   return (
-    <div className="flex h-auto flex-col gap-3 md:h-full">
+    <div className="flex flex-col gap-3">
       <div className="bg-background/90 sticky top-[3.05rem] z-40 flex items-center justify-between gap-3 border-b py-3 backdrop-blur-xs backdrop-saturate-150">
         <div>
           <h1 className="font-display text-primary text-xl font-bold tracking-tight">
