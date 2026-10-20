@@ -18,8 +18,8 @@
     "test": "vitest",
     "test-fe": "vitest --project frontend",
     "test-be": "vitest --project backend",
+    "test-coverage": "vitest --coverage",
     "test-doctor": "vitest doctor",
-    "test-coverage": "vitest run --coverage",
     "check-po": "node scripts/check-po.js"
   },
   "dependencies": {
