@@ -19,6 +19,7 @@
     "test-fe": "vitest --project frontend",
     "test-be": "vitest --project backend",
     "test-doctor": "vitest doctor",
+    "test-coverage": "vitest run --coverage",
     "check-po": "node scripts/check-po.js"
   },
   "dependencies": {
@@ -59,6 +60,7 @@
     "@types/node": "24.19.2",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
+    "@vitest/coverage-v8": "5.0.5",
     "eslint": "9.39.5",
     "eslint-config-next": "16.4.2",
     "eslint-plugin-unused-imports": "4.4.1",
