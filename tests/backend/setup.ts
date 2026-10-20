@@ -30,12 +30,10 @@ afterAll(async () => {
   delete process.env.MONGODB_URI
 })
 
-beforeEach(() => {
+afterEach(async () => {
   vi.resetAllMocks()
   resetRateLimitStore()
-})
 
-afterEach(async () => {
   const db = await connect()
   const collections = await db.listCollections().toArray()
 
