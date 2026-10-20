@@ -4,7 +4,6 @@ import type { UserWorkspaceConfig } from "vitest/config"
 
 const baseTestConfig = {
   globals: true,
-  environment: "node",
   pool: "threads",
 }
 const baseResolveConfig = {
@@ -16,7 +15,8 @@ const projects: UserWorkspaceConfig[] = [
     test: {
       ...baseTestConfig,
       name: "frontend",
-      include: ["tests/frontend/**/*.test.ts"],
+      environment: "happy-dom",
+      include: ["tests/frontend/**/*.test.{ts,tsx}"],
       setupFiles: ["./tests/frontend/setup.ts"],
     },
     resolve: {
@@ -27,6 +27,7 @@ const projects: UserWorkspaceConfig[] = [
     test: {
       ...baseTestConfig,
       name: "backend",
+      environment: "node",
       include: ["tests/backend/**/*.test.ts"],
       setupFiles: ["./tests/backend/setup.ts"],
       testTimeout: 120_000,
