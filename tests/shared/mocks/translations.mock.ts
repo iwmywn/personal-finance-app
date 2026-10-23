@@ -12,6 +12,8 @@ vi.mock("next-intl/server", async () => ({
 
 vi.mock("next-intl", async () => ({
   useExtracted: vi.fn(() => vi.fn((message: string) => message)),
+  useLocale: vi.fn(() => "en-US"),
+  useTimeZone: vi.fn(() => "UTC"),
 }))
 
 export {}

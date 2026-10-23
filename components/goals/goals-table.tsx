@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import Link from "next/link"
 import { MoreVerticalIcon, TargetIcon } from "lucide-react"
-import { useExtracted } from "next-intl"
+import { useExtracted, useTimeZone } from "next-intl"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -14,13 +14,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty"
 import { Progress } from "@/components/ui/progress"
 import {
   Table,
@@ -35,13 +28,16 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { DeleteGoalDialog } from "@/components/goals/delete-goal-dialog"
-import { GoalDialog } from "@/components/goals/goal-dialog"
-import { useGoals } from "@/context/goals-context"
-import { useTransactions } from "@/context/transactions-context"
+import { EmptyState } from "@/components/empty-state"
+import { DeleteGoal } from "@/components/goals/delete-goal"
+import { GoalForm } from "@/components/goals/goal-form"
+import { UnconvertedTransactionsAlert } from "@/components/transactions/unconverted-transactions-alert"
+import { useGoals } from "@/contexts/goals-context"
+import { useTransactions } from "@/contexts/transactions-context"
 import { useCategory } from "@/hooks/use-category"
 import { useFormatCurrency } from "@/hooks/use-format-currency"
 import { useFormatDate } from "@/hooks/use-format-date"
+import { serializeUTCDate } from "@/lib/date"
 import type { Goal } from "@/lib/definitions"
 import { calculateGoalsStats } from "@/lib/statistics"
 
@@ -59,31 +55,38 @@ export function GoalsTable({ filteredGoals }: GoalsTableProps) {
   const { getCategoryLabel, getCategoryDescription } = useCategory()
   const formatDate = useFormatDate()
   const formatCurrency = useFormatCurrency()
+  const timeZone = useTimeZone()
 
-  const goalsWithStats = calculateGoalsStats(filteredGoals, transactions)
+  const goalsWithStats = calculateGoalsStats(
+    filteredGoals,
+    transactions,
+    timeZone
+  )
+
+  const inflowTransactions = useMemo(
+    () => transactions.filter((t) => t.type === "inflow"),
+    [transactions]
+  )
 
   return (
     <>
-      <Card className="flex-1 overflow-auto">
-        <CardContent className="h-full">
+      <Card>
+        <CardContent>
           {filteredGoals.length === 0 ? (
-            <Empty className="h-full border">
-              <EmptyHeader>
-                <EmptyMedia variant="icon">
-                  <TargetIcon />
-                </EmptyMedia>
-                <EmptyTitle>{t("No goals found")}</EmptyTitle>
-                <EmptyDescription>
-                  {goals.length === 0
-                    ? t("You haven't created any goals yet.")
-                    : t("No goals found matching your filters.")}
-                </EmptyDescription>
-              </EmptyHeader>
-            </Empty>
+            <EmptyState
+              icon={<TargetIcon />}
+              title={t("No goals found")}
+              description={
+                goals.length === 0
+                  ? t("You haven't created any goals yet.")
+                  : t("No goals found matching your filters.")
+              }
+            />
           ) : (
-            <div className="table-wrapper">
+            <div className="flex h-full flex-col gap-3">
+              <UnconvertedTransactionsAlert transactions={inflowTransactions} />
               <Table>
-                <TableHeader className="bg-muted sticky top-0 z-1">
+                <TableHeader>
                   <TableRow className="[&>th]:text-center">
                     <TableHead>{t("Start Date")}</TableHead>
                     <TableHead>{t("End Date")}</TableHead>
@@ -101,7 +104,7 @@ export function GoalsTable({ filteredGoals }: GoalsTableProps) {
                     <TableRow key={goal._id} className="[&>td]:text-center">
                       <TableCell>{formatDate(goal.startDate)}</TableCell>
                       <TableCell>{formatDate(goal.endDate)}</TableCell>
-                      <TableCell className="font-medium">{goal.name}</TableCell>
+                      <TableCell>{goal.name}</TableCell>
                       <TableCell>
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -153,11 +156,7 @@ export function GoalsTable({ filteredGoals }: GoalsTableProps) {
                       <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button
-                              className="dark:hover:bg-input/50"
-                              variant="ghost"
-                              size="icon"
-                            >
+                            <Button variant="ghost" size="icon">
                               <MoreVerticalIcon />
                               <span className="sr-only">{t("Open menu")}</span>
                             </Button>
@@ -165,14 +164,12 @@ export function GoalsTable({ filteredGoals }: GoalsTableProps) {
                           <DropdownMenuContent>
                             <DropdownMenuItem asChild>
                               <Link
-                                href={`/transactions?from=${goal.startDate.toISOString()}&to=${goal.endDate.toISOString()}&category=${goal.categoryKey}`}
-                                className="cursor-pointer"
+                                href={`/transactions?from=${serializeUTCDate(goal.startDate)}&to=${serializeUTCDate(goal.endDate)}&type=inflow&category=${goal.categoryKey}`}
                               >
                                 {t("View")}
                               </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              className="cursor-pointer"
                               onClick={() => {
                                 setSelectedGoal(goal)
                                 setIsEditOpen(true)
@@ -181,7 +178,6 @@ export function GoalsTable({ filteredGoals }: GoalsTableProps) {
                               {t("Edit")}
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              className="cursor-pointer"
                               variant="destructive"
                               onClick={() => {
                                 setSelectedGoal(goal)
@@ -204,17 +200,17 @@ export function GoalsTable({ filteredGoals }: GoalsTableProps) {
 
       {selectedGoal && (
         <>
-          <GoalDialog
-            key={selectedGoal._id + "GoalDialog"}
+          <GoalForm
+            key={selectedGoal._id + "GoalForm"}
             goal={selectedGoal}
-            open={isEditOpen}
-            setOpen={setIsEditOpen}
+            isOpen={isEditOpen}
+            setIsOpen={setIsEditOpen}
           />
-          <DeleteGoalDialog
-            key={selectedGoal._id + "DeleteGoalDialog"}
+          <DeleteGoal
+            key={selectedGoal._id + "DeleteGoal"}
             goalId={selectedGoal._id}
-            open={isDeleteOpen}
-            setOpen={setIsDeleteOpen}
+            isOpen={isDeleteOpen}
+            setIsOpen={setIsDeleteOpen}
           />
         </>
       )}

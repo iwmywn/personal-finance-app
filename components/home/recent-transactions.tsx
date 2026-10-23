@@ -6,18 +6,13 @@ import { useExtracted } from "next-intl"
 
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty"
 import { Separator } from "@/components/ui/separator"
-import { useTransactions } from "@/context/transactions-context"
+import { EmptyState } from "@/components/empty-state"
+import { useTransactions } from "@/contexts/transactions-context"
 import { useCategory } from "@/hooks/use-category"
 import { useFormatCurrency } from "@/hooks/use-format-currency"
 import { useFormatDate } from "@/hooks/use-format-date"
+import { getFlowColorClass } from "@/lib/utils"
 
 export function RecentTransactions() {
   const { transactions } = useTransactions()
@@ -28,30 +23,27 @@ export function RecentTransactions() {
   const formatCurrency = useFormatCurrency()
 
   return (
-    <Card className="overflow-hidden py-0 pb-6">
-      <CardHeader className="bg-card sticky top-0 pt-6">
-        <CardTitle>{t("Recent Transactions")}</CardTitle>
+    <Card>
+      <CardHeader className="sticky top-0 z-10 border-b">
+        <CardTitle className="text-sm tracking-wider uppercase">
+          {t("Recent Transactions")}
+        </CardTitle>
       </CardHeader>
-      <CardContent className="h-full max-h-90 overflow-y-auto md:max-h-none">
-        <div className="h-full space-y-4">
-          {recentTransactions.length === 0 ? (
-            <Empty className="h-full border">
-              <EmptyHeader>
-                <EmptyMedia variant="icon">
-                  <WalletIcon />
-                </EmptyMedia>
-                <EmptyTitle>{t("No transactions found")}</EmptyTitle>
-                <EmptyDescription>
-                  {t("You haven't created any transactions yet.")}
-                </EmptyDescription>
-              </EmptyHeader>
-            </Empty>
-          ) : (
-            recentTransactions.map((transaction, index) => (
-              <Fragment key={transaction._id}>
-                <div className="flex items-center justify-between">
-                  <div className="flex max-w-2/4 items-center space-x-3">
-                    <div className="flex flex-col gap-1">
+      <CardContent className="h-90 space-y-3 overflow-y-auto md:max-h-none">
+        {recentTransactions.length === 0 ? (
+          <EmptyState
+            className="h-full"
+            icon={<WalletIcon />}
+            title={t("No transactions found")}
+            description={t("You haven't created any transactions yet.")}
+          />
+        ) : (
+          recentTransactions.map((transaction, index) => (
+            <Fragment key={transaction._id}>
+              <div className="flex items-center justify-between py-1">
+                <div className="flex max-w-2/4 items-center space-x-3">
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
                       <Badge
                         className={
                           transaction.type === "inflow"
@@ -61,33 +53,29 @@ export function RecentTransactions() {
                       >
                         {getCategoryLabel(transaction.categoryKey)}
                       </Badge>
-                      <div className="text-sm wrap-anywhere">
-                        {transaction.description}
-                      </div>
-                      <div className="text-muted-foreground text-xs">
+                      <span className="text-secondary text-[11px]">
                         {formatDate(transaction.date)}
-                      </div>
+                      </span>
                     </div>
-                  </div>
-                  <div className="max-w-2/4 text-right">
-                    <div
-                      className={`text-sm wrap-anywhere ${
-                        transaction.type === "inflow"
-                          ? "text-green-600"
-                          : "text-red-600"
-                      }`}
-                    >
-                      {transaction.type === "inflow" ? "+" : "-"}
-                      {formatCurrency(transaction.amount)}
+                    <div className="text-sm wrap-anywhere">
+                      {transaction.description}
                     </div>
                   </div>
                 </div>
+                <div className="max-w-2/4 text-right">
+                  <div
+                    className={`text-sm wrap-anywhere ${getFlowColorClass(transaction.type)}`}
+                  >
+                    {transaction.type === "inflow" ? "+" : "-"}
+                    {formatCurrency(transaction.amount, transaction.currency)}
+                  </div>
+                </div>
+              </div>
 
-                {index !== recentTransactions.length - 1 && <Separator />}
-              </Fragment>
-            ))
-          )}
-        </div>
+              {index !== recentTransactions.length - 1 && <Separator />}
+            </Fragment>
+          ))
+        )}
       </CardContent>
     </Card>
   )

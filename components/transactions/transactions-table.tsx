@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { MoreVerticalIcon, WalletIcon } from "lucide-react"
+import { AlertCircleIcon, MoreVerticalIcon, WalletIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 
 import { Badge } from "@/components/ui/badge"
@@ -14,12 +14,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty"
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 import {
   Table,
   TableBody,
@@ -33,22 +33,32 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { DeleteTransactionDialog } from "@/components/transactions/delete-transaction-dialog"
-import { TransactionDialog } from "@/components/transactions/transaction-dialog"
-import { useTransactions } from "@/context/transactions-context"
+import { EmptyState } from "@/components/empty-state"
+import { DeleteTransaction } from "@/components/transactions/delete-transaction"
+import { ExportButton } from "@/components/transactions/export-button"
+import { TransactionForm } from "@/components/transactions/transaction-form"
+import { UnconvertedTransactionsAlert } from "@/components/transactions/unconverted-transactions-alert"
+import { useTransactions } from "@/contexts/transactions-context"
+import { useUser } from "@/contexts/user-context"
 import { useCategory } from "@/hooks/use-category"
 import { useFormatCurrency } from "@/hooks/use-format-currency"
 import { useFormatDate } from "@/hooks/use-format-date"
 import type { Transaction } from "@/lib/definitions"
+import { getFlowColorClass } from "@/lib/utils"
+
+const ITEMS_PER_PAGE = 10
 
 interface TransactionsTableProps {
   filteredTransactions: Transaction[]
+  filterKey?: string
 }
 
 export function TransactionsTable({
   filteredTransactions,
+  filterKey,
 }: TransactionsTableProps) {
   const { transactions } = useTransactions()
+  const { user } = useUser()
   const t = useExtracted()
   const { getCategoryLabel, getCategoryDescription } = useCategory()
   const formatDate = useFormatDate()
@@ -57,40 +67,65 @@ export function TransactionsTable({
     useState<Transaction | null>(null)
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false)
+  const [isCurrentPage, setIsCurrentPage] = useState<number>(1)
+  const [prevFilterKey, setPrevFilterKey] = useState<string | undefined>(
+    filterKey
+  )
+
+  const totalPages =
+    Math.ceil(filteredTransactions.length / ITEMS_PER_PAGE) || 1
+
+  if (filterKey !== undefined && prevFilterKey !== filterKey) {
+    setPrevFilterKey(filterKey)
+    setIsCurrentPage(1)
+  } else if (isCurrentPage > totalPages) {
+    setIsCurrentPage(totalPages)
+  }
+
+  const activePage = Math.min(Math.max(isCurrentPage, 1), totalPages)
+
+  const startIndex = (activePage - 1) * ITEMS_PER_PAGE
+  const paginatedTransactions = filteredTransactions.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE
+  )
 
   return (
     <>
-      <Card className="flex-1 overflow-auto">
-        <CardContent className="h-full">
+      <Card>
+        <CardContent>
           {filteredTransactions.length === 0 ? (
-            <Empty className="h-full border">
-              <EmptyHeader>
-                <EmptyMedia variant="icon">
-                  <WalletIcon />
-                </EmptyMedia>
-                <EmptyTitle>{t("No transactions found")}</EmptyTitle>
-                <EmptyDescription>
-                  {transactions.length === 0
-                    ? t("You haven't created any transactions yet.")
-                    : t("No transactions found matching your filters.")}
-                </EmptyDescription>
-              </EmptyHeader>
-            </Empty>
+            <EmptyState
+              icon={<WalletIcon />}
+              title={t("No transactions found")}
+              description={
+                transactions.length === 0
+                  ? t("You haven't created any transactions yet.")
+                  : t("No transactions found matching your filters.")
+              }
+            />
           ) : (
-            <div className="table-wrapper">
+            <div className="flex h-full flex-col gap-3">
+              <UnconvertedTransactionsAlert
+                transactions={filteredTransactions}
+              />
               <Table>
-                <TableHeader className="bg-muted sticky top-0 z-1">
+                <TableHeader>
                   <TableRow className="[&>th]:text-center">
                     <TableHead>{t("Date")}</TableHead>
                     <TableHead>{t("Description")}</TableHead>
                     <TableHead>{t("Type")}</TableHead>
                     <TableHead>{t("Category")}</TableHead>
                     <TableHead>{t("Amount")}</TableHead>
-                    <TableHead></TableHead>
+                    <TableHead>
+                      <ExportButton
+                        filteredTransactions={filteredTransactions}
+                      />
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredTransactions.map((transaction) => (
+                  {paginatedTransactions.map((transaction) => (
                     <TableRow
                       key={transaction._id.toString()}
                       className="[&>td]:text-center"
@@ -125,32 +160,41 @@ export function TransactionsTable({
                         </Tooltip>
                       </TableCell>
                       <TableCell className="min-w-38 wrap-anywhere whitespace-normal">
-                        <span
-                          className={`font-semibold ${
-                            transaction.type === "inflow"
-                              ? "text-green-600"
-                              : "text-red-600"
-                          }`}
-                        >
-                          {transaction.type === "inflow" ? "+" : "-"}
-                          {formatCurrency(transaction.amount)}
-                        </span>
+                        <div className="flex items-center justify-center gap-1.5">
+                          <span className={getFlowColorClass(transaction.type)}>
+                            {transaction.type === "inflow" ? "+" : "-"}
+                            {formatCurrency(
+                              transaction.amount,
+                              transaction.currency
+                            )}
+                          </span>
+                          {transaction.currency !== user.currency && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <span className="text-yellow inline-flex cursor-help items-center hover:opacity-80">
+                                  <AlertCircleIcon className="size-4 shrink-0" />
+                                  <span className="sr-only">
+                                    {t("Exchange rate pending")}
+                                  </span>
+                                </span>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {t("Exchange rate pending")}
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button
-                              className="dark:hover:bg-input/50"
-                              variant="ghost"
-                              size="icon"
-                            >
+                            <Button variant="ghost" size="icon">
                               <MoreVerticalIcon />
                               <span className="sr-only">{t("Open menu")}</span>
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent>
                             <DropdownMenuItem
-                              className="cursor-pointer"
                               onClick={() => {
                                 setSelectedTransaction(transaction)
                                 setIsEditOpen(true)
@@ -159,7 +203,6 @@ export function TransactionsTable({
                               {t("Edit")}
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              className="cursor-pointer"
                               variant="destructive"
                               onClick={() => {
                                 setSelectedTransaction(transaction)
@@ -175,6 +218,47 @@ export function TransactionsTable({
                   ))}
                 </TableBody>
               </Table>
+
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        if (activePage > 1) {
+                          setIsCurrentPage(activePage - 1)
+                        }
+                      }}
+                      aria-disabled={activePage <= 1}
+                      tabIndex={activePage <= 1 ? -1 : undefined}
+                      className={
+                        activePage <= 1
+                          ? "pointer-events-none opacity-50"
+                          : "cursor-pointer"
+                      }
+                    />
+                  </PaginationItem>
+                  <PaginationItem>
+                    <PaginationNext
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        if (activePage < totalPages) {
+                          setIsCurrentPage(activePage + 1)
+                        }
+                      }}
+                      aria-disabled={activePage >= totalPages}
+                      tabIndex={activePage >= totalPages ? -1 : undefined}
+                      className={
+                        activePage >= totalPages
+                          ? "pointer-events-none opacity-50"
+                          : "cursor-pointer"
+                      }
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
             </div>
           )}
         </CardContent>
@@ -182,17 +266,17 @@ export function TransactionsTable({
 
       {selectedTransaction && (
         <>
-          <TransactionDialog
-            key={selectedTransaction._id + "TransactionDialog"}
+          <TransactionForm
+            key={selectedTransaction._id + "TransactionForm"}
             transaction={selectedTransaction}
-            open={isEditOpen}
-            setOpen={setIsEditOpen}
+            isOpen={isEditOpen}
+            setIsOpen={setIsEditOpen}
           />
-          <DeleteTransactionDialog
-            key={selectedTransaction._id + "DeleteTransactionDialog"}
+          <DeleteTransaction
+            key={selectedTransaction._id + "DeleteTransaction"}
             transactionId={selectedTransaction._id}
-            open={isDeleteOpen}
-            setOpen={setIsDeleteOpen}
+            isOpen={isDeleteOpen}
+            setIsOpen={setIsDeleteOpen}
           />
         </>
       )}

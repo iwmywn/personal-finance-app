@@ -2,7 +2,7 @@
 
 import { useExtracted } from "next-intl"
 
-import { siteConfig } from "@/app/pffa.config"
+import { siteConfig } from "@/app/pfa.config"
 import {
   Sidebar,
   SidebarContent,
@@ -25,13 +25,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {...props}
     >
       <SidebarHeader>
-        <SidebarMenuButton
-          size="lg"
-          tooltip={t("Personal & Family Finance App")}
-        >
+        <SidebarMenuButton size="lg" tooltip={t("Personal Finance App")}>
           <Logo loading="eager" />
-          <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-semibold">{siteConfig.name}</span>
+          <div className="grid flex-1 text-left leading-tight">
+            <span className="font-display text-primary truncate text-sm font-bold tracking-tight">
+              {siteConfig.name}
+            </span>
           </div>
         </SidebarMenuButton>
       </SidebarHeader>

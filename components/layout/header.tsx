@@ -1,6 +1,5 @@
 "use client"
 
-import dynamic from "next/dynamic"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { SlashIcon } from "lucide-react"
@@ -15,20 +14,8 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { ImpersonationIndicator } from "@/components/layout/impersonation-indicator"
-import { clientEnv } from "@/env/client"
+import { StopImpersonation } from "@/components/admin/stop-impersonation"
 import { useNav } from "@/hooks/use-nav"
-
-const ColorDialog =
-  clientEnv.NEXT_PUBLIC_NODE_ENV === "development"
-    ? dynamic(
-        () =>
-          import("@/components/layout/color-dialog").then(
-            (mod) => mod.ColorDialog
-          ),
-        { ssr: false }
-      )
-    : () => null
 
 export function Header() {
   const pathname = usePathname()
@@ -39,9 +26,9 @@ export function Header() {
   const foundItem = allNavItems.find((item) => item.url === pathname)
 
   return (
-    <header className="bg-primary-foreground sticky top-0 z-50 flex shrink-0 items-center justify-between py-2 backdrop-blur-xs backdrop-saturate-150">
-      <div className="flex items-center gap-2">
-        <SidebarTrigger className="-ml-1" />
+    <header className="bg-background/90 sticky top-0 z-50 flex shrink-0 items-center justify-between border-b py-2.5 backdrop-blur-xs backdrop-saturate-150">
+      <div className="flex items-center gap-3">
+        <SidebarTrigger className="hover:bg-primary hover:text-background border transition-colors" />
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -68,9 +55,8 @@ export function Header() {
           </BreadcrumbList>
         </Breadcrumb>
       </div>
-      <div className="flex items-center gap-2">
-        <ImpersonationIndicator />
-        <ColorDialog />
+      <div className="flex items-center gap-3">
+        <StopImpersonation />
       </div>
     </header>
   )

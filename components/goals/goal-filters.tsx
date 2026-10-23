@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { cn } from "cn"
 import { SearchIcon, XIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 
@@ -22,12 +23,12 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { GoalsTable } from "@/components/goals/goals-table"
-import { useGoals } from "@/context/goals-context"
-import { useTransactions } from "@/context/transactions-context"
+import { useGoals } from "@/contexts/goals-context"
+import { useTransactions } from "@/contexts/transactions-context"
 import { useCategory } from "@/hooks/use-category"
 import { useMonths } from "@/hooks/use-months"
+import { getUniqueDateRangeYears } from "@/lib/date"
 import { filterGoals } from "@/lib/filters"
-import { getUniqueYears } from "@/lib/utils"
 
 export function GoalFilters() {
   const { goals } = useGoals()
@@ -46,7 +47,7 @@ export function GoalFilters() {
   const { getCategoriesByType } = useCategory()
 
   const allMonths = useMonths()
-  const allYears = getUniqueYears(transactions)
+  const allYears = getUniqueDateRangeYears(goals)
 
   const hasActiveFilters =
     searchTerm !== "" ||
@@ -83,13 +84,17 @@ export function GoalFilters() {
       <Card>
         <CardContent>
           <div
-            className={`grid md:grid-cols-[1fr_1fr] md:grid-rows-3 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr] lg:grid-rows-2 2xl:grid-cols-[1fr_1fr_1fr_1fr_1fr] 2xl:grid-rows-2 ${
+            className={cn(
+              "grid gap-3 md:grid-cols-[1fr_1fr] md:grid-rows-3 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr] lg:grid-rows-2 2xl:grid-cols-[1fr_1fr_1fr_1fr_1fr] 2xl:grid-rows-2",
               hasActiveFilters &&
-              "md:grid-rows-3 lg:grid-rows-2 2xl:grid-cols-[1fr_1fr_1fr_1fr_1fr_auto]"
-            } gap-4`}
+                "md:grid-rows-3 lg:grid-rows-2 2xl:grid-cols-[1fr_1fr_1fr_1fr_1fr_auto]"
+            )}
           >
             <InputGroup
-              className={`col-span-full ${searchTerm !== "" && "border-primary"}`}
+              className={cn(
+                "col-span-full",
+                searchTerm !== "" && "border-primary"
+              )}
             >
               <InputGroupAddon>
                 <SearchIcon />
@@ -113,7 +118,10 @@ export function GoalFilters() {
 
             <Select value={filterMonth} onValueChange={setFilterMonth}>
               <SelectTrigger
-                className={`w-full justify-between font-normal ${filterMonth !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full",
+                  filterMonth !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Month")} />
               </SelectTrigger>
@@ -132,7 +140,10 @@ export function GoalFilters() {
 
             <Select value={filterYear} onValueChange={setFilterYear}>
               <SelectTrigger
-                className={`w-full ${filterYear !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full",
+                  filterYear !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Year")} />
               </SelectTrigger>
@@ -154,7 +165,10 @@ export function GoalFilters() {
               onValueChange={setFilterCategoryKey}
             >
               <SelectTrigger
-                className={`w-full ${filterCategoryKey !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full",
+                  filterCategoryKey !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Category")} />
               </SelectTrigger>
@@ -176,7 +190,10 @@ export function GoalFilters() {
               ) => setFilterProgress(value)}
             >
               <SelectTrigger
-                className={`w-full ${filterProgress !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full",
+                  filterProgress !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Progress")} />
               </SelectTrigger>
@@ -199,7 +216,10 @@ export function GoalFilters() {
               ) => setFilterStatus(value)}
             >
               <SelectTrigger
-                className={`w-full ${filterStatus !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full",
+                  filterStatus !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Status")} />
               </SelectTrigger>
@@ -207,9 +227,9 @@ export function GoalFilters() {
                 <SelectGroup>
                   <SelectItem value="all">{t("All Statuses")}</SelectItem>
                   <SelectSeparator />
-                  <SelectItem value="expired">{t("Expired")}</SelectItem>
                   <SelectItem value="active">{t("Active")}</SelectItem>
                   <SelectItem value="upcoming">{t("Upcoming")}</SelectItem>
+                  <SelectItem value="expired">{t("Expired")}</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>

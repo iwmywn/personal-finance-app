@@ -1,17 +1,12 @@
+import { Suspense } from "react"
 import type { Metadata } from "next"
 import Link from "next/link"
+import { connection } from "next/server"
 import { GhostIcon } from "lucide-react"
 import { getExtracted } from "next-intl/server"
 
 import { Button } from "@/components/ui/button"
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty"
+import { EmptyState } from "@/components/empty-state"
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getExtracted()
@@ -21,25 +16,30 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
+async function DynamicMarker() {
+  await connection()
+  return null
+}
+
 export default async function page() {
   const t = await getExtracted()
 
   return (
-    <Empty className="h-full border">
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <GhostIcon />
-        </EmptyMedia>
-        <EmptyTitle>{t("Page not found")}</EmptyTitle>
-        <EmptyDescription>
-          {t("The page you are looking for does not exist.")}
-        </EmptyDescription>
-      </EmptyHeader>
-      <EmptyContent>
-        <Button asChild>
-          <Link href="/home">{t("Back to Home")}</Link>
-        </Button>
-      </EmptyContent>
-    </Empty>
+    <>
+      <EmptyState
+        className="mt-3"
+        icon={<GhostIcon />}
+        title={t("Page not found")}
+        description={t("The page you are looking for does not exist.")}
+        action={
+          <Button asChild>
+            <Link href="/home">{t("Back to Home")}</Link>
+          </Button>
+        }
+      />
+      <Suspense>
+        <DynamicMarker />
+      </Suspense>
+    </>
   )
 }

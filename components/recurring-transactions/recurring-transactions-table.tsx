@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { MoreVerticalIcon, RepeatIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 
@@ -15,13 +15,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty"
-import {
   Table,
   TableBody,
   TableCell,
@@ -34,14 +27,14 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { DeleteRecurringTransactionDialog } from "@/components/recurring-transactions/delete-recurring-transaction-dialog"
-import { RecurringTransactionDialog } from "@/components/recurring-transactions/recurring-transaction-dialog"
-import { useRecurring } from "@/context/recurring-context"
+import { EmptyState } from "@/components/empty-state"
+import { DeleteRecurringTransaction } from "@/components/recurring-transactions/delete-recurring-transaction"
+import { useRecurring } from "@/contexts/recurring-context"
 import { useCategory } from "@/hooks/use-category"
 import { useFormatCurrency } from "@/hooks/use-format-currency"
 import { useFormatDate } from "@/hooks/use-format-date"
+import { localDateToUTCMidnight } from "@/lib/date"
 import type { RecurringTransaction } from "@/lib/definitions"
-import { localDateToUTCMidnight } from "@/lib/utils"
 
 interface RecurringTableProps {
   filteredRecurring: RecurringTransaction[]
@@ -53,12 +46,12 @@ export function RecurringTransactionsTable({
   const { recurringTransactions } = useRecurring()
   const [selectedRecurring, setSelectedRecurring] =
     useState<RecurringTransaction | null>(null)
-  const [isEditOpen, setIsEditOpen] = useState<boolean>(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false)
   const t = useExtracted()
   const { getCategoryLabel, getCategoryDescription } = useCategory()
   const formatDate = useFormatDate()
   const formatCurrency = useFormatCurrency()
+  const todayUTC = useMemo(() => localDateToUTCMidnight(new Date()), [])
 
   const getFrequencyLabel = (frequency: RecurringTransaction["frequency"]) => {
     switch (frequency) {
@@ -83,42 +76,46 @@ export function RecurringTransactionsTable({
 
   return (
     <>
-      <Card className="flex-1 overflow-auto">
-        <CardContent className="h-full">
+      <Card>
+        <CardContent>
           {filteredRecurring.length === 0 ? (
-            <Empty className="h-full border">
-              <EmptyHeader>
-                <EmptyMedia variant="icon">
-                  <RepeatIcon />
-                </EmptyMedia>
-                <EmptyTitle>{t("No recurring transactions found")}</EmptyTitle>
-                <EmptyDescription>
-                  {recurringTransactions.length === 0
-                    ? t("You haven't created any recurring transactions yet.")
-                    : t(
-                        "No recurring transactions found matching your filters."
-                      )}
-                </EmptyDescription>
-              </EmptyHeader>
-            </Empty>
+            <EmptyState
+              icon={<RepeatIcon />}
+              title={t("No recurring transactions found")}
+              description={
+                recurringTransactions.length === 0
+                  ? t("You haven't created any recurring transactions yet.")
+                  : t("No recurring transactions found matching your filters.")
+              }
+            />
           ) : (
-            <div className="table-wrapper">
-              <Table>
-                <TableHeader className="bg-muted sticky top-0 z-1">
-                  <TableRow className="[&>th]:text-center">
-                    <TableHead>{t("Start Date")}</TableHead>
-                    <TableHead>{t("End Date")}</TableHead>
-                    <TableHead>{t("Description")}</TableHead>
-                    <TableHead>{t("Type")}</TableHead>
-                    <TableHead>{t("Category")}</TableHead>
-                    <TableHead>{t("Amount")}</TableHead>
-                    <TableHead>{t("Frequency")}</TableHead>
-                    <TableHead>{t("Status")}</TableHead>
-                    <TableHead></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredRecurring.map((recurring) => (
+            <Table>
+              <TableHeader>
+                <TableRow className="[&>th]:text-center">
+                  <TableHead>{t("Start Date")}</TableHead>
+                  <TableHead>{t("End Date")}</TableHead>
+                  <TableHead>{t("Description")}</TableHead>
+                  <TableHead>{t("Type")}</TableHead>
+                  <TableHead>{t("Category")}</TableHead>
+                  <TableHead>{t("Amount")}</TableHead>
+                  <TableHead>{t("Frequency")}</TableHead>
+                  <TableHead>{t("Status")}</TableHead>
+                  <TableHead></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredRecurring.map((recurring) => {
+                  const isUpcoming = Boolean(
+                    recurring.startDate &&
+                    new Date(recurring.startDate) > todayUTC
+                  )
+                  const isEnded = Boolean(
+                    recurring.endDate && todayUTC > new Date(recurring.endDate)
+                  )
+
+                  const nextDate = getNextDate(recurring, todayUTC)
+
+                  return (
                     <TableRow
                       key={recurring._id}
                       className="[&>td]:text-center"
@@ -155,26 +152,24 @@ export function RecurringTransactionsTable({
                           </TooltipContent>
                         </Tooltip>
                       </TableCell>
-                      <TableCell>{formatCurrency(recurring.amount)}</TableCell>
+                      <TableCell>
+                        {formatCurrency(recurring.amount, recurring.currency)}
+                      </TableCell>
                       <TableCell>
                         <div className="flex flex-col gap-1">
                           <span>{getFrequencyLabel(recurring.frequency)}</span>
                           {recurring.frequency === "random" ? (
-                            <span className="text-muted-foreground text-xs">
+                            <span className="text-secondary text-xs">
                               {t("Every {days} days", {
-                                days: recurring.randomEveryXDays!.toString(),
+                                days:
+                                  recurring.randomEveryXDays?.toString() ?? "—",
                               })}
                             </span>
                           ) : null}
-                          {recurring.isActive ? (
-                            <span className="text-muted-foreground text-xs">
+                          {!isEnded && nextDate ? (
+                            <span className="text-secondary text-xs">
                               {t("Next: {date}", {
-                                date: formatDate(
-                                  getNextDate(
-                                    recurring,
-                                    localDateToUTCMidnight(new Date())
-                                  )
-                                ),
+                                date: formatDate(nextDate),
                               })}
                             </span>
                           ) : null}
@@ -183,36 +178,30 @@ export function RecurringTransactionsTable({
                       <TableCell>
                         <Badge
                           className={
-                            recurring.isActive ? "badge-green" : "badge-gray"
+                            isEnded
+                              ? "badge-gray"
+                              : isUpcoming
+                                ? "badge-yellow"
+                                : "badge-green"
                           }
                         >
-                          {recurring.isActive ? t("Active") : t("Inactive")}
+                          {isEnded
+                            ? t("Inactive")
+                            : isUpcoming
+                              ? t("Upcoming")
+                              : t("Active")}
                         </Badge>
                       </TableCell>
                       <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button
-                              className="dark:hover:bg-input/50"
-                              variant="ghost"
-                              size="icon"
-                            >
+                            <Button variant="ghost" size="icon">
                               <MoreVerticalIcon />
                               <span className="sr-only">{t("Open menu")}</span>
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent>
                             <DropdownMenuItem
-                              className="cursor-pointer"
-                              onClick={() => {
-                                setSelectedRecurring(recurring)
-                                setIsEditOpen(true)
-                              }}
-                            >
-                              {t("Edit")}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="cursor-pointer"
                               variant="destructive"
                               onClick={() => {
                                 setSelectedRecurring(recurring)
@@ -225,29 +214,21 @@ export function RecurringTransactionsTable({
                         </DropdownMenu>
                       </TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                  )
+                })}
+              </TableBody>
+            </Table>
           )}
         </CardContent>
       </Card>
 
       {selectedRecurring && (
-        <>
-          <RecurringTransactionDialog
-            key={selectedRecurring._id + "RecurringDialog"}
-            recurring={selectedRecurring}
-            open={isEditOpen}
-            setOpen={setIsEditOpen}
-          />
-          <DeleteRecurringTransactionDialog
-            key={selectedRecurring._id + "DeleteRecurringDialog"}
-            recurringId={selectedRecurring._id}
-            open={isDeleteOpen}
-            setOpen={setIsDeleteOpen}
-          />
-        </>
+        <DeleteRecurringTransaction
+          key={selectedRecurring._id + "DeleteRecurringTransaction"}
+          recurringId={selectedRecurring._id}
+          isOpen={isDeleteOpen}
+          setIsOpen={setIsDeleteOpen}
+        />
       )}
     </>
   )

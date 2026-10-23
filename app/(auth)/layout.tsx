@@ -1,18 +1,15 @@
 import { Suspense } from "react"
-import { getLocale } from "next-intl/server"
 
 import { ReCaptchaProvider } from "@/components/layout/recaptcha-provider"
 import { Logo } from "@/components/logo"
 
-export default async function AuthLayout({
+export default function AuthLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const locale = await getLocale()
-
   return (
-    <ReCaptchaProvider language={locale}>
+    <ReCaptchaProvider>
       <main className="flex min-h-screen items-center justify-center overflow-hidden p-6 md:p-10">
         <div className="w-full max-w-sm">
           <Suspense

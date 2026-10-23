@@ -1,9 +1,10 @@
+import Decimal from "decimal.js"
 import * as z from "zod"
 
-import { CATEGORIES } from "@/lib/category"
-import { CURRENCIES } from "@/lib/currency"
+import { CATEGORY_TYPES } from "@/lib/category"
+import { CURRENCIES, CURRENCY_CONFIG } from "@/lib/currency"
+import { normalizeToUTCMidnight, parseToUTCMidnight } from "@/lib/date"
 import { ASSIGNABLE_ROLES } from "@/lib/role"
-import { localDateToUTCMidnight } from "@/lib/utils"
 import type { SchemaMessages } from "@/schemas/messages"
 
 export function buildSchemas(messages: SchemaMessages) {
@@ -27,17 +28,78 @@ export function buildSchemas(messages: SchemaMessages) {
     z
       .string()
       .min(1, { message: messages.amountRequired })
-      .regex(/^\d+(\.\d+)?$/, {
+      .regex(/^\d+(\.\d{1,2})?$/, {
         message: messages.amountInvalidNumber,
       })
-      .transform((val) => parseFloat(val))
-      .refine((num) => num >= 0.01, {
-        message: messages.amountMin,
-      })
-      .refine((num) => num <= 100000000000, {
-        message: messages.amountMax,
-      })
-      .transform((num) => num.toString())
+      .refine(
+        (val) => {
+          try {
+            return new Decimal(val).gte("0.01")
+          } catch {
+            return false
+          }
+        },
+        { message: messages.amountMin }
+      )
+      .refine(
+        (val) => {
+          try {
+            return new Decimal(val).lte("1_000_000_000_000")
+          } catch {
+            return false
+          }
+        },
+        { message: messages.amountMax }
+      )
+      .transform((val) => new Decimal(val).toString())
+
+  const validateAmountForCurrency = (
+    currency: (typeof CURRENCIES)[number],
+    amount: string,
+    fieldPath: string,
+    ctx: z.RefinementCtx
+  ) => {
+    const decimals = CURRENCY_CONFIG[currency].decimals
+    try {
+      const dec = new Decimal(amount)
+      if (decimals === 0) {
+        if (!dec.isInteger()) {
+          ctx.addIssue({
+            path: [fieldPath],
+            message: messages.amountInvalidNumber,
+            code: "custom",
+          })
+          return
+        }
+        if (dec.lt(1)) {
+          ctx.addIssue({
+            path: [fieldPath],
+            message: messages.amountMin,
+            code: "custom",
+          })
+        }
+      } else if (dec.decimalPlaces() > decimals) {
+        ctx.addIssue({
+          path: [fieldPath],
+          message: messages.amountInvalidNumber,
+          code: "custom",
+        })
+      }
+    } catch {
+      // Handled by baseAmount
+    }
+  }
+
+  const baseDateSchema = (requiredMessage: string) =>
+    z
+      .date({ message: requiredMessage })
+      .transform((date) => parseToUTCMidnight(date) ?? date)
+
+  const baseOptionalDateSchema = () =>
+    z
+      .date()
+      .transform((date) => parseToUTCMidnight(date) ?? date)
+      .optional()
 
   const createSignInSchema = () =>
     z.object({
@@ -92,7 +154,7 @@ export function buildSchemas(messages: SchemaMessages) {
         .string()
         .min(1, { message: messages.nameRequired })
         .max(100, { message: messages.nameMaxLength })
-        .regex(/^[\p{L}\s]+$/u, {
+        .regex(/^[\p{L}\s'-]+$/u, {
           message: messages.nameLettersOnly,
         }),
     })
@@ -103,42 +165,58 @@ export function buildSchemas(messages: SchemaMessages) {
     })
 
   const createTransactionSchema = () =>
-    z.object({
-      type: z.enum(CATEGORIES, {
-        message: messages.transactionTypeRequired,
-      }),
-      categoryKey: z.string().min(1, { message: messages.categoryRequired }),
-      currency: z.enum(CURRENCIES, {
-        message: messages.currencyRequired,
-      }),
-      amount: baseAmount(),
-      description: z
-        .string()
-        .min(1, {
-          message: messages.descriptionRequired,
-        })
-        .max(200, {
-          message: messages.descriptionMaxLength,
+    z
+      .object({
+        type: z.enum(CATEGORY_TYPES, {
+          message: messages.transactionTypeRequired,
         }),
-      date: z.date({
-        message: messages.dateRequired,
-      }),
-    })
+        categoryKey: z.string().min(1, { message: messages.categoryRequired }),
+        currency: z.enum(CURRENCIES, {
+          message: messages.currencyRequired,
+        }),
+        amount: baseAmount(),
+        description: z
+          .string()
+          .trim()
+          .min(1, {
+            message: messages.descriptionRequired,
+          })
+          .max(200, {
+            message: messages.descriptionMaxLength,
+          }),
+        date: baseDateSchema(messages.dateRequired).refine(
+          (date) => {
+            // Allow up to UTC+14 (e.g., Kiribati / Line Islands) so users in the easternmost
+            // timezones recording transactions on their local "today" are not falsely flagged as future dates.
+            const maxAllowedMidnight = normalizeToUTCMidnight(
+              new Date(Date.now() + 14 * 60 * 60 * 1000)
+            )
+            return date.getTime() <= maxAllowedMidnight.getTime()
+          },
+          {
+            message: messages.dateCannotBeInFuture,
+          }
+        ),
+      })
+      .superRefine((data, ctx) => {
+        validateAmountForCurrency(data.currency, data.amount, "amount", ctx)
+      })
 
   const createCategorySchema = () =>
     z.object({
-      categoryKey: z.string().optional(),
-      type: z.enum(CATEGORIES, {
+      type: z.enum(CATEGORY_TYPES, {
         message: messages.typeRequired,
       }),
       label: z
         .string()
+        .trim()
         .min(1, { message: messages.categoryNameRequired })
         .max(50, {
           message: messages.categoryNameMaxLength,
         }),
       description: z
         .string()
+        .trim()
         .min(1, { message: messages.descriptionRequired })
         .max(200, {
           message: messages.descriptionMaxLength,
@@ -153,14 +231,16 @@ export function buildSchemas(messages: SchemaMessages) {
           message: messages.currencyRequired,
         }),
         allocatedAmount: baseAmount(),
-        startDate: z.date({
-          message: messages.startDateRequired,
-        }),
-        endDate: z.date({
-          message: messages.endDateRequired,
-        }),
+        startDate: baseDateSchema(messages.startDateRequired),
+        endDate: baseDateSchema(messages.endDateRequired),
       })
       .superRefine((data, ctx) => {
+        validateAmountForCurrency(
+          data.currency,
+          data.allocatedAmount,
+          "allocatedAmount",
+          ctx
+        )
         if (data.endDate <= data.startDate) {
           ctx.addIssue({
             path: ["endDate"],
@@ -175,6 +255,7 @@ export function buildSchemas(messages: SchemaMessages) {
       .object({
         name: z
           .string()
+          .trim()
           .min(1, { message: messages.goalNameRequired })
           .max(100, {
             message: messages.goalNameMaxLength,
@@ -184,14 +265,16 @@ export function buildSchemas(messages: SchemaMessages) {
           message: messages.currencyRequired,
         }),
         targetAmount: baseAmount(),
-        startDate: z.date({
-          message: messages.startDateRequired,
-        }),
-        endDate: z.date({
-          message: messages.endDateRequired,
-        }),
+        startDate: baseDateSchema(messages.startDateRequired),
+        endDate: baseDateSchema(messages.endDateRequired),
       })
       .superRefine((data, ctx) => {
+        validateAmountForCurrency(
+          data.currency,
+          data.targetAmount,
+          "targetAmount",
+          ctx
+        )
         if (data.endDate <= data.startDate) {
           ctx.addIssue({
             path: ["endDate"],
@@ -204,7 +287,7 @@ export function buildSchemas(messages: SchemaMessages) {
   const createRecurringTransactionSchema = () =>
     z
       .object({
-        type: z.enum(CATEGORIES, {
+        type: z.enum(CATEGORY_TYPES, {
           message: messages.typeRequired,
         }),
         categoryKey: z.string().min(1, { message: messages.categoryRequired }),
@@ -214,6 +297,7 @@ export function buildSchemas(messages: SchemaMessages) {
         amount: baseAmount(),
         description: z
           .string()
+          .trim()
           .min(1, {
             message: messages.descriptionRequired,
           })
@@ -243,31 +327,37 @@ export function buildSchemas(messages: SchemaMessages) {
             message: messages.randomDaysMax,
           })
           .optional(),
-        startDate: z.date({
-          message: messages.startDateRequired,
-        }),
-        endDate: z.date().optional(),
-        lastGenerated: z.date().optional(),
-        isActive: z.boolean(),
+        startDate: baseDateSchema(messages.startDateRequired),
+        endDate: baseOptionalDateSchema(),
       })
       .superRefine((data, ctx) => {
-        if (data.endDate && data.endDate <= data.startDate) {
+        validateAmountForCurrency(data.currency, data.amount, "amount", ctx)
+
+        // Allow down to UTC-12 (Anywhere on Earth / AoE) so users in westernmost
+        // timezones (e.g., UTC-8 to UTC-12) starting "today" in local evening are not falsely rejected as past dates.
+        const minAllowedMidnight = normalizeToUTCMidnight(
+          new Date(Date.now() + -12 * 60 * 60 * 1000)
+        )
+        if (data.startDate.getTime() < minAllowedMidnight.getTime()) {
           ctx.addIssue({
-            path: ["endDate"],
-            message: messages.endDateAfterStartDate,
+            path: ["startDate"],
+            message: messages.startDateMustBeInFuture,
             code: "custom",
           })
         }
 
-        if (
-          data.isActive &&
-          data.endDate &&
-          localDateToUTCMidnight(data.endDate) <
-            localDateToUTCMidnight(new Date())
-        ) {
+        if (data.frequency === "random" && !data.randomEveryXDays) {
           ctx.addIssue({
-            path: ["isActive"],
-            message: messages.expiredRecurringActivation,
+            path: ["randomEveryXDays"],
+            message: messages.randomDaysRequired,
+            code: "custom",
+          })
+        }
+
+        if (data.endDate && data.endDate <= data.startDate) {
+          ctx.addIssue({
+            path: ["endDate"],
+            message: messages.endDateAfterStartDate,
             code: "custom",
           })
         }
@@ -282,13 +372,6 @@ export function buildSchemas(messages: SchemaMessages) {
         .min(1, { message: messages.nameRequired })
         .max(100, { message: messages.nameMaxLength }),
       username: baseUsernameSchema(),
-      role: z.enum(ASSIGNABLE_ROLES, {
-        message: messages.roleRequired,
-      }),
-    })
-
-  const createAdminRoleSchema = () =>
-    z.object({
       role: z.enum(ASSIGNABLE_ROLES, {
         message: messages.roleRequired,
       }),
@@ -319,7 +402,6 @@ export function buildSchemas(messages: SchemaMessages) {
     createGoalSchema,
     createRecurringTransactionSchema,
     createAdminUserSchema,
-    createAdminRoleSchema,
     createAdminPasswordSchema,
     createAdminBanSchema,
   }

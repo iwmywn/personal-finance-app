@@ -4,42 +4,27 @@ import { useState } from "react"
 import { useExtracted } from "next-intl"
 
 import { Button } from "@/components/ui/button"
-import { ExportButton } from "@/components/transactions/export-button"
-import { TransactionDialog } from "@/components/transactions/transaction-dialog"
+import { PageLayout } from "@/components/layout/page-layout"
 import { TransactionFilters } from "@/components/transactions/transaction-filters"
-import type { Transaction } from "@/lib/definitions"
+import { TransactionForm } from "@/components/transactions/transaction-form"
 
 export default function TransactionsPage() {
   const [isOpen, setIsOpen] = useState<boolean>(false)
-  const [filteredTransactions, setFilteredTransactions] = useState<
-    Transaction[]
-  >([])
   const t = useExtracted()
 
   return (
     <>
-      <div className="page-content">
-        <div className="header">
-          <div>
-            <div className="title">{t("Transactions")}</div>
-            <div className="description">
-              {t(
-                "Manage cash inflows and outflows to track your personal finances."
-              )}
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <ExportButton filteredTransactions={filteredTransactions} />
-            <Button onClick={() => setIsOpen(true)}>{t("Add")}</Button>
-          </div>
-        </div>
+      <PageLayout
+        title={t("Transactions")}
+        description={t(
+          "Manage cash inflows and outflows to track your personal finances."
+        )}
+        action={<Button onClick={() => setIsOpen(true)}>{t("Add")}</Button>}
+      >
+        <TransactionFilters />
+      </PageLayout>
 
-        <TransactionFilters
-          onFilteredTransactionsChange={setFilteredTransactions}
-        />
-      </div>
-
-      <TransactionDialog open={isOpen} setOpen={setIsOpen} />
+      <TransactionForm isOpen={isOpen} setIsOpen={setIsOpen} />
     </>
   )
 }

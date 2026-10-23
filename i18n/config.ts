@@ -3,16 +3,16 @@ import type { DayPickerLocale } from "react-day-picker/locale"
 
 export const LOCALES = ["en-US", "zh-CN", "ja-JP", "ko-KR", "vi-VN"] as const
 
-export type AppLocale = (typeof LOCALES)[number]
+export type Locale = (typeof LOCALES)[number]
 
 // Default UI locale displayed to the user (fallback locale)
-export const DEFAULT_LOCALE: AppLocale = "vi-VN"
+export const DEFAULT_LOCALE: Locale = "vi-VN"
 
 // Source (base) locale used as reference in source code and translation dictionaries
-export const SOURCE_LOCALE: AppLocale = "en-US"
+export const SOURCE_LOCALE: Locale = "en-US"
 
 type LocaleConfigType = {
-  [K in AppLocale]: {
+  [K in Locale]: {
     dateLocale: DayPickerLocale
     displayName: string
   }

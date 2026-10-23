@@ -4,8 +4,9 @@ import { useState } from "react"
 import { useExtracted } from "next-intl"
 
 import { Button } from "@/components/ui/button"
-import { RecurringTransactionDialog } from "@/components/recurring-transactions/recurring-transaction-dialog"
-import { RecurringTransactionsFilters } from "@/components/recurring-transactions/recurring-transactions-filters"
+import { PageLayout } from "@/components/layout/page-layout"
+import { RecurringTransactionFilters } from "@/components/recurring-transactions/recurring-transaction-filters"
+import { RecurringTransactionForm } from "@/components/recurring-transactions/recurring-transaction-form"
 
 export default function RecurringTransactionsPage() {
   const [isOpen, setIsOpen] = useState<boolean>(false)
@@ -13,21 +14,15 @@ export default function RecurringTransactionsPage() {
 
   return (
     <>
-      <div className="page-content">
-        <div className="header">
-          <div>
-            <div className="title">{t("Recurring")}</div>
-            <div className="description">
-              {t("Manage your recurring transactions.")}
-            </div>
-          </div>
-          <Button onClick={() => setIsOpen(true)}>{t("Add")}</Button>
-        </div>
+      <PageLayout
+        title={t("Recurring")}
+        description={t("Manage your recurring transactions.")}
+        action={<Button onClick={() => setIsOpen(true)}>{t("Add")}</Button>}
+      >
+        <RecurringTransactionFilters />
+      </PageLayout>
 
-        <RecurringTransactionsFilters />
-      </div>
-
-      <RecurringTransactionDialog open={isOpen} setOpen={setIsOpen} />
+      <RecurringTransactionForm isOpen={isOpen} setIsOpen={setIsOpen} />
     </>
   )
 }
