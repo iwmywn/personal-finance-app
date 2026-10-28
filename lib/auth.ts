@@ -92,6 +92,8 @@ export const auth = betterAuth({
     modelName: "rateLimits",
     storage: "database",
     enabled: clientEnv.NEXT_PUBLIC_NODE_ENV === "production",
+    window: 60,
+    max: 60,
     customRules: {
       "/sign-in/username": {
         window: 60,
