@@ -10,6 +10,14 @@ import { renderWithProviders } from "@/tests/frontend/helpers/test-providers"
 import { TwoFactorForm } from "@/components/auth/two-factor-form"
 import { authClient } from "@/lib/auth-client"
 
+const mockExecuteRecaptcha = vi.fn().mockResolvedValue("mock-captcha-token")
+
+vi.mock("react-google-recaptcha-v3", () => ({
+  useGoogleReCaptcha: () => ({
+    executeRecaptcha: mockExecuteRecaptcha,
+  }),
+}))
+
 vi.mock("@/lib/auth-client", () => ({
   authClient: {
     twoFactor: {
@@ -26,6 +34,7 @@ vi.mock("@/i18n/locale", () => ({
 describe("TwoFactorForm", () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockExecuteRecaptcha.mockResolvedValue("mock-captcha-token")
   })
 
   it("should render 2FA code input and trust device checkbox", () => {
@@ -61,7 +70,7 @@ describe("TwoFactorForm", () => {
     expect(authClient.twoFactor.verifyTotp).not.toHaveBeenCalled()
   })
 
-  it("should call verifyTotp with code and trustDevice checkbox value", async () => {
+  it("should call verifyTotp and trigger captcha on valid submit", async () => {
     const user = userEvent.setup()
     vi.mocked(authClient.twoFactor.verifyTotp).mockImplementationOnce(
       mockAuthSuccess()
@@ -79,10 +88,14 @@ describe("TwoFactorForm", () => {
     await user.click(submitBtn)
 
     await waitFor(() => {
+      expect(mockExecuteRecaptcha).toHaveBeenCalledWith("two_factor")
       expect(authClient.twoFactor.verifyTotp).toHaveBeenCalledWith(
         expect.objectContaining({
           code: "123456",
           trustDevice: true,
+          fetchOptions: expect.objectContaining({
+            headers: { "x-captcha-response": "mock-captcha-token" },
+          }),
         })
       )
     })
