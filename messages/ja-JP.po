@@ -1085,6 +1085,7 @@ msgid "You will need to sign in again to access your account."
 msgstr "アカウントにアクセスするには、再度サインインする必要があります。"
 
 #: components/auth/signin-form.tsx
+#: components/auth/two-factor-form.tsx
 msgctxt "ExP2LI"
 msgid "CAPTCHA verification failed! Please try again later."
 msgstr "CAPTCHA認証に失敗しました！後でもう一度お試しください。"

@@ -4,6 +4,7 @@ import type { Route } from "next"
 import { useRouter, useSearchParams } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useExtracted } from "next-intl"
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
@@ -44,13 +45,24 @@ export function TwoFactorForm() {
     resolver: zodResolver(createTwoFactorCodeSchema()),
     defaultValues: { code: "", trustDevice: false },
   })
+  const { executeRecaptcha } = useGoogleReCaptcha()
 
   async function onSubmit(values: TwoFactorCodeFormValues) {
     try {
+      if (!executeRecaptcha) {
+        toast.error(t("CAPTCHA verification failed! Please try again later."))
+        return
+      }
+
+      const token = await executeRecaptcha("two_factor")
+
       await authClient.twoFactor.verifyTotp({
         code: values.code,
         trustDevice: values.trustDevice,
         fetchOptions: {
+          headers: {
+            "x-captcha-response": token,
+          },
           onError: (ctx) => {
             const callbackUrl = getSafeCallbackUrl(searchParams.get("next"))
             const signInUrl: Route = searchParams.has("next")
