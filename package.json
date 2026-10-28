@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "@better-auth/mongo-adapter": "1.7.14",
-    "@hookform/resolvers": "6.0.0",
+    "@hookform/resolvers": "6.0.1",
     "@t3-oss/env-nextjs": "0.13.11",
     "better-auth": "1.7.14",
     "class-variance-authority": "0.7.1",
