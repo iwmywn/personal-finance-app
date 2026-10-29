@@ -2729,6 +2729,11 @@ msgid "December"
 msgstr "December"
 
 #: schemas/messages.ts
+msgctxt "uiFoFm"
+msgid "Password is required"
+msgstr "Password is required"
+
+#: schemas/messages.ts
 msgctxt "MsWwGp"
 msgid "Password must have at least 8 characters, including uppercase, lowercase, number and special character."
 msgstr "Password must have at least 8 characters, including uppercase, lowercase, number and special character."

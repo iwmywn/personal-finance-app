@@ -2729,6 +2729,11 @@ msgid "December"
 msgstr "Tháng 12"
 
 #: schemas/messages.ts
+msgctxt "uiFoFm"
+msgid "Password is required"
+msgstr "Mật khẩu là bắt buộc"
+
+#: schemas/messages.ts
 msgctxt "MsWwGp"
 msgid "Password must have at least 8 characters, including uppercase, lowercase, number and special character."
 msgstr "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt."

@@ -2729,6 +2729,11 @@ msgid "December"
 msgstr "十二月"
 
 #: schemas/messages.ts
+msgctxt "uiFoFm"
+msgid "Password is required"
+msgstr "必须填写密码"
+
+#: schemas/messages.ts
 msgctxt "MsWwGp"
 msgid "Password must have at least 8 characters, including uppercase, lowercase, number and special character."
 msgstr "密码必须至少包含 8 个字符，包括大写字母、小写字母、数字和特殊字符。"

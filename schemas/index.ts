@@ -11,6 +11,7 @@ export function buildSchemas(messages: SchemaMessages) {
   const basePasswordSchema = () =>
     z
       .string()
+      .min(1, { message: messages.passwordRequired })
       .regex(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/, {
         message: messages.passwordFormat,
       })
