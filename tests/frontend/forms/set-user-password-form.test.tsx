@@ -76,7 +76,7 @@ describe("SetUserPasswordForm", () => {
     await user.click(saveBtn)
 
     await waitFor(() => {
-      expect(screen.getByText(/password must have/i)).toBeInTheDocument()
+      expect(screen.getByText(/password is required/i)).toBeInTheDocument()
     })
     expect(authClient.admin.setUserPassword).not.toHaveBeenCalled()
   })
