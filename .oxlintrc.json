@@ -39,10 +39,8 @@
   "ignorePatterns": [
     "node_modules/**",
     ".next/**",
-    "out/**",
-    "dist/**",
-    "build/**",
-    "next-env.d.ts",
-    "coverage/**"
+    "coverage/**",
+    "pnpm-lock.yaml",
+    "next-env.d.ts"
   ]
 }

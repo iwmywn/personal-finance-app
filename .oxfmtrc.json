@@ -40,11 +40,10 @@
     ]
   },
   "ignorePatterns": [
-    "dist",
-    "build",
-    ".next",
-    "node_modules",
-    "pnpm*.yaml",
-    "coverage"
+    "node_modules/**",
+    ".next/**",
+    "coverage/**",
+    "pnpm-lock.yaml",
+    "next-env.d.ts"
   ]
 }
