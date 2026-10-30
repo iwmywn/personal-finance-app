@@ -6,7 +6,7 @@ export async function getSchemaMessages() {
   const t = await getExtracted()
 
   return {
-    passwordRequired: t("Password is required"),
+    passwordRequired: t("Password is required."),
     passwordFormat: t(
       "Password must have at least 8 characters, including uppercase, lowercase, number and special character."
     ),

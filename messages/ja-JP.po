@@ -2729,9 +2729,9 @@ msgid "December"
 msgstr "12月"
 
 #: schemas/messages.ts
-msgctxt "uiFoFm"
-msgid "Password is required"
-msgstr "パスワードは必須です"
+msgctxt "pRvgsc"
+msgid "Password is required."
+msgstr "パスワードは必須です。"
 
 #: schemas/messages.ts
 msgctxt "MsWwGp"

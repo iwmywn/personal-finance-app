@@ -2729,9 +2729,9 @@ msgid "December"
 msgstr "Tháng 12"
 
 #: schemas/messages.ts
-msgctxt "uiFoFm"
-msgid "Password is required"
-msgstr "Mật khẩu là bắt buộc"
+msgctxt "pRvgsc"
+msgid "Password is required."
+msgstr "Mật khẩu là bắt buộc."
 
 #: schemas/messages.ts
 msgctxt "MsWwGp"
