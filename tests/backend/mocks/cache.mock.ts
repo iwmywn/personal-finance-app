@@ -12,5 +12,3 @@ vi.mock("next/cache", () => ({
     // no-op
   }),
 }))
-
-export {}

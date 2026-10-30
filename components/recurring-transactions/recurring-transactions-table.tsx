@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useState } from "react"
 import { MoreVerticalIcon, RepeatIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 
@@ -51,7 +51,7 @@ export function RecurringTransactionsTable({
   const { getCategoryLabel, getCategoryDescription } = useCategory()
   const formatDate = useFormatDate()
   const formatCurrency = useFormatCurrency()
-  const todayUTC = useMemo(() => localDateToUTCMidnight(new Date()), [])
+  const [todayUTC] = useState(() => localDateToUTCMidnight(new Date()))
 
   const getFrequencyLabel = (frequency: RecurringTransaction["frequency"]) => {
     switch (frequency) {

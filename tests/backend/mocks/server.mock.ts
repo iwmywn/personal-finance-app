@@ -16,5 +16,3 @@ vi.mock("next/server", async (importOriginal) => {
     }),
   }
 })
-
-export {}

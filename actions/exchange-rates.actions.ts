@@ -191,12 +191,12 @@ export async function convertTransactionsToCurrency(
 
   let minTimestamp = Infinity
   let maxTimestamp = -Infinity
-  const timestamps = new Array<number>(transactions.length)
+  const timestamps: number[] = []
   for (let i = 0; i < transactions.length; i++) {
     const time = normalizeToUTCMidnight(
       new Date(transactions[i].date)
     ).getTime()
-    timestamps[i] = time
+    timestamps.push(time)
     if (time < minTimestamp) minTimestamp = time
     if (time > maxTimestamp) maxTimestamp = time
   }

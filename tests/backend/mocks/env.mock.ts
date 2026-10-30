@@ -38,5 +38,3 @@ vi.mock("@/env/server", () => {
     },
   }
 })
-
-export {}

@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useState } from "react"
 import { cn } from "cn"
 import { SearchIcon, XIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
@@ -63,7 +63,7 @@ export function RecurringTransactionFilters() {
     setFilterCategoryKey("all")
   }
 
-  const todayUTC = useMemo(() => localDateToUTCMidnight(new Date()), [])
+  const [todayUTC] = useState(() => localDateToUTCMidnight(new Date()))
 
   const filteredRecurring = filterRecurringTransactions(recurringTransactions, {
     searchTerm,

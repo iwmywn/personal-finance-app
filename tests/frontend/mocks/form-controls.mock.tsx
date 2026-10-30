@@ -107,5 +107,3 @@ vi.mock("@/components/ui/calendar", () => ({
     </div>
   ),
 }))
-
-export {}
