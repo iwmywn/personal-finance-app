@@ -2,14 +2,14 @@ import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
 
-import { signInRoute } from "@/routes"
 import { getSession } from "@/actions/session.actions"
 import { siteConfig } from "@/app/pfa.config"
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
-import { TooltipProvider } from "@/components/ui/tooltip"
 import { AppSidebar } from "@/components/layout/app-sidebar"
 import { Header } from "@/components/layout/header"
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
+import { TooltipProvider } from "@/components/ui/tooltip"
 import { UserContext } from "@/contexts/user-context"
+import { signInRoute } from "@/routes"
 
 export default async function DashboardLayout({
   children,

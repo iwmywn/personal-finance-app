@@ -6,7 +6,8 @@ import type { CategoryKey, CategoryType } from "@/lib/category"
 import type { Currency } from "@/lib/currency"
 
 export type ActionResponse =
-  { error: string; success?: never } | { error?: never; success: string }
+  | { error: string; success?: never }
+  | { error?: never; success: string }
 
 export type AuthErrorCode = keyof (typeof auth)["$ERROR_CODES"]
 

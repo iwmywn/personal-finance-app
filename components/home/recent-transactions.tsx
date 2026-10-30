@@ -4,10 +4,10 @@ import { Fragment } from "react"
 import { WalletIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 
+import { EmptyState } from "@/components/empty-state"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { EmptyState } from "@/components/empty-state"
 import { useTransactions } from "@/contexts/transactions-context"
 import { useCategory } from "@/hooks/use-category"
 import { useFormatCurrency } from "@/hooks/use-format-currency"
@@ -53,7 +53,7 @@ export function RecentTransactions() {
                       >
                         {getCategoryLabel(transaction.categoryKey)}
                       </Badge>
-                      <span className="text-secondary text-[11px]">
+                      <span className="text-[11px] text-secondary">
                         {formatDate(transaction.date)}
                       </span>
                     </div>

@@ -42,7 +42,7 @@ export function TransactionSummary() {
       <div className="grid gap-3 md:grid-cols-3">
         <SummaryCard
           title={t("Monthly Inflow")}
-          icon={<ArrowUpIcon className="text-green size-4" />}
+          icon={<ArrowUpIcon className="size-4 text-green" />}
           value={formatCurrency(totalInflow)}
           valueClassName="text-green"
           description={`${inflowCount} ${t("transactions")}`}
@@ -50,7 +50,7 @@ export function TransactionSummary() {
 
         <SummaryCard
           title={t("Monthly Outflow")}
-          icon={<ArrowDownIcon className="text-red size-4" />}
+          icon={<ArrowDownIcon className="size-4 text-red" />}
           value={formatCurrency(totalOutflow)}
           valueClassName="text-red"
           description={`${outflowCount} ${t("transactions")}`}
@@ -60,9 +60,9 @@ export function TransactionSummary() {
           title={t("Monthly Balance")}
           icon={
             toDecimal(balance).greaterThanOrEqualTo(0) ? (
-              <TrendingUpIcon className="text-green size-4" />
+              <TrendingUpIcon className="size-4 text-green" />
             ) : (
-              <TrendingDownIcon className="text-red size-4" />
+              <TrendingDownIcon className="size-4 text-red" />
             )
           }
           value={formatCurrency(balance)}

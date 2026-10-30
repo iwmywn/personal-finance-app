@@ -2,14 +2,6 @@
 
 import { useExtracted } from "next-intl"
 
-import {
-  Card,
-  CardAction,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PageLayout } from "@/components/layout/page-layout"
 import { ActiveSessionsManager } from "@/components/settings/active-sessions-manager"
 import { ChangeNameForm } from "@/components/settings/change-name-form"
@@ -19,6 +11,14 @@ import { CurrencySelector } from "@/components/settings/currency-selector"
 import { LanguageSelector } from "@/components/settings/language-selector"
 import { ThemeSelector } from "@/components/settings/theme-selector"
 import { TwoFactorManager } from "@/components/settings/two-factor-manager"
+import {
+  Card,
+  CardAction,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function SettingsPage() {
   const t = useExtracted()

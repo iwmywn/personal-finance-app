@@ -59,7 +59,7 @@ export function QuickStats() {
                   <>
                     {currentMonthCount}
                     {unconvertedCount > 0 && (
-                      <span className="text-secondary text-xs">
+                      <span className="text-xs text-secondary">
                         {" "}
                         (+{unconvertedCount})
                       </span>
@@ -197,14 +197,15 @@ interface QuickStatsRowProps {
   valueClassName?: string
 }
 
-export function QuickStatsRow({
+function QuickStatsRow({
   title,
   value,
   valueClassName,
+  ...props
 }: QuickStatsRowProps) {
   return (
-    <div className="grid grid-cols-2 items-center py-1 text-sm">
-      <div className="text-secondary text-xs tracking-wider uppercase">
+    <div className="grid grid-cols-2 items-center py-1 text-sm" {...props}>
+      <div className="text-xs tracking-wider text-secondary uppercase">
         {title}
       </div>
       <div

@@ -5,6 +5,10 @@ import Link from "next/link"
 import { MoreVerticalIcon, TargetIcon } from "lucide-react"
 import { useExtracted, useTimeZone } from "next-intl"
 
+import { EmptyState } from "@/components/empty-state"
+import { DeleteGoal } from "@/components/goals/delete-goal"
+import { GoalForm } from "@/components/goals/goal-form"
+import { UnconvertedTransactionsAlert } from "@/components/transactions/unconverted-transactions-alert"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -28,10 +32,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { EmptyState } from "@/components/empty-state"
-import { DeleteGoal } from "@/components/goals/delete-goal"
-import { GoalForm } from "@/components/goals/goal-form"
-import { UnconvertedTransactionsAlert } from "@/components/transactions/unconverted-transactions-alert"
 import { useGoals } from "@/contexts/goals-context"
 import { useTransactions } from "@/contexts/transactions-context"
 import { useCategory } from "@/hooks/use-category"

@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form"
 import QRCode from "react-qr-code"
 import { toast } from "sonner"
 
+import { PasswordInput } from "@/components/password-input"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -29,7 +30,6 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { PasswordInput } from "@/components/password-input"
 import { useUser } from "@/contexts/user-context"
 import { useSchemas } from "@/hooks/use-schemas"
 import { authClient } from "@/lib/auth-client"

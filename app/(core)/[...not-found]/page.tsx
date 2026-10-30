@@ -5,8 +5,8 @@ import { connection } from "next/server"
 import { GhostIcon } from "lucide-react"
 import { getExtracted } from "next-intl/server"
 
-import { Button } from "@/components/ui/button"
 import { EmptyState } from "@/components/empty-state"
+import { Button } from "@/components/ui/button"
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getExtracted()

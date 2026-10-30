@@ -7,7 +7,6 @@ import { useExtracted } from "next-intl"
 import { toast } from "sonner"
 import { UAParser } from "ua-parser-js"
 
-import { signInRoute } from "@/routes"
 import { getLocationFromIP } from "@/actions/location.actions"
 import { getSessions, revokeSessionById } from "@/actions/session.actions"
 import { Button } from "@/components/ui/button"
@@ -32,6 +31,7 @@ import { Spinner } from "@/components/ui/spinner"
 import { useUser } from "@/contexts/user-context"
 import { authClient } from "@/lib/auth-client"
 import type { Session } from "@/lib/definitions"
+import { signInRoute } from "@/routes"
 
 export function ActiveSessionsManager() {
   const t = useExtracted()

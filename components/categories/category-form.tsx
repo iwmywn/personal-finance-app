@@ -176,7 +176,7 @@ export function CategoryForm({
                         {...field}
                       />
                       <InputGroupAddon align="block-end">
-                        <InputGroupText className="text-secondary text-xs">
+                        <InputGroupText className="text-xs text-secondary">
                           {field.value?.length || 0}/200
                         </InputGroupText>
                       </InputGroupAddon>

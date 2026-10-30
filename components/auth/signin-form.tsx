@@ -8,7 +8,7 @@ import { useGoogleReCaptcha } from "react-google-recaptcha-v3"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
-import { twoFactorRoute } from "@/routes"
+import { PasswordInput } from "@/components/password-input"
 import {
   Card,
   CardAction,
@@ -27,13 +27,13 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { PasswordInput } from "@/components/password-input"
 import { useSchemas } from "@/hooks/use-schemas"
 import type { Locale } from "@/i18n/config"
 import { setUserLocale } from "@/i18n/locale"
 import { authClient } from "@/lib/auth-client"
 import type { AuthErrorCode } from "@/lib/definitions"
 import { getSafeCallbackUrl } from "@/lib/utils"
+import { twoFactorRoute } from "@/routes"
 import type { SignInFormValues } from "@/schemas/types"
 
 import { LanguageSelector } from "./language-selector"

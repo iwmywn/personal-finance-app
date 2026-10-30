@@ -5,6 +5,8 @@ import { cn } from "cn"
 import { ChevronDownIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 
+import { StatisticsSummary } from "@/components/statistics/statistics-summary"
+import { StatisticsTable } from "@/components/statistics/statistics-table"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent } from "@/components/ui/card"
@@ -22,8 +24,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { StatisticsSummary } from "@/components/statistics/statistics-summary"
-import { StatisticsTable } from "@/components/statistics/statistics-table"
 import { useTransactions } from "@/contexts/transactions-context"
 import { useFormatDate } from "@/hooks/use-format-date"
 import { useMonths } from "@/hooks/use-months"

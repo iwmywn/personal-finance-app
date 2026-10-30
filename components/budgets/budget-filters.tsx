@@ -4,6 +4,7 @@ import { useState } from "react"
 import { cn } from "cn"
 import { useExtracted } from "next-intl"
 
+import { BudgetsTable } from "@/components/budgets/budgets-table"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -15,7 +16,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { BudgetsTable } from "@/components/budgets/budgets-table"
 import { useBudgets } from "@/contexts/budgets-context"
 import { useTransactions } from "@/contexts/transactions-context"
 import { useCategory } from "@/hooks/use-category"

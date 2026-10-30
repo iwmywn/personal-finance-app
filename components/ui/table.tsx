@@ -22,7 +22,7 @@ function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
   return (
     <thead
       data-slot="table-header"
-      className={cn("bg-background sticky top-0 z-1", className)}
+      className={cn("sticky top-0 z-1 bg-background", className)}
       {...props}
     />
   )
@@ -43,7 +43,7 @@ function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
     <tfoot
       data-slot="table-footer"
       className={cn(
-        "bg-secondary/15 border-t text-xs font-medium [&>tr]:last:border-b-0",
+        "border-t bg-secondary/15 text-xs font-medium [&>tr]:last:border-b-0",
         className
       )}
       {...props}
@@ -56,7 +56,7 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
     <tr
       data-slot="table-row"
       className={cn(
-        "hover:bg-secondary/10 has-aria-expanded:bg-secondary/10 data-[state=selected]:bg-secondary/20 border-b transition-colors",
+        "border-b transition-colors hover:bg-secondary/10 has-aria-expanded:bg-secondary/10 data-[state=selected]:bg-secondary/20",
         className
       )}
       {...props}
@@ -69,7 +69,7 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
     <th
       data-slot="table-head"
       className={cn(
-        "text-secondary h-9 border-r px-2 text-left align-middle text-[11px] font-semibold tracking-wider whitespace-nowrap uppercase last:border-r-0 has-[[role=checkbox]]:pr-0 *:[[role=checkbox]]:translate-y-0.5",
+        "h-9 border-r px-2 text-left align-middle text-[11px] font-semibold tracking-wider whitespace-nowrap text-secondary uppercase last:border-r-0 has-[[role=checkbox]]:pr-0 *:[[role=checkbox]]:translate-y-0.5",
         className
       )}
       {...props}
@@ -98,7 +98,7 @@ function TableCaption({
     <caption
       data-slot="table-caption"
       className={cn(
-        "text-secondary mt-4 text-xs tracking-wider uppercase",
+        "mt-4 text-xs tracking-wider text-secondary uppercase",
         className
       )}
       {...props}

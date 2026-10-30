@@ -15,12 +15,12 @@ export function PageLayout({
 }: PageLayoutProps) {
   return (
     <div className="flex flex-col gap-3">
-      <div className="bg-background/90 sticky top-[3.05rem] z-40 flex items-center justify-between gap-3 border-b py-3 backdrop-blur-xs backdrop-saturate-150">
+      <div className="sticky top-[3.05rem] z-40 flex items-center justify-between gap-3 border-b bg-background/90 py-3 backdrop-blur-xs backdrop-saturate-150">
         <div>
-          <h1 className="font-display text-primary text-xl font-bold tracking-tight">
+          <h1 className="font-display text-xl font-bold tracking-tight text-primary">
             {title}
           </h1>
-          <p className="text-secondary text-sm">{description}</p>
+          <p className="text-sm text-secondary">{description}</p>
         </div>
         {action && <div className="flex items-center gap-2">{action}</div>}
       </div>

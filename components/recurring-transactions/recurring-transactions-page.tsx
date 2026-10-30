@@ -3,10 +3,10 @@
 import { useState } from "react"
 import { useExtracted } from "next-intl"
 
-import { Button } from "@/components/ui/button"
 import { PageLayout } from "@/components/layout/page-layout"
 import { RecurringTransactionFilters } from "@/components/recurring-transactions/recurring-transaction-filters"
 import { RecurringTransactionForm } from "@/components/recurring-transactions/recurring-transaction-form"
+import { Button } from "@/components/ui/button"
 
 export default function RecurringTransactionsPage() {
   const [isOpen, setIsOpen] = useState<boolean>(false)

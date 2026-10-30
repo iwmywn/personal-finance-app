@@ -5,10 +5,10 @@ import {
   mockAuthenticatedUser,
   mockUnauthenticatedUser,
 } from "@/tests/backend/mocks/session.mock"
-import proxy from "@/proxy"
-import * as routes from "@/routes"
 import { siteConfig } from "@/app/pfa.config"
 import { clientEnv } from "@/env/client"
+import proxy from "@/proxy"
+import * as routes from "@/routes"
 
 describe("Proxy (Middleware)", () => {
   describe("Unauthenticated User", () => {

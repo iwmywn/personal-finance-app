@@ -12,6 +12,10 @@ import {
 import { useExtracted } from "next-intl"
 import { toast } from "sonner"
 
+import { BanUserForm } from "@/components/admin/ban-user-form"
+import { DeleteUser } from "@/components/admin/delete-user"
+import { SetUserPasswordForm } from "@/components/admin/set-user-password-form"
+import { EmptyState } from "@/components/empty-state"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -35,10 +39,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { BanUserForm } from "@/components/admin/ban-user-form"
-import { DeleteUser } from "@/components/admin/delete-user"
-import { SetUserPasswordForm } from "@/components/admin/set-user-password-form"
-import { EmptyState } from "@/components/empty-state"
 import { useUser } from "@/contexts/user-context"
 import { useFormatDate } from "@/hooks/use-format-date"
 import { authClient } from "@/lib/auth-client"
@@ -145,7 +145,7 @@ export function AdminTable({
                         <div className="grid flex-1 leading-tight">
                           <span>{u.name}</span>
                           {u.username && (
-                            <span className="text-secondary text-xs">
+                            <span className="text-xs text-secondary">
                               @{u.username}
                             </span>
                           )}
@@ -222,7 +222,7 @@ export function AdminTable({
                         )}
                       </TableCell>
 
-                      <TableCell className="text-secondary text-xs">
+                      <TableCell className="text-xs text-secondary">
                         {formatDate(new Date(u.createdAt))}
                       </TableCell>
 

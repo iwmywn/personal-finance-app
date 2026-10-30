@@ -3,12 +3,12 @@
 import { useState } from "react"
 import { useExtracted } from "next-intl"
 
-import { Button } from "@/components/ui/button"
 import { QuickStats } from "@/components/home/quick-stats"
 import { RecentTransactions } from "@/components/home/recent-transactions"
 import { TransactionSummary } from "@/components/home/transaction-summary"
 import { PageLayout } from "@/components/layout/page-layout"
 import { TransactionForm } from "@/components/transactions/transaction-form"
+import { Button } from "@/components/ui/button"
 import { useUser } from "@/contexts/user-context"
 
 export default function HomePage() {

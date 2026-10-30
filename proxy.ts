@@ -3,10 +3,10 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 import { getSessionCookie } from "better-auth/cookies"
 
-import * as routes from "@/routes"
 import { siteConfig } from "@/app/pfa.config"
 import { auth } from "@/lib/auth"
 import { isAdminRole } from "@/lib/role"
+import * as routes from "@/routes"
 
 function redirectIfProtectedRoute(request: NextRequest) {
   const { nextUrl } = request

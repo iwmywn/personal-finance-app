@@ -1,12 +1,11 @@
+import { MongoMemoryReplSet } from "mongodb-memory-server"
+
 import "@/tests/shared/mocks/translations.mock"
 import "@/tests/backend/mocks/env.mock"
 import "@/tests/backend/mocks/cache.mock"
 import "@/tests/backend/mocks/server.mock"
 import "@/tests/shared/mocks/server-only.mock"
 import "@/tests/backend/mocks/headers.mock"
-
-import { MongoMemoryReplSet } from "mongodb-memory-server"
-
 import { connect, disconnect } from "@/lib/db"
 import { resetRateLimitStore } from "@/lib/rate-limit"
 

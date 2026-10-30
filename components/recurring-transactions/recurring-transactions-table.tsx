@@ -5,6 +5,8 @@ import { MoreVerticalIcon, RepeatIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 
 import { getNextDate } from "@/app/api/(cronjobs)/recurring-transactions/utils"
+import { EmptyState } from "@/components/empty-state"
+import { DeleteRecurringTransaction } from "@/components/recurring-transactions/delete-recurring-transaction"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -27,8 +29,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { EmptyState } from "@/components/empty-state"
-import { DeleteRecurringTransaction } from "@/components/recurring-transactions/delete-recurring-transaction"
 import { useRecurring } from "@/contexts/recurring-context"
 import { useCategory } from "@/hooks/use-category"
 import { useFormatCurrency } from "@/hooks/use-format-currency"
@@ -159,7 +159,7 @@ export function RecurringTransactionsTable({
                         <div className="flex flex-col gap-1">
                           <span>{getFrequencyLabel(recurring.frequency)}</span>
                           {recurring.frequency === "random" ? (
-                            <span className="text-secondary text-xs">
+                            <span className="text-xs text-secondary">
                               {t("Every {days} days", {
                                 days:
                                   recurring.randomEveryXDays?.toString() ?? "—",
@@ -167,7 +167,7 @@ export function RecurringTransactionsTable({
                             </span>
                           ) : null}
                           {!isEnded && nextDate ? (
-                            <span className="text-secondary text-xs">
+                            <span className="text-xs text-secondary">
                               {t("Next: {date}", {
                                 date: formatDate(nextDate),
                               })}

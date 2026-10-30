@@ -6,6 +6,7 @@ import { useExtracted } from "next-intl"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
+import { PasswordInput } from "@/components/password-input"
 import {
   Dialog,
   DialogContent,
@@ -24,7 +25,6 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { PasswordInput } from "@/components/password-input"
 import { useSchemas } from "@/hooks/use-schemas"
 import { authClient } from "@/lib/auth-client"
 import type { AuthErrorCode } from "@/lib/definitions"
@@ -210,7 +210,7 @@ export function CreateUserForm({ isOpen, setIsOpen }: CreateUserFormProps) {
                       readOnly
                       disabled
                       value={field.value === "user" ? t("User") : field.value}
-                      className="bg-secondary/15 cursor-not-allowed"
+                      className="cursor-not-allowed bg-secondary/15"
                     />
                   </FormControl>
                   <FormMessage />

@@ -1,8 +1,8 @@
 import type { Route } from "next"
 import Decimal from "decimal.js"
 
-import { DEFAULT_SIGNIN_REDIRECT } from "@/routes"
 import type { Currency } from "@/lib/currency"
+import { DEFAULT_SIGNIN_REDIRECT } from "@/routes"
 
 export const progressColorClass = {
   gray: "progress-gray",

@@ -4,6 +4,11 @@ import { useState } from "react"
 import { AlertCircleIcon, MoreVerticalIcon, WalletIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 
+import { EmptyState } from "@/components/empty-state"
+import { DeleteTransaction } from "@/components/transactions/delete-transaction"
+import { ExportButton } from "@/components/transactions/export-button"
+import { TransactionForm } from "@/components/transactions/transaction-form"
+import { UnconvertedTransactionsAlert } from "@/components/transactions/unconverted-transactions-alert"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -33,11 +38,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { EmptyState } from "@/components/empty-state"
-import { DeleteTransaction } from "@/components/transactions/delete-transaction"
-import { ExportButton } from "@/components/transactions/export-button"
-import { TransactionForm } from "@/components/transactions/transaction-form"
-import { UnconvertedTransactionsAlert } from "@/components/transactions/unconverted-transactions-alert"
 import { useTransactions } from "@/contexts/transactions-context"
 import { useUser } from "@/contexts/user-context"
 import { useCategory } from "@/hooks/use-category"
@@ -171,7 +171,7 @@ export function TransactionsTable({
                           {transaction.currency !== user.currency && (
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <span className="text-yellow inline-flex cursor-help items-center hover:opacity-80">
+                                <span className="inline-flex cursor-help items-center text-yellow hover:opacity-80">
                                   <AlertCircleIcon className="size-4 shrink-0" />
                                   <span className="sr-only">
                                     {t("Exchange rate pending")}

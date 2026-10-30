@@ -3,7 +3,6 @@ import userEvent from "@testing-library/user-event"
 import { toast } from "sonner"
 
 import "@/tests/frontend/mocks/form-controls.mock"
-
 import { renderWithProviders } from "@/tests/frontend/helpers/test-providers"
 import { mockUser } from "@/tests/shared/data"
 import {

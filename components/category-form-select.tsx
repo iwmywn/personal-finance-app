@@ -60,7 +60,7 @@ export function CategoryFormSelect<
                 <SelectItem key={c.key} value={c.key}>
                   <div className="flex flex-col">
                     <span className="font-medium">{c.label}</span>
-                    <span className="text-secondary wrap-anywhere">
+                    <span className="wrap-anywhere text-secondary">
                       {c.description}
                     </span>
                   </div>

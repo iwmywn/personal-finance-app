@@ -61,7 +61,7 @@ function PaginationLink({
         }),
         "text-xs",
         isActive &&
-          "bg-primary text-background hover:bg-primary hover:text-background border-transparent",
+          "border-transparent bg-primary text-background hover:bg-primary hover:text-background",
         className
       )}
       {...props}

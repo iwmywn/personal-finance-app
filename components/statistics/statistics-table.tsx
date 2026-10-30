@@ -5,6 +5,7 @@ import Link from "next/link"
 import { MoreVerticalIcon, WalletIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 
+import { EmptyState } from "@/components/empty-state"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -27,7 +28,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { EmptyState } from "@/components/empty-state"
 import { useTransactions } from "@/contexts/transactions-context"
 import { useUser } from "@/contexts/user-context"
 import { useCategory } from "@/hooks/use-category"

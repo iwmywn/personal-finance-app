@@ -5,7 +5,7 @@ import { cn } from "cn"
 import { Slot } from "radix-ui"
 
 const buttonVariants = cva(
-  "inline-flex shrink-0 items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] whitespace-nowrap transition-colors duration-150 outline-none focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "inline-flex shrink-0 items-center justify-center gap-2 text-xs font-semibold tracking-[0.08em] whitespace-nowrap uppercase transition-colors duration-150 outline-none focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
@@ -16,9 +16,9 @@ const buttonVariants = cva(
         outline:
           "border text-primary hover:bg-primary hover:text-background active:opacity-90",
         secondary:
-          "bg-secondary/15 text-primary border hover:bg-primary hover:text-background",
+          "border bg-secondary/15 text-primary hover:bg-primary hover:text-background",
         ghost: "text-secondary hover:bg-secondary/15 hover:text-primary",
-        link: "text-ring underline-offset-4 hover:underline normal-case tracking-normal font-medium",
+        link: "font-medium tracking-normal text-ring normal-case underline-offset-4 hover:underline",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

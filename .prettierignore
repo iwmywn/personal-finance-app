@@ -1,6 +1,0 @@
-dist
-build
-.next
-node_modules
-pnpm*.yaml
-coverage

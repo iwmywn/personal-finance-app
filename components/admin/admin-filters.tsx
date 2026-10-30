@@ -6,6 +6,8 @@ import { SearchIcon, XIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 
 import type { AdminStats } from "@/actions/admin.actions"
+import { AdminSummary } from "@/components/admin/admin-summary"
+import { AdminTable } from "@/components/admin/admin-table"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -21,8 +23,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { AdminSummary } from "@/components/admin/admin-summary"
-import { AdminTable } from "@/components/admin/admin-table"
 import type { User } from "@/lib/definitions"
 import { filterUsers } from "@/lib/filters"
 

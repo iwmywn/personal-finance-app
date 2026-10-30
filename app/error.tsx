@@ -4,8 +4,8 @@ import { useEffect } from "react"
 import { TriangleAlertIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 
-import { Button } from "@/components/ui/button"
 import { EmptyState } from "@/components/empty-state"
+import { Button } from "@/components/ui/button"
 
 export default function Error({
   error,

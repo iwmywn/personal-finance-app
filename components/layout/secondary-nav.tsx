@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
+import { SignOutButton } from "@/components/auth/sign-out-button"
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -10,7 +11,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { SignOutButton } from "@/components/auth/sign-out-button"
 import { useNav } from "@/hooks/use-nav"
 
 export function SecondaryNav() {

@@ -3,10 +3,10 @@
 import { useState } from "react"
 import { useExtracted } from "next-intl"
 
-import { Button } from "@/components/ui/button"
 import { PageLayout } from "@/components/layout/page-layout"
 import { TransactionFilters } from "@/components/transactions/transaction-filters"
 import { TransactionForm } from "@/components/transactions/transaction-form"
+import { Button } from "@/components/ui/button"
 
 export default function TransactionsPage() {
   const [isOpen, setIsOpen] = useState<boolean>(false)

@@ -4,6 +4,9 @@ import { useState } from "react"
 import { MoreVerticalIcon, TagIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 
+import { CategoryForm } from "@/components/categories/category-form"
+import { DeleteCategory } from "@/components/categories/delete-category"
+import { EmptyState } from "@/components/empty-state"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -21,9 +24,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { CategoryForm } from "@/components/categories/category-form"
-import { DeleteCategory } from "@/components/categories/delete-category"
-import { EmptyState } from "@/components/empty-state"
 import { useCategories } from "@/contexts/categories-context"
 import type { Category } from "@/lib/definitions"
 

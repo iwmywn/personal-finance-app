@@ -9,15 +9,6 @@
     "nextjs",
     "import"
   ],
-  "ignorePatterns": [
-    "node_modules/**",
-    ".next/**",
-    "out/**",
-    "dist/**",
-    "build/**",
-    "next-env.d.ts",
-    "coverage/**"
-  ],
   "rules": {
     "eslint/no-unused-vars": [
       "error",
@@ -44,5 +35,14 @@
         "import/consistent-type-specifier-style": ["error", "prefer-top-level"]
       }
     }
+  ],
+  "ignorePatterns": [
+    "node_modules/**",
+    ".next/**",
+    "out/**",
+    "dist/**",
+    "build/**",
+    "next-env.d.ts",
+    "coverage/**"
   ]
 }

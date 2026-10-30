@@ -64,7 +64,7 @@ function EmptyTitle({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="empty-title"
       className={cn(
-        "font-display text-primary text-base font-bold tracking-tight",
+        "font-display text-base font-bold tracking-tight text-primary",
         className
       )}
       {...props}
@@ -77,7 +77,7 @@ function EmptyDescription({ className, ...props }: React.ComponentProps<"p">) {
     <div
       data-slot="empty-description"
       className={cn(
-        "text-secondary [&>a:hover]:text-primary text-xs [&>a]:underline [&>a]:underline-offset-4",
+        "text-xs text-secondary [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary",
         className
       )}
       {...props}

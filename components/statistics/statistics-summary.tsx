@@ -44,7 +44,7 @@ export function StatisticsSummary({
       <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
         <SummaryCard
           title={t("Total Inflow")}
-          icon={<ArrowUpIcon className="text-green size-4" />}
+          icon={<ArrowUpIcon className="size-4 text-green" />}
           value={formatCurrency(totalInflow)}
           valueClassName="text-green"
           description={`${inflowCount} ${t("transactions")}`}
@@ -52,7 +52,7 @@ export function StatisticsSummary({
 
         <SummaryCard
           title={t("Total Outflow")}
-          icon={<ArrowDownIcon className="text-red size-4" />}
+          icon={<ArrowDownIcon className="size-4 text-red" />}
           value={formatCurrency(totalOutflow)}
           valueClassName="text-red"
           description={`${outflowCount} ${t("transactions")}`}
@@ -62,9 +62,9 @@ export function StatisticsSummary({
           title={t("Balance")}
           icon={
             toDecimal(balance).greaterThanOrEqualTo(0) ? (
-              <TrendingUpIcon className="text-green size-4" />
+              <TrendingUpIcon className="size-4 text-green" />
             ) : (
-              <TrendingDownIcon className="text-red size-4" />
+              <TrendingDownIcon className="size-4 text-red" />
             )
           }
           value={formatCurrency(balance)}
@@ -80,12 +80,12 @@ export function StatisticsSummary({
 
         <SummaryCard
           title={t("Total Transactions")}
-          icon={<ActivityIcon className="text-blue size-4" />}
+          icon={<ActivityIcon className="size-4 text-blue" />}
           value={
             <>
               {transactionCount}
               {unconvertedCount > 0 && (
-                <span className="text-secondary text-xs font-normal">
+                <span className="text-xs font-normal text-secondary">
                   {" "}
                   (+{unconvertedCount})
                 </span>

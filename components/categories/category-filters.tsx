@@ -5,6 +5,7 @@ import { cn } from "cn"
 import { SearchIcon, XIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 
+import { CategoriesTable } from "@/components/categories/categories-table"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -21,7 +22,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { CategoriesTable } from "@/components/categories/categories-table"
 import { useCategories } from "@/contexts/categories-context"
 import type { CategoryType } from "@/lib/category"
 import { filterCustomCategories } from "@/lib/filters"

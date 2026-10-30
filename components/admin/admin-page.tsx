@@ -4,10 +4,10 @@ import { useState } from "react"
 import { useExtracted } from "next-intl"
 
 import type { AdminStats } from "@/actions/admin.actions"
-import { Button } from "@/components/ui/button"
 import { AdminFilters } from "@/components/admin/admin-filters"
 import { CreateUserForm } from "@/components/admin/create-user-form"
 import { PageLayout } from "@/components/layout/page-layout"
+import { Button } from "@/components/ui/button"
 import type { User } from "@/lib/definitions"
 
 interface AdminPageProps {

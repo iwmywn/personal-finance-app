@@ -6,7 +6,6 @@ import { LogOutIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 import { toast } from "sonner"
 
-import { signInRoute } from "@/routes"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,6 +21,7 @@ import { SidebarMenuButton } from "@/components/ui/sidebar"
 import { Spinner } from "@/components/ui/spinner"
 import { useUser } from "@/contexts/user-context"
 import { authClient } from "@/lib/auth-client"
+import { signInRoute } from "@/routes"
 
 export function SignOutButton() {
   const router = useRouter()

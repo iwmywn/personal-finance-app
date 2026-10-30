@@ -6,7 +6,7 @@ function Reticle({ className, ...props }: React.ComponentProps<"span">) {
     <span
       aria-hidden="true"
       className={cn(
-        "before:bg-line after:bg-line pointer-events-none absolute z-10 h-2.75 w-2.75 before:absolute before:inset-y-0 before:left-1.25 before:w-px after:absolute after:inset-x-0 after:top-1.25 after:h-px",
+        "pointer-events-none absolute z-10 h-2.75 w-2.75 before:absolute before:inset-y-0 before:left-1.25 before:w-px before:bg-line after:absolute after:inset-x-0 after:top-1.25 after:h-px after:bg-line",
         className
       )}
       {...props}

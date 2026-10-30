@@ -3,10 +3,10 @@
 import { useState } from "react"
 import { useExtracted } from "next-intl"
 
-import { Button } from "@/components/ui/button"
 import { BudgetFilters } from "@/components/budgets/budget-filters"
 import { BudgetForm } from "@/components/budgets/budget-form"
 import { PageLayout } from "@/components/layout/page-layout"
+import { Button } from "@/components/ui/button"
 
 export default function BudgetsPage() {
   const [isOpen, setIsOpen] = useState<boolean>(false)

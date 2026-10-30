@@ -6,9 +6,9 @@ import { useEffect } from "react"
 import { TriangleAlertIcon } from "lucide-react"
 
 import { fontDisplay, fontMono } from "@/app/fonts"
-import { Button } from "@/components/ui/button"
 import { EmptyState } from "@/components/empty-state"
 import { ThemeProvider } from "@/components/layout/theme-provider"
+import { Button } from "@/components/ui/button"
 
 export default function GlobalError({
   error,

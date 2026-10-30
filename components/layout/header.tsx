@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import { SlashIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 
+import { StopImpersonation } from "@/components/admin/stop-impersonation"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -14,7 +15,6 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { StopImpersonation } from "@/components/admin/stop-impersonation"
 import { useNav } from "@/hooks/use-nav"
 
 export function Header() {
@@ -26,9 +26,9 @@ export function Header() {
   const foundItem = allNavItems.find((item) => item.url === pathname)
 
   return (
-    <header className="bg-background/90 sticky top-0 z-50 flex shrink-0 items-center justify-between border-b py-2.5 backdrop-blur-xs backdrop-saturate-150">
+    <header className="sticky top-0 z-50 flex shrink-0 items-center justify-between border-b bg-background/90 py-2.5 backdrop-blur-xs backdrop-saturate-150">
       <div className="flex items-center gap-3">
-        <SidebarTrigger className="hover:bg-primary hover:text-background border transition-colors" />
+        <SidebarTrigger className="border transition-colors hover:bg-primary hover:text-background" />
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>

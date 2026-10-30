@@ -5,21 +5,21 @@ import { cn } from "cn"
 import { Slot } from "radix-ui"
 
 const badgeVariants = cva(
-  "inline-flex w-fit shrink-0 items-center justify-center gap-1.5 border px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.12em] whitespace-nowrap transition-colors focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none [&>svg]:size-3",
+  "inline-flex w-fit shrink-0 items-center justify-center gap-1.5 border px-2 py-0.5 text-[10px] font-medium tracking-[0.12em] whitespace-nowrap uppercase transition-colors focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none [&>svg]:size-3",
   {
     variants: {
       variant: {
         default:
-          "bg-primary text-background border-transparent [a&]:hover:opacity-80",
+          "border-transparent bg-primary text-background [a&]:hover:opacity-80",
         secondary:
           "bg-secondary/15 text-primary [a&]:hover:bg-primary [a&]:hover:text-background",
         destructive:
-          "bg-destructive text-white border-transparent [a&]:hover:bg-destructive/90",
+          "border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90",
         outline:
-          " text-primary bg-transparent [a&]:hover:bg-primary [a&]:hover:text-background",
+          "bg-transparent text-primary [a&]:hover:bg-primary [a&]:hover:text-background",
         ghost:
           "border-transparent [a&]:hover:bg-secondary/15 [a&]:hover:text-primary",
-        link: "text-ring border-transparent underline-offset-4 [a&]:hover:underline normal-case tracking-normal",
+        link: "border-transparent tracking-normal text-ring normal-case underline-offset-4 [a&]:hover:underline",
       },
     },
     defaultVariants: {

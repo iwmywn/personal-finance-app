@@ -41,7 +41,7 @@ export function SummaryCard({
         >
           {value}
         </div>
-        <div className={"text-secondary mt-1 text-xs tracking-wider uppercase"}>
+        <div className="mt-1 text-xs tracking-wider text-secondary uppercase">
           {description}
         </div>
       </CardContent>

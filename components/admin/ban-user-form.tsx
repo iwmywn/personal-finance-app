@@ -136,13 +136,13 @@ export function BanUserForm({ user, isOpen, setIsOpen }: BanUserFormProps) {
 
         {isBanned ? (
           <div className="space-y-4">
-            <div className="bg-secondary/15 border p-3 text-sm">
+            <div className="border bg-secondary/15 p-3 text-sm">
               <p className="text-secondary">
                 {t("Current ban reason")}:{" "}
                 {user.banReason || t("No reason specified")}
               </p>
               {user.banExpires && (
-                <p className="text-secondary mt-1">
+                <p className="mt-1 text-secondary">
                   {t("Expires on")}: {formatDate(user.banExpires)}
                 </p>
               )}

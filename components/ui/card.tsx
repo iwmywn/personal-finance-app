@@ -12,7 +12,7 @@ function Card({ className, ticks = true, children, ...props }: CardProps) {
     <div
       data-slot="card"
       className={cn(
-        "text-primary relative flex flex-col gap-6 border py-6",
+        "relative flex flex-col gap-6 border py-6 text-primary",
         className
       )}
       {...props}
@@ -41,7 +41,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-title"
       className={cn(
-        "font-display text-primary text-base font-semibold tracking-tight",
+        "font-display text-base font-semibold tracking-tight text-primary",
         className
       )}
       {...props}
@@ -53,7 +53,7 @@ function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-description"
-      className={cn("text-secondary text-xs", className)}
+      className={cn("text-xs text-secondary", className)}
       {...props}
     />
   )

@@ -75,10 +75,10 @@ export function StopImpersonation() {
               size="icon"
               variant="ghost"
               aria-label={t("Impersonating") + " " + user.name}
-              className="text-yellow relative size-7 cursor-pointer hover:opacity-80"
+              className="relative size-7 cursor-pointer text-yellow hover:opacity-80"
             >
               <ShieldAlertIcon className="size-4" />
-              <span className="bg-yellow absolute -top-0.5 -right-0.5 size-2" />
+              <span className="absolute -top-0.5 -right-0.5 size-2 bg-yellow" />
             </Button>
           </AlertDialogTrigger>
         </TooltipTrigger>

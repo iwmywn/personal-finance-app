@@ -3,10 +3,10 @@
 import { useState } from "react"
 import { useExtracted } from "next-intl"
 
-import { Button } from "@/components/ui/button"
 import { CategoryFilters } from "@/components/categories/category-filters"
 import { CategoryForm } from "@/components/categories/category-form"
 import { PageLayout } from "@/components/layout/page-layout"
+import { Button } from "@/components/ui/button"
 
 export default function CategoriesPage() {
   const [isOpen, setIsOpen] = useState<boolean>(false)
