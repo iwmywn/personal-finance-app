@@ -1,10 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import Link from "next/link"
 import { MoreVerticalIcon, PiggyBankIcon } from "lucide-react"
-import { useExtracted } from "next-intl"
+import { useExtracted, useTimeZone } from "next-intl"
 
+import { BudgetForm } from "@/components/budgets/budget-form"
+import { DeleteBudget } from "@/components/budgets/delete-budget"
+import { EmptyState } from "@/components/empty-state"
+import { UnconvertedTransactionsAlert } from "@/components/transactions/unconverted-transactions-alert"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -14,13 +18,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty"
 import { Progress } from "@/components/ui/progress"
 import {
   Table,
@@ -35,13 +32,12 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { BudgetDialog } from "@/components/budgets/budget-dialog"
-import { DeleteBudgetDialog } from "@/components/budgets/delete-budget-dialog"
-import { useBudgets } from "@/context/budgets-context"
-import { useTransactions } from "@/context/transactions-context"
+import { useBudgets } from "@/contexts/budgets-context"
+import { useTransactions } from "@/contexts/transactions-context"
 import { useCategory } from "@/hooks/use-category"
 import { useFormatCurrency } from "@/hooks/use-format-currency"
 import { useFormatDate } from "@/hooks/use-format-date"
+import { serializeUTCDate } from "@/lib/date"
 import type { Budget } from "@/lib/definitions"
 import { calculateBudgetsStats } from "@/lib/statistics"
 import { toDecimal } from "@/lib/utils"
@@ -60,31 +56,40 @@ export function BudgetsTable({ filteredBudgets }: BudgetsTableProps) {
   const { getCategoryLabel, getCategoryDescription } = useCategory()
   const formatDate = useFormatDate()
   const formatCurrency = useFormatCurrency()
+  const timeZone = useTimeZone()
 
-  const budgetsWithSpent = calculateBudgetsStats(filteredBudgets, transactions)
+  const budgetsWithSpent = calculateBudgetsStats(
+    filteredBudgets,
+    transactions,
+    timeZone
+  )
+
+  const outflowTransactions = useMemo(
+    () => transactions.filter((t) => t.type === "outflow"),
+    [transactions]
+  )
 
   return (
     <>
-      <Card className="flex-1 overflow-auto">
-        <CardContent className="h-full">
+      <Card>
+        <CardContent>
           {filteredBudgets.length === 0 ? (
-            <Empty className="h-full border">
-              <EmptyHeader>
-                <EmptyMedia variant="icon">
-                  <PiggyBankIcon />
-                </EmptyMedia>
-                <EmptyTitle>{t("No budgets found")}</EmptyTitle>
-                <EmptyDescription>
-                  {budgets.length === 0
-                    ? t("You haven't created any budgets yet.")
-                    : t("No budgets found matching your filters.")}
-                </EmptyDescription>
-              </EmptyHeader>
-            </Empty>
+            <EmptyState
+              icon={<PiggyBankIcon />}
+              title={t("No budgets found")}
+              description={
+                budgets.length === 0
+                  ? t("You haven't created any budgets yet.")
+                  : t("No budgets found matching your filters.")
+              }
+            />
           ) : (
-            <div className="table-wrapper">
+            <div className="flex h-full flex-col gap-3">
+              <UnconvertedTransactionsAlert
+                transactions={outflowTransactions}
+              />
               <Table>
-                <TableHeader className="bg-muted sticky top-0 z-1">
+                <TableHeader>
                   <TableRow className="[&>th]:text-center">
                     <TableHead>{t("Start Date")}</TableHead>
                     <TableHead>{t("End Date")}</TableHead>
@@ -164,11 +169,7 @@ export function BudgetsTable({ filteredBudgets }: BudgetsTableProps) {
                       <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button
-                              className="dark:hover:bg-input/50"
-                              variant="ghost"
-                              size="icon"
-                            >
+                            <Button variant="ghost" size="icon">
                               <MoreVerticalIcon />
                               <span className="sr-only">{t("Open menu")}</span>
                             </Button>
@@ -176,14 +177,12 @@ export function BudgetsTable({ filteredBudgets }: BudgetsTableProps) {
                           <DropdownMenuContent>
                             <DropdownMenuItem asChild>
                               <Link
-                                href={`/transactions?from=${budget.startDate.toISOString()}&to=${budget.endDate.toISOString()}&category=${budget.categoryKey}`}
-                                className="cursor-pointer"
+                                href={`/transactions?from=${serializeUTCDate(budget.startDate)}&to=${serializeUTCDate(budget.endDate)}&type=outflow&category=${budget.categoryKey}`}
                               >
                                 {t("View")}
                               </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              className="cursor-pointer"
                               onClick={() => {
                                 setSelectedBudget(budget)
                                 setIsEditOpen(true)
@@ -192,7 +191,6 @@ export function BudgetsTable({ filteredBudgets }: BudgetsTableProps) {
                               {t("Edit")}
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              className="cursor-pointer"
                               variant="destructive"
                               onClick={() => {
                                 setSelectedBudget(budget)
@@ -215,17 +213,17 @@ export function BudgetsTable({ filteredBudgets }: BudgetsTableProps) {
 
       {selectedBudget && (
         <>
-          <BudgetDialog
-            key={selectedBudget._id + "BudgetDialog"}
+          <BudgetForm
+            key={selectedBudget._id + "BudgetForm"}
             budget={selectedBudget}
-            open={isEditOpen}
-            setOpen={setIsEditOpen}
+            isOpen={isEditOpen}
+            setIsOpen={setIsEditOpen}
           />
-          <DeleteBudgetDialog
-            key={selectedBudget._id + "DeleteBudgetDialog"}
+          <DeleteBudget
+            key={selectedBudget._id + "DeleteBudget"}
             budgetId={selectedBudget._id}
-            open={isDeleteOpen}
-            setOpen={setIsDeleteOpen}
+            isOpen={isDeleteOpen}
+            setIsOpen={setIsDeleteOpen}
           />
         </>
       )}

@@ -1,5 +1,6 @@
 import MiniSearch from "minisearch"
 
+import { localDateToUTCMidnight } from "@/lib/date"
 import type {
   Budget,
   Category,
@@ -9,9 +10,9 @@ import type {
   User,
 } from "@/lib/definitions"
 import { calculateBudgetsStats, calculateGoalsStats } from "@/lib/statistics"
-import { localDateToUTCMidnight, progressColorClass } from "@/lib/utils"
+import { isUserBanned, progressColorClass } from "@/lib/utils"
 
-interface Filters {
+type Filters = {
   searchTerm?: string
   selectedDate?: Date | null
   dateRange?: {
@@ -25,6 +26,7 @@ interface Filters {
   filterProgress?: string
   filterStatus?: string
   filterRole?: string
+  todayUTC?: Date
 }
 
 function searchWithMiniSearch<T extends Record<string, unknown>>(
@@ -62,8 +64,6 @@ export function isDateRangeOverlapping(
   filterMonth: number | null,
   filterYear: number | null
 ): boolean {
-  if (!filterMonth && !filterYear) return true
-
   if (filterYear && filterMonth) {
     const filterStart = new Date(Date.UTC(filterYear, filterMonth - 1, 1))
     const filterEnd = new Date(Date.UTC(filterYear, filterMonth, 1) - 1)
@@ -97,9 +97,8 @@ export function isDateRangeOverlapping(
 
     if (startM <= endM) {
       return filterMonth >= startM && filterMonth <= endM
-    } else {
-      return filterMonth >= startM || filterMonth <= endM
     }
+    return filterMonth >= startM || filterMonth <= endM
   }
 
   return true
@@ -227,31 +226,24 @@ export function filterBudgets(
       transactions
     )
 
-    filteredBudgets = budgetsWithStats
-      .filter((budget) => {
-        const matchesStatus =
-          filterStatus === "all" || budget.status === filterStatus
+    filteredBudgets = budgetsWithStats.filter((budget) => {
+      const matchesStatus =
+        filterStatus === "all" || budget.status === filterStatus
 
-        let matchesProgress = true
-        if (filterProgress === "gray") {
-          matchesProgress =
-            budget.progressColorClass === progressColorClass.gray
-        }
-        if (filterProgress === "green") {
-          matchesProgress =
-            budget.progressColorClass === progressColorClass.green
-        }
-        if (filterProgress === "yellow") {
-          matchesProgress =
-            budget.progressColorClass === progressColorClass.yellow
-        }
-        if (filterProgress === "red") {
-          matchesProgress = budget.progressColorClass === progressColorClass.red
-        }
+      let matchesProgress = true
+      if (filterProgress === "gray") {
+        matchesProgress = budget.progressColorClass === progressColorClass.gray
+      } else if (filterProgress === "green") {
+        matchesProgress = budget.progressColorClass === progressColorClass.green
+      } else if (filterProgress === "yellow") {
+        matchesProgress =
+          budget.progressColorClass === progressColorClass.yellow
+      } else if (filterProgress === "red") {
+        matchesProgress = budget.progressColorClass === progressColorClass.red
+      }
 
-        return matchesStatus && matchesProgress
-      })
-      .map((budget) => budget)
+      return matchesStatus && matchesProgress
+    })
   }
 
   return filteredBudgets
@@ -300,26 +292,23 @@ export function filterGoals(
   if (filterStatus !== "all" || filterProgress !== "all") {
     const goalsWithStats = calculateGoalsStats(filteredGoals, transactions)
 
-    filteredGoals = goalsWithStats
-      .filter((goal) => {
-        const matchesStatus =
-          filterStatus === "all" || goal.status === filterStatus
+    filteredGoals = goalsWithStats.filter((goal) => {
+      const matchesStatus =
+        filterStatus === "all" || goal.status === filterStatus
 
-        let matchesProgress = true
-        if (filterProgress === "gray") {
-          matchesProgress = goal.progressColorClass === progressColorClass.gray
-        } else if (filterProgress === "green") {
-          matchesProgress = goal.progressColorClass === progressColorClass.green
-        } else if (filterProgress === "yellow") {
-          matchesProgress =
-            goal.progressColorClass === progressColorClass.yellow
-        } else if (filterProgress === "red") {
-          matchesProgress = goal.progressColorClass === progressColorClass.red
-        }
+      let matchesProgress = true
+      if (filterProgress === "gray") {
+        matchesProgress = goal.progressColorClass === progressColorClass.gray
+      } else if (filterProgress === "green") {
+        matchesProgress = goal.progressColorClass === progressColorClass.green
+      } else if (filterProgress === "yellow") {
+        matchesProgress = goal.progressColorClass === progressColorClass.yellow
+      } else if (filterProgress === "red") {
+        matchesProgress = goal.progressColorClass === progressColorClass.red
+      }
 
-        return matchesStatus && matchesProgress
-      })
-      .map((goal) => goal)
+      return matchesStatus && matchesProgress
+    })
   }
 
   return filteredGoals
@@ -345,6 +334,8 @@ export function filterRecurringTransactions(
     ? searchWithMiniSearch(recurringTransactions, searchTerm, ["description"])
     : null
 
+  const todayUTC = filters.todayUTC ?? localDateToUTCMidnight(new Date())
+
   return recurringTransactions.filter((recurring) => {
     const matchesSearch = matchingIds ? matchingIds.has(recurring._id) : true
 
@@ -363,10 +354,15 @@ export function filterRecurringTransactions(
     const matchesCategory =
       filterCategoryKey === "all" || recurring.categoryKey === filterCategoryKey
 
+    const isUpcoming = startDateOnly > todayUTC
+    const isEnded = Boolean(endDateOnly && todayUTC > endDateOnly)
+    const isActive = !isUpcoming && !isEnded
+
     const matchesStatus =
       filterStatus === "all" ||
-      (filterStatus === "active" && recurring.isActive) ||
-      (filterStatus === "inactive" && !recurring.isActive)
+      (filterStatus === "active" && isActive) ||
+      (filterStatus === "upcoming" && isUpcoming) ||
+      (filterStatus === "inactive" && isEnded)
 
     return (
       matchesSearch &&
@@ -390,15 +386,19 @@ export function filterUsers(users: User[], filters: Filters): User[] {
       )
     : null
 
+  const now = new Date()
+
   return users.filter((user) => {
     const matchesSearch = matchingIds ? matchingIds.has(user.id) : true
 
     const matchesRole = filterRole === "all" || user.role === filterRole
 
+    const banned = isUserBanned(user, now)
+
     const matchesStatus =
       filterStatus === "all" ||
-      (filterStatus === "active" && !Boolean(user.banned)) ||
-      (filterStatus === "banned" && Boolean(user.banned))
+      (filterStatus === "active" && !banned) ||
+      (filterStatus === "banned" && banned)
 
     return matchesSearch && matchesRole && matchesStatus
   })

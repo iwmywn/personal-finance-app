@@ -1,10 +1,10 @@
 import * as React from "react"
 import { cva } from "class-variance-authority"
 import type { VariantProps } from "class-variance-authority"
+import { cn } from "cn"
 import { Slot } from "radix-ui"
 
 import { Separator } from "@/components/ui/separator"
-import { cn } from "@/lib/utils"
 
 function ItemGroup({ className, ...props }: React.ComponentProps<"div">) {
   return (
@@ -32,13 +32,13 @@ function ItemSeparator({
 }
 
 const itemVariants = cva(
-  "group/item flex flex-wrap items-center rounded-md border border-transparent text-sm transition-colors duration-100 outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 [a]:transition-colors [a]:hover:bg-accent/50",
+  "group/item flex flex-wrap items-center text-sm transition-colors duration-100 outline-none focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring [a]:transition-colors [a]:hover:bg-secondary/15",
   {
     variants: {
       variant: {
         default: "bg-transparent",
-        outline: "border-border",
-        muted: "bg-muted/50",
+        outline: "border",
+        muted: "bg-secondary/15",
       },
       size: {
         default: "gap-4 p-4",
@@ -78,9 +78,8 @@ const itemMediaVariants = cva(
     variants: {
       variant: {
         default: "bg-transparent",
-        icon: "size-8 rounded-sm border bg-muted [&_svg:not([class*='size-'])]:size-4",
-        image:
-          "size-10 overflow-hidden rounded-sm [&_img]:size-full [&_img]:object-cover",
+        icon: "size-8 border bg-secondary/15 text-primary [&_svg:not([class*='size-'])]:size-4",
+        image: "size-10 overflow-hidden [&_img]:size-full [&_img]:object-cover",
       },
     },
     defaultVariants: {
@@ -135,8 +134,8 @@ function ItemDescription({ className, ...props }: React.ComponentProps<"p">) {
     <p
       data-slot="item-description"
       className={cn(
-        "text-muted-foreground line-clamp-2 text-sm leading-normal font-normal text-balance",
-        "[&>a:hover]:text-primary [&>a]:underline [&>a]:underline-offset-4",
+        "line-clamp-2 text-xs leading-normal font-normal text-balance text-secondary",
+        "[&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary",
         className
       )}
       {...props}
@@ -159,7 +158,7 @@ function ItemHeader({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="item-header"
       className={cn(
-        "flex basis-full items-center justify-between gap-2",
+        "flex basis-full items-center justify-between gap-2 border-b pb-2",
         className
       )}
       {...props}
@@ -172,7 +171,7 @@ function ItemFooter({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="item-footer"
       className={cn(
-        "flex basis-full items-center justify-between gap-2",
+        "flex basis-full items-center justify-between gap-2 border-t pt-2",
         className
       )}
       {...props}

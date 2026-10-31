@@ -21,13 +21,12 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: 24.19.0
+          node-version: 24.22.2
 
       - name: Install pnpm
         uses: pnpm/action-setup@v6
-        id: pnpm-install
         with:
-          version: 11.25.0
+          version: 12.16.1
           run_install: false
 
       - name: Get pnpm store directory
@@ -54,5 +53,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run tests
-        run: pnpm test
+      - name: Run tests with coverage
+        run: pnpm test:coverage
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 14

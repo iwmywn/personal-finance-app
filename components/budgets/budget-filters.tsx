@@ -1,8 +1,10 @@
 "use client"
 
 import { useState } from "react"
+import { cn } from "cn"
 import { useExtracted } from "next-intl"
 
+import { BudgetsTable } from "@/components/budgets/budgets-table"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -14,13 +16,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { BudgetsTable } from "@/components/budgets/budgets-table"
-import { useBudgets } from "@/context/budgets-context"
-import { useTransactions } from "@/context/transactions-context"
+import { useBudgets } from "@/contexts/budgets-context"
+import { useTransactions } from "@/contexts/transactions-context"
 import { useCategory } from "@/hooks/use-category"
 import { useMonths } from "@/hooks/use-months"
+import { getUniqueDateRangeYears } from "@/lib/date"
 import { filterBudgets } from "@/lib/filters"
-import { getUniqueYears } from "@/lib/utils"
 
 export function BudgetFilters() {
   const { budgets } = useBudgets()
@@ -38,7 +39,7 @@ export function BudgetFilters() {
   const { getCategoriesByType } = useCategory()
 
   const allMonths = useMonths()
-  const allYears = getUniqueYears(transactions)
+  const allYears = getUniqueDateRangeYears(budgets)
 
   const hasActiveFilters =
     filterMonth !== "all" ||
@@ -72,14 +73,18 @@ export function BudgetFilters() {
       <Card>
         <CardContent>
           <div
-            className={`grid md:grid-cols-[1fr_1fr] md:grid-rows-2 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr] lg:grid-rows-1 2xl:grid-cols-[1fr_1fr_1fr_1fr_1fr] 2xl:grid-rows-1 ${
+            className={cn(
+              "grid gap-3 md:grid-cols-[1fr_1fr] md:grid-rows-2 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr] lg:grid-rows-1 2xl:grid-cols-[1fr_1fr_1fr_1fr_1fr] 2xl:grid-rows-1",
               hasActiveFilters &&
-              "md:grid-rows-2 lg:grid-rows-1 2xl:grid-cols-[1fr_1fr_1fr_1fr_1fr_auto]"
-            } gap-4`}
+                "md:grid-rows-2 lg:grid-rows-1 2xl:grid-cols-[1fr_1fr_1fr_1fr_1fr_auto]"
+            )}
           >
             <Select value={filterMonth} onValueChange={setFilterMonth}>
               <SelectTrigger
-                className={`w-full ${filterMonth !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full",
+                  filterMonth !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Month")} />
               </SelectTrigger>
@@ -98,7 +103,10 @@ export function BudgetFilters() {
 
             <Select value={filterYear} onValueChange={setFilterYear}>
               <SelectTrigger
-                className={`w-full ${filterYear !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full",
+                  filterYear !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Year")} />
               </SelectTrigger>
@@ -120,7 +128,10 @@ export function BudgetFilters() {
               onValueChange={setFilterCategoryKey}
             >
               <SelectTrigger
-                className={`w-full ${filterCategoryKey !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full",
+                  filterCategoryKey !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Category")} />
               </SelectTrigger>
@@ -142,7 +153,10 @@ export function BudgetFilters() {
               ) => setFilterProgress(value)}
             >
               <SelectTrigger
-                className={`w-full ${filterProgress !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full",
+                  filterProgress !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Progress")} />
               </SelectTrigger>
@@ -167,7 +181,10 @@ export function BudgetFilters() {
               ) => setFilterStatus(value)}
             >
               <SelectTrigger
-                className={`w-full ${filterStatus !== "all" && "border-primary"}`}
+                className={cn(
+                  "w-full",
+                  filterStatus !== "all" && "border-primary"
+                )}
               >
                 <SelectValue placeholder={t("Status")} />
               </SelectTrigger>
@@ -175,9 +192,9 @@ export function BudgetFilters() {
                 <SelectGroup>
                   <SelectItem value="all">{t("All Statuses")}</SelectItem>
                   <SelectSeparator />
-                  <SelectItem value="expired">{t("Expired")}</SelectItem>
                   <SelectItem value="active">{t("Active")}</SelectItem>
                   <SelectItem value="upcoming">{t("Upcoming")}</SelectItem>
+                  <SelectItem value="expired">{t("Expired")}</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>

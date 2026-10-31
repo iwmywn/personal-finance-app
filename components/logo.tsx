@@ -1,8 +1,8 @@
 import Image from "next/image"
 import type { ImageProps } from "next/image"
+import { cn } from "cn"
 
-import { siteConfig } from "@/app/pffa.config"
-import { cn } from "@/lib/utils"
+import { siteConfig } from "@/app/pfa.config"
 
 interface LogoProps extends Omit<ImageProps, "src" | "alt"> {
   isLoading?: boolean

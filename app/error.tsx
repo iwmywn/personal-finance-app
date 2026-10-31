@@ -1,15 +1,18 @@
 "use client"
 
 import { useEffect } from "react"
-import Link from "next/link"
+import { TriangleAlertIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 
+import { EmptyState } from "@/components/empty-state"
 import { Button } from "@/components/ui/button"
 
 export default function Error({
   error,
+  retry,
 }: {
   error: Error & { digest?: string }
+  retry?: () => void
 }) {
   const t = useExtracted()
 
@@ -18,11 +21,18 @@ export default function Error({
   }, [error])
 
   return (
-    <div className="flex h-screen flex-col items-center justify-center gap-2 px-6 text-center md:px-16">
-      <h2 className="text-lg font-semibold">{t("Something went wrong!")}</h2>
-      <Button className="mt-2" asChild>
-        <Link href="/home">{t("Back to Home")}</Link>
-      </Button>
+    <div className="flex min-h-screen items-center justify-center p-6">
+      <EmptyState
+        className="w-full max-w-lg"
+        icon={<TriangleAlertIcon />}
+        title={t("Something went wrong!")}
+        description={error.message || t("Please try again later.")}
+        action={
+          retry ? (
+            <Button onClick={() => retry()}>{t("Try again")}</Button>
+          ) : undefined
+        }
+      />
     </div>
   )
 }
