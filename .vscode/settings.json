@@ -9,7 +9,8 @@
   "terminal.integrated.defaultProfile.windows": "PowerShell",
   "editor.defaultFormatter": "oxc.oxc-vscode",
   "js/ts.preferences.importModuleSpecifier": "non-relative",
-  "tailwindCSS.classAttributes": ["className", "tw", "class", "cn"],
+  "tailwindCSS.classAttributes": ["class", "className"],
+  "tailwindCSS.classFunctions": ["cn", "cva"],
   "[javascript]": {
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },
