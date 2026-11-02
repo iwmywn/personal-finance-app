@@ -1,23 +1,51 @@
 "use client"
 
-import { nunito } from "@/app/fonts"
+import "./globals.css"
+
+import { useEffect } from "react"
+import { TriangleAlertIcon } from "lucide-react"
+
+import { fontDisplay, fontMono } from "@/app/fonts"
+import { EmptyState } from "@/components/empty-state"
+import { ThemeProvider } from "@/components/layout/theme-provider"
 import { Button } from "@/components/ui/button"
 
 export default function GlobalError({
   error,
-  reset,
+  retry,
 }: {
   error: Error & { digest?: string }
-  reset: () => void
+  retry?: () => void
 }) {
+  useEffect(() => {
+    console.error("Global Error:", error)
+  }, [error])
+
   return (
-    <html lang="en-US" className={nunito.className}>
-      <body>
-        <main className="flex h-screen flex-col items-center justify-center gap-2 px-6 text-center md:px-16">
-          <h2 className="text-lg font-semibold">Something went wrong!</h2>
-          <p>{error.message}</p>
-          <Button onClick={() => reset()}>Try again</Button>
-        </main>
+    <html
+      lang="en-US"
+      suppressHydrationWarning
+      className={`${fontDisplay.variable} ${fontMono.variable} ${fontMono.className}`}
+    >
+      <body className="bg-background text-primary antialiased">
+        <ThemeProvider>
+          <main className="flex min-h-screen items-center justify-center p-6">
+            <EmptyState
+              className="w-full max-w-lg"
+              icon={<TriangleAlertIcon />}
+              title="Something went wrong!"
+              description={
+                error.message ||
+                "A critical system error occurred. Please try again."
+              }
+              action={
+                retry ? (
+                  <Button onClick={() => retry()}>Try again</Button>
+                ) : undefined
+              }
+            />
+          </main>
+        </ThemeProvider>
       </body>
     </html>
   )

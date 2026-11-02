@@ -1,0 +1,46 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "eslint",
+    "react",
+    "unicorn",
+    "oxc",
+    "typescript",
+    "nextjs",
+    "import"
+  ],
+  "rules": {
+    "eslint/no-unused-vars": [
+      "error",
+      {
+        "vars": "all",
+        "varsIgnorePattern": "^_",
+        "args": "after-used",
+        "argsIgnorePattern": "^_"
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["**/*.{ts,tsx}"],
+      "rules": {
+        "typescript/consistent-type-imports": [
+          "error",
+          {
+            "prefer": "type-imports",
+            "fixStyle": "separate-type-imports"
+          }
+        ],
+        "typescript/no-import-type-side-effects": "error",
+        "import/consistent-type-specifier-style": ["error", "prefer-top-level"]
+      }
+    }
+  ],
+  "ignorePatterns": [
+    "node_modules/**",
+    ".next/**",
+    "coverage/**",
+    "pnpm-lock.yaml",
+    "next-env.d.ts"
+  ]
+}

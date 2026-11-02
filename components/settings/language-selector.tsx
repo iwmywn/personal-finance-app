@@ -1,6 +1,6 @@
-"use client"
+﻿"use client"
 
-import { useState } from "react"
+import { useTransition } from "react"
 import { useExtracted } from "next-intl"
 import { toast } from "sonner"
 
@@ -11,41 +11,45 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { useUser } from "@/context/user-context"
+import { useUser } from "@/contexts/user-context"
 import { LOCALE_CONFIG } from "@/i18n/config"
-import type { AppLocale } from "@/i18n/config"
+import type { Locale } from "@/i18n/config"
 import { setUserLocale } from "@/i18n/locale"
 import { authClient } from "@/lib/auth-client"
 
 export function LanguageSelector() {
   const t = useExtracted()
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isPending, startTransition] = useTransition()
   const { user } = useUser()
 
-  async function handleLocaleChange(locale: AppLocale) {
-    setIsLoading(true)
-
-    await authClient.updateUser({
-      locale,
-      fetchOptions: {
-        onError: () => {
-          toast.error(t("Failed to update language! Please try again later."))
-        },
-        onSuccess: async () => {
-          await setUserLocale(locale)
-          window.location.reload()
-        },
-      },
+  function handleLocaleChange(locale: Locale) {
+    startTransition(async () => {
+      try {
+        await authClient.updateUser({
+          locale,
+          fetchOptions: {
+            onError: () => {
+              toast.error(
+                t("Failed to update language! Please try again later.")
+              )
+            },
+            onSuccess: async () => {
+              await setUserLocale(locale)
+              window.location.reload()
+            },
+          },
+        })
+      } catch {
+        toast.error(t("Failed to update language! Please try again later."))
+      }
     })
-
-    setIsLoading(false)
   }
 
   return (
     <Select
       value={user.locale}
       onValueChange={handleLocaleChange}
-      disabled={isLoading}
+      disabled={isPending}
     >
       <SelectTrigger>
         <SelectValue placeholder={t("Language")} />

@@ -1,31 +1,19 @@
 "use client"
 
-import { useState } from "react"
 import { useExtracted } from "next-intl"
 
+import { PageLayout } from "@/components/layout/page-layout"
 import { StatisticsFilters } from "@/components/statistics/statistics-filters"
-import { TransactionDialog } from "@/components/transactions/transaction-dialog"
 
 export default function StatisticsPage() {
-  const [isOpen, setIsOpen] = useState<boolean>(false)
   const t = useExtracted()
 
   return (
-    <>
-      <div className="page-content md:h-auto lg:h-[calc(100vh-4.375rem)]">
-        <div className="header">
-          <div>
-            <div className="title">{t("Statistics")}</div>
-            <div className="description">
-              {t("View your financial statistics.")}
-            </div>
-          </div>
-        </div>
-
-        <StatisticsFilters />
-      </div>
-
-      <TransactionDialog open={isOpen} setOpen={setIsOpen} />
-    </>
+    <PageLayout
+      title={t("Statistics")}
+      description={t("View your financial statistics.")}
+    >
+      <StatisticsFilters />
+    </PageLayout>
   )
 }

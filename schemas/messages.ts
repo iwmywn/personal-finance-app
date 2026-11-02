@@ -6,13 +6,14 @@ export async function getSchemaMessages() {
   const t = await getExtracted()
 
   return {
+    passwordRequired: t("Password is required."),
     passwordFormat: t(
       "Password must have at least 8 characters, including uppercase, lowercase, number and special character."
     ),
     amountRequired: t("Amount is required."),
     amountInvalidNumber: t("Amount must be a valid number."),
     amountMin: t("Amount must be greater than 0."),
-    amountMax: t("Maximum amount is 100 billion."),
+    amountMax: t("Maximum amount is 1 trillion."),
     usernameRequired: t("Username is required."),
     currentPasswordRequired: t("Current password is required."),
     newPasswordRequired: t("New password confirmation is required."),
@@ -36,10 +37,12 @@ export async function getSchemaMessages() {
     descriptionRequired: t("Description is required."),
     descriptionMaxLength: t("Description must be at most 200 characters."),
     dateRequired: t("Date is required."),
+    dateCannotBeInFuture: t("Transaction date cannot be in the future."),
     typeRequired: t("Type is required."),
     categoryNameRequired: t("Category name is required."),
     categoryNameMaxLength: t("Category name must be at most 50 characters."),
     startDateRequired: t("Start date is required."),
+    startDateMustBeInFuture: t("Start date must be in the future."),
     endDateRequired: t("End date is required."),
     endDateAfterStartDate: t("End date must be after start date."),
     goalNameRequired: t("Goal name is required."),

@@ -1,15 +1,18 @@
+import { MongoMemoryReplSet } from "mongodb-memory-server"
+
 import "@/tests/shared/mocks/translations.mock"
 import "@/tests/backend/mocks/env.mock"
 import "@/tests/backend/mocks/cache.mock"
-
-import { MongoMemoryServer } from "mongodb-memory-server"
-
+import "@/tests/backend/mocks/server.mock"
+import "@/tests/shared/mocks/server-only.mock"
+import "@/tests/backend/mocks/headers.mock"
 import { connect, disconnect } from "@/lib/db"
+import { resetRateLimitStore } from "@/lib/rate-limit"
 
-let mongoServer: MongoMemoryServer
+let mongoServer: MongoMemoryReplSet
 
 beforeAll(async () => {
-  mongoServer = await MongoMemoryServer.create()
+  mongoServer = await MongoMemoryReplSet.create()
   const mongoUri = mongoServer.getUri()
 
   process.env.DB_URI = mongoUri
@@ -26,11 +29,10 @@ afterAll(async () => {
   delete process.env.MONGODB_URI
 })
 
-beforeEach(() => {
-  vi.resetAllMocks()
-})
-
 afterEach(async () => {
+  vi.resetAllMocks()
+  resetRateLimitStore()
+
   const db = await connect()
   const collections = await db.listCollections().toArray()
 

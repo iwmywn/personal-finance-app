@@ -1,12 +1,12 @@
 "use client"
 
 import * as React from "react"
+import { cn } from "cn"
 import { EyeIcon, EyeOffIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { cn } from "@/lib/utils"
 
 type InputProps = React.InputHTMLAttributes<HTMLInputElement>
 

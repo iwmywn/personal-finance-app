@@ -12,7 +12,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function page() {
   return (
-    <PageDataProvider recurring transactions categories>
+    <PageDataProvider recurring categories>
       <RecurringTransactionsPage />
     </PageDataProvider>
   )

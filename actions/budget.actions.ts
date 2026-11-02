@@ -5,17 +5,19 @@ import { ObjectId } from "mongodb"
 import { getExtracted } from "next-intl/server"
 
 import { getBudgetsCollection } from "@/lib/collections"
-import type { Budget } from "@/lib/definitions"
+import type { ActionResponse, Budget } from "@/lib/definitions"
+import { isDuplicateKeyError } from "@/lib/indexes"
+import { isRateLimited, RATE_LIMIT_PRESETS } from "@/lib/rate-limit"
 import { getSchemas } from "@/schemas/server"
 import type { BudgetFormValues } from "@/schemas/types"
 
-import { getCurrentSession } from "./session.actions"
+import { isValidUserCategory } from "./category.server"
+import { getSession } from "./session.actions"
 import { toDecimal128 } from "./utils"
 
-export async function createBudget(values: BudgetFormValues): Promise<{
-  error?: string
-  success?: string
-}> {
+export async function createBudget(
+  values: BudgetFormValues
+): Promise<ActionResponse> {
   const t = await getExtracted()
 
   try {
@@ -26,30 +28,32 @@ export async function createBudget(values: BudgetFormValues): Promise<{
       return { error: t("Invalid data!") }
     }
 
-    const session = await getCurrentSession()
+    const { error, user, session } = await getSession()
 
-    if (!session) {
+    if (!user || !session) {
+      return { error }
+    }
+
+    if (await isRateLimited(`budget:${user.id}`, RATE_LIMIT_PRESETS.NORMAL)) {
       return {
-        error: t("Access denied! Please refresh the page and try again."),
+        error: t("Too many requests! Please slow down and try again later."),
       }
     }
 
-    const userId = session.user.id
-    const budgetsCollection = await getBudgetsCollection()
-    const existingBudget = await budgetsCollection.findOne({
-      userId: new ObjectId(userId),
-      categoryKey: parsedValues.data.categoryKey,
-      currency: parsedValues.data.currency,
-      startDate: parsedValues.data.startDate,
-      endDate: parsedValues.data.endDate,
-    })
+    const isValidCategory = await isValidUserCategory(
+      user.id,
+      parsedValues.data.categoryKey,
+      "outflow"
+    )
 
-    if (existingBudget) {
-      return { error: t("This budget already exists!") }
+    if (!isValidCategory) {
+      return { error: t("Invalid category!") }
     }
 
+    const budgetsCollection = await getBudgetsCollection()
+
     await budgetsCollection.insertOne({
-      userId: new ObjectId(userId),
+      userId: new ObjectId(user.id),
       categoryKey: parsedValues.data.categoryKey,
       currency: parsedValues.data.currency,
       allocatedAmount: toDecimal128(parsedValues.data.allocatedAmount),
@@ -57,24 +61,30 @@ export async function createBudget(values: BudgetFormValues): Promise<{
       endDate: parsedValues.data.endDate,
     })
 
-    updateTag(`budgets-${userId}`)
-    return { success: t("Budget has been added."), error: undefined }
+    updateTag(`budgets-${user.id}`)
+    return { success: t("Budget has been created.") }
   } catch (error) {
+    if (isDuplicateKeyError(error)) {
+      return { error: t("This budget already exists!") }
+    }
     console.error("Error creating budget:", error)
-    return { error: t("Failed to add budget! Please try again later.") }
+    return { error: t("Failed to create budget! Please try again later.") }
   }
 }
 
 export async function updateBudget(
   budgetId: string,
   values: BudgetFormValues
-): Promise<{
-  error?: string
-  success?: string
-}> {
+): Promise<ActionResponse> {
   const t = await getExtracted()
 
   try {
+    if (!ObjectId.isValid(budgetId)) {
+      return {
+        error: t("Invalid budget ID!"),
+      }
+    }
+
     const { createBudgetSchema } = await getSchemas()
     const parsedValues = createBudgetSchema().safeParse(values)
 
@@ -82,35 +92,31 @@ export async function updateBudget(
       return { error: t("Invalid data!") }
     }
 
-    const session = await getCurrentSession()
+    const { error, user, session } = await getSession()
 
-    if (!session) {
+    if (!user || !session) {
+      return { error }
+    }
+
+    if (await isRateLimited(`budget:${user.id}`, RATE_LIMIT_PRESETS.NORMAL)) {
       return {
-        error: t("Access denied! Please refresh the page and try again."),
+        error: t("Too many requests! Please slow down and try again later."),
       }
     }
 
-    if (!ObjectId.isValid(budgetId)) {
-      return {
-        error: t("Invalid budget ID!"),
-      }
+    const isValidCategory = await isValidUserCategory(
+      user.id,
+      parsedValues.data.categoryKey,
+      "outflow"
+    )
+
+    if (!isValidCategory) {
+      return { error: t("Invalid category!") }
     }
 
-    const userId = session.user.id
     const budgetsCollection = await getBudgetsCollection()
-    const existingBudget = await budgetsCollection.findOne({
-      _id: new ObjectId(budgetId),
-      userId: new ObjectId(userId),
-    })
-
-    if (!existingBudget) {
-      return {
-        error: t("Budget not found or you don't have permission to edit!"),
-      }
-    }
-
-    await budgetsCollection.updateOne(
-      { _id: new ObjectId(budgetId), userId: new ObjectId(userId) },
+    const result = await budgetsCollection.updateOne(
+      { _id: new ObjectId(budgetId), userId: new ObjectId(user.id) },
       {
         $set: {
           categoryKey: parsedValues.data.categoryKey,
@@ -122,54 +128,58 @@ export async function updateBudget(
       }
     )
 
-    updateTag(`budgets-${userId}`)
-    return { success: t("Budget has been updated."), error: undefined }
+    if (result.matchedCount === 0) {
+      return {
+        error: t("Budget not found or you don't have permission to edit!"),
+      }
+    }
+
+    updateTag(`budgets-${user.id}`)
+    return { success: t("Budget has been updated.") }
   } catch (error) {
+    if (isDuplicateKeyError(error)) {
+      return { error: t("This budget already exists!") }
+    }
     console.error("Error updating budget:", error)
     return { error: t("Failed to update budget! Please try again later.") }
   }
 }
 
-export async function deleteBudget(budgetId: string): Promise<{
-  error?: string
-  success?: string
-}> {
+export async function deleteBudget(budgetId: string): Promise<ActionResponse> {
   const t = await getExtracted()
 
   try {
-    const session = await getCurrentSession()
-
-    if (!session) {
-      return {
-        error: t("Access denied! Please refresh the page and try again."),
-      }
-    }
-
     if (!ObjectId.isValid(budgetId)) {
       return {
         error: t("Invalid budget ID!"),
       }
     }
 
-    const userId = session.user.id
+    const { error, user, session } = await getSession()
+
+    if (!user || !session) {
+      return { error }
+    }
+
+    if (await isRateLimited(`budget:${user.id}`, RATE_LIMIT_PRESETS.MODERATE)) {
+      return {
+        error: t("Too many requests! Please slow down and try again later."),
+      }
+    }
+
     const budgetsCollection = await getBudgetsCollection()
-    const existingBudget = await budgetsCollection.findOne({
+    const result = await budgetsCollection.deleteOne({
       _id: new ObjectId(budgetId),
-      userId: new ObjectId(userId),
+      userId: new ObjectId(user.id),
     })
 
-    if (!existingBudget) {
+    if (result.deletedCount === 0) {
       return {
         error: t("Budget not found or you don't have permission to delete!"),
       }
     }
 
-    await budgetsCollection.deleteOne({
-      _id: new ObjectId(budgetId),
-      userId: new ObjectId(userId),
-    })
-
-    updateTag(`budgets-${userId}`)
+    updateTag(`budgets-${user.id}`)
     return { success: t("Budget has been deleted.") }
   } catch (error) {
     console.error("Error deleting budget:", error)
@@ -181,16 +191,13 @@ export async function getBudgets(): Promise<{
   error?: string
   budgets?: Budget[]
 }> {
-  const t = await getExtracted()
-  const session = await getCurrentSession()
+  const { error, user, session } = await getSession()
 
-  if (!session) {
-    return {
-      error: t("Access denied! Please refresh the page and try again."),
-    }
+  if (!user || !session) {
+    return { error }
   }
 
-  return getCachedBudgets(session.user.id)
+  return getCachedBudgets(user.id)
 }
 
 async function getCachedBudgets(userId: string) {

@@ -1,9 +1,10 @@
 import type { Metadata } from "next"
+import { GhostIcon } from "lucide-react"
 import { getExtracted } from "next-intl/server"
 
-import { getAdminStats, listUsers } from "@/actions/admin.actions"
+import { getAdminData } from "@/actions/admin.actions"
 import AdminPage from "@/components/admin/admin-page"
-import { ErrorEmptyState } from "@/components/layout/error-empty-state"
+import { EmptyState } from "@/components/empty-state"
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getExtracted()
@@ -15,34 +16,18 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function page() {
   const t = await getExtracted()
+  const { error, stats, users } = await getAdminData()
 
-  const [statsResult, usersResult] = await Promise.all([
-    getAdminStats(),
-    listUsers(),
-  ])
-
-  if (!statsResult?.stats) {
+  if (!stats || !users) {
     return (
-      <ErrorEmptyState
-        title={t("CANNOT FETCH ADMIN STATS DATA")}
-        description={statsResult?.error}
+      <EmptyState
+        className="mt-3"
+        icon={<GhostIcon />}
+        title={t("Cannot fetch users data")}
+        description={error ?? t("Please try again later.")}
       />
     )
   }
 
-  if (!usersResult?.users) {
-    return (
-      <ErrorEmptyState
-        title={t("CANNOT FETCH USERS DATA")}
-        description={usersResult?.error}
-      />
-    )
-  }
-
-  return (
-    <AdminPage
-      initialStats={statsResult.stats}
-      initialUsers={usersResult.users}
-    />
-  )
+  return <AdminPage initialStats={stats} initialUsers={users} />
 }
