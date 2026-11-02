@@ -10,6 +10,8 @@ on:
 
 jobs:
   e2e:
+    permissions:
+      contents: read
     if: >-
       github.event_name == 'push' ||
       (github.event.action != 'labeled' &&
@@ -28,6 +30,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Start MongoDB replica set
         run: |
