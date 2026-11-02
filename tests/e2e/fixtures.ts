@@ -99,6 +99,36 @@ export async function selectPreviousMonth15thToTodayRange(
   await selectTodayInDatePicker(page, dialog, "End Date")
 }
 
+export interface DeleteRowOptions {
+  rowText: string | RegExp
+  dialogHeading: string
+  confirmMessage?: string | RegExp
+  successToast: string
+}
+
+export async function deleteRowViaMenu(
+  page: Page,
+  options: DeleteRowOptions
+): Promise<void> {
+  const row = page.getByRole("row").filter({ hasText: options.rowText })
+  await row.getByRole("button", { name: "Open menu" }).click()
+  await page.getByRole("menuitem", { name: "Delete" }).click()
+
+  const alertDialog = page.getByRole("alertdialog")
+  await expect(
+    alertDialog.getByRole("heading", { name: options.dialogHeading })
+  ).toBeVisible()
+  if (options.confirmMessage) {
+    await expect(alertDialog.getByText(options.confirmMessage)).toBeVisible()
+  }
+  await alertDialog.getByRole("button", { name: "Delete" }).click()
+
+  await expect(page.getByText(options.successToast)).toBeVisible({
+    timeout: 15_000,
+  })
+  await expect(row).toHaveCount(0, { timeout: 15_000 })
+}
+
 type WorkerFixtures = {
   workerUsername: string
 }

@@ -1,40 +1,13 @@
 import type { Page } from "@playwright/test"
 
 import {
+  deleteRowViaMenu,
   expect,
   selectPreviousMonth15thToTodayRange,
   selectTodayInDatePicker,
   test,
   uniqueTag,
 } from "@/tests/e2e/fixtures"
-
-interface DeleteRowOptions {
-  rowText: string
-  dialogHeading: string
-  confirmMessage: string
-  successToast: string
-}
-
-async function deleteRowViaMenu(
-  page: Page,
-  options: DeleteRowOptions
-): Promise<void> {
-  const row = page.getByRole("row").filter({ hasText: options.rowText })
-  await row.getByRole("button", { name: "Open menu" }).click()
-  await page.getByRole("menuitem", { name: "Delete" }).click()
-
-  const alertDialog = page.getByRole("alertdialog")
-  await expect(
-    alertDialog.getByRole("heading", { name: options.dialogHeading })
-  ).toBeVisible()
-  await expect(alertDialog.getByText(options.confirmMessage)).toBeVisible()
-  await alertDialog.getByRole("button", { name: "Delete" }).click()
-
-  await expect(page.getByText(options.successToast)).toBeVisible({
-    timeout: 15_000,
-  })
-  await expect(row).toHaveCount(0, { timeout: 15_000 })
-}
 
 interface CreateBudgetInput {
   category: string

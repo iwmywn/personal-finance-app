@@ -1,8 +1,10 @@
 import type { Page } from "@playwright/test"
 
 import {
+  deleteRowViaMenu,
   expect,
   selectPreviousMonth15thToTodayRange,
+  selectTodayInDatePicker,
   test,
   uniqueTag,
 } from "@/tests/e2e/fixtures"
@@ -54,12 +56,13 @@ async function deleteUnusedCategoryByName(
   page: Page,
   categoryName: string
 ): Promise<void> {
-  const row = page.getByRole("row").filter({ hasText: categoryName })
-  await attemptDeleteCategoryByName(page, categoryName)
-  await expect(page.getByText("Category has been deleted.")).toBeVisible({
-    timeout: 15_000,
+  await deleteRowViaMenu(page, {
+    rowText: categoryName,
+    dialogHeading: "Delete Category",
+    confirmMessage:
+      "Are you sure you want to delete this category? This action cannot be undone.",
+    successToast: "Category has been deleted.",
   })
-  await expect(row).toHaveCount(0, { timeout: 15_000 })
 }
 
 test.describe("Categories CRUD, duplicate guard, and in-use deletion refusal", () => {
@@ -295,11 +298,7 @@ test.describe("Categories CRUD, duplicate guard, and in-use deletion refusal", (
       .click()
     await txDialog.getByLabel("Amount").fill("150000")
     await txDialog.getByLabel("Description").fill(txDescription)
-    await txDialog.getByLabel("Date").click()
-    const txCalendar = page.getByRole("grid")
-    await expect(txCalendar).toBeVisible()
-    await txCalendar.getByRole("button", { name: /^Today,/ }).click()
-    await expect(txCalendar).toBeHidden()
+    await selectTodayInDatePicker(page, txDialog, "Date")
     await txDialog.getByRole("button", { name: "Add" }).click()
     await expect(page.getByText("Transaction has been created.")).toBeVisible({
       timeout: 15_000,
@@ -322,18 +321,13 @@ test.describe("Categories CRUD, duplicate guard, and in-use deletion refusal", (
 
     // Clean up the transaction so shared worker state remains clean
     await page.goto("/transactions")
-    const txRow = page.getByRole("row").filter({ hasText: txDescription })
-    await txRow.getByRole("button", { name: "Open menu" }).click()
-    await page.getByRole("menuitem", { name: "Delete" }).click()
-    const deleteTxAlert = page.getByRole("alertdialog")
-    await expect(
-      deleteTxAlert.getByRole("heading", { name: "Delete Transaction" })
-    ).toBeVisible()
-    await deleteTxAlert.getByRole("button", { name: "Delete" }).click()
-    await expect(page.getByText("Transaction has been deleted.")).toBeVisible({
-      timeout: 15_000,
+    await deleteRowViaMenu(page, {
+      rowText: txDescription,
+      dialogHeading: "Delete Transaction",
+      confirmMessage:
+        "Are you sure you want to delete this transaction? This action cannot be undone.",
+      successToast: "Transaction has been deleted.",
     })
-    await expect(txRow).toHaveCount(0, { timeout: 15_000 })
   })
 
   test("refuses to delete a custom category used by a budget and keeps the category in the list", async ({
@@ -386,18 +380,12 @@ test.describe("Categories CRUD, duplicate guard, and in-use deletion refusal", (
 
     // Clean up the budget
     await page.goto("/budgets")
-    const budgetRow = page.getByRole("row").filter({ hasText: categoryName })
-    await budgetRow.getByRole("button", { name: "Open menu" }).click()
-    await page.getByRole("menuitem", { name: "Delete" }).click()
-    const deleteBudgetAlert = page.getByRole("alertdialog")
-    await expect(
-      deleteBudgetAlert.getByRole("heading", { name: "Delete Budget" })
-    ).toBeVisible()
-    await deleteBudgetAlert.getByRole("button", { name: "Delete" }).click()
-    await expect(page.getByText("Budget has been deleted.")).toBeVisible({
-      timeout: 15_000,
+    await deleteRowViaMenu(page, {
+      rowText: categoryName,
+      dialogHeading: "Delete Budget",
+      confirmMessage: "Are you sure you want to delete this budget?",
+      successToast: "Budget has been deleted.",
     })
-    await expect(budgetRow).toHaveCount(0, { timeout: 15_000 })
   })
 
   test("refuses to delete a custom category used by a goal and keeps the category in the list", async ({
@@ -452,18 +440,12 @@ test.describe("Categories CRUD, duplicate guard, and in-use deletion refusal", (
 
     // Clean up the goal
     await page.goto("/goals")
-    const goalRow = page.getByRole("row").filter({ hasText: goalName })
-    await goalRow.getByRole("button", { name: "Open menu" }).click()
-    await page.getByRole("menuitem", { name: "Delete" }).click()
-    const deleteGoalAlert = page.getByRole("alertdialog")
-    await expect(
-      deleteGoalAlert.getByRole("heading", { name: "Delete Goal" })
-    ).toBeVisible()
-    await deleteGoalAlert.getByRole("button", { name: "Delete" }).click()
-    await expect(page.getByText("Goal has been deleted.")).toBeVisible({
-      timeout: 15_000,
+    await deleteRowViaMenu(page, {
+      rowText: goalName,
+      dialogHeading: "Delete Goal",
+      confirmMessage: "Are you sure you want to delete this goal?",
+      successToast: "Goal has been deleted.",
     })
-    await expect(goalRow).toHaveCount(0, { timeout: 15_000 })
   })
 
   test("refuses to delete a custom category used by a recurring transaction and keeps the category in the list", async ({
@@ -498,11 +480,7 @@ test.describe("Categories CRUD, duplicate guard, and in-use deletion refusal", (
       .click()
     await recurringDialog.getByLabel("Amount").fill("1000000")
     await recurringDialog.getByLabel("Description").fill(recurringDescription)
-    await recurringDialog.getByLabel("Start Date").click()
-    const recurringCalendar = page.getByRole("grid")
-    await expect(recurringCalendar).toBeVisible()
-    await recurringCalendar.getByRole("button", { name: /^Today,/ }).click()
-    await expect(recurringCalendar).toBeHidden()
+    await selectTodayInDatePicker(page, recurringDialog, "Start Date")
     await recurringDialog.getByRole("button", { name: "Add" }).click()
     await expect(
       page.getByText("Recurring transaction has been created.")
@@ -525,21 +503,12 @@ test.describe("Categories CRUD, duplicate guard, and in-use deletion refusal", (
 
     // Clean up the recurring transaction
     await page.goto("/recurring")
-    const recurringRow = page
-      .getByRole("row")
-      .filter({ hasText: recurringDescription })
-    await recurringRow.getByRole("button", { name: "Open menu" }).click()
-    await page.getByRole("menuitem", { name: "Delete" }).click()
-    const deleteRecurringAlert = page.getByRole("alertdialog")
-    await expect(
-      deleteRecurringAlert.getByRole("heading", {
-        name: "Delete Recurring Transaction",
-      })
-    ).toBeVisible()
-    await deleteRecurringAlert.getByRole("button", { name: "Delete" }).click()
-    await expect(
-      page.getByText("Recurring transaction has been deleted.")
-    ).toBeVisible({ timeout: 15_000 })
-    await expect(recurringRow).toHaveCount(0, { timeout: 15_000 })
+    await deleteRowViaMenu(page, {
+      rowText: recurringDescription,
+      dialogHeading: "Delete Recurring Transaction",
+      confirmMessage:
+        "Are you sure you want to delete this recurring transaction?",
+      successToast: "Recurring transaction has been deleted.",
+    })
   })
 })
