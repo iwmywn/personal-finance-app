@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto"
 import { test as base, expect } from "@playwright/test"
 
 import {
@@ -5,6 +6,10 @@ import {
   getWorkerStorageStatePath,
   getWorkerUsername,
 } from "@/tests/e2e/constants"
+
+export function uniqueTag(): string {
+  return randomUUID().slice(0, 8)
+}
 
 type WorkerFixtures = {
   workerUsername: string

@@ -1,12 +1,7 @@
-import { randomUUID } from "node:crypto"
 import { readFileSync } from "node:fs"
 import type { Locator, Page } from "@playwright/test"
 
-import { expect, test } from "@/tests/e2e/fixtures"
-
-function uniqueTag(): string {
-  return randomUUID().slice(0, 8)
-}
+import { expect, test, uniqueTag } from "@/tests/e2e/fixtures"
 
 function getCardByTitle(page: Page, title: string): Locator {
   return page
