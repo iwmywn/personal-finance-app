@@ -4,7 +4,7 @@ import {
   E2E_TOTP_SECRET,
   E2E_USERS,
 } from "@/tests/e2e/constants"
-import { expect, test } from "@/tests/e2e/fixtures"
+import { expect, signInAs, signOut, test } from "@/tests/e2e/fixtures"
 import { generateTotpCode } from "@/tests/e2e/helpers/totp"
 
 function getInvalidTotpCode(
@@ -49,11 +49,7 @@ test.describe("Guest authentication, two-factor, and route protection", () => {
   test("displays an error and stays signed out when signing in with an incorrect password", async ({
     page,
   }) => {
-    await page.goto("/signin")
-
-    await page.getByLabel("Username").fill(E2E_USERS.auth)
-    await page.getByLabel("Password").fill("WrongPassword123!")
-    await page.getByRole("button", { name: "Sign In" }).click()
+    await signInAs(page, E2E_USERS.auth, "WrongPassword123!")
 
     await expect(page.getByText("Invalid username or password!")).toBeVisible()
     await expect(page).toHaveURL(/\/signin$/)
@@ -74,11 +70,7 @@ test.describe("Guest authentication, two-factor, and route protection", () => {
   test("requires two-factor verification for 2FA user, rejects an invalid TOTP code, and accepts a valid TOTP code", async ({
     page,
   }) => {
-    await page.goto("/signin")
-
-    await page.getByLabel("Username").fill(E2E_USERS.twoFactor)
-    await page.getByLabel("Password").fill(E2E_DEFAULT_PASSWORD)
-    await page.getByRole("button", { name: "Sign In" }).click()
+    await signInAs(page, E2E_USERS.twoFactor, E2E_DEFAULT_PASSWORD)
 
     await expect(page).toHaveURL(/\/two-factor$/)
     await expect(
@@ -105,26 +97,14 @@ test.describe("Guest authentication, two-factor, and route protection", () => {
   test("signing out terminates the session and blocks subsequent access to protected routes", async ({
     page,
   }) => {
-    await page.goto("/signin")
-
-    await page.getByLabel("Username").fill(E2E_USERS.auth)
-    await page.getByLabel("Password").fill(E2E_DEFAULT_PASSWORD)
-    await page.getByRole("button", { name: "Sign In" }).click()
+    await signInAs(page, E2E_USERS.auth, E2E_DEFAULT_PASSWORD)
 
     await expect(page).toHaveURL(/\/home$/)
     await expect(
       page.getByRole("heading", { name: /Welcome back, Auth User/i })
     ).toBeVisible()
 
-    await page.getByRole("button", { name: "Sign Out" }).click()
-
-    const dialog = page.getByRole("alertdialog")
-    await expect(
-      dialog.getByText("Are you sure you want to sign out?")
-    ).toBeVisible()
-    await dialog.getByRole("button", { name: "Sign Out" }).click()
-
-    await expect(page).toHaveURL(/\/signin$/)
+    await signOut(page)
 
     await page.goto("/home")
     await expect(page).toHaveURL(/\/signin\?next=%2Fhome$/)

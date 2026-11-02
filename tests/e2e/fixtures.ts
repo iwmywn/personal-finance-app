@@ -3,6 +3,7 @@ import { test as base, expect } from "@playwright/test"
 import type { Locator, Page } from "@playwright/test"
 
 import {
+  E2E_DEFAULT_PASSWORD,
   E2E_SETUP_WORKER_COUNT,
   getWorkerStorageStatePath,
   getWorkerUsername,
@@ -10,6 +11,27 @@ import {
 
 export function uniqueTag(): string {
   return randomUUID().slice(0, 8)
+}
+
+export async function signInAs(
+  page: Page,
+  username: string,
+  password: string = E2E_DEFAULT_PASSWORD
+): Promise<void> {
+  await page.goto("/signin")
+  await page.getByLabel("Username").fill(username)
+  await page.getByLabel("Password", { exact: true }).fill(password)
+  await page.getByRole("button", { name: "Sign In" }).click()
+}
+
+export async function signOut(page: Page): Promise<void> {
+  await page.getByRole("button", { name: "Sign Out" }).click()
+  const alertDialog = page.getByRole("alertdialog")
+  await expect(
+    alertDialog.getByText("Are you sure you want to sign out?")
+  ).toBeVisible()
+  await alertDialog.getByRole("button", { name: "Sign Out" }).click()
+  await expect(page).toHaveURL(/\/signin$/, { timeout: 15_000 })
 }
 
 export async function selectTodayInDatePicker(

@@ -29,6 +29,7 @@ export const E2E_USERS = {
   twoFactor: "e2e_2fa_user",
   auth: "e2e_auth_user",
   settingsProfile: "e2e_settings_profile",
+  settingsUsername: "e2e_settings_username",
   settingsPassword: "e2e_settings_password",
   settingsTwoFactor: "e2e_settings_2fa",
   settingsSessions: "e2e_settings_sessions",

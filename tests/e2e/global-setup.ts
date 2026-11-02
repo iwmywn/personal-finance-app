@@ -87,6 +87,11 @@ export default async function globalSetup(config: FullConfig): Promise<void> {
         role: DEFAULT_ROLE,
       },
       {
+        username: E2E_USERS.settingsUsername,
+        name: "Settings Username User",
+        role: DEFAULT_ROLE,
+      },
+      {
         username: E2E_USERS.settingsPassword,
         name: "Settings Password User",
         role: DEFAULT_ROLE,
