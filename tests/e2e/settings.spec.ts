@@ -7,34 +7,14 @@ import {
 } from "@/tests/e2e/constants"
 import {
   expect,
+  expectHomeGreeting,
+  signInAndExpectHome,
   signInAs,
   signOut,
   test,
   uniqueTag,
 } from "@/tests/e2e/fixtures"
 import { generateTotpFromBase32 } from "@/tests/e2e/helpers/totp"
-
-async function expectHomeGreeting(
-  page: Page,
-  displayName: string
-): Promise<void> {
-  await expect(page).toHaveURL(/\/home$/, { timeout: 15_000 })
-  await expect(
-    page.getByRole("heading", {
-      name: new RegExp(`Welcome back, ${displayName}`, "i"),
-    })
-  ).toBeVisible({ timeout: 15_000 })
-}
-
-async function signInAndExpectHome(
-  page: Page,
-  username: string,
-  displayName: string,
-  password: string = E2E_DEFAULT_PASSWORD
-): Promise<void> {
-  await signInAs(page, username, password)
-  await expectHomeGreeting(page, displayName)
-}
 
 async function openAccountSettingsTab(page: Page): Promise<void> {
   await page.goto("/settings")

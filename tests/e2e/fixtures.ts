@@ -1,9 +1,10 @@
 import { randomUUID } from "node:crypto"
 import { test as base, expect } from "@playwright/test"
-import type { Locator, Page } from "@playwright/test"
+import type { Browser, Locator, Page } from "@playwright/test"
 
 import {
   E2E_DEFAULT_PASSWORD,
+  E2E_GUEST_STORAGE_STATE,
   E2E_SETUP_WORKER_COUNT,
   getWorkerStorageStatePath,
   getWorkerUsername,
@@ -11,6 +12,21 @@ import {
 
 export function uniqueTag(): string {
   return randomUUID().slice(0, 8)
+}
+
+export async function withGuestPage(
+  browser: Browser,
+  fn: (page: Page) => Promise<void>
+): Promise<void> {
+  const context = await browser.newContext({
+    storageState: E2E_GUEST_STORAGE_STATE,
+  })
+  try {
+    const page = await context.newPage()
+    await fn(page)
+  } finally {
+    await context.close()
+  }
 }
 
 export async function signInAs(
@@ -22,6 +38,29 @@ export async function signInAs(
   await page.getByLabel("Username").fill(username)
   await page.getByLabel("Password", { exact: true }).fill(password)
   await page.getByRole("button", { name: "Sign In" }).click()
+}
+
+export async function expectHomeGreeting(
+  page: Page,
+  displayName: string
+): Promise<void> {
+  await expect(page).toHaveURL(/\/home$/, { timeout: 15_000 })
+  await expect(
+    page.getByRole("heading", {
+      level: 1,
+      name: new RegExp(displayName),
+    })
+  ).toBeVisible({ timeout: 15_000 })
+}
+
+export async function signInAndExpectHome(
+  page: Page,
+  username: string,
+  displayName: string,
+  password: string = E2E_DEFAULT_PASSWORD
+): Promise<void> {
+  await signInAs(page, username, password)
+  await expectHomeGreeting(page, displayName)
 }
 
 export async function signOut(page: Page): Promise<void> {
