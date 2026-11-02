@@ -13,13 +13,12 @@ export const clientEnv = createEnv({
       .object(shape)
       .refine(
         (env) =>
-          !(
-            env.NEXT_PUBLIC_NODE_ENV === "production" &&
-            env.NEXT_PUBLIC_DISABLE_CAPTCHA === "true"
-          ),
+          env.NEXT_PUBLIC_DISABLE_CAPTCHA !== "true" ||
+          env.NEXT_PUBLIC_NODE_ENV === "development" ||
+          env.NEXT_PUBLIC_NODE_ENV === "test",
         {
           message:
-            "NEXT_PUBLIC_DISABLE_CAPTCHA cannot be enabled in production",
+            "NEXT_PUBLIC_DISABLE_CAPTCHA can only be enabled when NEXT_PUBLIC_NODE_ENV is development or test",
           path: ["NEXT_PUBLIC_DISABLE_CAPTCHA"],
         }
       ),
