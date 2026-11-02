@@ -20,11 +20,7 @@ jobs:
     name: pnpm test:e2e
     env:
       CI: true
-    services:
-      mongodb:
-        image: mongo:7.0
-        ports:
-          - 27017:27017
+
     steps:
       - uses: actions/checkout@v7
         with:
