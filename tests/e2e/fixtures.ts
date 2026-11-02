@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto"
 import { test as base, expect } from "@playwright/test"
+import type { Locator, Page } from "@playwright/test"
 
 import {
   E2E_SETUP_WORKER_COUNT,
@@ -9,6 +10,32 @@ import {
 
 export function uniqueTag(): string {
   return randomUUID().slice(0, 8)
+}
+
+export async function selectTodayInDatePicker(
+  page: Page,
+  dialog: Locator,
+  label: string
+): Promise<void> {
+  await dialog.getByLabel(label).click()
+  const calendarGrid = page.getByRole("grid")
+  await expect(calendarGrid).toBeVisible()
+  await calendarGrid.getByRole("button", { name: /^Today,/ }).click()
+  await expect(calendarGrid).toBeHidden()
+}
+
+export async function selectPreviousMonth15thToTodayRange(
+  page: Page,
+  dialog: Locator
+): Promise<void> {
+  await dialog.getByLabel("Start Date").click()
+  const startGrid = page.getByRole("grid")
+  await expect(startGrid).toBeVisible()
+  await page.getByRole("button", { name: "Go to the Previous Month" }).click()
+  await startGrid.getByRole("button", { name: /15th,/ }).click()
+  await expect(startGrid).toBeHidden()
+
+  await selectTodayInDatePicker(page, dialog, "End Date")
 }
 
 type WorkerFixtures = {

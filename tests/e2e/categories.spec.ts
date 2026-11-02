@@ -1,6 +1,11 @@
 import type { Page } from "@playwright/test"
 
-import { expect, test, uniqueTag } from "@/tests/e2e/fixtures"
+import {
+  expect,
+  selectPreviousMonth15thToTodayRange,
+  test,
+  uniqueTag,
+} from "@/tests/e2e/fixtures"
 
 interface CreateCategoryInput {
   type: "Inflow" | "Outflow"
@@ -55,24 +60,6 @@ async function deleteUnusedCategoryByName(
     timeout: 15_000,
   })
   await expect(row).toHaveCount(0, { timeout: 15_000 })
-}
-
-async function selectPreviousMonth15thToTodayRange(
-  page: Page,
-  dialog: ReturnType<Page["getByRole"]>
-): Promise<void> {
-  await dialog.getByLabel("Start Date").click()
-  const startGrid = page.getByRole("grid")
-  await expect(startGrid).toBeVisible()
-  await page.getByRole("button", { name: "Go to the Previous Month" }).click()
-  await startGrid.getByRole("button", { name: /15th,/ }).click()
-  await expect(startGrid).toBeHidden()
-
-  await dialog.getByLabel("End Date").click()
-  const endGrid = page.getByRole("grid")
-  await expect(endGrid).toBeVisible()
-  await endGrid.getByRole("button", { name: /^Today,/ }).click()
-  await expect(endGrid).toBeHidden()
 }
 
 test.describe("Categories CRUD, duplicate guard, and in-use deletion refusal", () => {
