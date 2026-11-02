@@ -1,5 +1,6 @@
 import "@testing-library/jest-dom/vitest"
 
+import "@/tests/shared/mocks/client-env.mock"
 import "@/tests/shared/mocks/server-only.mock"
 import "@/tests/shared/mocks/translations.mock"
 

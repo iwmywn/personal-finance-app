@@ -1,9 +1,9 @@
-import "./env/client"
-import "./env/server"
+import "@/env/server"
 
 import type { NextConfig } from "next"
 import createNextIntlPlugin from "next-intl/plugin"
 
+import { clientEnv } from "@/env/client"
 import { LOCALES, SOURCE_LOCALE } from "@/i18n/config"
 
 const withNextIntl = createNextIntlPlugin({
@@ -28,6 +28,7 @@ const withNextIntl = createNextIntlPlugin({
 })
 
 const nextConfig: NextConfig = {
+  distDir: clientEnv.NEXT_PUBLIC_NODE_ENV === "test" ? ".next-e2e" : ".next",
   devIndicators: {
     position: "bottom-right",
   },

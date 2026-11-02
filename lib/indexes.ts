@@ -1,9 +1,7 @@
-import "server-only"
-
 import { MongoServerError } from "mongodb"
 import type { Db } from "mongodb"
 
-async function ensureIndexes(db: Db) {
+export async function ensureIndexes(db: Db) {
   await Promise.all([
     db.collection("budgets").createIndex(
       {

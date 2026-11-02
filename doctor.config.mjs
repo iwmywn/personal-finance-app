@@ -1,6 +1,14 @@
 /** @type {import('react-doctor/api').ReactDoctorConfig } */
 const reactDoctorConfig = {
   projects: ["personal-finance-app"],
+  ignore: {
+    files: [
+      ".next/**",
+      ".next-e2e/**",
+      "playwright-report/**",
+      "test-results/**",
+    ],
+  },
   rules: {
     "react-doctor/only-export-components": "off",
     "react-doctor/prefer-tag-over-role": "off",

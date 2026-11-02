@@ -10,7 +10,11 @@ vi.mock("@/env/client", () => {
       get NEXT_PUBLIC_RECAPTCHA() {
         return "test-recaptcha"
       },
+      get NEXT_PUBLIC_DISABLE_CAPTCHA() {
+        return undefined
+      },
     },
+    isCaptchaDisabled: () => false,
   }
 })
 
