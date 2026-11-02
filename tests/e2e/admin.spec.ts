@@ -42,8 +42,7 @@ test.describe("Admin user management, security controls, and impersonation", () 
   test.use({ storageState: E2E_GUEST_STORAGE_STATE })
 
   test.beforeEach(async ({ page }) => {
-    await signInAs(page, E2E_USERS.admin)
-    await expect(page).toHaveURL(/\/home$/, { timeout: 15_000 })
+    await signInAndExpectHome(page, E2E_USERS.admin, "Admin User")
     await page.goto("/admin")
     await expect(page).toHaveURL(/\/admin$/, { timeout: 15_000 })
     await expect(
@@ -344,12 +343,13 @@ test.describe("Admin user management, security controls, and impersonation", () 
     await expect(page.getByText("Stopped impersonation session.")).toBeVisible({
       timeout: 15_000,
     })
+    await expect(alertDialog).toBeHidden()
 
     // Restores admin session and redirects back to /admin
     await expect(page).toHaveURL(/\/admin$/, { timeout: 15_000 })
     await expect(
       page.getByRole("heading", { name: "Admin Management" })
-    ).toBeVisible()
+    ).toBeVisible({ timeout: 15_000 })
     await expect(stopButton).toHaveCount(0)
   })
 })
