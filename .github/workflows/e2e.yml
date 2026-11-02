@@ -30,26 +30,30 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Initialize MongoDB replica set
+      - name: Start MongoDB replica set
         run: |
-          CONTAINER_ID=$(docker ps -q --filter ancestor=mongo:8.0)
-          docker exec "$CONTAINER_ID" sh -c 'printf "#!/bin/sh\nexec mongod --replSet rs0 --bind_ip_all\n" > /usr/local/bin/docker-entrypoint.sh && chmod +x /usr/local/bin/docker-entrypoint.sh'
-          docker restart "$CONTAINER_ID"
+          docker run -d --name mongo -p 27017:27017 mongo:8.0 --replSet rs0 --bind_ip_all
+
           for i in $(seq 1 30); do
-            if docker exec "$CONTAINER_ID" mongosh --quiet --eval "db.runCommand({ ping: 1 }).ok" >/dev/null 2>&1; then
-              break
-            fi
-            sleep 1
-          done
-          docker exec "$CONTAINER_ID" mongosh --quiet --eval 'rs.initiate({_id: "rs0", members: [{_id: 0, host: "localhost:27017"}]})'
-          for i in $(seq 1 30); do
-            STATE=$(docker exec "$CONTAINER_ID" mongosh --quiet --eval "rs.status().myState" 2>/dev/null || echo "0")
-            if [ "$STATE" = "1" ]; then
+            if docker exec mongo mongosh --quiet --eval "db.runCommand({ ping: 1 }).ok" >/dev/null 2>&1; then
               break
             fi
             sleep 1
           done
 
+          docker exec mongo mongosh --quiet --eval 'rs.initiate({_id: "rs0", members: [{_id: 0, host: "localhost:27017"}]})'
+
+          for i in $(seq 1 30); do
+            STATE=$(docker exec mongo mongosh --quiet --eval "rs.status().myState" 2>/dev/null || echo "0")
+            if [ "$STATE" = "1" ]; then
+              exit 0
+            fi
+            sleep 1
+          done
+
+          echo "MongoDB replica set did not become PRIMARY" >&2
+          docker logs mongo
+          exit 1
       - name: Install Node.js
         uses: actions/setup-node@v7
         with:
