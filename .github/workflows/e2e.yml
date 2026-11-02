@@ -30,7 +30,7 @@ jobs:
         run: |
           trap 'echo "--- docker ps -a ---"; docker ps -a; echo "--- mongo logs ---"; docker logs mongo' ERR
 
-          docker run -d --name mongo -p 27017:27017 mongo:7.0 --replSet rs0 --bind_ip_all
+          docker run -d --name mongo -p 27017:27017 mongo:8.0 --replSet rs0 --bind_ip_all
           sleep 3
 
           for i in $(seq 1 30); do
