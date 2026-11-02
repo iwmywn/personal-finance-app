@@ -178,7 +178,7 @@ test.describe("Budgets, Goals, and Recurring Transactions E2E", () => {
       .filter({ hasText: initialCategory })
     await expect(initialRow).toBeVisible()
     await expect(initialRow).toContainText("1.000.000 ₫")
-    await expect(initialRow).toContainText("0 ₫")
+    await expect(initialRow).toContainText(/(?<![\d.])0\s*₫/)
     await expect(initialRow).toContainText("Active")
 
     const initialProgress = initialRow.getByRole("progressbar")
@@ -210,7 +210,7 @@ test.describe("Budgets, Goals, and Recurring Transactions E2E", () => {
       .filter({ hasText: updatedCategory })
     await expect(updatedRow).toBeVisible()
     await expect(updatedRow).toContainText("1.500.000 ₫")
-    await expect(updatedRow).toContainText("0 ₫")
+    await expect(updatedRow).toContainText(/(?<![\d.])0\s*₫/)
     await expect(updatedRow).toContainText("Active")
 
     await deleteBudgetByCategory(page, updatedCategory)
@@ -238,7 +238,7 @@ test.describe("Budgets, Goals, and Recurring Transactions E2E", () => {
     const budgetRow = page.getByRole("row").filter({ hasText: category })
     await expect(budgetRow).toBeVisible()
     await expect(budgetRow).toContainText("1.000.000 ₫")
-    await expect(budgetRow).toContainText("0 ₫")
+    await expect(budgetRow).toContainText(/(?<![\d.])0\s*₫/)
 
     const progressBar = budgetRow.getByRole("progressbar")
     await progressBar.hover()
@@ -348,7 +348,7 @@ test.describe("Budgets, Goals, and Recurring Transactions E2E", () => {
     await expect(initialRow).toBeVisible()
     await expect(initialRow).toContainText("Salary & Bonus")
     await expect(initialRow).toContainText("10.000.000 ₫")
-    await expect(initialRow).toContainText("0 ₫")
+    await expect(initialRow).toContainText(/(?<![\d.])0\s*₫/)
     await expect(initialRow).toContainText("Active")
 
     await initialRow.getByRole("button", { name: "Open menu" }).click()
@@ -375,7 +375,7 @@ test.describe("Budgets, Goals, and Recurring Transactions E2E", () => {
     await expect(updatedRow).toBeVisible()
     await expect(updatedRow).toContainText("Investment & Passive")
     await expect(updatedRow).toContainText("15.000.000 ₫")
-    await expect(updatedRow).toContainText("0 ₫")
+    await expect(updatedRow).toContainText(/(?<![\d.])0\s*₫/)
     await expect(updatedRow).toContainText("Active")
 
     await deleteGoalByName(page, updatedGoalName)
