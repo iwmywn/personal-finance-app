@@ -17,7 +17,9 @@ for (let index = 0; index < E2E_SETUP_WORKER_COUNT; index++) {
     await page.getByRole("button", { name: "Sign In" }).click()
 
     await expect(page).toHaveURL(/\/home$/)
-    await expect(page.getByText(/Welcome back, Worker User/i)).toBeVisible()
+    await expect(
+      page.getByRole("heading", { name: /Welcome back, Worker User/i })
+    ).toBeVisible()
 
     await page.context().storageState({
       path: getWorkerStorageStatePath(index),
