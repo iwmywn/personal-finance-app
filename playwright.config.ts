@@ -7,6 +7,7 @@ import {
   E2E_DB_NAME,
   E2E_GUEST_STORAGE_STATE,
   E2E_PORT,
+  E2E_SETUP_WORKER_COUNT,
   E2E_TIMEZONE,
   getWorkerStorageStatePath,
 } from "@/tests/e2e/constants"
@@ -40,7 +41,7 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  workers: process.env.CI ? 2 : undefined,
+  workers: E2E_SETUP_WORKER_COUNT,
   reporter: process.env.CI
     ? [["github"], ["list"], ["html", { open: "never" }]]
     : [["list"], ["html", { open: "never" }]],

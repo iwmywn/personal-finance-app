@@ -33,10 +33,16 @@ export default async function globalSetup(config: FullConfig): Promise<void> {
     )
   }
 
+  if (config.workers > E2E_SETUP_WORKER_COUNT) {
+    throw new Error(
+      `Refusing to run E2E global setup: configured workers (${config.workers}) exceeds E2E_SETUP_WORKER_COUNT (${E2E_SETUP_WORKER_COUNT}).`
+    )
+  }
+
   rmSync(E2E_AUTH_DIR, { recursive: true, force: true })
   mkdirSync(E2E_AUTH_DIR, { recursive: true })
 
-  const workerCount = Math.max(config.workers, E2E_SETUP_WORKER_COUNT)
+  const workerCount = E2E_SETUP_WORKER_COUNT
   const client = new MongoClient(serverEnv.DB_URI)
   await client.connect()
 
