@@ -3,6 +3,7 @@ import { test as base, expect } from "@playwright/test"
 import type { Browser, Locator, Page } from "@playwright/test"
 
 import {
+  E2E_BASE_URL,
   E2E_DEFAULT_PASSWORD,
   E2E_GUEST_STORAGE_STATE,
   E2E_SETUP_WORKER_COUNT,
@@ -19,6 +20,7 @@ export async function withGuestPage(
   fn: (page: Page) => Promise<void>
 ): Promise<void> {
   const context = await browser.newContext({
+    baseURL: E2E_BASE_URL,
     storageState: E2E_GUEST_STORAGE_STATE,
   })
   try {
