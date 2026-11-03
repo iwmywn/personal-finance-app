@@ -1,5 +1,5 @@
 export const siteConfig = {
-  name: "PFA",
+  name: "Vozix",
   cookies: {
     locale: "locale",
     timezone: "timezone",

@@ -6,7 +6,7 @@ import { nextCookies } from "better-auth/next-js"
 import { admin, captcha, twoFactor, username } from "better-auth/plugins"
 import * as z from "zod"
 
-import { siteConfig } from "@/app/pfa.config"
+import { siteConfig } from "@/app/vozix.config"
 import { clientEnv, isCaptchaDisabled } from "@/env/client"
 import { serverEnv } from "@/env/server"
 import { DEFAULT_LOCALE, LOCALES } from "@/i18n/config"

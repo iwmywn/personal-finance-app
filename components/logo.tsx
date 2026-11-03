@@ -2,7 +2,7 @@ import Image from "next/image"
 import type { ImageProps } from "next/image"
 import { cn } from "cn"
 
-import { siteConfig } from "@/app/pfa.config"
+import { siteConfig } from "@/app/vozix.config"
 
 interface LogoProps extends Omit<ImageProps, "src" | "alt"> {
   isLoading?: boolean

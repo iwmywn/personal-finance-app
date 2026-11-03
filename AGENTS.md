@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Repository guidelines and architectural invariants for personal-finance-app.
+Repository guidelines and architectural invariants for vozix.
 
 ## Environment & Verification
 
@@ -9,7 +9,7 @@ Run all package commands with `pnpm`:
 - **Audit React Code**: `pnpm react-doctor` — verifies React 19 compiler compatibility, hooks hygiene, and hydration safety.
 - **Run Frontend Tests**: `pnpm test:fe` — UI component tests (`happy-dom`).
 - **Run Backend Tests**: `pnpm test:be` — integration tests (`node` + in-memory MongoDB replica set).
-- **Run E2E Tests**: `pnpm test:e2e` — end-to-end browser tests (`Playwright` + `pfa_test`).
+- **Run E2E Tests**: `pnpm test:e2e` — end-to-end browser tests (`Playwright`).
 - **Run Test Coverage**: `pnpm test:coverage` — enforces 90% coverage threshold (85% branches).
 - **Validate Translations**: `pnpm check:po` — checks for untranslated strings in `messages/*.po`.
 - **Sync Agent Skills**: `pnpm skills:install` — restores community skills from `skills-lock.json`.

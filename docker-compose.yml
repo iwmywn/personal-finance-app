@@ -1,7 +1,7 @@
 services:
   mongo:
     image: mongo:7.0
-    container_name: pfa-mongo
+    container_name: vozix-mongo
     restart: unless-stopped
     ports:
       - "127.0.0.1:27017:27017"
@@ -30,4 +30,3 @@ services:
 
 volumes:
   mongo-data:
-

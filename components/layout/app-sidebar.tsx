@@ -2,7 +2,7 @@
 
 import { useExtracted } from "next-intl"
 
-import { siteConfig } from "@/app/pfa.config"
+import { siteConfig } from "@/app/vozix.config"
 import { MainNav } from "@/components/layout/main-nav"
 import { SecondaryNav } from "@/components/layout/secondary-nav"
 import { Logo } from "@/components/logo"

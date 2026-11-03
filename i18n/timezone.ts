@@ -3,7 +3,7 @@
 import { cache } from "react"
 import { cookies } from "next/headers"
 
-import { siteConfig } from "@/app/pfa.config"
+import { siteConfig } from "@/app/vozix.config"
 
 const COOKIE_NAME = siteConfig.cookies.timezone
 const DEFAULT_TIMEZONE = "UTC"

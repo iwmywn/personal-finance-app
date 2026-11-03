@@ -82,7 +82,7 @@ jobs:
       - name: Run E2E tests
         env:
           DB_URI: mongodb://localhost:27017/?replicaSet=rs0&directConnection=true
-          DB_NAME: pfa_test
+          DB_NAME: vozix_test
           RECAPTCHA_SECRET: e2e-dummy-recaptcha-secret
           NEXT_PUBLIC_RECAPTCHA: e2e-dummy-recaptcha-site-key
           CRON_SECRET: e2e-dummy-cron-secret
