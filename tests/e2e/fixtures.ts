@@ -46,13 +46,13 @@ export async function expectHomeGreeting(
   page: Page,
   displayName: string
 ): Promise<void> {
-  await expect(page).toHaveURL(/\/home$/, { timeout: 15_000 })
+  await expect(page).toHaveURL(/\/home$/)
   await expect(
     page.getByRole("heading", {
       level: 1,
       name: new RegExp(displayName),
     })
-  ).toBeVisible({ timeout: 15_000 })
+  ).toBeVisible()
 }
 
 export async function signInAndExpectHome(
@@ -72,7 +72,7 @@ export async function signOut(page: Page): Promise<void> {
     alertDialog.getByText("Are you sure you want to sign out?")
   ).toBeVisible()
   await alertDialog.getByRole("button", { name: "Sign Out" }).click()
-  await expect(page).toHaveURL(/\/signin$/, { timeout: 15_000 })
+  await expect(page).toHaveURL(/\/signin$/)
 }
 
 export async function selectTodayInDatePicker(
@@ -125,10 +125,8 @@ export async function deleteRowViaMenu(
   }
   await alertDialog.getByRole("button", { name: "Delete" }).click()
 
-  await expect(page.getByText(options.successToast)).toBeVisible({
-    timeout: 15_000,
-  })
-  await expect(row).toHaveCount(0, { timeout: 15_000 })
+  await expect(page.getByText(options.successToast)).toBeVisible()
+  await expect(row).toHaveCount(0)
 }
 
 type WorkerFixtures = {

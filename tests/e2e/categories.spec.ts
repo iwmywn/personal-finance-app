@@ -85,14 +85,12 @@ test.describe("Categories CRUD, duplicate guard, and in-use deletion refusal", (
       name: inflowCategoryName,
       description: inflowDescription,
     })
-    await expect(page.getByText("Category has been created.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("Category has been created.")).toBeVisible()
 
     const inflowRow = page
       .getByRole("row")
       .filter({ hasText: inflowCategoryName })
-    await expect(inflowRow).toBeVisible({ timeout: 15_000 })
+    await expect(inflowRow).toBeVisible()
     await expect(inflowRow).toContainText(inflowDescription)
     await expect(inflowRow).toContainText("Inflow")
 
@@ -105,7 +103,7 @@ test.describe("Categories CRUD, duplicate guard, and in-use deletion refusal", (
     const outflowRow = page
       .getByRole("row")
       .filter({ hasText: outflowCategoryName })
-    await expect(outflowRow).toBeVisible({ timeout: 15_000 })
+    await expect(outflowRow).toBeVisible()
     await expect(outflowRow).toContainText(outflowDescription)
     await expect(outflowRow).toContainText("Outflow")
 
@@ -197,9 +195,7 @@ test.describe("Categories CRUD, duplicate guard, and in-use deletion refusal", (
       name: initialName,
       description: initialDescription,
     })
-    await expect(page.getByText("Category has been created.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("Category has been created.")).toBeVisible()
 
     const initialRow = page.getByRole("row").filter({ hasText: initialName })
     await expect(initialRow).toBeVisible()
@@ -218,9 +214,7 @@ test.describe("Categories CRUD, duplicate guard, and in-use deletion refusal", (
     await editDialog.getByLabel("Description").fill(updatedDescription)
     await editDialog.getByRole("button", { name: "Update" }).click()
 
-    await expect(page.getByText("Category has been updated.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("Category has been updated.")).toBeVisible()
     await expect(initialRow).toHaveCount(0)
 
     const updatedRow = page.getByRole("row").filter({ hasText: updatedName })
@@ -245,9 +239,7 @@ test.describe("Categories CRUD, duplicate guard, and in-use deletion refusal", (
       name: duplicateName,
       description,
     })
-    await expect(page.getByText("Category has been created.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("Category has been created.")).toBeVisible()
     await expect(
       page.getByRole("row").filter({ hasText: duplicateName })
     ).toHaveCount(1)
@@ -258,9 +250,7 @@ test.describe("Categories CRUD, duplicate guard, and in-use deletion refusal", (
       description: `Another description ${tag}`,
     })
 
-    await expect(page.getByText("This category already exists!")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("This category already exists!")).toBeVisible()
 
     const dialog = page.getByRole("dialog")
     await dialog.getByRole("button", { name: "Cancel" }).click()
@@ -284,9 +274,7 @@ test.describe("Categories CRUD, duplicate guard, and in-use deletion refusal", (
       name: categoryName,
       description: `Transaction guard category ${tag}`,
     })
-    await expect(page.getByText("Category has been created.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("Category has been created.")).toBeVisible()
 
     await page.goto("/transactions")
     await page.getByRole("button", { name: "Add" }).click()
@@ -300,9 +288,7 @@ test.describe("Categories CRUD, duplicate guard, and in-use deletion refusal", (
     await txDialog.getByLabel("Description").fill(txDescription)
     await selectTodayInDatePicker(page, txDialog, "Date")
     await txDialog.getByRole("button", { name: "Add" }).click()
-    await expect(page.getByText("Transaction has been created.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("Transaction has been created.")).toBeVisible()
 
     await page.goto("/categories")
     await attemptDeleteCategoryByName(page, categoryName)
@@ -310,7 +296,7 @@ test.describe("Categories CRUD, duplicate guard, and in-use deletion refusal", (
       page.getByText(
         "Cannot delete category. There are 1 transactions using this category. Please delete those transactions first."
       )
-    ).toBeVisible({ timeout: 15_000 })
+    ).toBeVisible()
 
     const alertDialog = page.getByRole("alertdialog")
     await alertDialog.getByRole("button", { name: "Cancel" }).click()
@@ -342,9 +328,7 @@ test.describe("Categories CRUD, duplicate guard, and in-use deletion refusal", (
       name: categoryName,
       description: `Budget guard category ${tag}`,
     })
-    await expect(page.getByText("Category has been created.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("Category has been created.")).toBeVisible()
 
     await page.goto("/budgets")
     await page.getByRole("button", { name: "Add" }).click()
@@ -359,9 +343,7 @@ test.describe("Categories CRUD, duplicate guard, and in-use deletion refusal", (
     await budgetDialog.getByLabel("Amount").fill("2000000")
     await selectPreviousMonth15thToTodayRange(page, budgetDialog)
     await budgetDialog.getByRole("button", { name: "Add" }).click()
-    await expect(page.getByText("Budget has been created.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("Budget has been created.")).toBeVisible()
 
     await page.goto("/categories")
     await attemptDeleteCategoryByName(page, categoryName)
@@ -369,7 +351,7 @@ test.describe("Categories CRUD, duplicate guard, and in-use deletion refusal", (
       page.getByText(
         "Cannot delete category. There are 1 budgets using this category. Please delete those budgets first."
       )
-    ).toBeVisible({ timeout: 15_000 })
+    ).toBeVisible()
 
     const alertDialog = page.getByRole("alertdialog")
     await alertDialog.getByRole("button", { name: "Cancel" }).click()
@@ -401,9 +383,7 @@ test.describe("Categories CRUD, duplicate guard, and in-use deletion refusal", (
       name: categoryName,
       description: `Goal guard category ${tag}`,
     })
-    await expect(page.getByText("Category has been created.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("Category has been created.")).toBeVisible()
 
     await page.goto("/goals")
     await page.getByRole("button", { name: "Add" }).click()
@@ -419,9 +399,7 @@ test.describe("Categories CRUD, duplicate guard, and in-use deletion refusal", (
     await goalDialog.getByLabel("Target Amount").fill("5000000")
     await selectPreviousMonth15thToTodayRange(page, goalDialog)
     await goalDialog.getByRole("button", { name: "Add" }).click()
-    await expect(page.getByText("Goal has been created.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("Goal has been created.")).toBeVisible()
 
     await page.goto("/categories")
     await attemptDeleteCategoryByName(page, categoryName)
@@ -429,7 +407,7 @@ test.describe("Categories CRUD, duplicate guard, and in-use deletion refusal", (
       page.getByText(
         "Cannot delete category. There are 1 goals using this category. Please delete those goals first."
       )
-    ).toBeVisible({ timeout: 15_000 })
+    ).toBeVisible()
 
     const alertDialog = page.getByRole("alertdialog")
     await alertDialog.getByRole("button", { name: "Cancel" }).click()
@@ -461,9 +439,7 @@ test.describe("Categories CRUD, duplicate guard, and in-use deletion refusal", (
       name: categoryName,
       description: `Recurring guard category ${tag}`,
     })
-    await expect(page.getByText("Category has been created.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("Category has been created.")).toBeVisible()
 
     await page.goto("/recurring")
     await page.getByRole("button", { name: "Add" }).click()
@@ -484,7 +460,7 @@ test.describe("Categories CRUD, duplicate guard, and in-use deletion refusal", (
     await recurringDialog.getByRole("button", { name: "Add" }).click()
     await expect(
       page.getByText("Recurring transaction has been created.")
-    ).toBeVisible({ timeout: 15_000 })
+    ).toBeVisible()
 
     await page.goto("/categories")
     await attemptDeleteCategoryByName(page, categoryName)
@@ -492,7 +468,7 @@ test.describe("Categories CRUD, duplicate guard, and in-use deletion refusal", (
       page.getByText(
         "Cannot delete category. There are 1 recurring transactions using this category. Please delete those recurring transactions first."
       )
-    ).toBeVisible({ timeout: 15_000 })
+    ).toBeVisible()
 
     const alertDialog = page.getByRole("alertdialog")
     await alertDialog.getByRole("button", { name: "Cancel" }).click()

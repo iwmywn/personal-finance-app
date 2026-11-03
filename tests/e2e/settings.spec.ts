@@ -24,7 +24,7 @@ async function openAccountSettingsTab(page: Page): Promise<void> {
     await expect(accountTab).toHaveAttribute("data-state", "active", {
       timeout: 1000,
     })
-  }).toPass({ timeout: 15_000 })
+  }).toPass()
 }
 
 function getCardByTitle(page: Page, title: string): Locator {
@@ -43,7 +43,7 @@ async function selectSettingsOption(
       await combobox.click()
     }
     await expect(option).toBeVisible({ timeout: 1000 })
-  }).toPass({ timeout: 15_000 })
+  }).toPass()
   await option.click()
   return combobox
 }
@@ -69,9 +69,7 @@ test.describe("Settings: profile, security, sessions, and preferences", () => {
     await dialog.getByLabel("Name").fill("Updated Profile Name")
     await dialog.getByRole("button", { name: "Save" }).click()
 
-    await expect(page.getByText("Your name has been updated.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("Your name has been updated.")).toBeVisible()
     await expect(dialog).toBeHidden()
 
     await page.goto("/home")
@@ -96,18 +94,18 @@ test.describe("Settings: profile, security, sessions, and preferences", () => {
     await dialog.getByLabel("Username").fill(E2E_USERS.admin)
     await dialog.getByRole("button", { name: "Save" }).click()
 
-    await expect(page.getByText("This username is already taken.")).toBeVisible(
-      { timeout: 15_000 }
-    )
+    await expect(
+      page.getByText("This username is already taken.")
+    ).toBeVisible()
     await expect(dialog).toBeVisible()
 
     const newUsername = `e2e_renamed_${uniqueTag()}`
     await dialog.getByLabel("Username").fill(newUsername)
     await dialog.getByRole("button", { name: "Save" }).click()
 
-    await expect(page.getByText("Your username has been changed.")).toBeVisible(
-      { timeout: 15_000 }
-    )
+    await expect(
+      page.getByText("Your username has been changed.")
+    ).toBeVisible()
     await expect(dialog).toBeHidden()
 
     await signOut(page)
@@ -139,9 +137,7 @@ test.describe("Settings: profile, security, sessions, and preferences", () => {
       .fill(newPassword)
     await dialog.getByRole("button", { name: "Save" }).click()
 
-    await expect(page.getByText("Current password is incorrect!")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("Current password is incorrect!")).toBeVisible()
     await expect(dialog).toBeVisible()
 
     await dialog
@@ -153,9 +149,9 @@ test.describe("Settings: profile, security, sessions, and preferences", () => {
       .fill(newPassword)
     await dialog.getByRole("button", { name: "Save" }).click()
 
-    await expect(page.getByText("Your password has been changed.")).toBeVisible(
-      { timeout: 15_000 }
-    )
+    await expect(
+      page.getByText("Your password has been changed.")
+    ).toBeVisible()
     await expect(dialog).toBeHidden()
 
     await signOut(page)
@@ -189,9 +185,7 @@ test.describe("Settings: profile, security, sessions, and preferences", () => {
       .fill(E2E_DEFAULT_PASSWORD)
     await enableDialog.getByRole("button", { name: "Enable 2FA" }).click()
 
-    await expect(enableDialog.getByText("Secret Key")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(enableDialog.getByText("Secret Key")).toBeVisible()
     // The "Secret Key" <Label> has no htmlFor, so the read-only input has no accessible name.
     const secret = await enableDialog.locator("input[readonly]").inputValue()
     expect(secret.length).toBeGreaterThan(0)
@@ -203,16 +197,16 @@ test.describe("Settings: profile, security, sessions, and preferences", () => {
 
     await expect(
       page.getByText("Two-factor authentication is now enabled.")
-    ).toBeVisible({ timeout: 15_000 })
+    ).toBeVisible()
     await expect(enableDialog).toBeHidden()
-    await expect(page.getByRole("button", { name: "Disable 2FA" })).toBeVisible(
-      { timeout: 15_000 }
-    )
+    await expect(
+      page.getByRole("button", { name: "Disable 2FA" })
+    ).toBeVisible()
 
     await signOut(page)
     await signInAs(page, E2E_USERS.settingsTwoFactor)
 
-    await expect(page).toHaveURL(/\/two-factor$/, { timeout: 15_000 })
+    await expect(page).toHaveURL(/\/two-factor$/)
     await page
       .getByLabel("Verification Code")
       .fill(generateTotpFromBase32(secret))
@@ -234,11 +228,9 @@ test.describe("Settings: profile, security, sessions, and preferences", () => {
 
     await expect(
       page.getByText("Two-factor authentication is now disabled.")
-    ).toBeVisible({ timeout: 15_000 })
+    ).toBeVisible()
     await expect(disableDialog).toBeHidden()
-    await expect(page.getByRole("button", { name: "Enable 2FA" })).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByRole("button", { name: "Enable 2FA" })).toBeVisible()
 
     await signOut(page)
     await signInAndExpectHome(
@@ -280,23 +272,19 @@ test.describe("Settings: profile, security, sessions, and preferences", () => {
       const currentSessionItem = sessionItems.filter({ hasText: "Current" })
       const otherSessionItem = sessionItems.filter({ hasNotText: "Current" })
 
-      await expect(currentSessionItem).toHaveCount(1, { timeout: 15_000 })
-      await expect(otherSessionItem).toHaveCount(1, { timeout: 15_000 })
+      await expect(currentSessionItem).toHaveCount(1)
+      await expect(otherSessionItem).toHaveCount(1)
 
       await otherSessionItem
         .getByRole("button", { name: "Terminate", exact: true })
         .click()
 
-      await expect(page.getByText("Session terminated.")).toBeVisible({
-        timeout: 15_000,
-      })
-      await expect(otherSessionItem).toHaveCount(0, { timeout: 15_000 })
+      await expect(page.getByText("Session terminated.")).toBeVisible()
+      await expect(otherSessionItem).toHaveCount(0)
       await expect(currentSessionItem).toHaveCount(1)
 
       await secondPage.goto("/home")
-      await expect(secondPage).toHaveURL(/\/signin\?next=%2Fhome$/, {
-        timeout: 15_000,
-      })
+      await expect(secondPage).toHaveURL(/\/signin\?next=%2Fhome$/)
 
       await page.goto("/home")
       await expectHomeGreeting(page, "Settings Sessions User")
@@ -333,22 +321,16 @@ test.describe("Settings: profile, security, sessions, and preferences", () => {
       "Currency",
       "US Dollar ($)"
     )
-    await expect(currencyCombobox).toContainText("US Dollar ($)", {
-      timeout: 15_000,
-    })
+    await expect(currencyCombobox).toContainText("US Dollar ($)")
 
     await page.goto("/home")
-    await expect(monthlyInflowCard).toContainText("$0.00", { timeout: 15_000 })
+    await expect(monthlyInflowCard).toContainText("$0.00")
 
     await page.goto("/settings")
     await selectSettingsOption(page, "Language", "Tiếng Việt")
 
-    await expect(page.locator("html")).toHaveAttribute("lang", "vi-VN", {
-      timeout: 15_000,
-    })
-    await expect(page.getByRole("heading", { name: "Cài đặt" })).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.locator("html")).toHaveAttribute("lang", "vi-VN")
+    await expect(page.getByRole("heading", { name: "Cài đặt" })).toBeVisible()
     await expect(
       page.getByText("Quản lý tài khoản và tùy chọn ứng dụng của bạn.")
     ).toBeVisible()

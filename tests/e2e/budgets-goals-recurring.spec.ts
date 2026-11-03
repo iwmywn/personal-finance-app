@@ -142,9 +142,7 @@ test.describe("Budgets, Goals, and Recurring Transactions E2E", () => {
       category: initialCategory,
       amount: "1000000",
     })
-    await expect(page.getByText("Budget has been created.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("Budget has been created.")).toBeVisible()
 
     const initialRow = page
       .getByRole("row")
@@ -173,9 +171,7 @@ test.describe("Budgets, Goals, and Recurring Transactions E2E", () => {
     await editDialog.getByLabel("Amount").fill("1500000")
     await editDialog.getByRole("button", { name: "Update" }).click()
 
-    await expect(page.getByText("Budget has been updated.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("Budget has been updated.")).toBeVisible()
     await expect(initialRow).toHaveCount(0)
 
     const updatedRow = page
@@ -204,9 +200,7 @@ test.describe("Budgets, Goals, and Recurring Transactions E2E", () => {
       category,
       amount: "1000000",
     })
-    await expect(page.getByText("Budget has been created.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("Budget has been created.")).toBeVisible()
 
     const budgetRow = page.getByRole("row").filter({ hasText: category })
     await expect(budgetRow).toBeVisible()
@@ -231,9 +225,7 @@ test.describe("Budgets, Goals, and Recurring Transactions E2E", () => {
     await txDialog.getByLabel("Description").fill(expenseDescription)
     await selectTodayInDatePicker(page, txDialog, "Date")
     await txDialog.getByRole("button", { name: "Add" }).click()
-    await expect(page.getByText("Transaction has been created.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("Transaction has been created.")).toBeVisible()
 
     // Verify budget progress reflects the 250,000 VND expense (25.0% of 1,000,000 VND)
     await page.goto("/budgets")
@@ -271,9 +263,7 @@ test.describe("Budgets, Goals, and Recurring Transactions E2E", () => {
       category,
       amount: "800000",
     })
-    await expect(page.getByText("Budget has been created.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("Budget has been created.")).toBeVisible()
     await expect(
       page.getByRole("row").filter({ hasText: category })
     ).toHaveCount(1)
@@ -282,9 +272,7 @@ test.describe("Budgets, Goals, and Recurring Transactions E2E", () => {
       category,
       amount: "800000",
     })
-    await expect(page.getByText("This budget already exists!")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("This budget already exists!")).toBeVisible()
 
     const dialog = page.getByRole("dialog")
     await dialog.getByRole("button", { name: "Cancel" }).click()
@@ -311,9 +299,7 @@ test.describe("Budgets, Goals, and Recurring Transactions E2E", () => {
       name: initialGoalName,
       targetAmount: "10000000",
     })
-    await expect(page.getByText("Goal has been created.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("Goal has been created.")).toBeVisible()
 
     const initialRow = page
       .getByRole("row")
@@ -337,9 +323,7 @@ test.describe("Budgets, Goals, and Recurring Transactions E2E", () => {
     await editDialog.getByLabel("Target Amount").fill("15000000")
     await editDialog.getByRole("button", { name: "Update" }).click()
 
-    await expect(page.getByText("Goal has been updated.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("Goal has been updated.")).toBeVisible()
     await expect(initialRow).toHaveCount(0)
 
     const updatedRow = page
@@ -367,9 +351,7 @@ test.describe("Budgets, Goals, and Recurring Transactions E2E", () => {
       name: duplicateGoalName,
       targetAmount: "5000000",
     })
-    await expect(page.getByText("Goal has been created.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("Goal has been created.")).toBeVisible()
     await expect(
       page.getByRole("row").filter({ hasText: duplicateGoalName })
     ).toHaveCount(1)
@@ -379,9 +361,7 @@ test.describe("Budgets, Goals, and Recurring Transactions E2E", () => {
       name: duplicateGoalName,
       targetAmount: "5000000",
     })
-    await expect(page.getByText("This goal already exists!")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("This goal already exists!")).toBeVisible()
 
     const dialog = page.getByRole("dialog")
     await dialog.getByRole("button", { name: "Cancel" }).click()
@@ -410,7 +390,7 @@ test.describe("Budgets, Goals, and Recurring Transactions E2E", () => {
     })
     await expect(
       page.getByText("Recurring transaction has been created.")
-    ).toBeVisible({ timeout: 15_000 })
+    ).toBeVisible()
 
     const recurringRow = page
       .getByRole("row")
@@ -431,7 +411,7 @@ test.describe("Budgets, Goals, and Recurring Transactions E2E", () => {
     })
     await expect(
       page.getByText("This recurring transaction already exists!")
-    ).toBeVisible({ timeout: 15_000 })
+    ).toBeVisible()
 
     const dialog = page.getByRole("dialog")
     await dialog.getByRole("button", { name: "Cancel" }).click()

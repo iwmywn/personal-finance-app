@@ -34,7 +34,7 @@ async function ensureNoTransactions(page: Page): Promise<void> {
   let count = await menuButtons.count()
   while (count > 0) {
     await confirmDeleteFromRowMenu(page, menuButtons.first())
-    await expect(menuButtons).toHaveCount(count - 1, { timeout: 15_000 })
+    await expect(menuButtons).toHaveCount(count - 1)
     count = await menuButtons.count()
   }
 }
@@ -48,10 +48,8 @@ async function deleteTransactionByDescription(
     page,
     row.getByRole("button", { name: "Open menu" })
   )
-  await expect(page.getByText("Transaction has been deleted.")).toBeVisible({
-    timeout: 15_000,
-  })
-  await expect(row).toHaveCount(0, { timeout: 15_000 })
+  await expect(page.getByText("Transaction has been deleted.")).toBeVisible()
+  await expect(row).toHaveCount(0)
 }
 
 interface CreateTransactionInput {
@@ -127,9 +125,7 @@ test.describe("Transactions, Home dashboard, and Statistics", () => {
       description,
     })
 
-    await expect(page.getByText("Transaction has been created.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("Transaction has been created.")).toBeVisible()
 
     const row = page.getByRole("row").filter({ hasText: description })
     await expect(row).toBeVisible()
@@ -163,9 +159,7 @@ test.describe("Transactions, Home dashboard, and Statistics", () => {
       description: initialDescription,
     })
 
-    await expect(page.getByText("Transaction has been created.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("Transaction has been created.")).toBeVisible()
 
     const initialRow = page
       .getByRole("row")
@@ -190,9 +184,7 @@ test.describe("Transactions, Home dashboard, and Statistics", () => {
     await editDialog.getByLabel("Description").fill(updatedDescription)
     await editDialog.getByRole("button", { name: "Update" }).click()
 
-    await expect(page.getByText("Transaction has been updated.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("Transaction has been updated.")).toBeVisible()
     await expect(initialRow).toHaveCount(0)
 
     const updatedRow = page
@@ -221,9 +213,7 @@ test.describe("Transactions, Home dashboard, and Statistics", () => {
       description: duplicateDescription,
     })
 
-    await expect(page.getByText("Transaction has been created.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("Transaction has been created.")).toBeVisible()
     await expect(
       page.getByRole("row").filter({ hasText: duplicateDescription })
     ).toHaveCount(1)
@@ -239,7 +229,7 @@ test.describe("Transactions, Home dashboard, and Statistics", () => {
       page.getByText(
         "This transaction already exists! Please merge transactions or add more details in the description."
       )
-    ).toBeVisible({ timeout: 15_000 })
+    ).toBeVisible()
 
     const dialog = page.getByRole("dialog")
     await dialog.getByRole("button", { name: "Cancel" }).click()
@@ -269,7 +259,7 @@ test.describe("Transactions, Home dashboard, and Statistics", () => {
     })
     await expect(
       page.getByRole("row").filter({ hasText: inflowDescription })
-    ).toBeVisible({ timeout: 15_000 })
+    ).toBeVisible()
 
     await openAndSubmitAddTransactionDialog(page, {
       type: "Outflow",
@@ -279,7 +269,7 @@ test.describe("Transactions, Home dashboard, and Statistics", () => {
     })
     await expect(
       page.getByRole("row").filter({ hasText: outflowDescription })
-    ).toBeVisible({ timeout: 15_000 })
+    ).toBeVisible()
 
     const inflowRow = page
       .getByRole("row")
@@ -362,9 +352,7 @@ test.describe("Transactions, Home dashboard, and Statistics", () => {
       description,
     })
 
-    await expect(page.getByText("Transaction has been created.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("Transaction has been created.")).toBeVisible()
 
     await expect(recentTransactionsCard).toContainText(description)
     await expect(recentTransactionsCard).toContainText("Salary & Bonus")
@@ -407,7 +395,7 @@ test.describe("Transactions, Home dashboard, and Statistics", () => {
     })
     await expect(
       page.getByRole("row").filter({ hasText: currentMonthDescription })
-    ).toBeVisible({ timeout: 15_000 })
+    ).toBeVisible()
 
     await openAndSubmitAddTransactionDialog(page, {
       type: "Outflow",
@@ -418,7 +406,7 @@ test.describe("Transactions, Home dashboard, and Statistics", () => {
     })
     await expect(
       page.getByRole("row").filter({ hasText: prevMonthDescription })
-    ).toBeVisible({ timeout: 15_000 })
+    ).toBeVisible()
 
     await page.goto("/statistics")
     await expect(

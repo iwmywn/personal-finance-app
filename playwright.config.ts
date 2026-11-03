@@ -42,6 +42,10 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   workers: E2E_SETUP_WORKER_COUNT,
+  timeout: 45_000,
+  expect: {
+    timeout: 15_000,
+  },
   reporter: process.env.CI
     ? [["github"], ["list"], ["html", { open: "never" }]]
     : [["list"], ["html", { open: "never" }]],
@@ -52,6 +56,8 @@ export default defineConfig({
     timezoneId: E2E_TIMEZONE,
     trace: "on-first-retry",
     screenshot: "only-on-failure",
+    actionTimeout: 15_000,
+    navigationTimeout: 30_000,
   },
   projects: [
     {

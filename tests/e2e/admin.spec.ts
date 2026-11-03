@@ -32,8 +32,8 @@ async function clickRowMenuItem(
       const menuButton = row.getByRole("button", { name: "Open menu" })
       await menuButton.click()
     }
-    await expect(menuItem).toBeVisible({ timeout: 1_000 })
-  }).toPass({ timeout: 15_000 })
+    await expect(menuItem).toBeVisible()
+  }).toPass()
 
   await menuItem.click()
 }
@@ -44,10 +44,10 @@ test.describe("Admin user management, security controls, and impersonation", () 
   test.beforeEach(async ({ page }) => {
     await signInAndExpectHome(page, E2E_USERS.admin, "Admin User")
     await page.goto("/admin")
-    await expect(page).toHaveURL(/\/admin$/, { timeout: 15_000 })
+    await expect(page).toHaveURL(/\/admin$/)
     await expect(
       page.getByRole("heading", { name: "Admin Management" })
-    ).toBeVisible({ timeout: 15_000 })
+    ).toBeVisible()
   })
 
   test("displays the user list, summary metrics, and admin indicators for seeded users", async ({
@@ -146,9 +146,7 @@ test.describe("Admin user management, security controls, and impersonation", () 
 
     await dialog.getByRole("button", { name: "Add" }).click()
 
-    await expect(page.getByText("User has been created.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("User has been created.")).toBeVisible()
     await expect(dialog).toBeHidden()
 
     // Filter to verify user appears in table
@@ -158,7 +156,7 @@ test.describe("Admin user management, security controls, and impersonation", () 
     const newRow = page.getByRole("row", {
       name: new RegExp(`^${fullName}\\s`),
     })
-    await expect(newRow).toBeVisible({ timeout: 15_000 })
+    await expect(newRow).toBeVisible()
     await expect(newRow).toContainText(`@${username}`)
 
     // Sign in through sign-in page with new user in an isolated context
@@ -189,9 +187,7 @@ test.describe("Admin user management, security controls, and impersonation", () 
     await dialog.getByLabel("New Password").fill(newPassword)
     await dialog.getByRole("button", { name: "Update" }).click()
 
-    await expect(page.getByText("Password has been updated.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("Password has been updated.")).toBeVisible()
     await expect(dialog).toBeHidden()
 
     // Verify signing in as the target user with the new password
@@ -227,13 +223,11 @@ test.describe("Admin user management, security controls, and impersonation", () 
       .fill("Violation of acceptable use policy")
     await dialog.getByRole("button", { name: "Ban" }).click()
 
-    await expect(page.getByText("User has been banned.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("User has been banned.")).toBeVisible()
     await expect(dialog).toBeHidden()
 
     // Status badge in row updates to Banned
-    await expect(row.getByText("Banned")).toBeVisible({ timeout: 15_000 })
+    await expect(row.getByText("Banned")).toBeVisible()
 
     // Verify signing in is blocked with the banned error message
     await withGuestPage(browser, async (bannedPage) => {
@@ -242,7 +236,7 @@ test.describe("Admin user management, security controls, and impersonation", () 
         bannedPage.getByText(
           "Your account has been banned. Please contact support if you believe this is an error."
         )
-      ).toBeVisible({ timeout: 15_000 })
+      ).toBeVisible()
       await expect(bannedPage).toHaveURL(/\/signin$/)
     })
   })
@@ -267,11 +261,9 @@ test.describe("Admin user management, security controls, and impersonation", () 
 
     await alertDialog.getByRole("button", { name: "Delete" }).click()
 
-    await expect(page.getByText("User has been deleted.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("User has been deleted.")).toBeVisible()
     await expect(alertDialog).toBeHidden()
-    await expect(row).toHaveCount(0, { timeout: 15_000 })
+    await expect(row).toHaveCount(0)
 
     // Verify admin accounts do not have an action menu (deletion cannot be initiated)
     const searchInput = page.getByPlaceholder(
@@ -312,10 +304,10 @@ test.describe("Admin user management, security controls, and impersonation", () 
 
     await expect(
       page.getByText("Now impersonating Target Impersonate User")
-    ).toBeVisible({ timeout: 15_000 })
+    ).toBeVisible()
 
     // Redirected to /home with impersonated user's view
-    await expect(page).toHaveURL(/\/home$/, { timeout: 15_000 })
+    await expect(page).toHaveURL(/\/home$/)
     await expectHomeGreeting(page, "Target Impersonate User")
 
     // Admin navigation link is not available to regular impersonated user
@@ -340,16 +332,14 @@ test.describe("Admin user management, security controls, and impersonation", () 
       .getByRole("button", { name: "Stop Impersonating" })
       .click()
 
-    await expect(page.getByText("Stopped impersonation session.")).toBeVisible({
-      timeout: 15_000,
-    })
+    await expect(page.getByText("Stopped impersonation session.")).toBeVisible()
     await expect(alertDialog).toBeHidden()
 
     // Restores admin session and redirects back to /admin
-    await expect(page).toHaveURL(/\/admin$/, { timeout: 15_000 })
+    await expect(page).toHaveURL(/\/admin$/)
     await expect(
       page.getByRole("heading", { name: "Admin Management" })
-    ).toBeVisible({ timeout: 15_000 })
+    ).toBeVisible()
     await expect(stopButton).toHaveCount(0)
   })
 })
