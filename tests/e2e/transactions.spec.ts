@@ -48,7 +48,6 @@ async function deleteTransactionByDescription(
     page,
     row.getByRole("button", { name: "Open menu" })
   )
-  await expect(page.getByText("Transaction has been deleted.")).toBeVisible()
   await expect(row).toHaveCount(0)
 }
 
@@ -196,6 +195,9 @@ test.describe("Transactions, Home dashboard, and Statistics", () => {
     await expect(updatedRow).toContainText("-185.000 ₫")
 
     await deleteTransactionByDescription(page, updatedDescription)
+    await expect(
+      page.getByText("Transaction has been deleted.", { exact: true })
+    ).toBeVisible()
   })
 
   test("displays the server-side duplicate error message when creating an identical transaction", async ({
