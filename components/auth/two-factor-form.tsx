@@ -8,6 +8,7 @@ import { useGoogleReCaptcha } from "react-google-recaptcha-v3"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
+import { revalidateCoreLayout } from "@/actions/revalidate.actions"
 import {
   Card,
   CardContent,
@@ -27,6 +28,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { isCaptchaDisabled } from "@/env/client"
 import { useSchemas } from "@/hooks/use-schemas"
 import type { Locale } from "@/i18n/config"
 import { setUserLocale } from "@/i18n/locale"
@@ -49,20 +51,29 @@ export function TwoFactorForm() {
 
   async function onSubmit(values: TwoFactorCodeFormValues) {
     try {
-      if (!executeRecaptcha) {
-        toast.error(t("CAPTCHA verification failed! Please try again later."))
-        return
-      }
+      const captchaDisabled = isCaptchaDisabled()
+      let token = ""
 
-      const token = await executeRecaptcha("two_factor")
+      if (!captchaDisabled) {
+        if (!executeRecaptcha) {
+          toast.error(t("CAPTCHA verification failed! Please try again later."))
+          return
+        }
+
+        token = await executeRecaptcha("two_factor")
+      }
 
       await authClient.twoFactor.verifyTotp({
         code: values.code,
         trustDevice: values.trustDevice,
         fetchOptions: {
-          headers: {
-            "x-captcha-response": token,
-          },
+          ...(captchaDisabled
+            ? {}
+            : {
+                headers: {
+                  "x-captcha-response": token,
+                },
+              }),
           onError: (ctx) => {
             const callbackUrl = getSafeCallbackUrl(searchParams.get("next"))
             const signInUrl: Route = searchParams.has("next")
@@ -104,8 +115,8 @@ export function TwoFactorForm() {
           onSuccess: async () => {
             const callbackUrl = getSafeCallbackUrl(searchParams.get("next"))
 
+            await revalidateCoreLayout()
             router.replace(callbackUrl)
-            router.refresh()
             form.reset()
 
             await authClient.getSession({

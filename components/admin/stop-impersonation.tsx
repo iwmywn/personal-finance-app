@@ -6,6 +6,7 @@ import { ShieldAlertIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 import { toast } from "sonner"
 
+import { revalidateCoreLayout } from "@/actions/revalidate.actions"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -52,11 +53,11 @@ export function StopImpersonation() {
                 t("Failed to stop impersonating! Please try again later.")
               )
             },
-            onSuccess: () => {
+            onSuccess: async () => {
               setIsOpen(false)
               toast.success(t("Stopped impersonation session."))
+              await revalidateCoreLayout()
               router.push("/admin")
-              router.refresh()
             },
           },
         })

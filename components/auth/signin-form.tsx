@@ -8,6 +8,7 @@ import { useGoogleReCaptcha } from "react-google-recaptcha-v3"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
+import { revalidateCoreLayout } from "@/actions/revalidate.actions"
 import { PasswordInput } from "@/components/password-input"
 import {
   Card,
@@ -27,6 +28,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { isCaptchaDisabled } from "@/env/client"
 import { useSchemas } from "@/hooks/use-schemas"
 import type { Locale } from "@/i18n/config"
 import { setUserLocale } from "@/i18n/locale"
@@ -54,20 +56,29 @@ export function SignInForm() {
 
   async function onSubmit(values: SignInFormValues) {
     try {
-      if (!executeRecaptcha) {
-        toast.error(t("CAPTCHA verification failed! Please try again later."))
-        return
-      }
+      const captchaDisabled = isCaptchaDisabled()
+      let token = ""
 
-      const token = await executeRecaptcha("sign_in")
+      if (!captchaDisabled) {
+        if (!executeRecaptcha) {
+          toast.error(t("CAPTCHA verification failed! Please try again later."))
+          return
+        }
+
+        token = await executeRecaptcha("sign_in")
+      }
 
       await authClient.signIn.username({
         username: values.username,
         password: values.password,
         fetchOptions: {
-          headers: {
-            "x-captcha-response": token,
-          },
+          ...(captchaDisabled
+            ? {}
+            : {
+                headers: {
+                  "x-captcha-response": token,
+                },
+              }),
           onError: (ctx) => {
             switch (ctx.error.code as AuthErrorCode) {
               case "VERIFICATION_FAILED":
@@ -112,8 +123,8 @@ export function SignInForm() {
               return
             }
 
+            await revalidateCoreLayout()
             router.push(callbackUrl)
-            router.refresh()
             form.reset()
 
             await authClient.getSession({

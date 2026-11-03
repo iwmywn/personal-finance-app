@@ -1,0 +1,33 @@
+services:
+  mongo:
+    image: mongo:7.0
+    container_name: pfa-mongo
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:27017:27017"
+    command: ["--replSet", "rs0", "--bind_ip_all"]
+    healthcheck:
+      test: >
+        mongosh --quiet --eval "
+          try {
+            if (!rs.status().ok) {
+              rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'localhost:27017'}]});
+            }
+          } catch (e) {
+            rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'localhost:27017'}]});
+          }
+          const s = rs.status();
+          if (!s.ok || (s.members && s.members[0].stateStr !== 'PRIMARY')) {
+            process.exit(1);
+          }
+        "
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
+

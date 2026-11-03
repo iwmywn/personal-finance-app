@@ -7,12 +7,47 @@ import { admin, captcha, twoFactor, username } from "better-auth/plugins"
 import * as z from "zod"
 
 import { siteConfig } from "@/app/pfa.config"
-import { clientEnv } from "@/env/client"
+import { clientEnv, isCaptchaDisabled } from "@/env/client"
 import { serverEnv } from "@/env/server"
 import { DEFAULT_LOCALE, LOCALES } from "@/i18n/config"
 import { CURRENCIES, DEFAULT_CURRENCY } from "@/lib/currency"
 import { connect } from "@/lib/db"
 import { ASSIGNABLE_ROLES, DEFAULT_ROLE } from "@/lib/role"
+
+const adminPlugin = admin()
+const captchaPlugin = captcha({
+  provider: "google-recaptcha",
+  secretKey: serverEnv.RECAPTCHA_SECRET,
+  endpoints: ["/sign-in/username", "/sign-in/email"],
+  minScore: 0.5,
+})
+const twoFactorPlugin = twoFactor({
+  schema: {
+    twoFactor: {
+      modelName: "twoFactors",
+    },
+  },
+})
+const usernamePlugin = username()
+const nextCookiesPlugin = nextCookies()
+
+const plugins = (
+  isCaptchaDisabled()
+    ? [adminPlugin, twoFactorPlugin, usernamePlugin, nextCookiesPlugin]
+    : [
+        adminPlugin,
+        captchaPlugin,
+        twoFactorPlugin,
+        usernamePlugin,
+        nextCookiesPlugin,
+      ]
+) as [
+  typeof adminPlugin,
+  typeof captchaPlugin,
+  typeof twoFactorPlugin,
+  typeof usernamePlugin,
+  typeof nextCookiesPlugin,
+]
 
 export const auth = betterAuth({
   appName: siteConfig.name,
@@ -63,24 +98,7 @@ export const auth = betterAuth({
   verification: {
     modelName: "verifications",
   },
-  plugins: [
-    admin(),
-    captcha({
-      provider: "google-recaptcha",
-      secretKey: serverEnv.RECAPTCHA_SECRET,
-      endpoints: ["/sign-in/username", "/sign-in/email"],
-      minScore: 0.5,
-    }),
-    twoFactor({
-      schema: {
-        twoFactor: {
-          modelName: "twoFactors",
-        },
-      },
-    }),
-    username(),
-    nextCookies(),
-  ],
+  plugins,
   advanced: {
     cookiePrefix: siteConfig.name,
     database: {

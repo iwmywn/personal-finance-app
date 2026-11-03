@@ -28,6 +28,7 @@ const withNextIntl = createNextIntlPlugin({
 })
 
 const nextConfig: NextConfig = {
+  distDir: process.env.NEXT_PUBLIC_NODE_ENV === "test" ? ".next-e2e" : ".next",
   devIndicators: {
     position: "bottom-right",
   },

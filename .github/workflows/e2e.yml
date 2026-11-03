@@ -1,0 +1,101 @@
+name: E2E
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches: ["**"]
+    types: [opened, reopened, synchronize, labeled]
+
+jobs:
+  e2e:
+    permissions:
+      contents: read
+    if: >-
+      github.event_name == 'push' ||
+      (github.event.action != 'labeled' &&
+       github.event.pull_request.author_association == 'OWNER') ||
+      (github.event.action == 'labeled' &&
+       github.event.label.name == 'run-e2e')
+    runs-on: ubuntu-latest
+    name: pnpm test:e2e
+    concurrency:
+      group: e2e-${{ github.ref }}
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+    env:
+      CI: true
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Start MongoDB replica set
+        run: |
+          trap 'echo "--- docker compose ps ---"; docker compose ps; echo "--- docker compose logs ---"; docker compose logs' ERR
+          docker compose up -d --wait
+
+      - name: Install Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24.22.2
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 12.16.1
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: |
+          echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v6
+        with:
+          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup Playwright browsers cache
+        id: playwright-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
+
+      - name: Install Playwright Chromium
+        run: |
+          if [ "${{ steps.playwright-cache.outputs.cache-hit }}" != "true" ]; then
+            pnpm exec playwright install --with-deps chromium
+          else
+            pnpm exec playwright install-deps chromium
+          fi
+
+      - name: Run E2E tests
+        env:
+          DB_URI: mongodb://localhost:27017/?replicaSet=rs0&directConnection=true
+          DB_NAME: pfa_test
+          RECAPTCHA_SECRET: e2e-dummy-recaptcha-secret
+          NEXT_PUBLIC_RECAPTCHA: e2e-dummy-recaptcha-site-key
+          CRON_SECRET: e2e-dummy-cron-secret
+          CURRENCY_API_SECRET: e2e-dummy-currency-api-secret
+        run: |
+          BETTER_AUTH_SECRET="$(openssl rand -base64 32)" pnpm test:e2e
+
+      - name: Upload Playwright failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-e2e-artifacts
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14

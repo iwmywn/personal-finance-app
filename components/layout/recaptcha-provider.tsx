@@ -3,7 +3,7 @@
 import { useLocale } from "next-intl"
 import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3"
 
-import { clientEnv } from "@/env/client"
+import { clientEnv, isCaptchaDisabled } from "@/env/client"
 
 export function ReCaptchaProvider({
   children,
@@ -11,6 +11,10 @@ export function ReCaptchaProvider({
   children: React.ReactNode
 }>) {
   const locale = useLocale()
+
+  if (isCaptchaDisabled()) {
+    return children
+  }
 
   return (
     <GoogleReCaptchaProvider

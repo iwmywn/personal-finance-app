@@ -12,6 +12,7 @@ import {
 import { useExtracted } from "next-intl"
 import { toast } from "sonner"
 
+import { revalidateCoreLayout } from "@/actions/revalidate.actions"
 import { BanUserForm } from "@/components/admin/ban-user-form"
 import { DeleteUser } from "@/components/admin/delete-user"
 import { SetUserPasswordForm } from "@/components/admin/set-user-password-form"
@@ -83,9 +84,9 @@ export function AdminTable({
                 break
             }
           },
-          onSuccess: () => {
+          onSuccess: async () => {
+            await revalidateCoreLayout()
             router.push("/home")
-            router.refresh()
             toast.success(t("Now impersonating") + ` ${targetUser.name}`)
           },
         },
