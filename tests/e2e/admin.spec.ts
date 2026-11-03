@@ -39,6 +39,7 @@ async function clickRowMenuItem(
 }
 
 test.describe("Admin user management, security controls, and impersonation", () => {
+  test.describe.configure({ retries: 0 })
   test.use({ storageState: E2E_GUEST_STORAGE_STATE })
 
   test.beforeEach(async ({ page }) => {
