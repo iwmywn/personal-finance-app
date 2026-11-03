@@ -8,6 +8,7 @@ import { useGoogleReCaptcha } from "react-google-recaptcha-v3"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
+import { revalidateCoreLayout } from "@/actions/revalidate.actions"
 import {
   Card,
   CardContent,
@@ -114,8 +115,8 @@ export function TwoFactorForm() {
           onSuccess: async () => {
             const callbackUrl = getSafeCallbackUrl(searchParams.get("next"))
 
+            await revalidateCoreLayout()
             router.replace(callbackUrl)
-            router.refresh()
             form.reset()
 
             await authClient.getSession({
