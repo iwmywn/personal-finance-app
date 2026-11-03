@@ -49,6 +49,7 @@ async function selectSettingsOption(
 }
 
 test.describe("Settings: profile, security, sessions, and preferences", () => {
+  test.describe.configure({ retries: 0 })
   test.use({ storageState: E2E_GUEST_STORAGE_STATE })
 
   test("changing the user's display name updates the name shown in the application UI", async ({
