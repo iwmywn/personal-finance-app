@@ -6,6 +6,7 @@ import {
   E2E_BASE_URL,
   E2E_DB_NAME,
   E2E_GUEST_STORAGE_STATE,
+  E2E_DB_URI,
   E2E_PORT,
   E2E_SETUP_WORKER_COUNT,
   E2E_TIMEZONE,
@@ -17,7 +18,12 @@ if (existsSync(envFilePath)) {
   process.loadEnvFile(envFilePath)
 }
 
+const isRemoteOptIn = process.env.E2E_ALLOW_REMOTE_DB === "true"
+
+const e2eDbUri = isRemoteOptIn ? process.env.DB_URI! : E2E_DB_URI
+
 const e2eEnvOverrides: Record<string, string> = {
+  DB_URI: e2eDbUri,
   DB_NAME: E2E_DB_NAME,
   CURRENCY_API_SECRET: "e2e-dummy-currency-api-secret",
   NEXT_PUBLIC_DISABLE_CAPTCHA: "true",

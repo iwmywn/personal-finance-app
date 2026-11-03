@@ -22,7 +22,10 @@
     "test:coverage": "vitest --coverage",
     "test:doctor": "vitest doctor",
     "check:po": "node scripts/check-po.js",
-    "skills:install": "npx skills experimental_install"
+    "skills:install": "npx skills experimental_install",
+    "db:up": "docker compose up -d --wait",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs -f"
   },
   "dependencies": {
     "@better-auth/mongo-adapter": "1.7.15",

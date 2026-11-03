@@ -34,30 +34,9 @@ jobs:
 
       - name: Start MongoDB replica set
         run: |
-          trap 'echo "--- docker ps -a ---"; docker ps -a; echo "--- mongo logs ---"; docker logs mongo' ERR
+          trap 'echo "--- docker compose ps ---"; docker compose ps; echo "--- docker compose logs ---"; docker compose logs' ERR
+          docker compose up -d --wait
 
-          docker run -d --name mongo -p 27017:27017 mongo:7.0 --replSet rs0 --bind_ip_all
-          sleep 3
-
-          for i in $(seq 1 30); do
-            if docker exec mongo mongosh --quiet --eval "db.runCommand({ ping: 1 }).ok" >/dev/null 2>&1; then
-              break
-            fi
-            sleep 1
-          done
-
-          docker exec mongo mongosh --quiet --eval 'rs.initiate({_id: "rs0", members: [{_id: 0, host: "localhost:27017"}]})'
-
-          for i in $(seq 1 30); do
-            STATE=$(docker exec mongo mongosh --quiet --eval "rs.status().myState" 2>/dev/null || echo "0")
-            if [ "$STATE" = "1" ]; then
-              exit 0
-            fi
-            sleep 1
-          done
-
-          echo "MongoDB replica set did not become PRIMARY" >&2
-          exit 1
       - name: Install Node.js
         uses: actions/setup-node@v7
         with:

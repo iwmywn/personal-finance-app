@@ -26,6 +26,87 @@ type SeedUserConfig = {
   twoFactorEnabled?: boolean
 }
 
+const LOCAL_HOSTNAMES = new Set([
+  "localhost",
+  "127.0.0.1",
+  "::1",
+  "[::1]",
+  "0.0.0.0",
+  "host.docker.internal",
+])
+
+export function getMongoHosts(uri: string): string {
+  try {
+    if (!uri || typeof uri !== "string") {
+      return "[unknown host]"
+    }
+
+    const schemeMatch = uri.match(/^mongodb(?:\+srv)?:\/\//)
+    if (!schemeMatch) {
+      return "[invalid URI]"
+    }
+
+    const withoutScheme = uri.slice(schemeMatch[0].length)
+    const authorityEndMatch = withoutScheme.search(/[/?]/)
+    const authority =
+      authorityEndMatch === -1
+        ? withoutScheme
+        : withoutScheme.slice(0, authorityEndMatch)
+
+    if (!authority) {
+      return "[empty host]"
+    }
+
+    const atIndex = authority.lastIndexOf("@")
+    const hostListStr =
+      atIndex === -1 ? authority : authority.slice(atIndex + 1)
+
+    return hostListStr || "[empty host]"
+  } catch {
+    return "[unparseable host]"
+  }
+}
+
+export function isLocalMongoUri(uri: string): boolean {
+  try {
+    if (!uri || typeof uri !== "string") {
+      return false
+    }
+
+    if (uri.startsWith("mongodb+srv://")) {
+      return false
+    }
+
+    if (!uri.startsWith("mongodb://")) {
+      return false
+    }
+
+    const hostListStr = getMongoHosts(uri)
+    const hostEntries = hostListStr.split(",")
+
+    return (
+      hostEntries.length > 0 &&
+      hostEntries.every((entry) => {
+        const trimmed = entry.trim()
+        if (!trimmed) return false
+
+        let hostname: string
+        if (trimmed.startsWith("[")) {
+          const closeIndex = trimmed.indexOf("]")
+          if (closeIndex === -1) return false
+          hostname = trimmed.slice(1, closeIndex)
+        } else {
+          hostname = trimmed.split(":")[0]
+        }
+
+        return LOCAL_HOSTNAMES.has(hostname.toLowerCase())
+      })
+    )
+  } catch {
+    return false
+  }
+}
+
 export default async function globalSetup(config: FullConfig): Promise<void> {
   if (serverEnv.DB_NAME !== E2E_DB_NAME) {
     throw new Error(
@@ -39,12 +120,28 @@ export default async function globalSetup(config: FullConfig): Promise<void> {
     )
   }
 
+  const allowRemoteDb = process.env.E2E_ALLOW_REMOTE_DB === "true"
+
+  if (!isLocalMongoUri(serverEnv.DB_URI) && !allowRemoteDb) {
+    const targetHost = getMongoHosts(serverEnv.DB_URI)
+    throw new Error(
+      `Refusing to run E2E global setup: serverEnv.DB_URI host ("${targetHost}") does not point to a local host. Set E2E_ALLOW_REMOTE_DB=true to override.`
+    )
+  }
+
   rmSync(E2E_AUTH_DIR, { recursive: true, force: true })
   mkdirSync(E2E_AUTH_DIR, { recursive: true })
 
   const workerCount = E2E_SETUP_WORKER_COUNT
   const client = new MongoClient(serverEnv.DB_URI)
-  await client.connect()
+  try {
+    await client.connect()
+  } catch (error) {
+    const targetHost = getMongoHosts(serverEnv.DB_URI)
+    throw new Error(
+      `Failed to connect to MongoDB at host "${targetHost}". Make sure your local MongoDB Docker container is running (run "pnpm db:up"). Error: ${error instanceof Error ? error.message : String(error)}`
+    )
+  }
 
   try {
     const db = client.db(serverEnv.DB_NAME)
