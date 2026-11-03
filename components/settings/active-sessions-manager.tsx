@@ -8,6 +8,7 @@ import { toast } from "sonner"
 import { UAParser } from "ua-parser-js"
 
 import { getLocationFromIP } from "@/actions/location.actions"
+import { revalidateCoreLayout } from "@/actions/revalidate.actions"
 import { getSessions, revokeSessionById } from "@/actions/session.actions"
 import { Button } from "@/components/ui/button"
 import {
@@ -121,10 +122,10 @@ export function ActiveSessionsManager() {
                 t("Failed to terminate session! Please try again later.")
               )
             },
-            onSuccess: () => {
+            onSuccess: async () => {
               toast.success(t("Session terminated."))
+              await revalidateCoreLayout()
               router.push("/admin")
-              router.refresh()
             },
           },
         })
@@ -171,10 +172,10 @@ export function ActiveSessionsManager() {
                 t("Failed to terminate all sessions! Please try again later.")
               )
             },
-            onSuccess: () => {
+            onSuccess: async () => {
               toast.success(t("All sessions terminated."))
+              await revalidateCoreLayout()
               router.push("/admin")
-              router.refresh()
             },
           },
         })
@@ -190,10 +191,10 @@ export function ActiveSessionsManager() {
               t("Failed to terminate all sessions! Please try again later.")
             )
           },
-          onSuccess: () => {
+          onSuccess: async () => {
             toast.success(t("All sessions terminated."))
+            await revalidateCoreLayout()
             router.push(signInRoute)
-            router.refresh()
           },
         },
       })

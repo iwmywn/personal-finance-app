@@ -6,6 +6,7 @@ import { LogOutIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 import { toast } from "sonner"
 
+import { revalidateCoreLayout } from "@/actions/revalidate.actions"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,11 +44,11 @@ export function SignOutButton() {
             onError: () => {
               toast.error(t("Failed to sign out! Please try again later."))
             },
-            onSuccess: () => {
+            onSuccess: async () => {
               setIsOpen(false)
               toast.success(t("Signed out."))
+              await revalidateCoreLayout()
               router.push(signInRoute)
-              router.refresh()
             },
           },
         })

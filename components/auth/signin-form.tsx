@@ -8,6 +8,7 @@ import { useGoogleReCaptcha } from "react-google-recaptcha-v3"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
+import { revalidateCoreLayout } from "@/actions/revalidate.actions"
 import { PasswordInput } from "@/components/password-input"
 import {
   Card,
@@ -122,8 +123,8 @@ export function SignInForm() {
               return
             }
 
+            await revalidateCoreLayout()
             router.push(callbackUrl)
-            router.refresh()
             form.reset()
 
             await authClient.getSession({
