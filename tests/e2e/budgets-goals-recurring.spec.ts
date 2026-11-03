@@ -154,8 +154,11 @@ test.describe("Budgets, Goals, and Recurring Transactions E2E", () => {
 
     const initialProgress = initialRow.getByRole("progressbar")
     await expect(initialProgress).toBeVisible()
-    await initialProgress.hover()
-    await expect(page.getByRole("tooltip")).toContainText("0.0%")
+    await expect(async () => {
+      await page.mouse.move(0, 0)
+      await initialProgress.hover()
+      await expect(page.getByRole("tooltip")).toContainText("0.0%")
+    }).toPass()
 
     await initialRow.getByRole("button", { name: "Open menu" }).click()
     await page.getByRole("menuitem", { name: "Edit" }).click()
@@ -192,62 +195,80 @@ test.describe("Budgets, Goals, and Recurring Transactions E2E", () => {
     const category = "Healthcare & Insurance"
     const expenseDescription = `E2E Budget Expense ${tag}`
 
-    await page.goto("/budgets")
-    await expect(page.getByRole("heading", { name: "Budgets" })).toBeVisible()
-    await ensureNoBudgetForCategories(page, [category])
+    try {
+      await page.goto("/budgets")
+      await expect(page.getByRole("heading", { name: "Budgets" })).toBeVisible()
+      await ensureNoBudgetForCategories(page, [category])
 
-    await openAndSubmitAddBudgetDialog(page, {
-      category,
-      amount: "1000000",
-    })
-    await expect(page.getByText("Budget has been created.")).toBeVisible()
+      await openAndSubmitAddBudgetDialog(page, {
+        category,
+        amount: "1000000",
+      })
+      await expect(page.getByText("Budget has been created.")).toBeVisible()
 
-    const budgetRow = page.getByRole("row").filter({ hasText: category })
-    await expect(budgetRow).toBeVisible()
-    await expect(budgetRow).toContainText("1.000.000 ₫")
-    await expect(budgetRow).toContainText(/(?<![\d.])0\s*₫/)
+      const budgetRow = page.getByRole("row").filter({ hasText: category })
+      await expect(budgetRow).toBeVisible()
+      await expect(budgetRow).toContainText("1.000.000 ₫")
+      await expect(budgetRow).toContainText(/(?<![\d.])0\s*₫/)
 
-    const progressBar = budgetRow.getByRole("progressbar")
-    await progressBar.hover()
-    await expect(page.getByRole("tooltip")).toContainText("0.0%")
+      const progressBar = budgetRow.getByRole("progressbar")
+      await expect(async () => {
+        await page.mouse.move(0, 0)
+        await progressBar.hover()
+        await expect(page.getByRole("tooltip")).toContainText("0.0%")
+      }).toPass()
 
-    // Record an expense transaction in the budgeted category on Today
-    await page.goto("/transactions")
-    await page.getByRole("button", { name: "Add" }).click()
-    const txDialog = page.getByRole("dialog")
-    await expect(
-      txDialog.getByRole("heading", { name: "Add Transaction" })
-    ).toBeVisible()
-    await txDialog.getByRole("tab", { name: "Outflow" }).click()
-    await txDialog.getByLabel("Category").click()
-    await page.getByRole("option", { name: new RegExp(`^${category}`) }).click()
-    await txDialog.getByLabel("Amount").fill("250000")
-    await txDialog.getByLabel("Description").fill(expenseDescription)
-    await selectTodayInDatePicker(page, txDialog, "Date")
-    await txDialog.getByRole("button", { name: "Add" }).click()
-    await expect(page.getByText("Transaction has been created.")).toBeVisible()
+      // Record an expense transaction in the budgeted category on Today
+      await page.goto("/transactions")
+      await page.getByRole("button", { name: "Add" }).click()
+      const txDialog = page.getByRole("dialog")
+      await expect(
+        txDialog.getByRole("heading", { name: "Add Transaction" })
+      ).toBeVisible()
+      await txDialog.getByRole("tab", { name: "Outflow" }).click()
+      await txDialog.getByLabel("Category").click()
+      await page
+        .getByRole("option", { name: new RegExp(`^${category}`) })
+        .click()
+      await txDialog.getByLabel("Amount").fill("250000")
+      await txDialog.getByLabel("Description").fill(expenseDescription)
+      await selectTodayInDatePicker(page, txDialog, "Date")
+      await txDialog.getByRole("button", { name: "Add" }).click()
+      await expect(
+        page.getByText("Transaction has been created.")
+      ).toBeVisible()
 
-    // Verify budget progress reflects the 250,000 VND expense (25.0% of 1,000,000 VND)
-    await page.goto("/budgets")
-    await expect(budgetRow).toBeVisible()
-    await expect(budgetRow).toContainText("1.000.000 ₫")
-    await expect(budgetRow).toContainText("250.000 ₫")
-    await expect(budgetRow).toContainText("750.000 ₫")
+      // Verify budget progress reflects the 250,000 VND expense (25.0% of 1,000,000 VND)
+      await page.goto("/budgets")
+      await expect(budgetRow).toBeVisible()
+      await expect(budgetRow).toContainText("1.000.000 ₫")
+      await expect(budgetRow).toContainText("250.000 ₫")
+      await expect(budgetRow).toContainText("750.000 ₫")
 
-    await progressBar.hover()
-    await expect(page.getByRole("tooltip")).toContainText("25.0%")
+      await expect(async () => {
+        await page.mouse.move(0, 0)
+        await progressBar.hover()
+        await expect(page.getByRole("tooltip")).toContainText("25.0%")
+      }).toPass()
+    } finally {
+      // Clean up the budget and the expense transaction
+      await page.goto("/budgets")
+      await ensureNoBudgetForCategories(page, [category])
 
-    // Clean up the budget and the expense transaction
-    await deleteBudgetByCategory(page, category)
-
-    await page.goto("/transactions")
-    await deleteRowViaMenu(page, {
-      rowText: expenseDescription,
-      dialogHeading: "Delete Transaction",
-      confirmMessage:
-        "Are you sure you want to delete this transaction? This action cannot be undone.",
-      successToast: "Transaction has been deleted.",
-    })
+      await page.goto("/transactions")
+      const expenseRow = page
+        .getByRole("row")
+        .filter({ hasText: expenseDescription })
+      if ((await expenseRow.count()) > 0) {
+        await deleteRowViaMenu(page, {
+          rowText: expenseDescription,
+          dialogHeading: "Delete Transaction",
+          confirmMessage:
+            "Are you sure you want to delete this transaction? This action cannot be undone.",
+          successToast: "Transaction has been deleted.",
+        })
+      }
+    }
   })
 
   test("displays the server-side duplicate error message when creating a budget that already exists", async ({
