@@ -55,9 +55,9 @@ export function ChangeNameForm() {
           },
           onSuccess: () => {
             setIsOpen(false)
+            form.reset({ name: values.name })
             toast.success(t("Your name has been updated."))
             router.refresh()
-            form.reset({ name: values.name })
           },
         },
       })

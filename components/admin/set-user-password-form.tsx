@@ -63,9 +63,9 @@ export function SetUserPasswordForm({
           },
           onSuccess: () => {
             setIsOpen(false)
+            form.reset()
             toast.success(t("Password has been updated."))
             router.refresh()
-            form.reset()
           },
         },
       })

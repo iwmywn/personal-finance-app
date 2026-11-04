@@ -117,9 +117,9 @@ export function GoalForm({ goal, isOpen, setIsOpen }: GoalFormProps) {
           toast.error(error)
         } else {
           setIsOpen(false)
+          form.reset()
           toast.success(success)
           router.refresh()
-          form.reset()
         }
       } catch {
         toast.error(t("Failed to create goal! Please try again later."))

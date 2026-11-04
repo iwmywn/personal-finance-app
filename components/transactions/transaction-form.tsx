@@ -132,12 +132,12 @@ export function TransactionForm({
           toast.error(error)
         } else {
           setIsOpen(false)
-          toast.success(success)
-          router.refresh()
           form.reset({
             ...form.formState.defaultValues,
             type,
           })
+          toast.success(success)
+          router.refresh()
         }
       } catch {
         toast.error(t("Failed to create transaction! Please try again later."))
