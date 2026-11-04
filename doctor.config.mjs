@@ -1,6 +1,6 @@
 /** @type {import('react-doctor/api').ReactDoctorConfig } */
 const reactDoctorConfig = {
-  projects: ["personal-finance-app"],
+  projects: ["vozix"],
   ignore: {
     files: [
       ".next/**",

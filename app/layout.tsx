@@ -6,7 +6,7 @@ import { NextIntlClientProvider } from "next-intl"
 import { getExtracted, getLocale } from "next-intl/server"
 
 import { fontDisplay, fontMono } from "@/app/fonts"
-import { siteConfig } from "@/app/pfa.config"
+import { siteConfig } from "@/app/vozix.config"
 import { ClientLang } from "@/components/layout/client-lang"
 import { ClientTimezone } from "@/components/layout/client-timezone"
 import { OfflineNotifier } from "@/components/layout/offline-notifier"

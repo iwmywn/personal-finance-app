@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
 
 import { getSession } from "@/actions/session.actions"
-import { siteConfig } from "@/app/pfa.config"
+import { siteConfig } from "@/app/vozix.config"
 import { AppSidebar } from "@/components/layout/app-sidebar"
 import { Header } from "@/components/layout/header"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"

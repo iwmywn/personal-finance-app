@@ -3,7 +3,7 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 import { getSessionCookie } from "better-auth/cookies"
 
-import { siteConfig } from "@/app/pfa.config"
+import { siteConfig } from "@/app/vozix.config"
 import { auth } from "@/lib/auth"
 import { isAdminRole } from "@/lib/role"
 import * as routes from "@/routes"

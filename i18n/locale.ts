@@ -3,7 +3,7 @@
 import { cache } from "react"
 import { cookies, headers } from "next/headers"
 
-import { siteConfig } from "@/app/pfa.config"
+import { siteConfig } from "@/app/vozix.config"
 import { DEFAULT_LOCALE, LOCALES } from "@/i18n/config"
 import type { Locale } from "@/i18n/config"
 import { auth } from "@/lib/auth"

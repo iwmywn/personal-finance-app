@@ -118,14 +118,14 @@ export function SignInForm() {
               const twoFactorUrl: Route = searchParams.has("next")
                 ? `${twoFactorRoute}?${new URLSearchParams({ next: callbackUrl }).toString()}`
                 : twoFactorRoute
-              router.push(twoFactorUrl)
               form.reset()
+              router.push(twoFactorUrl)
               return
             }
 
             await revalidateCoreLayout()
-            router.push(callbackUrl)
             form.reset()
+            router.push(callbackUrl)
 
             await authClient.getSession({
               fetchOptions: {

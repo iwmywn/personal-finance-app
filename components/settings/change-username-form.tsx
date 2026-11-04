@@ -76,9 +76,9 @@ export function ChangeUsernameForm() {
             },
             onSuccess: () => {
               setIsOpen(false)
+              form.reset({ username: values.username })
               toast.success(t("Your username has been changed."))
               router.refresh()
-              form.reset({ username: values.username })
             },
           },
         })

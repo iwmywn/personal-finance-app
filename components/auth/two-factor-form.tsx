@@ -85,25 +85,25 @@ export function TwoFactorForm() {
                 toast.error(t("Invalid authentication code!"))
                 break
               case "TOO_MANY_ATTEMPTS_REQUEST_NEW_CODE":
+                form.reset()
                 toast.error(t("Too many attempts. Please sign in again."))
                 router.replace(signInUrl)
-                form.reset()
                 break
               case "INVALID_TWO_FACTOR_COOKIE":
+                form.reset()
                 toast.error(
                   t("Two-factor session has expired. Please sign in again.")
                 )
                 router.replace(signInUrl)
-                form.reset()
                 break
               case "ACCOUNT_TEMPORARILY_LOCKED":
+                form.reset()
                 toast.error(
                   t(
                     "Your account is temporarily locked due to too many failed attempts. Please try again later."
                   )
                 )
                 router.replace(signInUrl)
-                form.reset()
                 break
               default:
                 toast.error(
@@ -116,8 +116,8 @@ export function TwoFactorForm() {
             const callbackUrl = getSafeCallbackUrl(searchParams.get("next"))
 
             await revalidateCoreLayout()
-            router.replace(callbackUrl)
             form.reset()
+            router.replace(callbackUrl)
 
             await authClient.getSession({
               fetchOptions: {

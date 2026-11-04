@@ -231,10 +231,10 @@ function VerifyTwoFactorForm({
           },
           onSuccess: () => {
             setIsOpen(false)
-            toast.success(t("Two-factor authentication is now enabled."))
-            router.refresh()
             setTotpURI(null)
             form.reset()
+            toast.success(t("Two-factor authentication is now enabled."))
+            router.refresh()
           },
         },
       })
@@ -319,9 +319,9 @@ function DisableTwoFactorForm({ setIsOpen }: DisableTwoFactorFormProps) {
           },
           onSuccess: () => {
             setIsOpen(false)
+            form.reset()
             toast.success(t("Two-factor authentication is now disabled."))
             router.refresh()
-            form.reset()
           },
         },
       })

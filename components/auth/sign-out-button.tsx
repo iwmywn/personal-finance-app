@@ -45,9 +45,9 @@ export function SignOutButton() {
               toast.error(t("Failed to sign out! Please try again later."))
             },
             onSuccess: async () => {
+              await revalidateCoreLayout()
               setIsOpen(false)
               toast.success(t("Signed out."))
-              await revalidateCoreLayout()
               router.push(signInRoute)
             },
           },

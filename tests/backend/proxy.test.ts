@@ -5,7 +5,7 @@ import {
   mockAuthenticatedUser,
   mockUnauthenticatedUser,
 } from "@/tests/backend/mocks/session.mock"
-import { siteConfig } from "@/app/pfa.config"
+import { siteConfig } from "@/app/vozix.config"
 import { clientEnv } from "@/env/client"
 import proxy from "@/proxy"
 import * as routes from "@/routes"

@@ -8,7 +8,7 @@ import { PanelLeftIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 import { Slot } from "radix-ui"
 
-import { siteConfig } from "@/app/pfa.config"
+import { siteConfig } from "@/app/vozix.config"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"

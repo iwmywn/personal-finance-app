@@ -2,7 +2,7 @@
 
 import { useEffect } from "react"
 
-import { siteConfig } from "@/app/pfa.config"
+import { siteConfig } from "@/app/vozix.config"
 
 const COOKIE_NAME = siteConfig.cookies.timezone
 const ONE_YEAR_SECONDS = 365 * 24 * 60 * 60

@@ -1,4 +1,4 @@
-[wip] my personal finance app
+my finance app
 
 ---
 

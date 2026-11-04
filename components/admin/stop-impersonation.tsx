@@ -54,9 +54,9 @@ export function StopImpersonation() {
               )
             },
             onSuccess: async () => {
+              await revalidateCoreLayout()
               setIsOpen(false)
               toast.success(t("Stopped impersonation session."))
-              await revalidateCoreLayout()
               router.push("/admin")
             },
           },
@@ -107,7 +107,7 @@ export function StopImpersonation() {
           <AlertDialogCancel disabled={isPending}>
             {t("Cancel")}
           </AlertDialogCancel>
-          <AlertDialogAction onClick={onStopImpersonating}>
+          <AlertDialogAction onClick={onStopImpersonating} disabled={isPending}>
             {isPending && <Spinner />} {t("Stop Impersonating")}
           </AlertDialogAction>
         </AlertDialogFooter>
