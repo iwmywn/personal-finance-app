@@ -724,6 +724,8 @@ msgid "Email address is not yet verified"
 msgstr "メールアドレスはまだ確認されていません"
 
 #: components/admin/admin-table.tsx
+#: components/admin/ban-user-form.tsx
+#: components/admin/unban-user-form.tsx
 msgctxt "yXnEV2"
 msgid "No reason"
 msgstr "理由なし"
@@ -755,7 +757,7 @@ msgid "Reset Password"
 msgstr "パスワードをリセット"
 
 #: components/admin/admin-table.tsx
-#: components/admin/ban-user-form.tsx
+#: components/admin/unban-user-form.tsx
 msgctxt "6U4eIn"
 msgid "Unban"
 msgstr "BAN解除"
@@ -783,16 +785,6 @@ msgid "Delete"
 msgstr "削除"
 
 #: components/admin/ban-user-form.tsx
-msgctxt "aRQh8u"
-msgid "Failed to update ban status! Please try again later."
-msgstr "BAN状態の更新に失敗しました！後でもう一度お試しください。"
-
-#: components/admin/ban-user-form.tsx
-msgctxt "tLY3l1"
-msgid "User has been unbanned."
-msgstr "ユーザーのBANが解除されました。"
-
-#: components/admin/ban-user-form.tsx
 msgctxt "ViifPP"
 msgid "Failed to ban user! Please try again later."
 msgstr "ユーザーのBANに失敗しました！後でもう一度お試しください。"
@@ -803,39 +795,14 @@ msgid "User has been banned."
 msgstr "ユーザーがBANされました。"
 
 #: components/admin/ban-user-form.tsx
-msgctxt "aFpb8P"
-msgid "Unban User"
-msgstr "ユーザーのBANを解除"
-
-#: components/admin/ban-user-form.tsx
 msgctxt "Ro3EXO"
 msgid "Ban User"
 msgstr "ユーザーをBAN"
 
 #: components/admin/ban-user-form.tsx
-msgctxt "bZ5A9F"
-msgid "Restore access for"
-msgstr "アクセス権を復元:"
-
-#: components/admin/ban-user-form.tsx
 msgctxt "fJtO6z"
 msgid "Prevent this user from signing in and revoke all active sessions."
 msgstr "このユーザーのサインインを防ぎ、すべてのアクティブセッションを取り消します。"
-
-#: components/admin/ban-user-form.tsx
-msgctxt "4pV2cx"
-msgid "Current ban reason"
-msgstr "現在のBAN理由"
-
-#: components/admin/ban-user-form.tsx
-msgctxt "09AU_2"
-msgid "No reason specified"
-msgstr "理由が指定されていません"
-
-#: components/admin/ban-user-form.tsx
-msgctxt "0t4WRs"
-msgid "Expires on"
-msgstr "有効期限:"
 
 #: components/admin/ban-user-form.tsx
 msgctxt "VGVk-h"
@@ -876,6 +843,31 @@ msgstr "7日間"
 msgctxt "vgJsLx"
 msgid "30 Days"
 msgstr "30日間"
+
+#: components/admin/ban-user-form.tsx
+#: components/admin/create-user-form.tsx
+#: components/admin/delete-user.tsx
+#: components/admin/set-user-password-form.tsx
+#: components/admin/stop-impersonation.tsx
+#: components/admin/unban-user-form.tsx
+#: components/auth/sign-out-button.tsx
+#: components/budgets/budget-form.tsx
+#: components/budgets/delete-budget.tsx
+#: components/categories/category-form.tsx
+#: components/categories/delete-category.tsx
+#: components/goals/delete-goal.tsx
+#: components/goals/goal-form.tsx
+#: components/recurring-transactions/delete-recurring-transaction.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/settings/change-name-form.tsx
+#: components/settings/change-password-form.tsx
+#: components/settings/change-username-form.tsx
+#: components/settings/two-factor-manager.tsx
+#: components/transactions/delete-transaction.tsx
+#: components/transactions/transaction-form.tsx
+msgctxt "47FYwb"
+msgid "Cancel"
+msgstr "キャンセル"
 
 #: components/admin/create-user-form.tsx
 #: components/settings/change-username-form.tsx
@@ -963,19 +955,6 @@ msgctxt "qSy-Lo"
 msgid "All associated data will be permanently deleted. This action cannot be undone."
 msgstr "関連するすべてのデータは完全に削除されます。この操作は元に戻せません。"
 
-#: components/admin/delete-user.tsx
-#: components/admin/stop-impersonation.tsx
-#: components/auth/sign-out-button.tsx
-#: components/budgets/delete-budget.tsx
-#: components/categories/delete-category.tsx
-#: components/goals/delete-goal.tsx
-#: components/recurring-transactions/delete-recurring-transaction.tsx
-#: components/transactions/delete-transaction.tsx
-#: components/ui/dialog.tsx
-msgctxt "47FYwb"
-msgid "Cancel"
-msgstr "キャンセル"
-
 #: components/admin/set-user-password-form.tsx
 msgctxt "VvoQv7"
 msgid "Failed to set user password! Please try again later."
@@ -1045,6 +1024,36 @@ msgstr "停止すると管理者セッションが復元され、管理パネル
 msgctxt "d0A6B0"
 msgid "Stop Impersonating"
 msgstr "なりすましを停止"
+
+#: components/admin/unban-user-form.tsx
+msgctxt "aRQh8u"
+msgid "Failed to update ban status! Please try again later."
+msgstr "BAN状態の更新に失敗しました！後でもう一度お試しください。"
+
+#: components/admin/unban-user-form.tsx
+msgctxt "tLY3l1"
+msgid "User has been unbanned."
+msgstr "ユーザーのBANが解除されました。"
+
+#: components/admin/unban-user-form.tsx
+msgctxt "aFpb8P"
+msgid "Unban User"
+msgstr "ユーザーのBANを解除"
+
+#: components/admin/unban-user-form.tsx
+msgctxt "bZ5A9F"
+msgid "Restore access for"
+msgstr "アクセス権を復元:"
+
+#: components/admin/unban-user-form.tsx
+msgctxt "4pV2cx"
+msgid "Current ban reason"
+msgstr "現在のBAN理由"
+
+#: components/admin/unban-user-form.tsx
+msgctxt "0t4WRs"
+msgid "Expires on"
+msgstr "有効期限:"
 
 #: components/auth/language-selector.tsx
 #: components/settings/language-selector.tsx

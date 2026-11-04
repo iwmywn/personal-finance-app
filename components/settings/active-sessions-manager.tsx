@@ -111,6 +111,8 @@ export function ActiveSessionsManager() {
   }, [isOpen, sortedSessions, locations])
 
   async function handleRevokeSession(sessionId: string) {
+    if (isTerminating !== undefined || isRevokingAll) return
+
     setIsTerminating(sessionId)
 
     try {
@@ -151,6 +153,8 @@ export function ActiveSessionsManager() {
   }
 
   async function handleRevokeAllSessions() {
+    if (isRevokingAll || isTerminating !== undefined) return
+
     setIsRevokingAll(true)
 
     try {
@@ -208,7 +212,13 @@ export function ActiveSessionsManager() {
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!isRevokingAll && isTerminating === undefined)
+          handleOpenChange(open)
+      }}
+    >
       <DialogTrigger asChild>
         <Button variant="outline">{t("View Active Sessions")}</Button>
       </DialogTrigger>
@@ -268,7 +278,7 @@ export function ActiveSessionsManager() {
                       variant="outline"
                       size="sm"
                       onClick={() => handleRevokeSession(s.id)}
-                      disabled={isTerminating === s.id || isRevokingAll}
+                      disabled={isTerminating !== undefined || isRevokingAll}
                     >
                       {isTerminating === s.id && <Spinner />}
                       {t("Terminate")}

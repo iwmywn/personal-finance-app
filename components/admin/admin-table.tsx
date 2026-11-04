@@ -16,6 +16,7 @@ import { revalidateCoreLayout } from "@/actions/revalidate.actions"
 import { BanUserForm } from "@/components/admin/ban-user-form"
 import { DeleteUser } from "@/components/admin/delete-user"
 import { SetUserPasswordForm } from "@/components/admin/set-user-password-form"
+import { UnbanUserForm } from "@/components/admin/unban-user-form"
 import { EmptyState } from "@/components/empty-state"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -93,7 +94,6 @@ export function AdminTable({
       })
     } catch {
       toast.error(t("Failed to impersonate user! Please try again later."))
-      setImpersonatingId(null)
     }
 
     setImpersonatingId(null)
@@ -293,12 +293,21 @@ export function AdminTable({
 
       {selectedUser && (
         <>
-          <BanUserForm
-            key={selectedUser.id + "BanUserForm"}
-            user={selectedUser}
-            isOpen={isBanOpen}
-            setIsOpen={setIsBanOpen}
-          />
+          {isUserBanned(selectedUser) ? (
+            <UnbanUserForm
+              key={selectedUser.id + "UnbanUserForm"}
+              user={selectedUser}
+              isOpen={isBanOpen}
+              setIsOpen={setIsBanOpen}
+            />
+          ) : (
+            <BanUserForm
+              key={selectedUser.id + "BanUserForm"}
+              user={selectedUser}
+              isOpen={isBanOpen}
+              setIsOpen={setIsBanOpen}
+            />
+          )}
           <SetUserPasswordForm
             key={selectedUser.id + "SetUserPasswordForm"}
             user={selectedUser}

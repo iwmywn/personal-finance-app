@@ -6,8 +6,9 @@ import { XIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 import { Dialog as DialogPrimitive } from "radix-ui"
 
-import { Button } from "@/components/ui/button"
 import { ReticleCorners } from "@/components/ui/reticle"
+
+import { Button } from "./button"
 
 function Dialog({
   ...props
@@ -27,10 +28,21 @@ function DialogPortal({
   return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />
 }
 
-function DialogClose({
+function DialogCancel({
+  className,
+  children,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Close>) {
-  return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
+  return (
+    <DialogPrimitive.Close
+      data-slot="dialog-close"
+      className={cn("", className)}
+      asChild
+      {...props}
+    >
+      <Button variant="outline">{children}</Button>
+    </DialogPrimitive.Close>
+  )
 }
 
 function DialogOverlay({
@@ -105,14 +117,9 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
 
 function DialogFooter({
   className,
-  showCancelButton = false,
   children,
   ...props
-}: React.ComponentProps<"div"> & {
-  showCancelButton?: boolean
-}) {
-  const t = useExtracted()
-
+}: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="dialog-footer"
@@ -122,11 +129,6 @@ function DialogFooter({
       )}
       {...props}
     >
-      {showCancelButton && (
-        <DialogClose asChild>
-          <Button variant="outline">{t("Cancel")}</Button>
-        </DialogClose>
-      )}
       {children}
     </div>
   )
@@ -163,7 +165,7 @@ function DialogDescription({
 
 export {
   Dialog,
-  DialogClose,
+  DialogCancel,
   DialogContent,
   DialogDescription,
   DialogFooter,

@@ -724,9 +724,11 @@ msgid "Email address is not yet verified"
 msgstr "邮箱地址尚未验证"
 
 #: components/admin/admin-table.tsx
+#: components/admin/ban-user-form.tsx
+#: components/admin/unban-user-form.tsx
 msgctxt "yXnEV2"
 msgid "No reason"
-msgstr "无原因"
+msgstr "无理由"
 
 #: components/admin/admin-table.tsx
 msgctxt "xhQMeQ"
@@ -755,7 +757,7 @@ msgid "Reset Password"
 msgstr "重置密码"
 
 #: components/admin/admin-table.tsx
-#: components/admin/ban-user-form.tsx
+#: components/admin/unban-user-form.tsx
 msgctxt "6U4eIn"
 msgid "Unban"
 msgstr "解封"
@@ -783,16 +785,6 @@ msgid "Delete"
 msgstr "删除"
 
 #: components/admin/ban-user-form.tsx
-msgctxt "aRQh8u"
-msgid "Failed to update ban status! Please try again later."
-msgstr "更新封禁状态失败！请稍后再试。"
-
-#: components/admin/ban-user-form.tsx
-msgctxt "tLY3l1"
-msgid "User has been unbanned."
-msgstr "已解除对该用户的封禁。"
-
-#: components/admin/ban-user-form.tsx
 msgctxt "ViifPP"
 msgid "Failed to ban user! Please try again later."
 msgstr "封禁用户失败！请稍后再试。"
@@ -803,39 +795,14 @@ msgid "User has been banned."
 msgstr "用户已被封禁。"
 
 #: components/admin/ban-user-form.tsx
-msgctxt "aFpb8P"
-msgid "Unban User"
-msgstr "解封用户"
-
-#: components/admin/ban-user-form.tsx
 msgctxt "Ro3EXO"
 msgid "Ban User"
 msgstr "封禁用户"
 
 #: components/admin/ban-user-form.tsx
-msgctxt "bZ5A9F"
-msgid "Restore access for"
-msgstr "恢复访问权限："
-
-#: components/admin/ban-user-form.tsx
 msgctxt "fJtO6z"
 msgid "Prevent this user from signing in and revoke all active sessions."
 msgstr "阻止此用户登录并撤销所有活跃会话。"
-
-#: components/admin/ban-user-form.tsx
-msgctxt "4pV2cx"
-msgid "Current ban reason"
-msgstr "当前封禁原因"
-
-#: components/admin/ban-user-form.tsx
-msgctxt "09AU_2"
-msgid "No reason specified"
-msgstr "未指定原因"
-
-#: components/admin/ban-user-form.tsx
-msgctxt "0t4WRs"
-msgid "Expires on"
-msgstr "过期时间于"
 
 #: components/admin/ban-user-form.tsx
 msgctxt "VGVk-h"
@@ -876,6 +843,31 @@ msgstr "7天"
 msgctxt "vgJsLx"
 msgid "30 Days"
 msgstr "30天"
+
+#: components/admin/ban-user-form.tsx
+#: components/admin/create-user-form.tsx
+#: components/admin/delete-user.tsx
+#: components/admin/set-user-password-form.tsx
+#: components/admin/stop-impersonation.tsx
+#: components/admin/unban-user-form.tsx
+#: components/auth/sign-out-button.tsx
+#: components/budgets/budget-form.tsx
+#: components/budgets/delete-budget.tsx
+#: components/categories/category-form.tsx
+#: components/categories/delete-category.tsx
+#: components/goals/delete-goal.tsx
+#: components/goals/goal-form.tsx
+#: components/recurring-transactions/delete-recurring-transaction.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/settings/change-name-form.tsx
+#: components/settings/change-password-form.tsx
+#: components/settings/change-username-form.tsx
+#: components/settings/two-factor-manager.tsx
+#: components/transactions/delete-transaction.tsx
+#: components/transactions/transaction-form.tsx
+msgctxt "47FYwb"
+msgid "Cancel"
+msgstr "取消"
 
 #: components/admin/create-user-form.tsx
 #: components/settings/change-username-form.tsx
@@ -963,19 +955,6 @@ msgctxt "qSy-Lo"
 msgid "All associated data will be permanently deleted. This action cannot be undone."
 msgstr "所有相关数据将被永久删除。此操作无法撤销。"
 
-#: components/admin/delete-user.tsx
-#: components/admin/stop-impersonation.tsx
-#: components/auth/sign-out-button.tsx
-#: components/budgets/delete-budget.tsx
-#: components/categories/delete-category.tsx
-#: components/goals/delete-goal.tsx
-#: components/recurring-transactions/delete-recurring-transaction.tsx
-#: components/transactions/delete-transaction.tsx
-#: components/ui/dialog.tsx
-msgctxt "47FYwb"
-msgid "Cancel"
-msgstr "取消"
-
 #: components/admin/set-user-password-form.tsx
 msgctxt "VvoQv7"
 msgid "Failed to set user password! Please try again later."
@@ -1045,6 +1024,36 @@ msgstr "停止后将恢复您的管理员会话，并将您重定向回管理面
 msgctxt "d0A6B0"
 msgid "Stop Impersonating"
 msgstr "停止模拟"
+
+#: components/admin/unban-user-form.tsx
+msgctxt "aRQh8u"
+msgid "Failed to update ban status! Please try again later."
+msgstr "更新封禁状态失败！请稍后再试。"
+
+#: components/admin/unban-user-form.tsx
+msgctxt "tLY3l1"
+msgid "User has been unbanned."
+msgstr "已解除对该用户的封禁。"
+
+#: components/admin/unban-user-form.tsx
+msgctxt "aFpb8P"
+msgid "Unban User"
+msgstr "解封用户"
+
+#: components/admin/unban-user-form.tsx
+msgctxt "bZ5A9F"
+msgid "Restore access for"
+msgstr "恢复访问权限："
+
+#: components/admin/unban-user-form.tsx
+msgctxt "4pV2cx"
+msgid "Current ban reason"
+msgstr "当前封禁原因"
+
+#: components/admin/unban-user-form.tsx
+msgctxt "0t4WRs"
+msgid "Expires on"
+msgstr "过期时间于"
 
 #: components/auth/language-selector.tsx
 #: components/settings/language-selector.tsx

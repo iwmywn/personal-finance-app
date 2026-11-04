@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   Dialog,
+  DialogCancel,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -90,7 +91,12 @@ export function ChangePasswordForm() {
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!form.formState.isSubmitting) setIsOpen(open)
+      }}
+    >
       <DialogTrigger asChild>
         <Button variant="outline">{t("Change Password")}</Button>
       </DialogTrigger>
@@ -184,7 +190,10 @@ export function ChangePasswordForm() {
               )}
             />
 
-            <DialogFooter showCancelButton>
+            <DialogFooter>
+              <DialogCancel disabled={form.formState.isSubmitting}>
+                {t("Cancel")}
+              </DialogCancel>
               <FormButton isSubmitting={form.formState.isSubmitting}>
                 {t("Save")}
               </FormButton>

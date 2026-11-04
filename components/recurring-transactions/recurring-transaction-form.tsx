@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
   Dialog,
+  DialogCancel,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -141,7 +142,12 @@ export function RecurringTransactionForm({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!form.formState.isSubmitting) setIsOpen(open)
+      }}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{t("Add Recurring Transaction")}</DialogTitle>
@@ -450,7 +456,10 @@ export function RecurringTransactionForm({
               )}
             />
 
-            <DialogFooter showCancelButton>
+            <DialogFooter>
+              <DialogCancel disabled={form.formState.isSubmitting}>
+                {t("Cancel")}
+              </DialogCancel>
               <FormButton isSubmitting={form.formState.isSubmitting}>
                 {t("Add")}
               </FormButton>

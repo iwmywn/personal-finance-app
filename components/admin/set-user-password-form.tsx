@@ -9,6 +9,7 @@ import { toast } from "sonner"
 import { PasswordInput } from "@/components/password-input"
 import {
   Dialog,
+  DialogCancel,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -75,7 +76,12 @@ export function SetUserPasswordForm({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!form.formState.isSubmitting) setIsOpen(open)
+      }}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{t("Reset User Password")}</DialogTitle>
@@ -108,7 +114,10 @@ export function SetUserPasswordForm({
               )}
             />
 
-            <DialogFooter showCancelButton>
+            <DialogFooter>
+              <DialogCancel disabled={form.formState.isSubmitting}>
+                {t("Cancel")}
+              </DialogCancel>
               <FormButton isSubmitting={form.formState.isSubmitting}>
                 {t("Update")}
               </FormButton>

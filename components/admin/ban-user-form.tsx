@@ -1,15 +1,14 @@
 "use client"
 
-import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useExtracted } from "next-intl"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 
-import { Button } from "@/components/ui/button"
 import {
   Dialog,
+  DialogCancel,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -33,12 +32,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Spinner } from "@/components/ui/spinner"
-import { useFormatDate } from "@/hooks/use-format-date"
 import { useSchemas } from "@/hooks/use-schemas"
 import { authClient } from "@/lib/auth-client"
 import type { User } from "@/lib/definitions"
-import { isUserBanned } from "@/lib/utils"
 import type { AdminBanFormValues } from "@/schemas/types"
 
 interface BanUserFormProps {
@@ -50,54 +46,33 @@ interface BanUserFormProps {
 export function BanUserForm({ user, isOpen, setIsOpen }: BanUserFormProps) {
   const t = useExtracted()
   const router = useRouter()
-  const formatDate = useFormatDate()
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
-  const isBanned = isUserBanned(user)
   const { createAdminBanSchema } = useSchemas()
+  const banSchema = createAdminBanSchema()
   const form = useForm<AdminBanFormValues>({
-    resolver: zodResolver(createAdminBanSchema()),
+    resolver: (values, context, options) => {
+      const normalizedValues: AdminBanFormValues = {
+        ...values,
+        banReason: values.banReason?.trim() || undefined,
+      }
+      return zodResolver(banSchema)(normalizedValues, context, options)
+    },
     defaultValues: {
       banReason: "",
       duration: "permanent",
     },
   })
 
-  async function handleUnban() {
-    setIsSubmitting(true)
-
-    try {
-      await authClient.admin.unbanUser({
-        userId: user.id,
-        fetchOptions: {
-          onError: () => {
-            toast.error(
-              t("Failed to update ban status! Please try again later.")
-            )
-          },
-          onSuccess: () => {
-            setIsOpen(false)
-            toast.success(t("User has been unbanned."))
-            router.refresh()
-          },
-        },
-      })
-      setIsSubmitting(false)
-    } catch {
-      setIsSubmitting(false)
-      toast.error(t("Failed to update ban status! Please try again later."))
-    }
-  }
-
-  async function onSubmit(values: AdminBanFormValues) {
+  async function handleBan(values: AdminBanFormValues) {
     const expiresInSeconds =
       values.duration === "permanent" ? undefined : Number(values.duration)
-
-    setIsSubmitting(true)
 
     try {
       await authClient.admin.banUser({
         userId: user.id,
-        banReason: values.banReason?.trim() || undefined,
+        // Do not use Better Auth's default ban reason; fallback to localized "No reason"
+        // in the admin's current language.
+        // [See official docs](https://better-auth.com/docs/plugins/admin#default-ban-reason)
+        banReason: values.banReason?.trim() || t("No reason"),
         banExpiresIn: expiresInSeconds,
         fetchOptions: {
           onError: () => {
@@ -111,109 +86,89 @@ export function BanUserForm({ user, isOpen, setIsOpen }: BanUserFormProps) {
           },
         },
       })
-      setIsSubmitting(false)
     } catch {
-      setIsSubmitting(false)
       toast.error(t("Failed to ban user! Please try again later."))
     }
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!form.formState.isSubmitting) setIsOpen(open)
+      }}
+    >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>
-            {isBanned ? t("Unban User") : t("Ban User")}
-          </DialogTitle>
+          <DialogTitle>{t("Ban User")}</DialogTitle>
           <DialogDescription>
-            {isBanned
-              ? t("Restore access for") + ` ${user.name} (${user.email}).`
-              : t(
-                  "Prevent this user from signing in and revoke all active sessions."
-                )}
+            {t(
+              "Prevent this user from signing in and revoke all active sessions."
+            )}
           </DialogDescription>
         </DialogHeader>
 
-        {isBanned ? (
-          <div className="space-y-4">
-            <div className="border bg-secondary/15 p-3 text-sm">
-              <p className="text-secondary">
-                {t("Current ban reason")}:{" "}
-                {user.banReason || t("No reason specified")}
-              </p>
-              {user.banExpires && (
-                <p className="mt-1 text-secondary">
-                  {t("Expires on")}: {formatDate(user.banExpires)}
-                </p>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleBan)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="banReason"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="form-ban-reason">
+                    {t("Ban Reason")}
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      id="form-ban-reason"
+                      placeholder={t("e.g. Violation of terms of service")}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
-            </div>
+            />
 
-            <DialogFooter showCancelButton>
-              <Button onClick={handleUnban} disabled={isSubmitting}>
-                {isSubmitting && <Spinner />}
-                {t("Unban")}
-              </Button>
-            </DialogFooter>
-          </div>
-        ) : (
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="banReason"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel htmlFor="form-ban-reason">
-                      {t("Ban Reason")}
-                    </FormLabel>
+            <FormField
+              control={form.control}
+              name="duration"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="form-duration">{t("Duration")}</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
-                      <Input
-                        id="form-ban-reason"
-                        placeholder={t("e.g. Violation of terms of service")}
-                        {...field}
-                      />
+                      <SelectTrigger id="form-duration" className="w-full">
+                        <SelectValue placeholder={t("Select ban duration")} />
+                      </SelectTrigger>
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                    <SelectContent>
+                      <SelectItem value="permanent">
+                        {t("Permanent")}
+                      </SelectItem>
+                      <SelectItem value="86400">{t("24 Hours")}</SelectItem>
+                      <SelectItem value="604800">{t("7 Days")}</SelectItem>
+                      <SelectItem value="2592000">{t("30 Days")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="duration"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel htmlFor="form-duration">
-                      {t("Duration")}
-                    </FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger id="form-duration" className="w-full">
-                          <SelectValue placeholder={t("Select ban duration")} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="permanent">
-                          {t("Permanent")}
-                        </SelectItem>
-                        <SelectItem value="86400">{t("24 Hours")}</SelectItem>
-                        <SelectItem value="604800">{t("7 Days")}</SelectItem>
-                        <SelectItem value="2592000">{t("30 Days")}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <DialogFooter showCancelButton>
-                <FormButton variant="destructive" isSubmitting={isSubmitting}>
-                  {t("Ban")}
-                </FormButton>
-              </DialogFooter>
-            </form>
-          </Form>
-        )}
+            <DialogFooter>
+              <DialogCancel disabled={form.formState.isSubmitting}>
+                {t("Cancel")}
+              </DialogCancel>
+              <FormButton
+                variant="destructive"
+                isSubmitting={form.formState.isSubmitting}
+              >
+                {t("Ban")}
+              </FormButton>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   )

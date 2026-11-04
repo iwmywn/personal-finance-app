@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
   Dialog,
+  DialogCancel,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -128,7 +129,12 @@ export function GoalForm({ goal, isOpen, setIsOpen }: GoalFormProps) {
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!form.formState.isSubmitting) setIsOpen(open)
+      }}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{goal ? t("Edit Goal") : t("Add Goal")}</DialogTitle>
@@ -317,7 +323,10 @@ export function GoalForm({ goal, isOpen, setIsOpen }: GoalFormProps) {
               )}
             />
 
-            <DialogFooter showCancelButton>
+            <DialogFooter>
+              <DialogCancel disabled={form.formState.isSubmitting}>
+                {t("Cancel")}
+              </DialogCancel>
               <FormButton isSubmitting={form.formState.isSubmitting}>
                 {goal ? t("Update") : t("Add")}
               </FormButton>

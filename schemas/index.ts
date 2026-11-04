@@ -384,9 +384,9 @@ export function buildSchemas(messages: SchemaMessages) {
     z.object({
       banReason: z
         .string()
+        .min(1)
         .max(200, { message: messages.banReasonMaxLength })
-        .optional()
-        .or(z.literal("")),
+        .optional(),
       duration: z.string().min(1, { message: messages.durationRequired }),
     })
 
