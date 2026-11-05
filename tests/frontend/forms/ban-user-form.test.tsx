@@ -16,7 +16,6 @@ vi.mock("@/lib/auth-client", () => ({
   authClient: {
     admin: {
       banUser: vi.fn(),
-      unbanUser: vi.fn(),
     },
   },
 }))
@@ -29,14 +28,6 @@ describe("BanUserForm", () => {
     id: "target-user-1",
     name: "Target User",
     banned: false,
-  }
-
-  const bannedTargetUser: User = {
-    ...mockUser,
-    id: "target-user-2",
-    name: "Banned Target User",
-    banned: true,
-    banReason: "Violated terms",
   }
 
   beforeEach(() => {
@@ -81,35 +72,95 @@ describe("BanUserForm", () => {
     })
   })
 
-  it("should render unban dialog for banned user and trigger unban", async () => {
+  it("should fallback to 'No reason' when ban reason is omitted", async () => {
     const user = userEvent.setup()
-    vi.mocked(authClient.admin.unbanUser).mockImplementationOnce(
+    vi.mocked(authClient.admin.banUser).mockImplementationOnce(
       mockAuthSuccess()
     )
 
     renderWithProviders(
       <BanUserForm
-        user={bannedTargetUser}
+        user={activeTargetUser}
         isOpen={true}
         setIsOpen={setIsOpen}
       />
     )
 
-    expect(screen.getByText("Unban User")).toBeInTheDocument()
-    const unbanBtn = screen.getByRole("button", { name: /^unban$/i })
-    await user.click(unbanBtn)
+    const banBtn = screen.getByRole("button", { name: /^ban$/i })
+    await user.click(banBtn)
 
     await waitFor(() => {
-      expect(authClient.admin.unbanUser).toHaveBeenCalledWith(
+      expect(authClient.admin.banUser).toHaveBeenCalledWith(
         expect.objectContaining({
-          userId: "target-user-2",
+          userId: "target-user-1",
+          banReason: "No reason",
         })
       )
     })
 
     await waitFor(() => {
-      expect(toast.success).toHaveBeenCalledWith("User has been unbanned.")
+      expect(toast.success).toHaveBeenCalledWith("User has been banned.")
       expect(setIsOpen).toHaveBeenCalledWith(false)
+    })
+  })
+
+  it("should fallback to 'No reason' when ban reason contains only whitespace", async () => {
+    const user = userEvent.setup()
+    vi.mocked(authClient.admin.banUser).mockImplementationOnce(
+      mockAuthSuccess()
+    )
+
+    renderWithProviders(
+      <BanUserForm
+        user={activeTargetUser}
+        isOpen={true}
+        setIsOpen={setIsOpen}
+      />
+    )
+
+    await user.type(screen.getByLabelText(/ban reason/i), "   ")
+
+    const banBtn = screen.getByRole("button", { name: /^ban$/i })
+    await user.click(banBtn)
+
+    await waitFor(() => {
+      expect(authClient.admin.banUser).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: "target-user-1",
+          banReason: "No reason",
+        })
+      )
+    })
+  })
+
+  it("should normalize cleared ban reason to undefined before validation so it remains valid", async () => {
+    const user = userEvent.setup()
+    vi.mocked(authClient.admin.banUser).mockImplementationOnce(
+      mockAuthSuccess()
+    )
+
+    renderWithProviders(
+      <BanUserForm
+        user={activeTargetUser}
+        isOpen={true}
+        setIsOpen={setIsOpen}
+      />
+    )
+
+    const reasonInput = screen.getByLabelText(/ban reason/i)
+    await user.type(reasonInput, "Temporary reason")
+    await user.clear(reasonInput)
+
+    const banBtn = screen.getByRole("button", { name: /^ban$/i })
+    await user.click(banBtn)
+
+    await waitFor(() => {
+      expect(authClient.admin.banUser).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: "target-user-1",
+          banReason: "No reason",
+        })
+      )
     })
   })
 
@@ -134,31 +185,6 @@ describe("BanUserForm", () => {
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith(
         "Failed to ban user! Please try again later."
-      )
-      expect(setIsOpen).not.toHaveBeenCalledWith(false)
-    })
-  })
-
-  it("should show error toast when unbanUser fails", async () => {
-    const user = userEvent.setup()
-    vi.mocked(authClient.admin.unbanUser).mockImplementationOnce(
-      mockAuthError({ message: "Unban failed" })
-    )
-
-    renderWithProviders(
-      <BanUserForm
-        user={bannedTargetUser}
-        isOpen={true}
-        setIsOpen={setIsOpen}
-      />
-    )
-
-    const unbanBtn = screen.getByRole("button", { name: /^unban$/i })
-    await user.click(unbanBtn)
-
-    await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith(
-        "Failed to update ban status! Please try again later."
       )
       expect(setIsOpen).not.toHaveBeenCalledWith(false)
     })

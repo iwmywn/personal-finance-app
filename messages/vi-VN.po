@@ -724,6 +724,8 @@ msgid "Email address is not yet verified"
 msgstr "Địa chỉ email chưa được xác minh"
 
 #: components/admin/admin-table.tsx
+#: components/admin/ban-user-form.tsx
+#: components/admin/unban-user-form.tsx
 msgctxt "yXnEV2"
 msgid "No reason"
 msgstr "Không có lý do"
@@ -755,7 +757,7 @@ msgid "Reset Password"
 msgstr "Đặt lại mật khẩu"
 
 #: components/admin/admin-table.tsx
-#: components/admin/ban-user-form.tsx
+#: components/admin/unban-user-form.tsx
 msgctxt "6U4eIn"
 msgid "Unban"
 msgstr "Gỡ cấm"
@@ -783,16 +785,6 @@ msgid "Delete"
 msgstr "Xóa"
 
 #: components/admin/ban-user-form.tsx
-msgctxt "aRQh8u"
-msgid "Failed to update ban status! Please try again later."
-msgstr "Cập nhật trạng thái cấm thất bại! Vui lòng thử lại sau."
-
-#: components/admin/ban-user-form.tsx
-msgctxt "tLY3l1"
-msgid "User has been unbanned."
-msgstr "Người dùng đã được gỡ cấm."
-
-#: components/admin/ban-user-form.tsx
 msgctxt "ViifPP"
 msgid "Failed to ban user! Please try again later."
 msgstr "Cấm người dùng thất bại! Vui lòng thử lại sau."
@@ -803,39 +795,14 @@ msgid "User has been banned."
 msgstr "Người dùng đã bị cấm."
 
 #: components/admin/ban-user-form.tsx
-msgctxt "aFpb8P"
-msgid "Unban User"
-msgstr "Gỡ cấm người dùng"
-
-#: components/admin/ban-user-form.tsx
 msgctxt "Ro3EXO"
 msgid "Ban User"
 msgstr "Cấm người dùng"
 
 #: components/admin/ban-user-form.tsx
-msgctxt "bZ5A9F"
-msgid "Restore access for"
-msgstr "Khôi phục quyền truy cập cho"
-
-#: components/admin/ban-user-form.tsx
 msgctxt "fJtO6z"
 msgid "Prevent this user from signing in and revoke all active sessions."
 msgstr "Ngăn người dùng này đăng nhập và thu hồi tất cả các phiên đang hoạt động."
-
-#: components/admin/ban-user-form.tsx
-msgctxt "4pV2cx"
-msgid "Current ban reason"
-msgstr "Lý do cấm hiện tại"
-
-#: components/admin/ban-user-form.tsx
-msgctxt "09AU_2"
-msgid "No reason specified"
-msgstr "Không có lý do cụ thể"
-
-#: components/admin/ban-user-form.tsx
-msgctxt "0t4WRs"
-msgid "Expires on"
-msgstr "Hết hạn vào"
 
 #: components/admin/ban-user-form.tsx
 msgctxt "VGVk-h"
@@ -876,6 +843,31 @@ msgstr "7 ngày"
 msgctxt "vgJsLx"
 msgid "30 Days"
 msgstr "30 ngày"
+
+#: components/admin/ban-user-form.tsx
+#: components/admin/create-user-form.tsx
+#: components/admin/delete-user.tsx
+#: components/admin/set-user-password-form.tsx
+#: components/admin/stop-impersonation.tsx
+#: components/admin/unban-user-form.tsx
+#: components/auth/sign-out-button.tsx
+#: components/budgets/budget-form.tsx
+#: components/budgets/delete-budget.tsx
+#: components/categories/category-form.tsx
+#: components/categories/delete-category.tsx
+#: components/goals/delete-goal.tsx
+#: components/goals/goal-form.tsx
+#: components/recurring-transactions/delete-recurring-transaction.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/settings/change-name-form.tsx
+#: components/settings/change-password-form.tsx
+#: components/settings/change-username-form.tsx
+#: components/settings/two-factor-manager.tsx
+#: components/transactions/delete-transaction.tsx
+#: components/transactions/transaction-form.tsx
+msgctxt "47FYwb"
+msgid "Cancel"
+msgstr "Hủy"
 
 #: components/admin/create-user-form.tsx
 #: components/settings/change-username-form.tsx
@@ -963,19 +955,6 @@ msgctxt "qSy-Lo"
 msgid "All associated data will be permanently deleted. This action cannot be undone."
 msgstr "Tất cả dữ liệu liên quan sẽ bị xóa vĩnh viễn. Hành động này không thể hoàn tác."
 
-#: components/admin/delete-user.tsx
-#: components/admin/stop-impersonation.tsx
-#: components/auth/sign-out-button.tsx
-#: components/budgets/delete-budget.tsx
-#: components/categories/delete-category.tsx
-#: components/goals/delete-goal.tsx
-#: components/recurring-transactions/delete-recurring-transaction.tsx
-#: components/transactions/delete-transaction.tsx
-#: components/ui/dialog.tsx
-msgctxt "47FYwb"
-msgid "Cancel"
-msgstr "Hủy"
-
 #: components/admin/set-user-password-form.tsx
 msgctxt "VvoQv7"
 msgid "Failed to set user password! Please try again later."
@@ -1045,6 +1024,36 @@ msgstr "Việc dừng lại sẽ khôi phục phiên quản trị viên của b�
 msgctxt "d0A6B0"
 msgid "Stop Impersonating"
 msgstr "Dừng đóng vai"
+
+#: components/admin/unban-user-form.tsx
+msgctxt "aRQh8u"
+msgid "Failed to update ban status! Please try again later."
+msgstr "Cập nhật trạng thái cấm thất bại! Vui lòng thử lại sau."
+
+#: components/admin/unban-user-form.tsx
+msgctxt "tLY3l1"
+msgid "User has been unbanned."
+msgstr "Người dùng đã được gỡ cấm."
+
+#: components/admin/unban-user-form.tsx
+msgctxt "aFpb8P"
+msgid "Unban User"
+msgstr "Gỡ cấm người dùng"
+
+#: components/admin/unban-user-form.tsx
+msgctxt "bZ5A9F"
+msgid "Restore access for"
+msgstr "Khôi phục quyền truy cập cho"
+
+#: components/admin/unban-user-form.tsx
+msgctxt "4pV2cx"
+msgid "Current ban reason"
+msgstr "Lý do cấm hiện tại"
+
+#: components/admin/unban-user-form.tsx
+msgctxt "0t4WRs"
+msgid "Expires on"
+msgstr "Hết hạn vào"
 
 #: components/auth/language-selector.tsx
 #: components/settings/language-selector.tsx

@@ -724,6 +724,8 @@ msgid "Email address is not yet verified"
 msgstr "이메일 주소가 아직 인증되지 않았습니다"
 
 #: components/admin/admin-table.tsx
+#: components/admin/ban-user-form.tsx
+#: components/admin/unban-user-form.tsx
 msgctxt "yXnEV2"
 msgid "No reason"
 msgstr "사유 없음"
@@ -755,7 +757,7 @@ msgid "Reset Password"
 msgstr "비밀번호 재설정"
 
 #: components/admin/admin-table.tsx
-#: components/admin/ban-user-form.tsx
+#: components/admin/unban-user-form.tsx
 msgctxt "6U4eIn"
 msgid "Unban"
 msgstr "차단 해제"
@@ -783,16 +785,6 @@ msgid "Delete"
 msgstr "삭제"
 
 #: components/admin/ban-user-form.tsx
-msgctxt "aRQh8u"
-msgid "Failed to update ban status! Please try again later."
-msgstr "차단 상태 업데이트에 실패했습니다! 나중에 다시 시도해주세요."
-
-#: components/admin/ban-user-form.tsx
-msgctxt "tLY3l1"
-msgid "User has been unbanned."
-msgstr "사용자 차단이 해제되었습니다."
-
-#: components/admin/ban-user-form.tsx
 msgctxt "ViifPP"
 msgid "Failed to ban user! Please try again later."
 msgstr "사용자 차단에 실패했습니다! 나중에 다시 시도해주세요."
@@ -803,39 +795,14 @@ msgid "User has been banned."
 msgstr "사용자가 차단되었습니다."
 
 #: components/admin/ban-user-form.tsx
-msgctxt "aFpb8P"
-msgid "Unban User"
-msgstr "사용자 차단 해제"
-
-#: components/admin/ban-user-form.tsx
 msgctxt "Ro3EXO"
 msgid "Ban User"
 msgstr "사용자 차단"
 
 #: components/admin/ban-user-form.tsx
-msgctxt "bZ5A9F"
-msgid "Restore access for"
-msgstr "다음에 대한 액세스 복원:"
-
-#: components/admin/ban-user-form.tsx
 msgctxt "fJtO6z"
 msgid "Prevent this user from signing in and revoke all active sessions."
 msgstr "이 사용자의 로그인을 방지하고 모든 활성 세션을 취소합니다."
-
-#: components/admin/ban-user-form.tsx
-msgctxt "4pV2cx"
-msgid "Current ban reason"
-msgstr "현재 차단 사유"
-
-#: components/admin/ban-user-form.tsx
-msgctxt "09AU_2"
-msgid "No reason specified"
-msgstr "사유가 지정되지 않음"
-
-#: components/admin/ban-user-form.tsx
-msgctxt "0t4WRs"
-msgid "Expires on"
-msgstr "만료일:"
 
 #: components/admin/ban-user-form.tsx
 msgctxt "VGVk-h"
@@ -876,6 +843,31 @@ msgstr "7일"
 msgctxt "vgJsLx"
 msgid "30 Days"
 msgstr "30일"
+
+#: components/admin/ban-user-form.tsx
+#: components/admin/create-user-form.tsx
+#: components/admin/delete-user.tsx
+#: components/admin/set-user-password-form.tsx
+#: components/admin/stop-impersonation.tsx
+#: components/admin/unban-user-form.tsx
+#: components/auth/sign-out-button.tsx
+#: components/budgets/budget-form.tsx
+#: components/budgets/delete-budget.tsx
+#: components/categories/category-form.tsx
+#: components/categories/delete-category.tsx
+#: components/goals/delete-goal.tsx
+#: components/goals/goal-form.tsx
+#: components/recurring-transactions/delete-recurring-transaction.tsx
+#: components/recurring-transactions/recurring-transaction-form.tsx
+#: components/settings/change-name-form.tsx
+#: components/settings/change-password-form.tsx
+#: components/settings/change-username-form.tsx
+#: components/settings/two-factor-manager.tsx
+#: components/transactions/delete-transaction.tsx
+#: components/transactions/transaction-form.tsx
+msgctxt "47FYwb"
+msgid "Cancel"
+msgstr "취소"
 
 #: components/admin/create-user-form.tsx
 #: components/settings/change-username-form.tsx
@@ -963,19 +955,6 @@ msgctxt "qSy-Lo"
 msgid "All associated data will be permanently deleted. This action cannot be undone."
 msgstr "모든 관련 데이터가 영구적으로 삭제됩니다. 이 작업은 취소할 수 없습니다."
 
-#: components/admin/delete-user.tsx
-#: components/admin/stop-impersonation.tsx
-#: components/auth/sign-out-button.tsx
-#: components/budgets/delete-budget.tsx
-#: components/categories/delete-category.tsx
-#: components/goals/delete-goal.tsx
-#: components/recurring-transactions/delete-recurring-transaction.tsx
-#: components/transactions/delete-transaction.tsx
-#: components/ui/dialog.tsx
-msgctxt "47FYwb"
-msgid "Cancel"
-msgstr "취소"
-
 #: components/admin/set-user-password-form.tsx
 msgctxt "VvoQv7"
 msgid "Failed to set user password! Please try again later."
@@ -1045,6 +1024,36 @@ msgstr "중지하면 관리자 세션이 복원되고 관리자 패널로 다시
 msgctxt "d0A6B0"
 msgid "Stop Impersonating"
 msgstr "가장 중지"
+
+#: components/admin/unban-user-form.tsx
+msgctxt "aRQh8u"
+msgid "Failed to update ban status! Please try again later."
+msgstr "차단 상태 업데이트에 실패했습니다! 나중에 다시 시도해주세요."
+
+#: components/admin/unban-user-form.tsx
+msgctxt "tLY3l1"
+msgid "User has been unbanned."
+msgstr "사용자 차단이 해제되었습니다."
+
+#: components/admin/unban-user-form.tsx
+msgctxt "aFpb8P"
+msgid "Unban User"
+msgstr "사용자 차단 해제"
+
+#: components/admin/unban-user-form.tsx
+msgctxt "bZ5A9F"
+msgid "Restore access for"
+msgstr "다음에 대한 액세스 복원:"
+
+#: components/admin/unban-user-form.tsx
+msgctxt "4pV2cx"
+msgid "Current ban reason"
+msgstr "현재 차단 사유"
+
+#: components/admin/unban-user-form.tsx
+msgctxt "0t4WRs"
+msgid "Expires on"
+msgstr "만료일:"
 
 #: components/auth/language-selector.tsx
 #: components/settings/language-selector.tsx

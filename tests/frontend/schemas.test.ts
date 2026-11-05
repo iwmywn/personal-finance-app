@@ -693,16 +693,24 @@ describe("Zod Validation Schemas", async () => {
 
       expect(
         schema.safeParse({
-          banReason: "",
-          duration: "permanent",
+          duration: "1d",
         }).success
       ).toBe(true)
 
       expect(
         schema.safeParse({
-          duration: "1d",
+          banReason: undefined,
+          duration: "permanent",
         }).success
       ).toBe(true)
+    })
+
+    it("should reject empty string banReason", () => {
+      const result = schema.safeParse({
+        banReason: "",
+        duration: "7d",
+      })
+      expect(result.success).toBe(false)
     })
 
     it("should reject banReason exceeding 200 characters", () => {

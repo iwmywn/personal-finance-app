@@ -12,6 +12,7 @@ import { PasswordInput } from "@/components/password-input"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
+  DialogCancel,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -43,11 +44,17 @@ export function TwoFactorManager() {
   const t = useExtracted()
   const { user } = useUser()
   const [isOpen, setIsOpen] = useState<boolean>(false)
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [totpURI, setTotpURI] = useState<string | null>(null)
   const secret = totpURI?.match(/secret=([^&]+)/)?.[1]
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!isSubmitting) setIsOpen(open)
+      }}
+    >
       <DialogTrigger asChild>
         <Button variant="outline">
           {user.twoFactorEnabled ? t("Disable 2FA") : t("Enable 2FA")}
@@ -63,7 +70,11 @@ export function TwoFactorManager() {
               </DialogDescription>
             </DialogHeader>
             {!totpURI ? (
-              <EnableTwoFactorForm setTotpURI={setTotpURI} />
+              <EnableTwoFactorForm
+                setTotpURI={setTotpURI}
+                isSubmitting={isSubmitting}
+                setIsSubmitting={setIsSubmitting}
+              />
             ) : (
               <div className="space-y-4">
                 <div className="flex justify-center">
@@ -83,6 +94,8 @@ export function TwoFactorManager() {
                 <VerifyTwoFactorForm
                   setTotpURI={setTotpURI}
                   setIsOpen={setIsOpen}
+                  isSubmitting={isSubmitting}
+                  setIsSubmitting={setIsSubmitting}
                 />
               </div>
             )}
@@ -97,7 +110,11 @@ export function TwoFactorManager() {
                 {t("Enter your password to disable 2FA.")}
               </DialogDescription>
             </DialogHeader>
-            <DisableTwoFactorForm setIsOpen={setIsOpen} />
+            <DisableTwoFactorForm
+              setIsOpen={setIsOpen}
+              isSubmitting={isSubmitting}
+              setIsSubmitting={setIsSubmitting}
+            />
           </>
         )}
       </DialogContent>
@@ -107,9 +124,15 @@ export function TwoFactorManager() {
 
 interface EnableTwoFactorFormProps {
   setTotpURI: (uri: string | null) => void
+  isSubmitting: boolean
+  setIsSubmitting: (isSubmitting: boolean) => void
 }
 
-function EnableTwoFactorForm({ setTotpURI }: EnableTwoFactorFormProps) {
+function EnableTwoFactorForm({
+  setTotpURI,
+  isSubmitting,
+  setIsSubmitting,
+}: EnableTwoFactorFormProps) {
   const t = useExtracted()
   const { createTwoFactorPasswordSchema } = useSchemas()
   const form = useForm<TwoFactorPasswordFormValues>({
@@ -118,6 +141,8 @@ function EnableTwoFactorForm({ setTotpURI }: EnableTwoFactorFormProps) {
   })
 
   async function onSubmit(values: TwoFactorPasswordFormValues) {
+    setIsSubmitting(true)
+
     try {
       await authClient.twoFactor.enable({
         password: values.password,
@@ -152,6 +177,8 @@ function EnableTwoFactorForm({ setTotpURI }: EnableTwoFactorFormProps) {
     } catch {
       toast.error(t("Failed to enable 2FA! Please try again later."))
     }
+
+    setIsSubmitting(false)
   }
 
   return (
@@ -176,10 +203,9 @@ function EnableTwoFactorForm({ setTotpURI }: EnableTwoFactorFormProps) {
           )}
         />
 
-        <DialogFooter showCancelButton>
-          <FormButton isSubmitting={form.formState.isSubmitting}>
-            {t("Enable 2FA")}
-          </FormButton>
+        <DialogFooter>
+          <DialogCancel disabled={isSubmitting}>{t("Cancel")}</DialogCancel>
+          <FormButton isSubmitting={isSubmitting}>{t("Enable 2FA")}</FormButton>
         </DialogFooter>
       </form>
     </Form>
@@ -189,11 +215,15 @@ function EnableTwoFactorForm({ setTotpURI }: EnableTwoFactorFormProps) {
 interface VerifyTwoFactorFormProps {
   setTotpURI: (uri: string | null) => void
   setIsOpen: (isOpen: boolean) => void
+  isSubmitting: boolean
+  setIsSubmitting: (isSubmitting: boolean) => void
 }
 
 function VerifyTwoFactorForm({
   setTotpURI,
   setIsOpen,
+  isSubmitting,
+  setIsSubmitting,
 }: VerifyTwoFactorFormProps) {
   const t = useExtracted()
   const router = useRouter()
@@ -204,6 +234,8 @@ function VerifyTwoFactorForm({
   })
 
   async function onSubmit(values: TwoFactorCodeFormValues) {
+    setIsSubmitting(true)
+
     try {
       await authClient.twoFactor.verifyTotp({
         code: values.code,
@@ -241,6 +273,8 @@ function VerifyTwoFactorForm({
     } catch {
       toast.error(t("Failed to verify 2FA code! Please try again later."))
     }
+
+    setIsSubmitting(false)
   }
 
   return (
@@ -268,10 +302,9 @@ function VerifyTwoFactorForm({
           )}
         />
 
-        <DialogFooter showCancelButton>
-          <FormButton isSubmitting={form.formState.isSubmitting}>
-            {t("Verify")}
-          </FormButton>
+        <DialogFooter>
+          <DialogCancel disabled={isSubmitting}>{t("Cancel")}</DialogCancel>
+          <FormButton isSubmitting={isSubmitting}>{t("Verify")}</FormButton>
         </DialogFooter>
       </form>
     </Form>
@@ -280,9 +313,15 @@ function VerifyTwoFactorForm({
 
 interface DisableTwoFactorFormProps {
   setIsOpen: (isOpen: boolean) => void
+  isSubmitting: boolean
+  setIsSubmitting: (isSubmitting: boolean) => void
 }
 
-function DisableTwoFactorForm({ setIsOpen }: DisableTwoFactorFormProps) {
+function DisableTwoFactorForm({
+  setIsOpen,
+  isSubmitting,
+  setIsSubmitting,
+}: DisableTwoFactorFormProps) {
   const t = useExtracted()
   const router = useRouter()
   const { createTwoFactorPasswordSchema } = useSchemas()
@@ -292,6 +331,8 @@ function DisableTwoFactorForm({ setIsOpen }: DisableTwoFactorFormProps) {
   })
 
   async function onSubmit(values: TwoFactorPasswordFormValues) {
+    setIsSubmitting(true)
+
     try {
       await authClient.twoFactor.disable({
         password: values.password,
@@ -328,6 +369,8 @@ function DisableTwoFactorForm({ setIsOpen }: DisableTwoFactorFormProps) {
     } catch {
       toast.error(t("Failed to disable 2FA! Please try again later."))
     }
+
+    setIsSubmitting(false)
   }
 
   return (
@@ -352,8 +395,9 @@ function DisableTwoFactorForm({ setIsOpen }: DisableTwoFactorFormProps) {
           )}
         />
 
-        <DialogFooter showCancelButton>
-          <FormButton isSubmitting={form.formState.isSubmitting}>
+        <DialogFooter>
+          <DialogCancel disabled={isSubmitting}>{t("Cancel")}</DialogCancel>
+          <FormButton isSubmitting={isSubmitting}>
             {t("Disable 2FA")}
           </FormButton>
         </DialogFooter>

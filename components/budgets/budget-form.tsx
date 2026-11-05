@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
   Dialog,
+  DialogCancel,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -126,7 +127,12 @@ export function BudgetForm({ budget, isOpen, setIsOpen }: BudgetFormProps) {
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!form.formState.isSubmitting) setIsOpen(open)
+      }}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
@@ -295,7 +301,10 @@ export function BudgetForm({ budget, isOpen, setIsOpen }: BudgetFormProps) {
               )}
             />
 
-            <DialogFooter showCancelButton>
+            <DialogFooter>
+              <DialogCancel disabled={form.formState.isSubmitting}>
+                {t("Cancel")}
+              </DialogCancel>
               <FormButton isSubmitting={form.formState.isSubmitting}>
                 {budget ? t("Update") : t("Add")}
               </FormButton>

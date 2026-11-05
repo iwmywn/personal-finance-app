@@ -20,7 +20,7 @@ Run all package commands with `pnpm`:
 
 - **Database Access**: Raw MongoDB Node.js driver (no ORM). Retrieve typed collections via factory functions in `lib/collections.ts`. Wrap multi-document mutations in `withTransaction` (`lib/db.ts`).
 - **Server Boundaries**: Isolate server code with `import "server-only"`.
-- **Data Mutations**: Route all state mutations strictly through Server Actions in `actions/` marked with `"use server"`. UI components remain pure presenters.
+- **Data Mutations**: Route domain state mutations through Server Actions in `actions/` marked with `"use server"`. Auth, account, and admin operations may use Better Auth endpoints (`authClient`) directly.
 - **Validation & Rate Limiting**: Validate Server Action inputs with Zod schemas from `schemas/server.ts`. Protect sensitive endpoints with `isRateLimited` (`lib/rate-limit.ts`).
 
 ### 2. Environment Configuration
@@ -35,7 +35,7 @@ Run all package commands with `pnpm`:
 
 ### 4. Code Conventions
 
-- **File Naming**: Use `kebab-case.ts(x)` for all files.
+- **File Naming**: Use `kebab-case` for source files. Exempt generated and locale files.
 - **Module Resolution**: Use `@/*` alias for root-relative imports.
 
 ## Context Pointers
