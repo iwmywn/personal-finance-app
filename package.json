@@ -28,10 +28,10 @@
     "db:logs": "docker compose logs -f"
   },
   "dependencies": {
-    "@better-auth/mongo-adapter": "1.7.16",
+    "@better-auth/mongo-adapter": "1.7.17",
     "@hookform/resolvers": "7.0.2",
     "@t3-oss/env-nextjs": "0.13.11",
-    "better-auth": "1.7.16",
+    "better-auth": "1.7.17",
     "class-variance-authority": "0.7.1",
     "cn": "0.5.2",
     "decimal.js": "10.6.0",
