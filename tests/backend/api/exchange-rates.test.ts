@@ -1,4 +1,4 @@
-import { updateTag } from "next/cache"
+import { revalidateTag } from "next/cache"
 import { NextRequest } from "next/server"
 import { ObjectId } from "mongodb"
 
@@ -7,7 +7,6 @@ import {
   insertTestTransaction,
 } from "@/tests/backend/helpers/database"
 import { mockDBAnotherUser, mockDBUser } from "@/tests/shared/data"
-import * as exchangeRatesActions from "@/actions/exchange-rates.actions"
 import { toDecimal128 } from "@/actions/utils"
 import { GET } from "@/app/api/(cronjobs)/exchange-rates/route"
 import * as collections from "@/lib/collections"
@@ -15,6 +14,7 @@ import {
   getExchangeRatesCollection,
   getMissingExchangeRatesCollection,
 } from "@/lib/collections"
+import * as exchangeRatesActions from "@/lib/currency-engine"
 import { addDays, normalizeToUTCMidnight } from "@/lib/date"
 
 const cronSecret = "test-cron-secret"
@@ -312,13 +312,17 @@ describe("Exchange Rates Cron Job", () => {
       const response = await GET(request)
       expect(response.status).toBe(200)
 
-      expect(updateTag).toHaveBeenCalledWith(`transactions-${mockDBUser._id}`)
-      expect(updateTag).toHaveBeenCalledWith(
-        `transactions-${mockDBAnotherUser._id}`
+      expect(revalidateTag).toHaveBeenCalledWith(
+        `transactions-${mockDBUser._id}`,
+        { expire: 0 }
+      )
+      expect(revalidateTag).toHaveBeenCalledWith(
+        `transactions-${mockDBAnotherUser._id}`,
+        { expire: 0 }
       )
     })
 
-    it("should not call updateTag when no transactions exist on synced dates", async () => {
+    it("should not call revalidateTag when no transactions exist on synced dates", async () => {
       const mockRatesResponse = {
         meta: { last_updated_at: "2024-03-10T23:59:59Z" },
         data: {
@@ -344,7 +348,7 @@ describe("Exchange Rates Cron Job", () => {
       const response = await GET(request)
       expect(response.status).toBe(200)
 
-      expect(updateTag).not.toHaveBeenCalled()
+      expect(revalidateTag).not.toHaveBeenCalled()
     })
 
     it("should clean up queued dates from missingRatesCollection if exchange rates are already resolved", async () => {
@@ -591,11 +595,11 @@ describe("Exchange Rates Cron Job", () => {
       // Cause ensureExchangeRateForDate to throw and enqueueMissingExchangeRateDate
       //  to also throw (unhandled inside map)
       vi.spyOn(
-        exchangeRatesActions,
+        exchangeRatesActions.currencyEngine,
         "ensureExchangeRateForDate"
       ).mockRejectedValueOnce(new Error("API network failure"))
       vi.spyOn(
-        exchangeRatesActions,
+        exchangeRatesActions.currencyEngine,
         "enqueueMissingExchangeRateDate"
       ).mockRejectedValueOnce(new Error("Database write failure"))
 

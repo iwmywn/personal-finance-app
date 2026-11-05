@@ -1,9 +1,14 @@
+import type Decimal from "decimal.js"
 import type { Decimal128, ObjectId } from "mongodb"
 
-import type { DBRatesMap, RatesMap } from "@/actions/exchange-rates.actions"
 import type { auth } from "@/lib/auth"
 import type { CategoryKey, CategoryType } from "@/lib/category"
 import type { Currency } from "@/lib/currency"
+
+export type DBRatesMap = Partial<Record<Exclude<Currency, "USD">, Decimal128>> &
+  Record<string, Decimal128>
+export type RatesMap = Partial<Record<Currency, Decimal>> &
+  Record<string, Decimal>
 
 export type ActionResponse =
   | { error: string; success?: never }

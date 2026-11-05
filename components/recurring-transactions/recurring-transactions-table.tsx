@@ -4,7 +4,6 @@ import { useState } from "react"
 import { MoreVerticalIcon, RepeatIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 
-import { getNextDate } from "@/app/api/(cronjobs)/recurring-transactions/utils"
 import { EmptyState } from "@/components/empty-state"
 import { DeleteRecurringTransaction } from "@/components/recurring-transactions/delete-recurring-transaction"
 import { Badge } from "@/components/ui/badge"
@@ -35,6 +34,7 @@ import { useFormatCurrency } from "@/hooks/use-format-currency"
 import { useFormatDate } from "@/hooks/use-format-date"
 import { localDateToUTCMidnight } from "@/lib/date"
 import type { RecurringTransaction } from "@/lib/definitions"
+import { getNextOccurrence as getNextDate } from "@/lib/recurring"
 
 interface RecurringTableProps {
   filteredRecurring: RecurringTransaction[]

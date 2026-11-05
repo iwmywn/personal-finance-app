@@ -1,7 +1,6 @@
 import type { Route } from "next"
 import Decimal from "decimal.js"
 
-import type { Currency } from "@/lib/currency"
 import { DEFAULT_SIGNIN_REDIRECT } from "@/routes"
 
 export const progressColorClass = {
@@ -35,28 +34,7 @@ export function toDecimal(value: string): Decimal {
   return new Decimal(value)
 }
 
-export function convertAmountWithRates(
-  amount: Decimal | string | number,
-  from: Currency,
-  to: Currency,
-  rates?: Partial<Record<Currency, Decimal | string | number>>
-): Decimal {
-  const decAmount = new Decimal(amount)
-  if (from === to || !rates) return decAmount
-
-  const rateFromVal = rates[from] ?? (from === "USD" ? "1" : undefined)
-  const rateToVal = rates[to] ?? (to === "USD" ? "1" : undefined)
-  if (!rateFromVal || !rateToVal) return decAmount
-
-  const rateFrom = new Decimal(rateFromVal)
-  const rateTo = new Decimal(rateToVal)
-  if (rateFrom.lte(0) || rateTo.lte(0)) return decAmount
-
-  const amountInUSD = from === "USD" ? decAmount : decAmount.dividedBy(rateFrom)
-  const result = to === "USD" ? amountInUSD : amountInUSD.mul(rateTo)
-
-  return result
-}
+export { convertAmountWithRates } from "@/lib/currency"
 
 export function getSafeCallbackUrl(
   url: string | null | undefined,

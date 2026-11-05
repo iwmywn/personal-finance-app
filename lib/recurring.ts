@@ -4,7 +4,7 @@ import type {
   RecurringTransaction,
 } from "@/lib/definitions"
 
-function addMonthsClamped(
+export function addMonthsClamped(
   currentUTC: Date,
   months: number,
   targetDay: number
@@ -21,7 +21,7 @@ function addMonthsClamped(
   )
 }
 
-function stepNextDate(
+export function stepNextDate(
   currentUTC: Date,
   frequency: DBRecurringTransaction["frequency"],
   startDateUTC: Date,
@@ -57,10 +57,15 @@ function stepNextDate(
   }
 }
 
-export function getNextDate(
+/**
+ * Calculates the next occurrence date for a recurring schedule after its last generated date.
+ * Returns null if the schedule has ended or the next candidate exceeds endDate.
+ */
+export function getNextOccurrence(
   rec: DBRecurringTransaction | RecurringTransaction,
-  todayUTC: Date
+  asOfDate: Date = normalizeToUTCMidnight(new Date())
 ): Date | null {
+  const todayUTC = normalizeToUTCMidnight(asOfDate)
   const startUTC = normalizeToUTCMidnight(new Date(rec.startDate))
   const endUTC = rec.endDate
     ? normalizeToUTCMidnight(new Date(rec.endDate))
@@ -95,10 +100,16 @@ export function getNextDate(
   return candidate
 }
 
-export function getDueDates(
-  rec: DBRecurringTransaction,
-  todayUTC: Date
+export const getNextDate = getNextOccurrence
+
+/**
+ * Calculates all due occurrence dates for a recurring schedule up to today/asOfDate.
+ */
+export function getDueOccurrences(
+  rec: DBRecurringTransaction | RecurringTransaction,
+  asOfDate: Date = normalizeToUTCMidnight(new Date())
 ): Date[] {
+  const todayUTC = normalizeToUTCMidnight(asOfDate)
   const startUTC = normalizeToUTCMidnight(new Date(rec.startDate))
   const endUTC = rec.endDate
     ? normalizeToUTCMidnight(new Date(rec.endDate))
@@ -133,3 +144,5 @@ export function getDueDates(
 
   return dueDates
 }
+
+export const getDueDates = getDueOccurrences

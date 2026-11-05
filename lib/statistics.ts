@@ -1,10 +1,11 @@
 import Decimal from "decimal.js"
 
 import type { CategoryKey } from "@/lib/category"
+import { resolveTransactionAmount } from "@/lib/currency"
 import type { Currency } from "@/lib/currency"
 import { getTodayInTimezone, normalizeToUTCMidnight } from "@/lib/date"
 import type { Budget, Goal, Transaction } from "@/lib/definitions"
-import { convertAmountWithRates, progressColorClass } from "@/lib/utils"
+import { progressColorClass } from "@/lib/utils"
 
 export function getCurrentMonthTransactions(
   transactions: Transaction[],
@@ -34,36 +35,6 @@ type QuickStats = {
   avgOutflow: string | null
   savingsRate: string | null
   popularCategory: CategoryKey[]
-}
-
-function resolveTransactionAmount(
-  t: Transaction,
-  targetCurrency?: Currency
-): Decimal | null {
-  if (!targetCurrency || t.currency === targetCurrency) {
-    return new Decimal(t.amount)
-  }
-
-  const originalAmount = t.originalAmount ?? t.amount
-  const originalCurrency = (t.originalCurrency ?? t.currency) as Currency
-
-  if (t.rates && originalCurrency && targetCurrency) {
-    const rateFrom =
-      t.rates[originalCurrency] ??
-      (originalCurrency === "USD" ? "1" : undefined)
-    const rateTo =
-      t.rates[targetCurrency] ?? (targetCurrency === "USD" ? "1" : undefined)
-    if (rateFrom && rateTo) {
-      return convertAmountWithRates(
-        originalAmount,
-        originalCurrency,
-        targetCurrency,
-        t.rates
-      )
-    }
-  }
-
-  return null
 }
 
 export function calculateQuickStats(
@@ -308,39 +279,8 @@ function calculateStatsBase<TBase extends Budget | Goal>(
   const targetCurrency = config.getBaseCurrency(base)
 
   const total = filtered.reduce((sum, t) => {
-    const originalAmount = t.originalAmount
-    const originalCurrency = t.originalCurrency
-    const ratesStr = t.rates
-
-    if (originalAmount && originalCurrency && ratesStr) {
-      const rateFrom =
-        ratesStr[originalCurrency] ??
-        (originalCurrency === "USD" ? "1" : undefined)
-      const rateTo =
-        ratesStr[targetCurrency] ?? (targetCurrency === "USD" ? "1" : undefined)
-      if (originalCurrency === targetCurrency || (rateFrom && rateTo)) {
-        const converted = convertAmountWithRates(
-          originalAmount,
-          originalCurrency,
-          targetCurrency,
-          ratesStr
-        )
-        return sum.plus(converted)
-      }
-      return sum
-    }
-
-    const txCurrency = originalCurrency ?? t.currency
-    if (txCurrency === targetCurrency) {
-      const amountToAdd = originalAmount ?? t.amount
-      return sum.plus(new Decimal(amountToAdd))
-    }
-
-    if (t.currency === targetCurrency) {
-      return sum.plus(new Decimal(t.amount))
-    }
-
-    return sum
+    const amount = resolveTransactionAmount(t, targetCurrency)
+    return amount !== null ? sum.plus(amount) : sum
   }, new Decimal(0))
 
   const target = new Decimal(config.getBaseTargetAmount(base))

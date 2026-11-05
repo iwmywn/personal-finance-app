@@ -8,7 +8,7 @@ vi.mock("next/cache", () => ({
   cacheLife: vi.fn((_options: unknown) => {
     // no-op
   }),
-  revalidateTag: vi.fn((_tag: string) => {
+  revalidateTag: vi.fn((_tag: string, _profile?: unknown) => {
     // no-op
   }),
 }))
