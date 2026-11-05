@@ -7,12 +7,8 @@ msgstr ""
 "X-Message-Key: msgctxt\n"
 
 #: actions/admin.actions.ts
-#: actions/budget.actions.ts
-#: actions/category.actions.ts
-#: actions/goal.actions.ts
-#: actions/recurring.actions.ts
 #: actions/session.actions.ts
-#: actions/transaction.actions.ts
+#: lib/action-handler.ts
 msgctxt "OYzwyU"
 msgid "Too many requests! Please slow down and try again later."
 msgstr "요청이 너무 많습니다! 잠시 후 다시 시도해 주세요."
@@ -28,6 +24,17 @@ msgid "Invalid user ID!"
 msgstr "잘못된 사용자 ID입니다!"
 
 #: actions/admin.actions.ts
+msgctxt "7l4h1s"
+msgid "User has been deleted."
+msgstr "사용자가 삭제되었습니다."
+
+#: actions/admin.actions.ts
+#: components/admin/delete-user.tsx
+msgctxt "xkkfdF"
+msgid "Failed to delete user! Please try again later."
+msgstr "사용자 삭제에 실패했습니다! 나중에 다시 시도해주세요."
+
+#: actions/admin.actions.ts
 msgctxt "ScDYhZ"
 msgid "You cannot delete your own account!"
 msgstr "자신의 계정은 삭제할 수 없습니다!"
@@ -41,34 +48,6 @@ msgstr "사용자를 찾을 수 없습니다!"
 msgctxt "Wt-dMj"
 msgid "Cannot delete another administrator account!"
 msgstr "다른 관리자 계정은 삭제할 수 없습니다!"
-
-#: actions/admin.actions.ts
-msgctxt "7l4h1s"
-msgid "User has been deleted."
-msgstr "사용자가 삭제되었습니다."
-
-#: actions/admin.actions.ts
-#: components/admin/delete-user.tsx
-msgctxt "xkkfdF"
-msgid "Failed to delete user! Please try again later."
-msgstr "사용자 삭제에 실패했습니다! 나중에 다시 시도해주세요."
-
-#: actions/budget.actions.ts
-#: actions/category.actions.ts
-#: actions/goal.actions.ts
-#: actions/recurring.actions.ts
-#: actions/transaction.actions.ts
-msgctxt "5GmpFA"
-msgid "Invalid data!"
-msgstr "잘못된 데이터입니다!"
-
-#: actions/budget.actions.ts
-#: actions/goal.actions.ts
-#: actions/recurring.actions.ts
-#: actions/transaction.actions.ts
-msgctxt "IViGC5"
-msgid "Invalid category!"
-msgstr "잘못된 카테고리입니다!"
 
 #: actions/budget.actions.ts
 msgctxt "sW3_mQ"
@@ -92,11 +71,6 @@ msgid "Invalid budget ID!"
 msgstr "잘못된 예산 ID입니다!"
 
 #: actions/budget.actions.ts
-msgctxt "5BmD1W"
-msgid "Budget not found or you don't have permission to edit!"
-msgstr "예산을 찾을 수 없거나 편집 권한이 없습니다!"
-
-#: actions/budget.actions.ts
 msgctxt "Ipw0W1"
 msgid "Budget has been updated."
 msgstr "예산이 업데이트되었습니다."
@@ -108,9 +82,9 @@ msgid "Failed to update budget! Please try again later."
 msgstr "예산 업데이트에 실패했습니다! 나중에 다시 시도해주세요."
 
 #: actions/budget.actions.ts
-msgctxt "fDrjqQ"
-msgid "Budget not found or you don't have permission to delete!"
-msgstr "예산을 찾을 수 없거나 삭제 권한이 없습니다!"
+msgctxt "5BmD1W"
+msgid "Budget not found or you don't have permission to edit!"
+msgstr "예산을 찾을 수 없거나 편집 권한이 없습니다!"
 
 #: actions/budget.actions.ts
 msgctxt "GeSZei"
@@ -122,6 +96,11 @@ msgstr "예산이 삭제되었습니다."
 msgctxt "niO8qC"
 msgid "Failed to delete budget! Please try again later."
 msgstr "예산 삭제에 실패했습니다! 나중에 다시 시도해주세요."
+
+#: actions/budget.actions.ts
+msgctxt "fDrjqQ"
+msgid "Budget not found or you don't have permission to delete!"
+msgstr "예산을 찾을 수 없거나 삭제 권한이 없습니다!"
 
 #: actions/budget.actions.ts
 msgctxt "xFeLWs"
@@ -150,6 +129,17 @@ msgid "Invalid category ID!"
 msgstr "잘못된 카테고리 ID입니다!"
 
 #: actions/category.actions.ts
+msgctxt "RMEY96"
+msgid "Category has been updated."
+msgstr "카테고리가 업데이트되었습니다."
+
+#: actions/category.actions.ts
+#: components/categories/category-form.tsx
+msgctxt "PoUgbk"
+msgid "Failed to update category! Please try again later."
+msgstr "카테고리 업데이트에 실패했습니다! 나중에 다시 시도해주세요."
+
+#: actions/category.actions.ts
 msgctxt "cLveqK"
 msgid "Category type cannot be changed!"
 msgstr "카테고리 유형은 변경할 수 없습니다!"
@@ -160,15 +150,15 @@ msgid "Category not found or you don't have permission to edit!"
 msgstr "카테고리를 찾을 수 없거나 편집 권한이 없습니다!"
 
 #: actions/category.actions.ts
-msgctxt "RMEY96"
-msgid "Category has been updated."
-msgstr "카테고리가 업데이트되었습니다."
+msgctxt "7Al4tw"
+msgid "Category has been deleted."
+msgstr "카테고리가 삭제되었습니다."
 
 #: actions/category.actions.ts
-#: components/categories/category-form.tsx
-msgctxt "PoUgbk"
-msgid "Failed to update category! Please try again later."
-msgstr "카테고리 업데이트에 실패했습니다! 나중에 다시 시도해주세요."
+#: components/categories/delete-category.tsx
+msgctxt "XWfgXI"
+msgid "Failed to delete category! Please try again later."
+msgstr "카테고리 삭제에 실패했습니다! 나중에 다시 시도해주세요."
 
 #: actions/category.actions.ts
 msgctxt "IzwrSe"
@@ -194,17 +184,6 @@ msgstr "카테고리를 삭제할 수 없습니다. 이 카테고리를 사용�
 msgctxt "Q_Y_ED"
 msgid "Cannot delete category. There are {count} recurring transactions using this category. Please delete those recurring transactions first."
 msgstr "카테고리를 삭제할 수 없습니다. 이 카테고리를 사용하는 반복 거래가 {count}개 있습니다. 먼저 해당 반복 거래를 삭제해주세요."
-
-#: actions/category.actions.ts
-msgctxt "7Al4tw"
-msgid "Category has been deleted."
-msgstr "카테고리가 삭제되었습니다."
-
-#: actions/category.actions.ts
-#: components/categories/delete-category.tsx
-msgctxt "XWfgXI"
-msgid "Failed to delete category! Please try again later."
-msgstr "카테고리 삭제에 실패했습니다! 나중에 다시 시도해주세요."
 
 #: actions/category.actions.ts
 msgctxt "gzfdvr"
@@ -233,11 +212,6 @@ msgid "Invalid goal ID!"
 msgstr "잘못된 목표 ID입니다!"
 
 #: actions/goal.actions.ts
-msgctxt "iQpYZg"
-msgid "Goal not found or you don't have permission to edit!"
-msgstr "목표를 찾을 수 없거나 편집 권한이 없습니다!"
-
-#: actions/goal.actions.ts
 msgctxt "SpmGQk"
 msgid "Goal has been updated."
 msgstr "목표가 업데이트되었습니다."
@@ -249,9 +223,9 @@ msgid "Failed to update goal! Please try again later."
 msgstr "목표 업데이트에 실패했습니다! 나중에 다시 시도해주세요."
 
 #: actions/goal.actions.ts
-msgctxt "Av4WTA"
-msgid "Goal not found or you don't have permission to delete!"
-msgstr "목표를 찾을 수 없거나 삭제 권한이 없습니다!"
+msgctxt "iQpYZg"
+msgid "Goal not found or you don't have permission to edit!"
+msgstr "목표를 찾을 수 없거나 편집 권한이 없습니다!"
 
 #: actions/goal.actions.ts
 msgctxt "MT417I"
@@ -263,6 +237,11 @@ msgstr "목표가 삭제되었습니다."
 msgctxt "uwewg6"
 msgid "Failed to delete goal! Please try again later."
 msgstr "목표 삭제에 실패했습니다! 나중에 다시 시도해주세요."
+
+#: actions/goal.actions.ts
+msgctxt "Av4WTA"
+msgid "Goal not found or you don't have permission to delete!"
+msgstr "목표를 찾을 수 없거나 삭제 권한이 없습니다!"
 
 #: actions/goal.actions.ts
 msgctxt "xwvGbl"
@@ -291,11 +270,6 @@ msgid "Invalid recurring transaction ID!"
 msgstr "잘못된 반복 거래 ID입니다!"
 
 #: actions/recurring.actions.ts
-msgctxt "TJXAsr"
-msgid "Recurring transaction not found or you don't have permission to delete!"
-msgstr "반복 거래를 찾을 수 없거나 삭제 권한이 없습니다!"
-
-#: actions/recurring.actions.ts
 msgctxt "0L6Kzl"
 msgid "Recurring transaction has been deleted."
 msgstr "반복 거래가 삭제되었습니다."
@@ -305,6 +279,11 @@ msgstr "반복 거래가 삭제되었습니다."
 msgctxt "9p5fYg"
 msgid "Failed to delete recurring transaction! Please try again later."
 msgstr "반복 거래 삭제에 실패했습니다! 나중에 다시 시도해주세요."
+
+#: actions/recurring.actions.ts
+msgctxt "TJXAsr"
+msgid "Recurring transaction not found or you don't have permission to delete!"
+msgstr "반복 거래를 찾을 수 없거나 삭제 권한이 없습니다!"
 
 #: actions/recurring.actions.ts
 msgctxt "D92YlY"
@@ -365,11 +344,6 @@ msgid "Invalid transaction ID!"
 msgstr "잘못된 거래 ID입니다!"
 
 #: actions/transaction.actions.ts
-msgctxt "qyC85x"
-msgid "Transaction not found or you don't have permission to edit!"
-msgstr "거래를 찾을 수 없거나 편집 권한이 없습니다!"
-
-#: actions/transaction.actions.ts
 msgctxt "VHOeqA"
 msgid "Transaction has been updated."
 msgstr "거래가 업데이트되었습니다."
@@ -381,9 +355,9 @@ msgid "Failed to update transaction! Please try again later."
 msgstr "거래 업데이트에 실패했습니다! 나중에 다시 시도해주세요."
 
 #: actions/transaction.actions.ts
-msgctxt "Fxn2_P"
-msgid "Transaction not found or you don't have permission to delete!"
-msgstr "거래를 찾을 수 없거나 삭제 권한이 없습니다!"
+msgctxt "qyC85x"
+msgid "Transaction not found or you don't have permission to edit!"
+msgstr "거래를 찾을 수 없거나 편집 권한이 없습니다!"
 
 #: actions/transaction.actions.ts
 msgctxt "tz6kfd"
@@ -395,6 +369,11 @@ msgstr "거래가 삭제되었습니다."
 msgctxt "DcqDur"
 msgid "Failed to delete transaction! Please try again later."
 msgstr "거래 삭제에 실패했습니다! 나중에 다시 시도해주세요."
+
+#: actions/transaction.actions.ts
+msgctxt "Fxn2_P"
+msgid "Transaction not found or you don't have permission to delete!"
+msgstr "거래를 찾을 수 없거나 삭제 권한이 없습니다!"
 
 #: actions/transaction.actions.ts
 msgctxt "-VVz7r"
@@ -2736,6 +2715,36 @@ msgstr "11월"
 msgctxt "SsiZK7"
 msgid "December"
 msgstr "12월"
+
+#: lib/action-handler.ts
+msgctxt "4qILV3"
+msgid "Invalid ID!"
+msgstr "잘못된 ID입니다!"
+
+#: lib/action-handler.ts
+msgctxt "5GmpFA"
+msgid "Invalid data!"
+msgstr "잘못된 데이터입니다!"
+
+#: lib/action-handler.ts
+msgctxt "IViGC5"
+msgid "Invalid category!"
+msgstr "잘못된 카테고리입니다!"
+
+#: lib/action-handler.ts
+msgctxt "xVYw0y"
+msgid "Operation completed successfully."
+msgstr "작업이 성공적으로 완료되었습니다."
+
+#: lib/action-handler.ts
+msgctxt "iy38w1"
+msgid "This item already exists!"
+msgstr "이 항목이 이미 존재합니다!"
+
+#: lib/action-handler.ts
+msgctxt "vwdxch"
+msgid "Failed to complete action! Please try again later."
+msgstr "작업을 완료하지 못했습니다! 나중에 다시 시도해주세요."
 
 #: schemas/messages.ts
 msgctxt "pRvgsc"

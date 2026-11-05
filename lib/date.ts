@@ -242,6 +242,56 @@ export function getTodayInTimezone(timeZone?: string): Date {
   }
 }
 
+/**
+ * Returns true if the date range overlaps with the given month and/or year.
+ */
+export function isDateRangeOverlapping(
+  start: Date,
+  end: Date | null | undefined,
+  filterMonth: number | null,
+  filterYear: number | null
+): boolean {
+  if (filterYear && filterMonth) {
+    const filterStart = new Date(Date.UTC(filterYear, filterMonth - 1, 1))
+    const filterEnd = new Date(Date.UTC(filterYear, filterMonth, 1) - 1)
+
+    return (
+      start.getTime() <= filterEnd.getTime() &&
+      (!end || end.getTime() >= filterStart.getTime())
+    )
+  }
+
+  if (filterYear) {
+    const filterStart = new Date(Date.UTC(filterYear, 0, 1))
+    const filterEnd = new Date(Date.UTC(filterYear + 1, 0, 1) - 1)
+
+    return (
+      start.getTime() <= filterEnd.getTime() &&
+      (!end || end.getTime() >= filterStart.getTime())
+    )
+  }
+
+  if (filterMonth) {
+    if (!end) return true
+
+    const durationMonths =
+      (end.getUTCFullYear() - start.getUTCFullYear()) * 12 +
+      (end.getUTCMonth() - start.getUTCMonth())
+    if (durationMonths >= 11) return true
+
+    const startM = start.getUTCMonth() + 1
+    const endM = end.getUTCMonth() + 1
+
+    if (startM <= endM) {
+      return filterMonth >= startM && filterMonth <= endM
+    }
+
+    return filterMonth >= startM || filterMonth <= endM
+  }
+
+  return true
+}
+
 export function getUniqueYears(transactions: Transaction[]): number[] {
   return Array.from(
     new Set(transactions.map((t) => new Date(t.date).getUTCFullYear()))

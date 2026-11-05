@@ -1,6 +1,6 @@
 import MiniSearch from "minisearch"
 
-import { localDateToUTCMidnight } from "@/lib/date"
+import { isDateRangeOverlapping, localDateToUTCMidnight } from "@/lib/date"
 import type {
   Budget,
   Category,
@@ -9,8 +9,8 @@ import type {
   Transaction,
   User,
 } from "@/lib/definitions"
-import { calculateBudgetsStats, calculateGoalsStats } from "@/lib/statistics"
-import { isUserBanned, progressColorClass } from "@/lib/utils"
+import { isUserBanned } from "@/lib/utils"
+import { FinancialRollupEngine } from "@/lib/valuation-engine"
 
 type Filters = {
   searchTerm?: string
@@ -58,51 +58,7 @@ function searchWithMiniSearch<T extends Record<string, unknown>>(
   return new Set(results.map((result) => String(result[idField])))
 }
 
-export function isDateRangeOverlapping(
-  start: Date,
-  end: Date | null | undefined,
-  filterMonth: number | null,
-  filterYear: number | null
-): boolean {
-  if (filterYear && filterMonth) {
-    const filterStart = new Date(Date.UTC(filterYear, filterMonth - 1, 1))
-    const filterEnd = new Date(Date.UTC(filterYear, filterMonth, 1) - 1)
-
-    return (
-      start.getTime() <= filterEnd.getTime() &&
-      (!end || end.getTime() >= filterStart.getTime())
-    )
-  }
-
-  if (filterYear) {
-    const filterStart = new Date(Date.UTC(filterYear, 0, 1))
-    const filterEnd = new Date(Date.UTC(filterYear + 1, 0, 1) - 1)
-
-    return (
-      start.getTime() <= filterEnd.getTime() &&
-      (!end || end.getTime() >= filterStart.getTime())
-    )
-  }
-
-  if (filterMonth) {
-    if (!end) return true
-
-    const durationMonths =
-      (end.getUTCFullYear() - start.getUTCFullYear()) * 12 +
-      (end.getUTCMonth() - start.getUTCMonth())
-    if (durationMonths >= 11) return true
-
-    const startM = start.getUTCMonth() + 1
-    const endM = end.getUTCMonth() + 1
-
-    if (startM <= endM) {
-      return filterMonth >= startM && filterMonth <= endM
-    }
-    return filterMonth >= startM || filterMonth <= endM
-  }
-
-  return true
-}
+export { isDateRangeOverlapping } from "@/lib/date"
 
 export function filterTransactions(
   transactions: Transaction[],
@@ -190,128 +146,54 @@ export function filterCustomCategories(
 export function filterBudgets(
   budgets: Budget[],
   filters: Filters,
-  transactions: Transaction[]
+  transactions: Transaction[],
+  timeZone?: string
 ): Budget[] {
-  const {
-    filterMonth = "all",
-    filterYear = "all",
-    filterCategoryKey = "all",
-    filterProgress = "all",
-    filterStatus = "all",
-  } = filters
-
-  const parsedMonth = filterMonth === "all" ? null : parseInt(filterMonth)
-  const parsedYear = filterYear === "all" ? null : parseInt(filterYear)
-
-  let filteredBudgets = budgets.filter((budget) => {
-    const budgetStartDateOnly = new Date(budget.startDate)
-    const budgetEndDateOnly = new Date(budget.endDate)
-
-    const overlaps = isDateRangeOverlapping(
-      budgetStartDateOnly,
-      budgetEndDateOnly,
-      parsedMonth,
-      parsedYear
-    )
-
-    const matchesCategory =
-      filterCategoryKey === "all" || budget.categoryKey === filterCategoryKey
-
-    return overlaps && matchesCategory
+  const engine = new FinancialRollupEngine(transactions, {
+    timeZone,
+    asOfDate: filters.todayUTC,
   })
 
-  if (filterStatus !== "all" || filterProgress !== "all") {
-    const budgetsWithStats = calculateBudgetsStats(
-      filteredBudgets,
-      transactions
-    )
+  const valuations = engine.evaluateBudgets(budgets, {
+    filterMonth: filters.filterMonth,
+    filterYear: filters.filterYear,
+    filterCategoryKey: filters.filterCategoryKey,
+    filterStatus: filters.filterStatus,
+    filterHealth: filters.filterProgress,
+  })
 
-    filteredBudgets = budgetsWithStats.filter((budget) => {
-      const matchesStatus =
-        filterStatus === "all" || budget.status === filterStatus
-
-      let matchesProgress = true
-      if (filterProgress === "gray") {
-        matchesProgress = budget.progressColorClass === progressColorClass.gray
-      } else if (filterProgress === "green") {
-        matchesProgress = budget.progressColorClass === progressColorClass.green
-      } else if (filterProgress === "yellow") {
-        matchesProgress =
-          budget.progressColorClass === progressColorClass.yellow
-      } else if (filterProgress === "red") {
-        matchesProgress = budget.progressColorClass === progressColorClass.red
-      }
-
-      return matchesStatus && matchesProgress
-    })
-  }
-
-  return filteredBudgets
+  return valuations.map((v) => v.budget)
 }
 
 export function filterGoals(
   goals: Goal[],
   filters: Filters,
-  transactions: Transaction[]
+  transactions: Transaction[],
+  timeZone?: string
 ): Goal[] {
-  const {
-    searchTerm = "",
-    filterMonth = "all",
-    filterYear = "all",
-    filterStatus = "all",
-    filterProgress = "all",
-    filterCategoryKey = "all",
-  } = filters
-
-  const parsedMonth = filterMonth === "all" ? null : parseInt(filterMonth)
-  const parsedYear = filterYear === "all" ? null : parseInt(filterYear)
-
+  const { searchTerm = "" } = filters
   const matchingIds = searchTerm
     ? searchWithMiniSearch(goals, searchTerm, ["name"])
     : null
 
-  let filteredGoals = goals.filter((goal) => {
-    const goalStartDateOnly = new Date(goal.startDate)
-    const goalEndDateOnly = new Date(goal.endDate)
+  const searchFilteredGoals = matchingIds
+    ? goals.filter((g) => matchingIds.has(g._id))
+    : goals
 
-    const matchesSearch = matchingIds ? matchingIds.has(goal._id) : true
-
-    const overlaps = isDateRangeOverlapping(
-      goalStartDateOnly,
-      goalEndDateOnly,
-      parsedMonth,
-      parsedYear
-    )
-
-    const matchesCategory =
-      filterCategoryKey === "all" || goal.categoryKey === filterCategoryKey
-
-    return matchesSearch && overlaps && matchesCategory
+  const engine = new FinancialRollupEngine(transactions, {
+    timeZone,
+    asOfDate: filters.todayUTC,
   })
 
-  if (filterStatus !== "all" || filterProgress !== "all") {
-    const goalsWithStats = calculateGoalsStats(filteredGoals, transactions)
+  const valuations = engine.evaluateGoals(searchFilteredGoals, {
+    filterMonth: filters.filterMonth,
+    filterYear: filters.filterYear,
+    filterCategoryKey: filters.filterCategoryKey,
+    filterStatus: filters.filterStatus,
+    filterHealth: filters.filterProgress,
+  })
 
-    filteredGoals = goalsWithStats.filter((goal) => {
-      const matchesStatus =
-        filterStatus === "all" || goal.status === filterStatus
-
-      let matchesProgress = true
-      if (filterProgress === "gray") {
-        matchesProgress = goal.progressColorClass === progressColorClass.gray
-      } else if (filterProgress === "green") {
-        matchesProgress = goal.progressColorClass === progressColorClass.green
-      } else if (filterProgress === "yellow") {
-        matchesProgress = goal.progressColorClass === progressColorClass.yellow
-      } else if (filterProgress === "red") {
-        matchesProgress = goal.progressColorClass === progressColorClass.red
-      }
-
-      return matchesStatus && matchesProgress
-    })
-  }
-
-  return filteredGoals
+  return valuations.map((v) => v.goal)
 }
 
 export function filterRecurringTransactions(

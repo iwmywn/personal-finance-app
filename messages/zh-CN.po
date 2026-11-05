@@ -7,12 +7,8 @@ msgstr ""
 "X-Message-Key: msgctxt\n"
 
 #: actions/admin.actions.ts
-#: actions/budget.actions.ts
-#: actions/category.actions.ts
-#: actions/goal.actions.ts
-#: actions/recurring.actions.ts
 #: actions/session.actions.ts
-#: actions/transaction.actions.ts
+#: lib/action-handler.ts
 msgctxt "OYzwyU"
 msgid "Too many requests! Please slow down and try again later."
 msgstr "请求过于频繁！请稍后再试。"
@@ -28,6 +24,17 @@ msgid "Invalid user ID!"
 msgstr "用户 ID 无效！"
 
 #: actions/admin.actions.ts
+msgctxt "7l4h1s"
+msgid "User has been deleted."
+msgstr "用户已删除。"
+
+#: actions/admin.actions.ts
+#: components/admin/delete-user.tsx
+msgctxt "xkkfdF"
+msgid "Failed to delete user! Please try again later."
+msgstr "删除用户失败！请稍后再试。"
+
+#: actions/admin.actions.ts
 msgctxt "ScDYhZ"
 msgid "You cannot delete your own account!"
 msgstr "您不能删除自己的账户！"
@@ -41,34 +48,6 @@ msgstr "未找到用户！"
 msgctxt "Wt-dMj"
 msgid "Cannot delete another administrator account!"
 msgstr "无法删除其他管理员账户！"
-
-#: actions/admin.actions.ts
-msgctxt "7l4h1s"
-msgid "User has been deleted."
-msgstr "用户已删除。"
-
-#: actions/admin.actions.ts
-#: components/admin/delete-user.tsx
-msgctxt "xkkfdF"
-msgid "Failed to delete user! Please try again later."
-msgstr "删除用户失败！请稍后再试。"
-
-#: actions/budget.actions.ts
-#: actions/category.actions.ts
-#: actions/goal.actions.ts
-#: actions/recurring.actions.ts
-#: actions/transaction.actions.ts
-msgctxt "5GmpFA"
-msgid "Invalid data!"
-msgstr "无效数据！"
-
-#: actions/budget.actions.ts
-#: actions/goal.actions.ts
-#: actions/recurring.actions.ts
-#: actions/transaction.actions.ts
-msgctxt "IViGC5"
-msgid "Invalid category!"
-msgstr "分类无效！"
 
 #: actions/budget.actions.ts
 msgctxt "sW3_mQ"
@@ -92,11 +71,6 @@ msgid "Invalid budget ID!"
 msgstr "无效的预算 ID！"
 
 #: actions/budget.actions.ts
-msgctxt "5BmD1W"
-msgid "Budget not found or you don't have permission to edit!"
-msgstr "未找到预算或您没有权限编辑！"
-
-#: actions/budget.actions.ts
 msgctxt "Ipw0W1"
 msgid "Budget has been updated."
 msgstr "预算已更新。"
@@ -108,9 +82,9 @@ msgid "Failed to update budget! Please try again later."
 msgstr "更新预算失败！请稍后再试。"
 
 #: actions/budget.actions.ts
-msgctxt "fDrjqQ"
-msgid "Budget not found or you don't have permission to delete!"
-msgstr "未找到预算或您没有权限删除！"
+msgctxt "5BmD1W"
+msgid "Budget not found or you don't have permission to edit!"
+msgstr "未找到预算或您没有权限编辑！"
 
 #: actions/budget.actions.ts
 msgctxt "GeSZei"
@@ -122,6 +96,11 @@ msgstr "预算已删除。"
 msgctxt "niO8qC"
 msgid "Failed to delete budget! Please try again later."
 msgstr "删除预算失败！请稍后再试。"
+
+#: actions/budget.actions.ts
+msgctxt "fDrjqQ"
+msgid "Budget not found or you don't have permission to delete!"
+msgstr "未找到预算或您没有权限删除！"
 
 #: actions/budget.actions.ts
 msgctxt "xFeLWs"
@@ -150,6 +129,17 @@ msgid "Invalid category ID!"
 msgstr "无效的分类 ID！"
 
 #: actions/category.actions.ts
+msgctxt "RMEY96"
+msgid "Category has been updated."
+msgstr "分类已更新。"
+
+#: actions/category.actions.ts
+#: components/categories/category-form.tsx
+msgctxt "PoUgbk"
+msgid "Failed to update category! Please try again later."
+msgstr "更新分类失败！请稍后再试。"
+
+#: actions/category.actions.ts
 msgctxt "cLveqK"
 msgid "Category type cannot be changed!"
 msgstr "分类类型不能更改！"
@@ -160,15 +150,15 @@ msgid "Category not found or you don't have permission to edit!"
 msgstr "未找到分类或您没有权限编辑！"
 
 #: actions/category.actions.ts
-msgctxt "RMEY96"
-msgid "Category has been updated."
-msgstr "分类已更新。"
+msgctxt "7Al4tw"
+msgid "Category has been deleted."
+msgstr "分类已删除。"
 
 #: actions/category.actions.ts
-#: components/categories/category-form.tsx
-msgctxt "PoUgbk"
-msgid "Failed to update category! Please try again later."
-msgstr "更新分类失败！请稍后再试。"
+#: components/categories/delete-category.tsx
+msgctxt "XWfgXI"
+msgid "Failed to delete category! Please try again later."
+msgstr "删除分类失败！请稍后再试。"
 
 #: actions/category.actions.ts
 msgctxt "IzwrSe"
@@ -194,17 +184,6 @@ msgstr "无法删除分类。有 {count} 个目标正在使用此分类。请先
 msgctxt "Q_Y_ED"
 msgid "Cannot delete category. There are {count} recurring transactions using this category. Please delete those recurring transactions first."
 msgstr "无法删除分类。有 {count} 个定期交易正在使用此分类。请先删除这些定期交易。"
-
-#: actions/category.actions.ts
-msgctxt "7Al4tw"
-msgid "Category has been deleted."
-msgstr "分类已删除。"
-
-#: actions/category.actions.ts
-#: components/categories/delete-category.tsx
-msgctxt "XWfgXI"
-msgid "Failed to delete category! Please try again later."
-msgstr "删除分类失败！请稍后再试。"
 
 #: actions/category.actions.ts
 msgctxt "gzfdvr"
@@ -233,11 +212,6 @@ msgid "Invalid goal ID!"
 msgstr "无效的目标 ID！"
 
 #: actions/goal.actions.ts
-msgctxt "iQpYZg"
-msgid "Goal not found or you don't have permission to edit!"
-msgstr "未找到目标或您没有权限编辑！"
-
-#: actions/goal.actions.ts
 msgctxt "SpmGQk"
 msgid "Goal has been updated."
 msgstr "目标已更新。"
@@ -249,9 +223,9 @@ msgid "Failed to update goal! Please try again later."
 msgstr "更新目标失败！请稍后再试。"
 
 #: actions/goal.actions.ts
-msgctxt "Av4WTA"
-msgid "Goal not found or you don't have permission to delete!"
-msgstr "未找到目标或您没有权限删除！"
+msgctxt "iQpYZg"
+msgid "Goal not found or you don't have permission to edit!"
+msgstr "未找到目标或您没有权限编辑！"
 
 #: actions/goal.actions.ts
 msgctxt "MT417I"
@@ -263,6 +237,11 @@ msgstr "目标已删除。"
 msgctxt "uwewg6"
 msgid "Failed to delete goal! Please try again later."
 msgstr "删除目标失败！请稍后再试。"
+
+#: actions/goal.actions.ts
+msgctxt "Av4WTA"
+msgid "Goal not found or you don't have permission to delete!"
+msgstr "未找到目标或您没有权限删除！"
 
 #: actions/goal.actions.ts
 msgctxt "xwvGbl"
@@ -291,11 +270,6 @@ msgid "Invalid recurring transaction ID!"
 msgstr "无效的定期交易 ID！"
 
 #: actions/recurring.actions.ts
-msgctxt "TJXAsr"
-msgid "Recurring transaction not found or you don't have permission to delete!"
-msgstr "未找到定期交易或您没有权限删除！"
-
-#: actions/recurring.actions.ts
 msgctxt "0L6Kzl"
 msgid "Recurring transaction has been deleted."
 msgstr "定期交易已删除。"
@@ -305,6 +279,11 @@ msgstr "定期交易已删除。"
 msgctxt "9p5fYg"
 msgid "Failed to delete recurring transaction! Please try again later."
 msgstr "删除定期交易失败！请稍后再试。"
+
+#: actions/recurring.actions.ts
+msgctxt "TJXAsr"
+msgid "Recurring transaction not found or you don't have permission to delete!"
+msgstr "未找到定期交易或您没有权限删除！"
 
 #: actions/recurring.actions.ts
 msgctxt "D92YlY"
@@ -365,11 +344,6 @@ msgid "Invalid transaction ID!"
 msgstr "无效的交易 ID！"
 
 #: actions/transaction.actions.ts
-msgctxt "qyC85x"
-msgid "Transaction not found or you don't have permission to edit!"
-msgstr "未找到交易或您没有权限编辑！"
-
-#: actions/transaction.actions.ts
 msgctxt "VHOeqA"
 msgid "Transaction has been updated."
 msgstr "交易已更新。"
@@ -381,9 +355,9 @@ msgid "Failed to update transaction! Please try again later."
 msgstr "更新交易失败！请稍后再试。"
 
 #: actions/transaction.actions.ts
-msgctxt "Fxn2_P"
-msgid "Transaction not found or you don't have permission to delete!"
-msgstr "未找到交易或您没有权限删除！"
+msgctxt "qyC85x"
+msgid "Transaction not found or you don't have permission to edit!"
+msgstr "未找到交易或您没有权限编辑！"
 
 #: actions/transaction.actions.ts
 msgctxt "tz6kfd"
@@ -395,6 +369,11 @@ msgstr "交易已删除。"
 msgctxt "DcqDur"
 msgid "Failed to delete transaction! Please try again later."
 msgstr "删除交易失败！请稍后再试。"
+
+#: actions/transaction.actions.ts
+msgctxt "Fxn2_P"
+msgid "Transaction not found or you don't have permission to delete!"
+msgstr "未找到交易或您没有权限删除！"
 
 #: actions/transaction.actions.ts
 msgctxt "-VVz7r"
@@ -2736,6 +2715,36 @@ msgstr "十一月"
 msgctxt "SsiZK7"
 msgid "December"
 msgstr "十二月"
+
+#: lib/action-handler.ts
+msgctxt "4qILV3"
+msgid "Invalid ID!"
+msgstr "无效的 ID！"
+
+#: lib/action-handler.ts
+msgctxt "5GmpFA"
+msgid "Invalid data!"
+msgstr "无效数据！"
+
+#: lib/action-handler.ts
+msgctxt "IViGC5"
+msgid "Invalid category!"
+msgstr "分类无效！"
+
+#: lib/action-handler.ts
+msgctxt "xVYw0y"
+msgid "Operation completed successfully."
+msgstr "操作已成功完成。"
+
+#: lib/action-handler.ts
+msgctxt "iy38w1"
+msgid "This item already exists!"
+msgstr "此项目已存在！"
+
+#: lib/action-handler.ts
+msgctxt "vwdxch"
+msgid "Failed to complete action! Please try again later."
+msgstr "完成操作失败！请稍后再试。"
 
 #: schemas/messages.ts
 msgctxt "pRvgsc"

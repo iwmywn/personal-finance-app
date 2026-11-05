@@ -695,6 +695,57 @@ describe("Filters", () => {
 
       expect(result).toHaveLength(mockBudgets.length)
     })
+
+    it("should preserve local-date behavior when timeZone is omitted", () => {
+      vi.useFakeTimers()
+      try {
+        vi.setSystemTime(new Date(2024, 0, 15, 10, 0, 0))
+        const testBudget = {
+          ...mockBudgets[0],
+          startDate: new Date(2024, 0, 1),
+          endDate: new Date(2024, 0, 31),
+        }
+        const result = filterBudgets(
+          [testBudget],
+          { filterStatus: "active" },
+          mockTransactions
+        )
+        expect(result).toHaveLength(1)
+        expect(result[0]._id).toBe(testBudget._id)
+      } finally {
+        vi.useRealTimers()
+      }
+    })
+
+    it("should preserve existing behavior when caller provides explicit timeZone", () => {
+      vi.useFakeTimers()
+      try {
+        vi.setSystemTime(new Date("2024-02-01T02:00:00.000Z"))
+        const febBudget = {
+          ...mockBudgets[0],
+          startDate: new Date("2024-02-01T00:00:00.000Z"),
+          endDate: new Date("2024-02-28T00:00:00.000Z"),
+        }
+
+        const nyResult = filterBudgets(
+          [febBudget],
+          { filterStatus: "upcoming" },
+          mockTransactions,
+          "America/New_York"
+        )
+        expect(nyResult).toHaveLength(1)
+
+        const utcResult = filterBudgets(
+          [febBudget],
+          { filterStatus: "active" },
+          mockTransactions,
+          "UTC"
+        )
+        expect(utcResult).toHaveLength(1)
+      } finally {
+        vi.useRealTimers()
+      }
+    })
   })
 
   describe("filterGoals", () => {
@@ -984,6 +1035,58 @@ describe("Filters", () => {
       )
 
       expect(result).toHaveLength(mockGoals.length)
+    })
+
+    it("should preserve local-date behavior when timeZone is omitted", () => {
+      vi.useFakeTimers()
+      try {
+        vi.setSystemTime(new Date(2024, 0, 15, 10, 0, 0))
+        const testGoal = {
+          ...mockGoals[0],
+          startDate: new Date(2024, 0, 1),
+          endDate: new Date(2024, 0, 31),
+        }
+        const result = filterGoals(
+          [testGoal],
+          { filterStatus: "active" },
+          mockTransactions
+        )
+        expect(result).toHaveLength(1)
+        expect(result[0]._id).toBe(testGoal._id)
+      } finally {
+        vi.useRealTimers()
+      }
+    })
+
+    it("should preserve existing behavior when caller provides explicit timeZone", () => {
+      vi.useFakeTimers()
+      try {
+        // 2024-02-01T02:00:00.000Z is 2024-01-31 in America/New_York (UTC-5)
+        vi.setSystemTime(new Date("2024-02-01T02:00:00.000Z"))
+        const febGoal = {
+          ...mockGoals[0],
+          startDate: new Date("2024-02-01T00:00:00.000Z"),
+          endDate: new Date("2024-02-28T00:00:00.000Z"),
+        }
+
+        const nyResult = filterGoals(
+          [febGoal],
+          { filterStatus: "upcoming" },
+          mockTransactions,
+          "America/New_York"
+        )
+        expect(nyResult).toHaveLength(1)
+
+        const utcResult = filterGoals(
+          [febGoal],
+          { filterStatus: "active" },
+          mockTransactions,
+          "UTC"
+        )
+        expect(utcResult).toHaveLength(1)
+      } finally {
+        vi.useRealTimers()
+      }
     })
   })
 

@@ -1,10 +1,10 @@
 "use server"
 
-import { updateTag } from "next/cache"
 import { headers } from "next/headers"
 import { ObjectId } from "mongodb"
 import { getExtracted } from "next-intl/server"
 
+import { runDomainMutation } from "@/lib/action-handler"
 import { auth } from "@/lib/auth"
 import {
   getBudgetsCollection,
@@ -104,132 +104,124 @@ export async function getAdminData(): Promise<{
 export async function deleteUser(userId: string): Promise<ActionResponse> {
   const t = await getExtracted()
 
-  try {
-    if (!ObjectId.isValid(userId)) {
-      return {
-        error: t("Invalid user ID!"),
-      }
-    }
-
-    const { error, user, session } = await getSession(true)
-
-    if (!user || !session) return { error }
-
-    if (
-      await isRateLimited(`admin:delete:${user.id}`, RATE_LIMIT_PRESETS.STRICT)
-    ) {
-      return {
-        error: t("Too many requests! Please slow down and try again later."),
-      }
-    }
-
-    if (user.id === userId) {
-      return { error: t("You cannot delete your own account!") }
-    }
-
-    const userObjectId = new ObjectId(userId)
-    const usersCollection = await getUsersCollection()
-    const targetUser = await usersCollection.findOne({ _id: userObjectId })
-
-    if (!targetUser) {
-      return { error: t("User not found!") }
-    }
-
-    if (targetUser.role === "admin") {
-      return { error: t("Cannot delete another administrator account!") }
-    }
-
-    const [
-      transactionsCollection,
-      categoriesCollection,
-      budgetsCollection,
-      goalsCollection,
-      recurringCollection,
-    ] = await Promise.all([
-      getTransactionsCollection(),
-      getCategoriesCollection(),
-      getBudgetsCollection(),
-      getGoalsCollection(),
-      getRecurringTransactionsCollection(),
-    ])
-
-    await withTransaction(async (dbSession) => {
-      await transactionsCollection.deleteMany(
-        { userId: userObjectId },
-        { session: dbSession }
-      )
-      await categoriesCollection.deleteMany(
-        { userId: userObjectId },
-        { session: dbSession }
-      )
-      await budgetsCollection.deleteMany(
-        { userId: userObjectId },
-        { session: dbSession }
-      )
-      await goalsCollection.deleteMany(
-        { userId: userObjectId },
-        { session: dbSession }
-      )
-      await recurringCollection.deleteMany(
-        { userId: userObjectId },
-        { session: dbSession }
-      )
-
-      const db = await connect()
-      const userFilter = {
-        $or: [{ userId: userObjectId }, { userId }],
+  return runDomainMutation<string>({
+    rawInput: userId,
+    validateId: {
+      id: userId,
+      message: t("Invalid user ID!"),
+    },
+    requireAdmin: true,
+    rateLimit: {
+      domain: "admin:delete",
+      preset: RATE_LIMIT_PRESETS.STRICT,
+    },
+    revalidate: (_user, id) => [
+      `transactions-${id}`,
+      `categories-${id}`,
+      `budgets-${id}`,
+      `goals-${id}`,
+      `recurringTransactions-${id}`,
+    ],
+    successMessage: t("User has been deleted."),
+    fallbackErrorMessage: t("Failed to delete user! Please try again later."),
+    execute: async ({ input: userId, user }) => {
+      if (user.id === userId) {
+        return { error: t("You cannot delete your own account!") }
       }
 
-      const userVerifications = await db
-        .collection("verifications")
-        .find(
-          { value: userId },
-          { session: dbSession, projection: { identifier: 1 } }
-        )
-        .toArray()
+      const userObjectId = new ObjectId(userId)
+      const usersCollection = await getUsersCollection()
+      const targetUser = await usersCollection.findOne({ _id: userObjectId })
 
-      const attemptIdentifiers = userVerifications
-        .map((doc) => doc.identifier)
-        .filter(Boolean)
-        .map((identifier) => `2fa-attempts-${identifier}`)
+      if (!targetUser) {
+        return { error: t("User not found!") }
+      }
 
-      await Promise.all([
-        db
-          .collection("sessions")
-          .deleteMany(userFilter, { session: dbSession }),
-        db
-          .collection("accounts")
-          .deleteMany(userFilter, { session: dbSession }),
-        db
-          .collection("twoFactors")
-          .deleteMany(userFilter, { session: dbSession }),
-        db.collection("verifications").deleteMany(
-          {
-            $or: [
-              { value: userId },
-              ...(attemptIdentifiers.length > 0
-                ? [{ identifier: { $in: attemptIdentifiers } }]
-                : []),
-            ],
-          },
-          { session: dbSession }
-        ),
+      if (targetUser.role === "admin") {
+        return { error: t("Cannot delete another administrator account!") }
+      }
+
+      const [
+        transactionsCollection,
+        categoriesCollection,
+        budgetsCollection,
+        goalsCollection,
+        recurringCollection,
+      ] = await Promise.all([
+        getTransactionsCollection(),
+        getCategoriesCollection(),
+        getBudgetsCollection(),
+        getGoalsCollection(),
+        getRecurringTransactionsCollection(),
       ])
-      await usersCollection.deleteOne(
-        { _id: userObjectId },
-        { session: dbSession }
-      )
-    })
 
-    updateTag(`transactions-${userId}`)
-    updateTag(`categories-${userId}`)
-    updateTag(`budgets-${userId}`)
-    updateTag(`goals-${userId}`)
-    updateTag(`recurringTransactions-${userId}`)
+      await withTransaction(async (dbSession) => {
+        await transactionsCollection.deleteMany(
+          { userId: userObjectId },
+          { session: dbSession }
+        )
+        await categoriesCollection.deleteMany(
+          { userId: userObjectId },
+          { session: dbSession }
+        )
+        await budgetsCollection.deleteMany(
+          { userId: userObjectId },
+          { session: dbSession }
+        )
+        await goalsCollection.deleteMany(
+          { userId: userObjectId },
+          { session: dbSession }
+        )
+        await recurringCollection.deleteMany(
+          { userId: userObjectId },
+          { session: dbSession }
+        )
 
-    return { success: t("User has been deleted.") }
-  } catch (error) {
-    console.error("Error deleting user:", error)
-    return { error: t("Failed to delete user! Please try again later.") }
-  }
+        const db = await connect()
+        const userFilter = {
+          $or: [{ userId: userObjectId }, { userId }],
+        }
+
+        const userVerifications = await db
+          .collection("verifications")
+          .find(
+            { value: userId },
+            { session: dbSession, projection: { identifier: 1 } }
+          )
+          .toArray()
+
+        const attemptIdentifiers = userVerifications
+          .map((doc) => doc.identifier)
+          .filter(Boolean)
+          .map((identifier) => `2fa-attempts-${identifier}`)
+
+        await Promise.all([
+          db
+            .collection("sessions")
+            .deleteMany(userFilter, { session: dbSession }),
+          db
+            .collection("accounts")
+            .deleteMany(userFilter, { session: dbSession }),
+          db
+            .collection("twoFactors")
+            .deleteMany(userFilter, { session: dbSession }),
+          db.collection("verifications").deleteMany(
+            {
+              $or: [
+                { value: userId },
+                ...(attemptIdentifiers.length > 0
+                  ? [{ identifier: { $in: attemptIdentifiers } }]
+                  : []),
+              ],
+            },
+            { session: dbSession }
+          ),
+        ])
+        await usersCollection.deleteOne(
+          { _id: userObjectId },
+          { session: dbSession }
+        )
+      })
+    },
+  })
 }

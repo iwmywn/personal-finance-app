@@ -35,3 +35,24 @@ _Avoid_: Rate scraping, FX polling, rate sync cron
 **Nearest-Rate Interpolation**:
 The heuristic algorithm that resolves the chronologically closest available exchange rate when an exact calendar date snapshot is missing.
 _Avoid_: Rate fuzzy matching, date snapping, rate estimation
+
+### Financial Valuation & Performance
+
+**Financial Valuation**:
+The point-in-time calculation of realized cash flows and progress percentages against a financial schedule (budget allocation or savings goal) across normalized date windows and currencies.
+_Avoid_: Budget calculation, goal stats, spending analysis
+
+**Rollup Health**:
+A discrete domain classification of financial progress relative to target thresholds (`unstarted`, `on_track`, `warning`, `exceeded`).
+
+- **Budgets (spending vs allocation)**:
+  - `unstarted`: No converted outflow transactions in date window.
+  - `on_track`: Spent < 75% of allocated amount.
+  - `warning`: Spent 75% to < 100% of allocated amount.
+  - `exceeded`: Spent >= 100% of allocated amount.
+- **Goals (savings vs target)**:
+  - `unstarted`: No converted inflow transactions in date window.
+  - `on_track`: Accumulated >= 100% of target amount (target achieved / on track).
+  - `warning`: Accumulated 75% to < 100% of target amount (approaching target).
+  - `exceeded`: Accumulated < 75% of target amount (behind target).
+    _Avoid_: Progress color, budget status, bar style

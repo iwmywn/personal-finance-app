@@ -7,12 +7,8 @@ msgstr ""
 "X-Message-Key: msgctxt\n"
 
 #: actions/admin.actions.ts
-#: actions/budget.actions.ts
-#: actions/category.actions.ts
-#: actions/goal.actions.ts
-#: actions/recurring.actions.ts
 #: actions/session.actions.ts
-#: actions/transaction.actions.ts
+#: lib/action-handler.ts
 msgctxt "OYzwyU"
 msgid "Too many requests! Please slow down and try again later."
 msgstr "リクエストが多すぎます！少し時間を置いてから再度お試しください。"
@@ -28,6 +24,17 @@ msgid "Invalid user ID!"
 msgstr "ユーザーIDが無効です！"
 
 #: actions/admin.actions.ts
+msgctxt "7l4h1s"
+msgid "User has been deleted."
+msgstr "ユーザーが削除されました。"
+
+#: actions/admin.actions.ts
+#: components/admin/delete-user.tsx
+msgctxt "xkkfdF"
+msgid "Failed to delete user! Please try again later."
+msgstr "ユーザーの削除に失敗しました！後でもう一度お試しください。"
+
+#: actions/admin.actions.ts
 msgctxt "ScDYhZ"
 msgid "You cannot delete your own account!"
 msgstr "自分のアカウントを削除することはできません！"
@@ -41,34 +48,6 @@ msgstr "ユーザーが見つかりません！"
 msgctxt "Wt-dMj"
 msgid "Cannot delete another administrator account!"
 msgstr "他の管理者アカウントを削除することはできません！"
-
-#: actions/admin.actions.ts
-msgctxt "7l4h1s"
-msgid "User has been deleted."
-msgstr "ユーザーが削除されました。"
-
-#: actions/admin.actions.ts
-#: components/admin/delete-user.tsx
-msgctxt "xkkfdF"
-msgid "Failed to delete user! Please try again later."
-msgstr "ユーザーの削除に失敗しました！後でもう一度お試しください。"
-
-#: actions/budget.actions.ts
-#: actions/category.actions.ts
-#: actions/goal.actions.ts
-#: actions/recurring.actions.ts
-#: actions/transaction.actions.ts
-msgctxt "5GmpFA"
-msgid "Invalid data!"
-msgstr "無効なデータです！"
-
-#: actions/budget.actions.ts
-#: actions/goal.actions.ts
-#: actions/recurring.actions.ts
-#: actions/transaction.actions.ts
-msgctxt "IViGC5"
-msgid "Invalid category!"
-msgstr "カテゴリが無効です！"
 
 #: actions/budget.actions.ts
 msgctxt "sW3_mQ"
@@ -92,11 +71,6 @@ msgid "Invalid budget ID!"
 msgstr "予算IDが無効です！"
 
 #: actions/budget.actions.ts
-msgctxt "5BmD1W"
-msgid "Budget not found or you don't have permission to edit!"
-msgstr "予算が見つからないか、編集権限がありません！"
-
-#: actions/budget.actions.ts
 msgctxt "Ipw0W1"
 msgid "Budget has been updated."
 msgstr "予算が更新されました。"
@@ -108,9 +82,9 @@ msgid "Failed to update budget! Please try again later."
 msgstr "予算の更新に失敗しました！後でもう一度お試しください。"
 
 #: actions/budget.actions.ts
-msgctxt "fDrjqQ"
-msgid "Budget not found or you don't have permission to delete!"
-msgstr "予算が見つからないか、削除権限がありません！"
+msgctxt "5BmD1W"
+msgid "Budget not found or you don't have permission to edit!"
+msgstr "予算が見つからないか、編集権限がありません！"
 
 #: actions/budget.actions.ts
 msgctxt "GeSZei"
@@ -122,6 +96,11 @@ msgstr "予算が削除されました。"
 msgctxt "niO8qC"
 msgid "Failed to delete budget! Please try again later."
 msgstr "予算の削除に失敗しました！後でもう一度お試しください。"
+
+#: actions/budget.actions.ts
+msgctxt "fDrjqQ"
+msgid "Budget not found or you don't have permission to delete!"
+msgstr "予算が見つからないか、削除権限がありません！"
 
 #: actions/budget.actions.ts
 msgctxt "xFeLWs"
@@ -150,6 +129,17 @@ msgid "Invalid category ID!"
 msgstr "カテゴリIDが無効です！"
 
 #: actions/category.actions.ts
+msgctxt "RMEY96"
+msgid "Category has been updated."
+msgstr "カテゴリが更新されました。"
+
+#: actions/category.actions.ts
+#: components/categories/category-form.tsx
+msgctxt "PoUgbk"
+msgid "Failed to update category! Please try again later."
+msgstr "カテゴリの更新に失敗しました！後でもう一度お試しください。"
+
+#: actions/category.actions.ts
 msgctxt "cLveqK"
 msgid "Category type cannot be changed!"
 msgstr "カテゴリのタイプは変更できません！"
@@ -160,15 +150,15 @@ msgid "Category not found or you don't have permission to edit!"
 msgstr "カテゴリが見つからないか、編集権限がありません！"
 
 #: actions/category.actions.ts
-msgctxt "RMEY96"
-msgid "Category has been updated."
-msgstr "カテゴリが更新されました。"
+msgctxt "7Al4tw"
+msgid "Category has been deleted."
+msgstr "カテゴリが削除されました。"
 
 #: actions/category.actions.ts
-#: components/categories/category-form.tsx
-msgctxt "PoUgbk"
-msgid "Failed to update category! Please try again later."
-msgstr "カテゴリの更新に失敗しました！後でもう一度お試しください。"
+#: components/categories/delete-category.tsx
+msgctxt "XWfgXI"
+msgid "Failed to delete category! Please try again later."
+msgstr "カテゴリの削除に失敗しました！後でもう一度お試しください。"
 
 #: actions/category.actions.ts
 msgctxt "IzwrSe"
@@ -194,17 +184,6 @@ msgstr "カテゴリを削除できません。このカテゴリを使用して
 msgctxt "Q_Y_ED"
 msgid "Cannot delete category. There are {count} recurring transactions using this category. Please delete those recurring transactions first."
 msgstr "カテゴリを削除できません。このカテゴリを使用している定期取引が{count}個あります。まずそれらの定期取引を削除してください。"
-
-#: actions/category.actions.ts
-msgctxt "7Al4tw"
-msgid "Category has been deleted."
-msgstr "カテゴリが削除されました。"
-
-#: actions/category.actions.ts
-#: components/categories/delete-category.tsx
-msgctxt "XWfgXI"
-msgid "Failed to delete category! Please try again later."
-msgstr "カテゴリの削除に失敗しました！後でもう一度お試しください。"
 
 #: actions/category.actions.ts
 msgctxt "gzfdvr"
@@ -233,11 +212,6 @@ msgid "Invalid goal ID!"
 msgstr "目標IDが無効です！"
 
 #: actions/goal.actions.ts
-msgctxt "iQpYZg"
-msgid "Goal not found or you don't have permission to edit!"
-msgstr "目標が見つからないか、編集権限がありません！"
-
-#: actions/goal.actions.ts
 msgctxt "SpmGQk"
 msgid "Goal has been updated."
 msgstr "目標が更新されました。"
@@ -249,9 +223,9 @@ msgid "Failed to update goal! Please try again later."
 msgstr "目標の更新に失敗しました！後でもう一度お試しください。"
 
 #: actions/goal.actions.ts
-msgctxt "Av4WTA"
-msgid "Goal not found or you don't have permission to delete!"
-msgstr "目標が見つからないか、削除権限がありません！"
+msgctxt "iQpYZg"
+msgid "Goal not found or you don't have permission to edit!"
+msgstr "目標が見つからないか、編集権限がありません！"
 
 #: actions/goal.actions.ts
 msgctxt "MT417I"
@@ -263,6 +237,11 @@ msgstr "目標が削除されました。"
 msgctxt "uwewg6"
 msgid "Failed to delete goal! Please try again later."
 msgstr "目標の削除に失敗しました！後でもう一度お試しください。"
+
+#: actions/goal.actions.ts
+msgctxt "Av4WTA"
+msgid "Goal not found or you don't have permission to delete!"
+msgstr "目標が見つからないか、削除権限がありません！"
 
 #: actions/goal.actions.ts
 msgctxt "xwvGbl"
@@ -291,11 +270,6 @@ msgid "Invalid recurring transaction ID!"
 msgstr "定期取引IDが無効です！"
 
 #: actions/recurring.actions.ts
-msgctxt "TJXAsr"
-msgid "Recurring transaction not found or you don't have permission to delete!"
-msgstr "定期取引が見つからないか、削除権限がありません！"
-
-#: actions/recurring.actions.ts
 msgctxt "0L6Kzl"
 msgid "Recurring transaction has been deleted."
 msgstr "定期取引が削除されました。"
@@ -305,6 +279,11 @@ msgstr "定期取引が削除されました。"
 msgctxt "9p5fYg"
 msgid "Failed to delete recurring transaction! Please try again later."
 msgstr "定期取引の削除に失敗しました！後でもう一度お試しください。"
+
+#: actions/recurring.actions.ts
+msgctxt "TJXAsr"
+msgid "Recurring transaction not found or you don't have permission to delete!"
+msgstr "定期取引が見つからないか、削除権限がありません！"
 
 #: actions/recurring.actions.ts
 msgctxt "D92YlY"
@@ -365,11 +344,6 @@ msgid "Invalid transaction ID!"
 msgstr "取引IDが無効です！"
 
 #: actions/transaction.actions.ts
-msgctxt "qyC85x"
-msgid "Transaction not found or you don't have permission to edit!"
-msgstr "取引が見つからないか、編集権限がありません！"
-
-#: actions/transaction.actions.ts
 msgctxt "VHOeqA"
 msgid "Transaction has been updated."
 msgstr "取引が更新されました。"
@@ -381,9 +355,9 @@ msgid "Failed to update transaction! Please try again later."
 msgstr "取引の更新に失敗しました！後でもう一度お試しください。"
 
 #: actions/transaction.actions.ts
-msgctxt "Fxn2_P"
-msgid "Transaction not found or you don't have permission to delete!"
-msgstr "取引が見つからないか、削除権限がありません！"
+msgctxt "qyC85x"
+msgid "Transaction not found or you don't have permission to edit!"
+msgstr "取引が見つからないか、編集権限がありません！"
 
 #: actions/transaction.actions.ts
 msgctxt "tz6kfd"
@@ -395,6 +369,11 @@ msgstr "取引が削除されました。"
 msgctxt "DcqDur"
 msgid "Failed to delete transaction! Please try again later."
 msgstr "取引の削除に失敗しました！後でもう一度お試しください。"
+
+#: actions/transaction.actions.ts
+msgctxt "Fxn2_P"
+msgid "Transaction not found or you don't have permission to delete!"
+msgstr "取引が見つからないか、削除権限がありません！"
 
 #: actions/transaction.actions.ts
 msgctxt "-VVz7r"
@@ -2736,6 +2715,36 @@ msgstr "11月"
 msgctxt "SsiZK7"
 msgid "December"
 msgstr "12月"
+
+#: lib/action-handler.ts
+msgctxt "4qILV3"
+msgid "Invalid ID!"
+msgstr "IDが無効です！"
+
+#: lib/action-handler.ts
+msgctxt "5GmpFA"
+msgid "Invalid data!"
+msgstr "無効なデータです！"
+
+#: lib/action-handler.ts
+msgctxt "IViGC5"
+msgid "Invalid category!"
+msgstr "カテゴリが無効です！"
+
+#: lib/action-handler.ts
+msgctxt "xVYw0y"
+msgid "Operation completed successfully."
+msgstr "操作が正常に完了しました。"
+
+#: lib/action-handler.ts
+msgctxt "iy38w1"
+msgid "This item already exists!"
+msgstr "この項目は既に存在します！"
+
+#: lib/action-handler.ts
+msgctxt "vwdxch"
+msgid "Failed to complete action! Please try again later."
+msgstr "操作の完了に失敗しました！後でもう一度お試しください。"
 
 #: schemas/messages.ts
 msgctxt "pRvgsc"
