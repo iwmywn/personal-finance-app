@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { useExtracted } from "next-intl"
 import { toast } from "sonner"
@@ -36,39 +36,38 @@ export function UnbanUserForm({ user, isOpen, setIsOpen }: UnbanUserFormProps) {
   const t = useExtracted()
   const router = useRouter()
   const formatDate = useFormatDate()
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+
+  const [isPending, startTransition] = useTransition()
 
   async function handleUnban() {
-    setIsSubmitting(true)
-
-    try {
-      await authClient.admin.unbanUser({
-        userId: user.id,
-        fetchOptions: {
-          onError: () => {
-            toast.error(
-              t("Failed to update ban status! Please try again later.")
-            )
+    startTransition(async () => {
+      try {
+        await authClient.admin.unbanUser({
+          userId: user.id,
+          fetchOptions: {
+            onError: () => {
+              toast.error(
+                t("Failed to update ban status! Please try again later.")
+              )
+            },
+            onSuccess: () => {
+              setIsOpen(false)
+              toast.success(t("User has been unbanned."))
+              router.refresh()
+            },
           },
-          onSuccess: () => {
-            setIsOpen(false)
-            toast.success(t("User has been unbanned."))
-            router.refresh()
-          },
-        },
-      })
-    } catch {
-      toast.error(t("Failed to update ban status! Please try again later."))
-    }
-
-    setIsSubmitting(false)
+        })
+      } catch {
+        toast.error(t("Failed to update ban status! Please try again later."))
+      }
+    })
   }
 
   return (
     <Dialog
       open={isOpen}
       onOpenChange={(open) => {
-        if (!isSubmitting) setIsOpen(open)
+        if (!isPending) setIsOpen(open)
       }}
     >
       <DialogContent>
@@ -94,9 +93,9 @@ export function UnbanUserForm({ user, isOpen, setIsOpen }: UnbanUserFormProps) {
           </Item>
 
           <DialogFooter>
-            <DialogCancel disabled={isSubmitting}>{t("Cancel")}</DialogCancel>
-            <Button onClick={handleUnban} disabled={isSubmitting}>
-              {isSubmitting && <Spinner />}
+            <DialogCancel disabled={isPending}>{t("Cancel")}</DialogCancel>
+            <Button onClick={handleUnban} disabled={isPending}>
+              {isPending && <Spinner />}
               {t("Unban")}
             </Button>
           </DialogFooter>
