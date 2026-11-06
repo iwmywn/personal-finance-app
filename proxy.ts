@@ -1,7 +1,11 @@
 import type { NextURL } from "next/dist/server/web/next-url"
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
-import { getSessionCookie } from "better-auth/cookies"
+import {
+  getSessionCookie,
+  parseSetCookieHeader,
+  toCookieOptions,
+} from "better-auth/cookies"
 
 import { siteConfig } from "@/app/vozix.config"
 import { auth } from "@/lib/auth"
@@ -38,30 +42,68 @@ function redirectTo(pathname: string, nextUrl: NextURL) {
   return NextResponse.redirect(new URL(pathname, nextUrl))
 }
 
+function applyRenewalCookies(response: NextResponse, headers: Headers | null) {
+  if (!headers) return
+
+  const setCookieHeader = headers.get("set-cookie")
+  if (!setCookieHeader) return
+
+  const parsed = parseSetCookieHeader(setCookieHeader)
+  parsed.forEach((cookie, key) => {
+    const options = toCookieOptions(cookie)
+    // Only forward valid session renewal cookies;
+    // never forward deletion cookies (max-age === 0 or empty value)
+    if (key && options.maxAge !== 0 && cookie.value !== "") {
+      response.cookies.set(key, cookie.value, options)
+    }
+  })
+}
+
 export default async function proxy(request: NextRequest) {
   const { nextUrl } = request
   const { pathname } = nextUrl
 
-  const session = await auth.api.getSession({
+  // Passing `_flag: "router"` prevents Better-Auth's `nextCookies` plugin
+  // from calling `cookies().set(...)` to delete session cookies on middleware
+  // responses when handling stale or in-flight prefetch requests.
+  // We use `returnHeaders: true` so legitimate session renewal cookies can be
+  // extracted and forwarded to the browser on valid active sessions.
+  const sessionResult = await auth.api.getSession({
     headers: request.headers,
+    returnHeaders: true,
+    _flag: "router",
+  } as unknown as Parameters<typeof auth.api.getSession>[0] & {
+    returnHeaders: true
+    _flag: string
   })
+
+  const session =
+    sessionResult && "response" in sessionResult
+      ? sessionResult.response
+      : (sessionResult as Awaited<ReturnType<typeof auth.api.getSession>>)
+  const sessionHeaders =
+    sessionResult && "headers" in sessionResult ? sessionResult.headers : null
 
   if (!session) {
     return redirectIfProtectedRoute(request)
   }
 
+  let response: NextResponse
+
   if (
     routes.authRoutes.some((route) => pathname.startsWith(route)) ||
     pathname === "/"
   ) {
-    return redirectTo(routes.DEFAULT_SIGNIN_REDIRECT, nextUrl)
+    response = redirectTo(routes.DEFAULT_SIGNIN_REDIRECT, nextUrl)
+  } else if (pathname.startsWith("/admin") && !isAdminRole(session.user.role)) {
+    response = redirectTo(routes.DEFAULT_SIGNIN_REDIRECT, nextUrl)
+  } else {
+    response = NextResponse.next()
   }
 
-  if (pathname.startsWith("/admin") && !isAdminRole(session.user.role)) {
-    return redirectTo(routes.DEFAULT_SIGNIN_REDIRECT, nextUrl)
-  }
+  applyRenewalCookies(response, sessionHeaders)
 
-  return NextResponse.next()
+  return response
 }
 
 export const config = {

@@ -3,8 +3,10 @@ import { NextRequest } from "next/server"
 import {
   mockAuthenticatedAdmin,
   mockAuthenticatedUser,
+  mockGetSession,
   mockUnauthenticatedUser,
 } from "@/tests/backend/mocks/session.mock"
+import { mockDBUser } from "@/tests/shared/data"
 import { siteConfig } from "@/app/vozix.config"
 import { clientEnv } from "@/env/client"
 import proxy from "@/proxy"
@@ -206,6 +208,70 @@ describe("Proxy (Middleware)", () => {
 
       expect(response.headers.get("location")).toBeNull()
       expect(response.headers.get("x-middleware-next")).toBe("1")
+    })
+  })
+
+  describe("Session Renewal and Cookie Forwarding", () => {
+    it("should forward valid session renewal cookies when the session is authenticated", async () => {
+      mockGetSession.mockResolvedValue({
+        response: {
+          user: {
+            ...mockDBUser,
+            id: mockDBUser._id.toString(),
+          },
+          session: {},
+        },
+        headers: new Headers({
+          "set-cookie":
+            "Vozix.session_token=renewed-token; Path=/; Max-Age=604800; HttpOnly; SameSite=Lax",
+        }),
+      })
+
+      const request = new NextRequest(`${clientEnv.NEXT_PUBLIC_URL}/home`)
+      const response = await proxy(request)
+
+      expect(response.cookies.get("Vozix.session_token")?.value).toBe(
+        "renewed-token"
+      )
+    })
+
+    it("should not forward stale-session deletion cookies with max-age 0", async () => {
+      mockGetSession.mockResolvedValue({
+        response: {
+          user: {
+            ...mockDBUser,
+            id: mockDBUser._id.toString(),
+          },
+          session: {},
+        },
+        headers: new Headers({
+          "set-cookie": "Vozix.session_token=; Path=/; Max-Age=0; HttpOnly",
+        }),
+      })
+
+      const request = new NextRequest(`${clientEnv.NEXT_PUBLIC_URL}/home`)
+      const response = await proxy(request)
+
+      expect(response.cookies.get("Vozix.session_token")).toBeUndefined()
+    })
+
+    it("should not forward any cookies when the session is unauthenticated/null", async () => {
+      mockGetSession.mockResolvedValue({
+        response: null,
+        headers: new Headers({
+          "set-cookie": "Vozix.session_token=; Path=/; Max-Age=0; HttpOnly",
+        }),
+      })
+
+      const request = new NextRequest(
+        `${clientEnv.NEXT_PUBLIC_URL}/transactions`
+      )
+      const response = await proxy(request)
+
+      expect(response.cookies.get("Vozix.session_token")).toBeUndefined()
+      expect(response.headers.get("location")).toBe(
+        `${clientEnv.NEXT_PUBLIC_URL}${routes.signInRoute}?next=%2Ftransactions`
+      )
     })
   })
 })

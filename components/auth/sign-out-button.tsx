@@ -47,8 +47,8 @@ export function SignOutButton() {
             onSuccess: async () => {
               await revalidateCoreLayout()
               setIsOpen(false)
-              toast.success(t("Signed out."))
               router.push(signInRoute)
+              toast.success(t("Signed out."))
             },
           },
         })

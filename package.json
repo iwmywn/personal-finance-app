@@ -28,14 +28,14 @@
     "db:logs": "docker compose logs -f"
   },
   "dependencies": {
-    "@better-auth/mongo-adapter": "1.7.17",
+    "@better-auth/mongo-adapter": "1.7.18",
     "@hookform/resolvers": "7.0.3",
     "@t3-oss/env-nextjs": "0.13.11",
-    "better-auth": "1.7.17",
+    "better-auth": "1.7.18",
     "class-variance-authority": "0.7.1",
     "cn": "0.5.2",
     "decimal.js": "10.6.0",
-    "lucide-react": "1.69.0",
+    "lucide-react": "1.70.0",
     "minisearch": "7.2.0",
     "mongodb": "7.8.0",
     "next": "16.4.5",
@@ -43,7 +43,7 @@
     "next-themes": "0.4.6",
     "nuqs": "2.10.2",
     "radix-ui": "1.8.1",
-    "rate-limiter-flexible": "11.2.4",
+    "rate-limiter-flexible": "11.3.0",
     "react": "19.3.1",
     "react-currency-input-field": "4.0.14",
     "react-day-picker": "10.0.2",
@@ -59,7 +59,7 @@
     "@commitlint/cli": "21.2.4",
     "@commitlint/config-conventional": "21.2.4",
     "@iwmywn/release": "2.0.0",
-    "@playwright/test": "1.64.1",
+    "@playwright/test": "1.65.0",
     "@tailwindcss/postcss": "4.3.4",
     "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "16.3.3",
@@ -94,5 +94,5 @@
       "onFail": "warn"
     }
   },
-  "packageManager": "pnpm@12.16.1"
+  "packageManager": "pnpm@12.18.0"
 }

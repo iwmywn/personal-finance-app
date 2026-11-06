@@ -44,8 +44,8 @@ export function DeleteRecurringTransaction({
           toast.error(error)
         } else {
           setIsOpen(false)
-          toast.success(success)
           router.refresh()
+          toast.success(success)
         }
       } catch {
         toast.error(

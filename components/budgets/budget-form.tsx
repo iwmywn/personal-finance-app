@@ -102,8 +102,8 @@ export function BudgetForm({ budget, isOpen, setIsOpen }: BudgetFormProps) {
           toast.error(error)
         } else {
           setIsOpen(false)
-          toast.success(success)
           router.refresh()
+          toast.success(success)
         }
       } catch {
         toast.error(t("Failed to update budget! Please try again later."))
@@ -117,8 +117,8 @@ export function BudgetForm({ budget, isOpen, setIsOpen }: BudgetFormProps) {
         } else {
           setIsOpen(false)
           form.reset()
-          toast.success(success)
           router.refresh()
+          toast.success(success)
         }
       } catch {
         toast.error(t("Failed to create budget! Please try again later."))

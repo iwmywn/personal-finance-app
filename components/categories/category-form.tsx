@@ -78,8 +78,8 @@ export function CategoryForm({
           toast.error(error)
         } else {
           setIsOpen(false)
-          toast.success(success)
           router.refresh()
+          toast.success(success)
         }
       } catch {
         toast.error(t("Failed to update category! Please try again later."))
@@ -96,8 +96,8 @@ export function CategoryForm({
             ...form.formState.defaultValues,
             type,
           })
-          toast.success(success)
           router.refresh()
+          toast.success(success)
         }
       } catch {
         toast.error(t("Failed to create category! Please try again later."))

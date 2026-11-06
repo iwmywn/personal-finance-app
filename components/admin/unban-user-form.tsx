@@ -36,7 +36,6 @@ export function UnbanUserForm({ user, isOpen, setIsOpen }: UnbanUserFormProps) {
   const t = useExtracted()
   const router = useRouter()
   const formatDate = useFormatDate()
-
   const [isPending, startTransition] = useTransition()
 
   async function handleUnban() {
