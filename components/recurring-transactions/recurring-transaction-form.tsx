@@ -125,8 +125,8 @@ export function RecurringTransactionForm({
           ...form.formState.defaultValues,
           type,
         })
-        toast.success(success)
         router.refresh()
+        toast.success(success)
       }
     } catch {
       toast.error(

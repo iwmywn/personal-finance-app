@@ -80,8 +80,8 @@ export function ChangePasswordForm() {
           onSuccess: () => {
             setIsOpen(false)
             form.reset()
-            toast.success(t("Your password has been changed."))
             router.refresh()
+            toast.success(t("Your password has been changed."))
           },
         },
       })

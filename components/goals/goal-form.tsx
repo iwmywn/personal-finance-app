@@ -104,8 +104,8 @@ export function GoalForm({ goal, isOpen, setIsOpen }: GoalFormProps) {
           toast.error(error)
         } else {
           setIsOpen(false)
-          toast.success(success)
           router.refresh()
+          toast.success(success)
         }
       } catch {
         toast.error(t("Failed to update goal! Please try again later."))
@@ -119,8 +119,8 @@ export function GoalForm({ goal, isOpen, setIsOpen }: GoalFormProps) {
         } else {
           setIsOpen(false)
           form.reset()
-          toast.success(success)
           router.refresh()
+          toast.success(success)
         }
       } catch {
         toast.error(t("Failed to create goal! Please try again later."))

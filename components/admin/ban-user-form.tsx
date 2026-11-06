@@ -81,8 +81,8 @@ export function BanUserForm({ user, isOpen, setIsOpen }: BanUserFormProps) {
           onSuccess: () => {
             setIsOpen(false)
             form.reset()
-            toast.success(t("User has been banned."))
             router.refresh()
+            toast.success(t("User has been banned."))
           },
         },
       })

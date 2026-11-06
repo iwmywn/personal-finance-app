@@ -98,8 +98,8 @@ export function CreateUserForm({ isOpen, setIsOpen }: CreateUserFormProps) {
           onSuccess: () => {
             setIsOpen(false)
             form.reset()
-            toast.success(t("User has been created."))
             router.refresh()
+            toast.success(t("User has been created."))
           },
         },
       })

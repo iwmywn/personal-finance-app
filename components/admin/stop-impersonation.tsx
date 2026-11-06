@@ -57,8 +57,8 @@ export function StopImpersonation() {
           onSuccess: async () => {
             await revalidateCoreLayout()
             setIsOpen(false)
-            toast.success(t("Stopped impersonation session."))
             router.push("/admin")
+            toast.success(t("Stopped impersonation session."))
           },
         },
       })

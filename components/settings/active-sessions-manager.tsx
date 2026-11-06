@@ -126,8 +126,8 @@ export function ActiveSessionsManager() {
             },
             onSuccess: async () => {
               await revalidateCoreLayout()
-              toast.success(t("Session terminated."))
               router.push("/admin")
+              toast.success(t("Session terminated."))
             },
           },
         })
@@ -142,8 +142,8 @@ export function ActiveSessionsManager() {
         toast.error(error)
       } else {
         setActiveSessions((prev) => prev.filter((s) => s.id !== sessionId))
-        toast.success(success)
         router.refresh()
+        toast.success(success)
       }
     } catch {
       toast.error(t("Failed to terminate session! Please try again later."))
@@ -178,8 +178,8 @@ export function ActiveSessionsManager() {
             },
             onSuccess: async () => {
               await revalidateCoreLayout()
-              toast.success(t("All sessions terminated."))
               router.push("/admin")
+              toast.success(t("All sessions terminated."))
             },
           },
         })
@@ -197,8 +197,8 @@ export function ActiveSessionsManager() {
           },
           onSuccess: async () => {
             await revalidateCoreLayout()
-            toast.success(t("All sessions terminated."))
             router.push(signInRoute)
+            toast.success(t("All sessions terminated."))
           },
         },
       })

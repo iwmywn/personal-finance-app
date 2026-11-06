@@ -265,8 +265,8 @@ function VerifyTwoFactorForm({
             setIsOpen(false)
             setTotpURI(null)
             form.reset()
-            toast.success(t("Two-factor authentication is now enabled."))
             router.refresh()
+            toast.success(t("Two-factor authentication is now enabled."))
           },
         },
       })
@@ -361,8 +361,8 @@ function DisableTwoFactorForm({
           onSuccess: () => {
             setIsOpen(false)
             form.reset()
-            toast.success(t("Two-factor authentication is now disabled."))
             router.refresh()
+            toast.success(t("Two-factor authentication is now disabled."))
           },
         },
       })
