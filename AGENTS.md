@@ -6,6 +6,7 @@ Repository guidelines and architectural invariants for vozix.
 
 Run all package commands with `pnpm`:
 
+- **Type Check**: `pnpm type-check` — type checks the codebase (`tsc --noEmit`).
 - **Audit React Code**: `pnpm react-doctor` — verifies React 19 compiler compatibility, hooks hygiene, and hydration safety.
 - **Run Frontend Tests**: `pnpm test:fe` — UI component tests (`happy-dom`).
 - **Run Backend Tests**: `pnpm test:be` — integration tests (`node` + in-memory MongoDB replica set).
