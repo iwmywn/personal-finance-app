@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { cn } from "cn"
-import { useExtracted } from "next-intl"
+import { useExtracted, useTimeZone } from "next-intl"
 
 import { BudgetsTable } from "@/components/budgets/budgets-table"
 import { Button } from "@/components/ui/button"
@@ -36,6 +36,7 @@ export function BudgetFilters() {
     "all" | "expired" | "active" | "upcoming"
   >("all")
   const t = useExtracted()
+  const timeZone = useTimeZone()
   const { getCategoriesByType } = useCategory()
 
   const allMonths = useMonths()
@@ -65,7 +66,8 @@ export function BudgetFilters() {
       filterProgress,
       filterStatus,
     },
-    transactions
+    transactions,
+    timeZone
   )
 
   return (

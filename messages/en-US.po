@@ -7,12 +7,8 @@ msgstr ""
 "X-Message-Key: msgctxt\n"
 
 #: actions/admin.actions.ts
-#: actions/budget.actions.ts
-#: actions/category.actions.ts
-#: actions/goal.actions.ts
-#: actions/recurring.actions.ts
 #: actions/session.actions.ts
-#: actions/transaction.actions.ts
+#: lib/action-handler.ts
 msgctxt "OYzwyU"
 msgid "Too many requests! Please slow down and try again later."
 msgstr "Too many requests! Please slow down and try again later."
@@ -28,6 +24,17 @@ msgid "Invalid user ID!"
 msgstr "Invalid user ID!"
 
 #: actions/admin.actions.ts
+msgctxt "7l4h1s"
+msgid "User has been deleted."
+msgstr "User has been deleted."
+
+#: actions/admin.actions.ts
+#: components/admin/delete-user.tsx
+msgctxt "xkkfdF"
+msgid "Failed to delete user! Please try again later."
+msgstr "Failed to delete user! Please try again later."
+
+#: actions/admin.actions.ts
 msgctxt "ScDYhZ"
 msgid "You cannot delete your own account!"
 msgstr "You cannot delete your own account!"
@@ -41,34 +48,6 @@ msgstr "User not found!"
 msgctxt "Wt-dMj"
 msgid "Cannot delete another administrator account!"
 msgstr "Cannot delete another administrator account!"
-
-#: actions/admin.actions.ts
-msgctxt "7l4h1s"
-msgid "User has been deleted."
-msgstr "User has been deleted."
-
-#: actions/admin.actions.ts
-#: components/admin/delete-user.tsx
-msgctxt "xkkfdF"
-msgid "Failed to delete user! Please try again later."
-msgstr "Failed to delete user! Please try again later."
-
-#: actions/budget.actions.ts
-#: actions/category.actions.ts
-#: actions/goal.actions.ts
-#: actions/recurring.actions.ts
-#: actions/transaction.actions.ts
-msgctxt "5GmpFA"
-msgid "Invalid data!"
-msgstr "Invalid data!"
-
-#: actions/budget.actions.ts
-#: actions/goal.actions.ts
-#: actions/recurring.actions.ts
-#: actions/transaction.actions.ts
-msgctxt "IViGC5"
-msgid "Invalid category!"
-msgstr "Invalid category!"
 
 #: actions/budget.actions.ts
 msgctxt "sW3_mQ"
@@ -92,11 +71,6 @@ msgid "Invalid budget ID!"
 msgstr "Invalid budget ID!"
 
 #: actions/budget.actions.ts
-msgctxt "5BmD1W"
-msgid "Budget not found or you don't have permission to edit!"
-msgstr "Budget not found or you don't have permission to edit!"
-
-#: actions/budget.actions.ts
 msgctxt "Ipw0W1"
 msgid "Budget has been updated."
 msgstr "Budget has been updated."
@@ -108,9 +82,9 @@ msgid "Failed to update budget! Please try again later."
 msgstr "Failed to update budget! Please try again later."
 
 #: actions/budget.actions.ts
-msgctxt "fDrjqQ"
-msgid "Budget not found or you don't have permission to delete!"
-msgstr "Budget not found or you don't have permission to delete!"
+msgctxt "5BmD1W"
+msgid "Budget not found or you don't have permission to edit!"
+msgstr "Budget not found or you don't have permission to edit!"
 
 #: actions/budget.actions.ts
 msgctxt "GeSZei"
@@ -122,6 +96,11 @@ msgstr "Budget has been deleted."
 msgctxt "niO8qC"
 msgid "Failed to delete budget! Please try again later."
 msgstr "Failed to delete budget! Please try again later."
+
+#: actions/budget.actions.ts
+msgctxt "fDrjqQ"
+msgid "Budget not found or you don't have permission to delete!"
+msgstr "Budget not found or you don't have permission to delete!"
 
 #: actions/budget.actions.ts
 msgctxt "xFeLWs"
@@ -150,6 +129,17 @@ msgid "Invalid category ID!"
 msgstr "Invalid category ID!"
 
 #: actions/category.actions.ts
+msgctxt "RMEY96"
+msgid "Category has been updated."
+msgstr "Category has been updated."
+
+#: actions/category.actions.ts
+#: components/categories/category-form.tsx
+msgctxt "PoUgbk"
+msgid "Failed to update category! Please try again later."
+msgstr "Failed to update category! Please try again later."
+
+#: actions/category.actions.ts
 msgctxt "cLveqK"
 msgid "Category type cannot be changed!"
 msgstr "Category type cannot be changed!"
@@ -160,15 +150,15 @@ msgid "Category not found or you don't have permission to edit!"
 msgstr "Category not found or you don't have permission to edit!"
 
 #: actions/category.actions.ts
-msgctxt "RMEY96"
-msgid "Category has been updated."
-msgstr "Category has been updated."
+msgctxt "7Al4tw"
+msgid "Category has been deleted."
+msgstr "Category has been deleted."
 
 #: actions/category.actions.ts
-#: components/categories/category-form.tsx
-msgctxt "PoUgbk"
-msgid "Failed to update category! Please try again later."
-msgstr "Failed to update category! Please try again later."
+#: components/categories/delete-category.tsx
+msgctxt "XWfgXI"
+msgid "Failed to delete category! Please try again later."
+msgstr "Failed to delete category! Please try again later."
 
 #: actions/category.actions.ts
 msgctxt "IzwrSe"
@@ -194,17 +184,6 @@ msgstr "Cannot delete category. There are {count} goals using this category. Ple
 msgctxt "Q_Y_ED"
 msgid "Cannot delete category. There are {count} recurring transactions using this category. Please delete those recurring transactions first."
 msgstr "Cannot delete category. There are {count} recurring transactions using this category. Please delete those recurring transactions first."
-
-#: actions/category.actions.ts
-msgctxt "7Al4tw"
-msgid "Category has been deleted."
-msgstr "Category has been deleted."
-
-#: actions/category.actions.ts
-#: components/categories/delete-category.tsx
-msgctxt "XWfgXI"
-msgid "Failed to delete category! Please try again later."
-msgstr "Failed to delete category! Please try again later."
 
 #: actions/category.actions.ts
 msgctxt "gzfdvr"
@@ -233,11 +212,6 @@ msgid "Invalid goal ID!"
 msgstr "Invalid goal ID!"
 
 #: actions/goal.actions.ts
-msgctxt "iQpYZg"
-msgid "Goal not found or you don't have permission to edit!"
-msgstr "Goal not found or you don't have permission to edit!"
-
-#: actions/goal.actions.ts
 msgctxt "SpmGQk"
 msgid "Goal has been updated."
 msgstr "Goal has been updated."
@@ -249,9 +223,9 @@ msgid "Failed to update goal! Please try again later."
 msgstr "Failed to update goal! Please try again later."
 
 #: actions/goal.actions.ts
-msgctxt "Av4WTA"
-msgid "Goal not found or you don't have permission to delete!"
-msgstr "Goal not found or you don't have permission to delete!"
+msgctxt "iQpYZg"
+msgid "Goal not found or you don't have permission to edit!"
+msgstr "Goal not found or you don't have permission to edit!"
 
 #: actions/goal.actions.ts
 msgctxt "MT417I"
@@ -263,6 +237,11 @@ msgstr "Goal has been deleted."
 msgctxt "uwewg6"
 msgid "Failed to delete goal! Please try again later."
 msgstr "Failed to delete goal! Please try again later."
+
+#: actions/goal.actions.ts
+msgctxt "Av4WTA"
+msgid "Goal not found or you don't have permission to delete!"
+msgstr "Goal not found or you don't have permission to delete!"
 
 #: actions/goal.actions.ts
 msgctxt "xwvGbl"
@@ -291,11 +270,6 @@ msgid "Invalid recurring transaction ID!"
 msgstr "Invalid recurring transaction ID!"
 
 #: actions/recurring.actions.ts
-msgctxt "TJXAsr"
-msgid "Recurring transaction not found or you don't have permission to delete!"
-msgstr "Recurring transaction not found or you don't have permission to delete!"
-
-#: actions/recurring.actions.ts
 msgctxt "0L6Kzl"
 msgid "Recurring transaction has been deleted."
 msgstr "Recurring transaction has been deleted."
@@ -305,6 +279,11 @@ msgstr "Recurring transaction has been deleted."
 msgctxt "9p5fYg"
 msgid "Failed to delete recurring transaction! Please try again later."
 msgstr "Failed to delete recurring transaction! Please try again later."
+
+#: actions/recurring.actions.ts
+msgctxt "TJXAsr"
+msgid "Recurring transaction not found or you don't have permission to delete!"
+msgstr "Recurring transaction not found or you don't have permission to delete!"
 
 #: actions/recurring.actions.ts
 msgctxt "D92YlY"
@@ -365,11 +344,6 @@ msgid "Invalid transaction ID!"
 msgstr "Invalid transaction ID!"
 
 #: actions/transaction.actions.ts
-msgctxt "qyC85x"
-msgid "Transaction not found or you don't have permission to edit!"
-msgstr "Transaction not found or you don't have permission to edit!"
-
-#: actions/transaction.actions.ts
 msgctxt "VHOeqA"
 msgid "Transaction has been updated."
 msgstr "Transaction has been updated."
@@ -381,9 +355,9 @@ msgid "Failed to update transaction! Please try again later."
 msgstr "Failed to update transaction! Please try again later."
 
 #: actions/transaction.actions.ts
-msgctxt "Fxn2_P"
-msgid "Transaction not found or you don't have permission to delete!"
-msgstr "Transaction not found or you don't have permission to delete!"
+msgctxt "qyC85x"
+msgid "Transaction not found or you don't have permission to edit!"
+msgstr "Transaction not found or you don't have permission to edit!"
 
 #: actions/transaction.actions.ts
 msgctxt "tz6kfd"
@@ -395,6 +369,11 @@ msgstr "Transaction has been deleted."
 msgctxt "DcqDur"
 msgid "Failed to delete transaction! Please try again later."
 msgstr "Failed to delete transaction! Please try again later."
+
+#: actions/transaction.actions.ts
+msgctxt "Fxn2_P"
+msgid "Transaction not found or you don't have permission to delete!"
+msgstr "Transaction not found or you don't have permission to delete!"
 
 #: actions/transaction.actions.ts
 msgctxt "-VVz7r"
@@ -2736,6 +2715,36 @@ msgstr "November"
 msgctxt "SsiZK7"
 msgid "December"
 msgstr "December"
+
+#: lib/action-handler.ts
+msgctxt "4qILV3"
+msgid "Invalid ID!"
+msgstr "Invalid ID!"
+
+#: lib/action-handler.ts
+msgctxt "5GmpFA"
+msgid "Invalid data!"
+msgstr "Invalid data!"
+
+#: lib/action-handler.ts
+msgctxt "IViGC5"
+msgid "Invalid category!"
+msgstr "Invalid category!"
+
+#: lib/action-handler.ts
+msgctxt "xVYw0y"
+msgid "Operation completed successfully."
+msgstr "Operation completed successfully."
+
+#: lib/action-handler.ts
+msgctxt "iy38w1"
+msgid "This item already exists!"
+msgstr "This item already exists!"
+
+#: lib/action-handler.ts
+msgctxt "vwdxch"
+msgid "Failed to complete action! Please try again later."
+msgstr "Failed to complete action! Please try again later."
 
 #: schemas/messages.ts
 msgctxt "pRvgsc"

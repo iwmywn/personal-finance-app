@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { cn } from "cn"
 import { SearchIcon, XIcon } from "lucide-react"
-import { useExtracted } from "next-intl"
+import { useExtracted, useTimeZone } from "next-intl"
 
 import { GoalsTable } from "@/components/goals/goals-table"
 import { Button } from "@/components/ui/button"
@@ -44,6 +44,7 @@ export function GoalFilters() {
   >("all")
   const [filterCategoryKey, setFilterCategoryKey] = useState<string>("all")
   const t = useExtracted()
+  const timeZone = useTimeZone()
   const { getCategoriesByType } = useCategory()
 
   const allMonths = useMonths()
@@ -76,7 +77,8 @@ export function GoalFilters() {
       filterProgress,
       filterCategoryKey,
     },
-    transactions
+    transactions,
+    timeZone
   )
 
   return (

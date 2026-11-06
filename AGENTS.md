@@ -32,6 +32,7 @@ Run all package commands with `pnpm`:
 - Base strings live directly in source code (`actions/`, `app/`, `components/`, `hooks/`, `lib/`, `schemas/`). `next build` / `next dev` extracts them into `messages/en-US.po`.
 - Keep `messages/en-US.po` strictly as auto-generated output (never edit it manually).
 - Provide localized translations in target files (`vi-VN.po`, `ja-JP.po`, `ko-KR.po`, `zh-CN.po`) and run `pnpm check:po` to verify completeness.
+- **Translation Scope**: `next-intl` does not support passing the translation function (`t`) from `useExtracted()` or `getExtracted()` across components. Call `useExtracted()` (client) or `await getExtracted()` (server) directly within each component or action instead of passing `t` as a prop.
 
 ### 4. Code Conventions
 

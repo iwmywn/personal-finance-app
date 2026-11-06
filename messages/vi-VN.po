@@ -7,12 +7,8 @@ msgstr ""
 "X-Message-Key: msgctxt\n"
 
 #: actions/admin.actions.ts
-#: actions/budget.actions.ts
-#: actions/category.actions.ts
-#: actions/goal.actions.ts
-#: actions/recurring.actions.ts
 #: actions/session.actions.ts
-#: actions/transaction.actions.ts
+#: lib/action-handler.ts
 msgctxt "OYzwyU"
 msgid "Too many requests! Please slow down and try again later."
 msgstr "Quá nhiều yêu cầu! Vui lòng thao tác chậm lại và thử lại sau."
@@ -28,6 +24,17 @@ msgid "Invalid user ID!"
 msgstr "ID người dùng không hợp lệ!"
 
 #: actions/admin.actions.ts
+msgctxt "7l4h1s"
+msgid "User has been deleted."
+msgstr "Người dùng đã bị xóa."
+
+#: actions/admin.actions.ts
+#: components/admin/delete-user.tsx
+msgctxt "xkkfdF"
+msgid "Failed to delete user! Please try again later."
+msgstr "Xóa người dùng thất bại! Vui lòng thử lại sau."
+
+#: actions/admin.actions.ts
 msgctxt "ScDYhZ"
 msgid "You cannot delete your own account!"
 msgstr "Bạn không thể xóa tài khoản của chính mình!"
@@ -41,34 +48,6 @@ msgstr "Không tìm thấy người dùng!"
 msgctxt "Wt-dMj"
 msgid "Cannot delete another administrator account!"
 msgstr "Không thể xóa tài khoản quản trị viên khác!"
-
-#: actions/admin.actions.ts
-msgctxt "7l4h1s"
-msgid "User has been deleted."
-msgstr "Người dùng đã bị xóa."
-
-#: actions/admin.actions.ts
-#: components/admin/delete-user.tsx
-msgctxt "xkkfdF"
-msgid "Failed to delete user! Please try again later."
-msgstr "Xóa người dùng thất bại! Vui lòng thử lại sau."
-
-#: actions/budget.actions.ts
-#: actions/category.actions.ts
-#: actions/goal.actions.ts
-#: actions/recurring.actions.ts
-#: actions/transaction.actions.ts
-msgctxt "5GmpFA"
-msgid "Invalid data!"
-msgstr "Dữ liệu không hợp lệ!"
-
-#: actions/budget.actions.ts
-#: actions/goal.actions.ts
-#: actions/recurring.actions.ts
-#: actions/transaction.actions.ts
-msgctxt "IViGC5"
-msgid "Invalid category!"
-msgstr "Danh mục không hợp lệ!"
 
 #: actions/budget.actions.ts
 msgctxt "sW3_mQ"
@@ -92,11 +71,6 @@ msgid "Invalid budget ID!"
 msgstr "ID ngân sách không hợp lệ!"
 
 #: actions/budget.actions.ts
-msgctxt "5BmD1W"
-msgid "Budget not found or you don't have permission to edit!"
-msgstr "Không tìm thấy ngân sách hoặc bạn không có quyền chỉnh sửa!"
-
-#: actions/budget.actions.ts
 msgctxt "Ipw0W1"
 msgid "Budget has been updated."
 msgstr "Ngân sách đã được cập nhật."
@@ -108,9 +82,9 @@ msgid "Failed to update budget! Please try again later."
 msgstr "Cập nhật ngân sách thất bại! Vui lòng thử lại sau."
 
 #: actions/budget.actions.ts
-msgctxt "fDrjqQ"
-msgid "Budget not found or you don't have permission to delete!"
-msgstr "Không tìm thấy ngân sách hoặc bạn không có quyền xóa!"
+msgctxt "5BmD1W"
+msgid "Budget not found or you don't have permission to edit!"
+msgstr "Không tìm thấy ngân sách hoặc bạn không có quyền chỉnh sửa!"
 
 #: actions/budget.actions.ts
 msgctxt "GeSZei"
@@ -122,6 +96,11 @@ msgstr "Ngân sách đã được xóa."
 msgctxt "niO8qC"
 msgid "Failed to delete budget! Please try again later."
 msgstr "Xóa ngân sách thất bại! Vui lòng thử lại sau."
+
+#: actions/budget.actions.ts
+msgctxt "fDrjqQ"
+msgid "Budget not found or you don't have permission to delete!"
+msgstr "Không tìm thấy ngân sách hoặc bạn không có quyền xóa!"
 
 #: actions/budget.actions.ts
 msgctxt "xFeLWs"
@@ -150,6 +129,17 @@ msgid "Invalid category ID!"
 msgstr "ID danh mục không hợp lệ!"
 
 #: actions/category.actions.ts
+msgctxt "RMEY96"
+msgid "Category has been updated."
+msgstr "Danh mục đã được cập nhật."
+
+#: actions/category.actions.ts
+#: components/categories/category-form.tsx
+msgctxt "PoUgbk"
+msgid "Failed to update category! Please try again later."
+msgstr "Cập nhật danh mục thất bại! Vui lòng thử lại sau."
+
+#: actions/category.actions.ts
 msgctxt "cLveqK"
 msgid "Category type cannot be changed!"
 msgstr "Không thể thay đổi loại danh mục!"
@@ -160,15 +150,15 @@ msgid "Category not found or you don't have permission to edit!"
 msgstr "Không tìm thấy danh mục hoặc bạn không có quyền chỉnh sửa!"
 
 #: actions/category.actions.ts
-msgctxt "RMEY96"
-msgid "Category has been updated."
-msgstr "Danh mục đã được cập nhật."
+msgctxt "7Al4tw"
+msgid "Category has been deleted."
+msgstr "Danh mục đã được xóa."
 
 #: actions/category.actions.ts
-#: components/categories/category-form.tsx
-msgctxt "PoUgbk"
-msgid "Failed to update category! Please try again later."
-msgstr "Cập nhật danh mục thất bại! Vui lòng thử lại sau."
+#: components/categories/delete-category.tsx
+msgctxt "XWfgXI"
+msgid "Failed to delete category! Please try again later."
+msgstr "Xóa danh mục thất bại! Vui lòng thử lại sau."
 
 #: actions/category.actions.ts
 msgctxt "IzwrSe"
@@ -194,17 +184,6 @@ msgstr "Không thể xóa danh mục. Có {count} mục tiêu đang sử dụng 
 msgctxt "Q_Y_ED"
 msgid "Cannot delete category. There are {count} recurring transactions using this category. Please delete those recurring transactions first."
 msgstr "Không thể xóa danh mục. Có {count} giao dịch định kỳ đang sử dụng danh mục này. Vui lòng xóa các giao dịch định kỳ đó trước."
-
-#: actions/category.actions.ts
-msgctxt "7Al4tw"
-msgid "Category has been deleted."
-msgstr "Danh mục đã được xóa."
-
-#: actions/category.actions.ts
-#: components/categories/delete-category.tsx
-msgctxt "XWfgXI"
-msgid "Failed to delete category! Please try again later."
-msgstr "Xóa danh mục thất bại! Vui lòng thử lại sau."
 
 #: actions/category.actions.ts
 msgctxt "gzfdvr"
@@ -233,11 +212,6 @@ msgid "Invalid goal ID!"
 msgstr "ID mục tiêu không hợp lệ!"
 
 #: actions/goal.actions.ts
-msgctxt "iQpYZg"
-msgid "Goal not found or you don't have permission to edit!"
-msgstr "Không tìm thấy mục tiêu hoặc bạn không có quyền chỉnh sửa!"
-
-#: actions/goal.actions.ts
 msgctxt "SpmGQk"
 msgid "Goal has been updated."
 msgstr "Mục tiêu đã được cập nhật."
@@ -249,9 +223,9 @@ msgid "Failed to update goal! Please try again later."
 msgstr "Cập nhật mục tiêu thất bại! Vui lòng thử lại sau."
 
 #: actions/goal.actions.ts
-msgctxt "Av4WTA"
-msgid "Goal not found or you don't have permission to delete!"
-msgstr "Không tìm thấy mục tiêu hoặc bạn không có quyền xóa!"
+msgctxt "iQpYZg"
+msgid "Goal not found or you don't have permission to edit!"
+msgstr "Không tìm thấy mục tiêu hoặc bạn không có quyền chỉnh sửa!"
 
 #: actions/goal.actions.ts
 msgctxt "MT417I"
@@ -263,6 +237,11 @@ msgstr "Mục tiêu đã được xóa."
 msgctxt "uwewg6"
 msgid "Failed to delete goal! Please try again later."
 msgstr "Xóa mục tiêu thất bại! Vui lòng thử lại sau."
+
+#: actions/goal.actions.ts
+msgctxt "Av4WTA"
+msgid "Goal not found or you don't have permission to delete!"
+msgstr "Không tìm thấy mục tiêu hoặc bạn không có quyền xóa!"
 
 #: actions/goal.actions.ts
 msgctxt "xwvGbl"
@@ -291,11 +270,6 @@ msgid "Invalid recurring transaction ID!"
 msgstr "ID giao dịch định kỳ không hợp lệ!"
 
 #: actions/recurring.actions.ts
-msgctxt "TJXAsr"
-msgid "Recurring transaction not found or you don't have permission to delete!"
-msgstr "Không tìm thấy giao dịch định kỳ hoặc bạn không có quyền xóa!"
-
-#: actions/recurring.actions.ts
 msgctxt "0L6Kzl"
 msgid "Recurring transaction has been deleted."
 msgstr "Giao dịch định kỳ đã được xóa."
@@ -305,6 +279,11 @@ msgstr "Giao dịch định kỳ đã được xóa."
 msgctxt "9p5fYg"
 msgid "Failed to delete recurring transaction! Please try again later."
 msgstr "Xóa giao dịch định kỳ thất bại! Vui lòng thử lại sau."
+
+#: actions/recurring.actions.ts
+msgctxt "TJXAsr"
+msgid "Recurring transaction not found or you don't have permission to delete!"
+msgstr "Không tìm thấy giao dịch định kỳ hoặc bạn không có quyền xóa!"
 
 #: actions/recurring.actions.ts
 msgctxt "D92YlY"
@@ -365,11 +344,6 @@ msgid "Invalid transaction ID!"
 msgstr "ID giao dịch không hợp lệ!"
 
 #: actions/transaction.actions.ts
-msgctxt "qyC85x"
-msgid "Transaction not found or you don't have permission to edit!"
-msgstr "Không tìm thấy giao dịch hoặc bạn không có quyền chỉnh sửa!"
-
-#: actions/transaction.actions.ts
 msgctxt "VHOeqA"
 msgid "Transaction has been updated."
 msgstr "Giao dịch đã được cập nhật."
@@ -381,9 +355,9 @@ msgid "Failed to update transaction! Please try again later."
 msgstr "Cập nhật giao dịch thất bại! Vui lòng thử lại sau."
 
 #: actions/transaction.actions.ts
-msgctxt "Fxn2_P"
-msgid "Transaction not found or you don't have permission to delete!"
-msgstr "Không tìm thấy giao dịch hoặc bạn không có quyền xóa!"
+msgctxt "qyC85x"
+msgid "Transaction not found or you don't have permission to edit!"
+msgstr "Không tìm thấy giao dịch hoặc bạn không có quyền chỉnh sửa!"
 
 #: actions/transaction.actions.ts
 msgctxt "tz6kfd"
@@ -395,6 +369,11 @@ msgstr "Giao dịch đã được xóa."
 msgctxt "DcqDur"
 msgid "Failed to delete transaction! Please try again later."
 msgstr "Xóa giao dịch thất bại! Vui lòng thử lại sau."
+
+#: actions/transaction.actions.ts
+msgctxt "Fxn2_P"
+msgid "Transaction not found or you don't have permission to delete!"
+msgstr "Không tìm thấy giao dịch hoặc bạn không có quyền xóa!"
 
 #: actions/transaction.actions.ts
 msgctxt "-VVz7r"
@@ -2736,6 +2715,36 @@ msgstr "Tháng 11"
 msgctxt "SsiZK7"
 msgid "December"
 msgstr "Tháng 12"
+
+#: lib/action-handler.ts
+msgctxt "4qILV3"
+msgid "Invalid ID!"
+msgstr "ID không hợp lệ!"
+
+#: lib/action-handler.ts
+msgctxt "5GmpFA"
+msgid "Invalid data!"
+msgstr "Dữ liệu không hợp lệ!"
+
+#: lib/action-handler.ts
+msgctxt "IViGC5"
+msgid "Invalid category!"
+msgstr "Danh mục không hợp lệ!"
+
+#: lib/action-handler.ts
+msgctxt "xVYw0y"
+msgid "Operation completed successfully."
+msgstr "Thao tác hoàn tất thành công."
+
+#: lib/action-handler.ts
+msgctxt "iy38w1"
+msgid "This item already exists!"
+msgstr "Mục này đã tồn tại!"
+
+#: lib/action-handler.ts
+msgctxt "vwdxch"
+msgid "Failed to complete action! Please try again later."
+msgstr "Hoàn tất thao tác thất bại! Vui lòng thử lại sau."
 
 #: schemas/messages.ts
 msgctxt "pRvgsc"

@@ -1,17 +1,16 @@
 "use server"
 
-import { cacheTag, updateTag } from "next/cache"
+import { cacheTag } from "next/cache"
 import { ObjectId } from "mongodb"
 import { getExtracted } from "next-intl/server"
 
+import { runDomainMutation } from "@/lib/action-handler"
 import { getRecurringTransactionsCollection } from "@/lib/collections"
 import type { ActionResponse, RecurringTransaction } from "@/lib/definitions"
-import { isDuplicateKeyError } from "@/lib/indexes"
-import { isRateLimited, RATE_LIMIT_PRESETS } from "@/lib/rate-limit"
+import { RATE_LIMIT_PRESETS } from "@/lib/rate-limit"
 import { getSchemas } from "@/schemas/server"
 import type { RecurringTransactionFormValues } from "@/schemas/types"
 
-import { isValidUserCategory } from "./category.server"
 import { getSession } from "./session.actions"
 import { toDecimal128 } from "./utils"
 
@@ -20,69 +19,38 @@ export async function createRecurringTransaction(
 ): Promise<ActionResponse> {
   const t = await getExtracted()
 
-  try {
-    const { createRecurringTransactionSchema } = await getSchemas()
-    const parsedValues = createRecurringTransactionSchema().safeParse(values)
+  return runDomainMutation({
+    rawInput: values,
+    schema: async () => (await getSchemas()).createRecurringTransactionSchema(),
+    rateLimit: { domain: "recurring", preset: RATE_LIMIT_PRESETS.STRICT },
+    categoryCheck: (input) => ({
+      key: input.categoryKey,
+      expectedType: input.type,
+    }),
+    revalidate: ["recurringTransactions"],
+    successMessage: t("Recurring transaction has been created."),
+    duplicateKeyMessage: t("This recurring transaction already exists!"),
+    fallbackErrorMessage: t(
+      "Failed to create recurring transaction! Please try again later."
+    ),
+    execute: async ({ input, user }) => {
+      const recurringCollection = await getRecurringTransactionsCollection()
 
-    if (!parsedValues.success) {
-      return { error: t("Invalid data!") }
-    }
-
-    const { error, user, session } = await getSession()
-
-    if (!user || !session) {
-      return { error }
-    }
-
-    if (
-      await isRateLimited(`recurring:${user.id}`, RATE_LIMIT_PRESETS.STRICT)
-    ) {
-      return {
-        error: t("Too many requests! Please slow down and try again later."),
-      }
-    }
-
-    const isValidCategory = await isValidUserCategory(
-      user.id,
-      parsedValues.data.categoryKey,
-      parsedValues.data.type
-    )
-
-    if (!isValidCategory) {
-      return { error: t("Invalid category!") }
-    }
-
-    const recurringCollection = await getRecurringTransactionsCollection()
-
-    await recurringCollection.insertOne({
-      userId: new ObjectId(user.id),
-      type: parsedValues.data.type,
-      categoryKey: parsedValues.data.categoryKey,
-      amount: toDecimal128(parsedValues.data.amount),
-      currency: parsedValues.data.currency,
-      description: parsedValues.data.description,
-      frequency: parsedValues.data.frequency,
-      randomEveryXDays: parsedValues.data.randomEveryXDays,
-      startDate: parsedValues.data.startDate,
-      endDate: parsedValues.data.endDate,
-      lastGeneratedDate: undefined,
-    })
-
-    updateTag(`recurringTransactions-${user.id}`)
-    return {
-      success: t("Recurring transaction has been created."),
-    }
-  } catch (error) {
-    if (isDuplicateKeyError(error)) {
-      return { error: t("This recurring transaction already exists!") }
-    }
-    console.error("Error creating recurring transaction:", error)
-    return {
-      error: t(
-        "Failed to create recurring transaction! Please try again later."
-      ),
-    }
-  }
+      await recurringCollection.insertOne({
+        userId: new ObjectId(user.id),
+        type: input.type,
+        categoryKey: input.categoryKey,
+        amount: toDecimal128(input.amount),
+        currency: input.currency,
+        description: input.description,
+        frequency: input.frequency,
+        randomEveryXDays: input.randomEveryXDays,
+        startDate: input.startDate,
+        endDate: input.endDate,
+        lastGeneratedDate: undefined,
+      })
+    },
+  })
 }
 
 export async function deleteRecurringTransaction(
@@ -90,51 +58,34 @@ export async function deleteRecurringTransaction(
 ): Promise<ActionResponse> {
   const t = await getExtracted()
 
-  try {
-    if (!ObjectId.isValid(recurringId)) {
-      return {
-        error: t("Invalid recurring transaction ID!"),
+  return runDomainMutation<string>({
+    rawInput: recurringId,
+    validateId: {
+      id: recurringId,
+      message: t("Invalid recurring transaction ID!"),
+    },
+    rateLimit: { domain: "recurring", preset: RATE_LIMIT_PRESETS.MODERATE },
+    revalidate: ["recurringTransactions"],
+    successMessage: t("Recurring transaction has been deleted."),
+    fallbackErrorMessage: t(
+      "Failed to delete recurring transaction! Please try again later."
+    ),
+    execute: async ({ input: recurringId, user }) => {
+      const recurringCollection = await getRecurringTransactionsCollection()
+      const result = await recurringCollection.deleteOne({
+        _id: new ObjectId(recurringId),
+        userId: new ObjectId(user.id),
+      })
+
+      if (result.deletedCount === 0) {
+        return {
+          error: t(
+            "Recurring transaction not found or you don't have permission to delete!"
+          ),
+        }
       }
-    }
-
-    const { error, user, session } = await getSession()
-
-    if (!user || !session) {
-      return { error }
-    }
-
-    if (
-      await isRateLimited(`recurring:${user.id}`, RATE_LIMIT_PRESETS.MODERATE)
-    ) {
-      return {
-        error: t("Too many requests! Please slow down and try again later."),
-      }
-    }
-
-    const recurringCollection = await getRecurringTransactionsCollection()
-    const result = await recurringCollection.deleteOne({
-      _id: new ObjectId(recurringId),
-      userId: new ObjectId(user.id),
-    })
-
-    if (result.deletedCount === 0) {
-      return {
-        error: t(
-          "Recurring transaction not found or you don't have permission to delete!"
-        ),
-      }
-    }
-
-    updateTag(`recurringTransactions-${user.id}`)
-    return { success: t("Recurring transaction has been deleted.") }
-  } catch (error) {
-    console.error("Error deleting recurring transaction:", error)
-    return {
-      error: t(
-        "Failed to delete recurring transaction! Please try again later."
-      ),
-    }
-  }
+    },
+  })
 }
 
 /**

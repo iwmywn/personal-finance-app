@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { ShieldAlertIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
@@ -32,7 +32,7 @@ export function StopImpersonation() {
   const t = useExtracted()
   const router = useRouter()
   const userContext = useUser()
-  const [isPending, startTransition] = useTransition()
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [isOpen, setIsOpen] = useState<boolean>(false)
 
   if (!userContext.session.impersonatedBy) {
@@ -44,27 +44,29 @@ export function StopImpersonation() {
   async function onStopImpersonating(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault()
 
-    startTransition(async () => {
-      try {
-        await authClient.admin.stopImpersonating({
-          fetchOptions: {
-            onError: () => {
-              toast.error(
-                t("Failed to stop impersonating! Please try again later.")
-              )
-            },
-            onSuccess: async () => {
-              await revalidateCoreLayout()
-              setIsOpen(false)
-              toast.success(t("Stopped impersonation session."))
-              router.push("/admin")
-            },
+    setIsSubmitting(true)
+
+    try {
+      await authClient.admin.stopImpersonating({
+        fetchOptions: {
+          onError: () => {
+            toast.error(
+              t("Failed to stop impersonating! Please try again later.")
+            )
           },
-        })
-      } catch {
-        toast.error(t("Failed to stop impersonating! Please try again later."))
-      }
-    })
+          onSuccess: async () => {
+            await revalidateCoreLayout()
+            setIsOpen(false)
+            toast.success(t("Stopped impersonation session."))
+            router.push("/admin")
+          },
+        },
+      })
+    } catch {
+      toast.error(t("Failed to stop impersonating! Please try again later."))
+    }
+
+    setIsSubmitting(false)
   }
 
   return (
@@ -104,11 +106,14 @@ export function StopImpersonation() {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isPending}>
+          <AlertDialogCancel disabled={isSubmitting}>
             {t("Cancel")}
           </AlertDialogCancel>
-          <AlertDialogAction onClick={onStopImpersonating} disabled={isPending}>
-            {isPending && <Spinner />} {t("Stop Impersonating")}
+          <AlertDialogAction
+            onClick={onStopImpersonating}
+            disabled={isSubmitting}
+          >
+            {isSubmitting && <Spinner />} {t("Stop Impersonating")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

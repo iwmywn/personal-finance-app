@@ -316,6 +316,17 @@ describe("Statistics", () => {
       expect(result.unconvertedCount).toBe(0)
       expect(result.avgOutflow).toBe("100")
     })
+
+    it("should preserve local-date behavior when timeZone is omitted", () => {
+      vi.useFakeTimers()
+      try {
+        vi.setSystemTime(new Date(2024, 0, 15, 10, 0, 0))
+        const result = calculateQuickStats(mockTransactions)
+        expect(result.currentMonthCount).toBe(5)
+      } finally {
+        vi.useRealTimers()
+      }
+    })
   })
 
   describe("calculateSummaryStats", () => {
@@ -1048,6 +1059,26 @@ describe("Statistics", () => {
       expect(result.spent).toBe("250000")
       expect(result.percentage).toBe(50)
     })
+
+    it("should preserve local-date behavior when timeZone is omitted", () => {
+      vi.useFakeTimers()
+      try {
+        vi.setSystemTime(new Date(2024, 0, 15, 10, 0, 0))
+        const [result] = calculateBudgetsStats(
+          [
+            {
+              ...mockBudgets[0],
+              startDate: new Date(2024, 0, 1),
+              endDate: new Date(2024, 0, 31),
+            },
+          ],
+          mockTransactions
+        )
+        expect(result.status).toBe("active")
+      } finally {
+        vi.useRealTimers()
+      }
+    })
   })
 
   describe("calculateGoalsStats", () => {
@@ -1579,6 +1610,26 @@ describe("Statistics", () => {
       const [result] = calculateGoalsStats([goal], transactions)
       expect(result.accumulated).toBe("250000")
       expect(result.percentage).toBe(50)
+    })
+
+    it("should preserve local-date behavior when timeZone is omitted", () => {
+      vi.useFakeTimers()
+      try {
+        vi.setSystemTime(new Date(2024, 0, 15, 10, 0, 0))
+        const [result] = calculateGoalsStats(
+          [
+            {
+              ...mockGoals[0],
+              startDate: new Date(2024, 0, 1),
+              endDate: new Date(2024, 0, 31),
+            },
+          ],
+          mockTransactions
+        )
+        expect(result.status).toBe("active")
+      } finally {
+        vi.useRealTimers()
+      }
     })
   })
 })

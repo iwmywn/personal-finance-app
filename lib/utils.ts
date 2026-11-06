@@ -1,6 +1,7 @@
 import type { Route } from "next"
 import Decimal from "decimal.js"
 
+import type { RollupHealth } from "@/lib/valuation-engine"
 import { DEFAULT_SIGNIN_REDIRECT } from "@/routes"
 
 export const progressColorClass = {
@@ -9,6 +10,19 @@ export const progressColorClass = {
   yellow: "progress-yellow",
   red: "progress-red",
 } as const
+
+export function getRollupHealthClass(health: RollupHealth): string {
+  switch (health) {
+    case "unstarted":
+      return progressColorClass.gray
+    case "on_track":
+      return progressColorClass.green
+    case "warning":
+      return progressColorClass.yellow
+    case "exceeded":
+      return progressColorClass.red
+  }
+}
 
 export function getFlowColorClass(
   type?: "inflow" | "outflow" | string | null
