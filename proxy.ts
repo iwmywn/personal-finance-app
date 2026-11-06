@@ -42,9 +42,13 @@ export default async function proxy(request: NextRequest) {
   const { nextUrl } = request
   const { pathname } = nextUrl
 
+  // Passing `_flag: "router"` prevents Better-Auth's `nextCookies` plugin
+  // from calling `cookies().set(...)` to delete session cookies on middleware
+  // responses when handling stale or in-flight prefetch requests.
   const session = await auth.api.getSession({
     headers: request.headers,
-  })
+    _flag: "router",
+  } as unknown as Parameters<typeof auth.api.getSession>[0])
 
   if (!session) {
     return redirectIfProtectedRoute(request)
