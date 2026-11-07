@@ -1,14 +1,15 @@
 import { mockTransactions } from "@/tests/shared/data"
 import { sanitizeCSVField } from "@/components/transactions/export-button"
-import { formatCurrency } from "@/lib/currency"
+import { convertAmountWithRates, formatCurrency } from "@/lib/currency"
 import { getUniqueDateRangeYears, getUniqueYears } from "@/lib/date"
 import {
-  convertAmountWithRates,
   getBalanceColorClass,
   getFlowColorClass,
+  getRollupHealthClass,
   getSafeCallbackUrl,
+  getScheduleStatusClass,
   isUserBanned,
-  progressColorClass,
+  searchWithMiniSearch,
 } from "@/lib/utils"
 
 describe("Utils", () => {
@@ -404,12 +405,52 @@ describe("Utils", () => {
     })
   })
 
-  describe("progressColorClass", () => {
-    it("should map semantic progress colors to CSS classes", () => {
-      expect(progressColorClass.gray).toBe("progress-gray")
-      expect(progressColorClass.green).toBe("progress-green")
-      expect(progressColorClass.yellow).toBe("progress-yellow")
-      expect(progressColorClass.red).toBe("progress-red")
+  describe("getRollupHealthClass & getScheduleStatusClass", () => {
+    it("should map RollupHealth states to progress color CSS classes", () => {
+      expect(getRollupHealthClass("unstarted")).toBe("progress-gray")
+      expect(getRollupHealthClass("on_track")).toBe("progress-green")
+      expect(getRollupHealthClass("warning")).toBe("progress-yellow")
+      expect(getRollupHealthClass("exceeded")).toBe("progress-red")
+    })
+
+    it("should map ScheduleStatus states to badge CSS classes", () => {
+      expect(getScheduleStatusClass("expired")).toBe("badge-red")
+      expect(getScheduleStatusClass("active")).toBe("badge-green")
+      expect(getScheduleStatusClass("upcoming")).toBe("badge-yellow")
+    })
+  })
+
+  describe("searchWithMiniSearch", () => {
+    const sampleDocs = [
+      { _id: "doc-1", id: "custom-1", title: "Monthly Salary Bonus" },
+      { _id: "doc-2", id: "custom-2", title: "Emergency Rainy Day Fund" },
+    ]
+
+    it("should return all document IDs when searchTerm is empty or whitespace", () => {
+      expect(searchWithMiniSearch(sampleDocs, "", ["title"])).toEqual(
+        new Set(["doc-1", "doc-2"])
+      )
+      expect(searchWithMiniSearch(sampleDocs, "   ", ["title"])).toEqual(
+        new Set(["doc-1", "doc-2"])
+      )
+    })
+
+    it("should match documents using prefix and multi-word AND semantics", () => {
+      expect(searchWithMiniSearch(sampleDocs, "emerg", ["title"])).toEqual(
+        new Set(["doc-2"])
+      )
+      expect(
+        searchWithMiniSearch(sampleDocs, "fund emergency", ["title"])
+      ).toEqual(new Set(["doc-2"]))
+      expect(
+        searchWithMiniSearch(sampleDocs, "salary emergency", ["title"])
+      ).toEqual(new Set())
+    })
+
+    it("should support custom idField", () => {
+      expect(
+        searchWithMiniSearch(sampleDocs, "salary", ["title"], "id")
+      ).toEqual(new Set(["custom-1"]))
     })
   })
 })

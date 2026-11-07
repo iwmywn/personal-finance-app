@@ -5,7 +5,6 @@ import type { CategoryType } from "@/lib/category"
 import type { Currency } from "@/lib/currency"
 import { localDateToUTCMidnight, normalizeToUTCMidnight } from "@/lib/date"
 import type {
-  Budget,
   Category,
   DBBudget,
   DBCategory,
@@ -14,7 +13,6 @@ import type {
   DBRecurringTransaction,
   DBTransaction,
   DBUser,
-  Goal,
   RecurringTransaction,
   Session,
   Transaction,
@@ -375,122 +373,6 @@ export const mockCustomCategories: Category[] = [
     type: "outflow",
     label: "Taxi",
     description: "Custom transport category",
-  },
-]
-
-export const mockBudgets: Budget[] = [
-  {
-    _id: "1",
-    userId: "68f712e4cda4897217a05a1c",
-    categoryKey: "food_beverage",
-    allocatedAmount: "1000000",
-    currency: "VND",
-    // related transactions: [6]
-    startDate: new Date("2024-02-01"),
-    endDate: new Date("2024-02-28"),
-  },
-  {
-    _id: "2",
-    userId: "68f712e4cda4897217a05a1c",
-    categoryKey: "transportation",
-    allocatedAmount: "500000",
-    currency: "VND",
-    // related transactions: [7]
-    startDate: new Date("2024-03-01"),
-    endDate: new Date("2024-03-28"),
-  },
-  {
-    _id: "3",
-    userId: "68f712e4cda4897217a05a1c",
-    categoryKey: "housing",
-    allocatedAmount: "2000000",
-    currency: "VND",
-    // related transactions: [8]
-    startDate: new Date("2024-04-01"),
-    endDate: new Date("2024-04-28"),
-  },
-  {
-    _id: "4",
-    userId: "68f712e4cda4897217a05a1c",
-    categoryKey: "food_beverage",
-    allocatedAmount: "1500000",
-    currency: "VND",
-    // related transactions: [7]
-    startDate: new Date("2024-03-01"),
-    endDate: new Date("2024-03-28"),
-  },
-  {
-    _id: "5",
-    userId: "68f712e4cda4897217a05a1c",
-    categoryKey: "business_freelance",
-    allocatedAmount: "3000000",
-    currency: "VND",
-    // related transactions: [1, 2, 3, 4, 5]
-    startDate: new Date("2023-01-01"),
-    endDate: new Date("2023-01-31"),
-  },
-]
-
-export const mockGoals: Goal[] = [
-  {
-    _id: "1",
-    userId: "68f712e4cda4897217a05a1c",
-    categoryKey: "salary_bonus",
-    name: "buy a motorbike",
-    targetAmount: "50000000",
-    currency: "VND",
-    startDate: new Date("2024-01-01"),
-    endDate: new Date("2024-12-31"),
-  },
-  {
-    _id: "2",
-    userId: "68f712e4cda4897217a05a1c",
-    categoryKey: "business_freelance",
-    name: "buy a house",
-    targetAmount: "2000000000",
-    currency: "VND",
-    startDate: new Date("2024-01-01"),
-    endDate: new Date("2025-12-31"),
-  },
-  {
-    _id: "3",
-    userId: "68f712e4cda4897217a05a1c",
-    categoryKey: "business_freelance",
-    name: "freelance tax buffer",
-    targetAmount: "600",
-    currency: "VND",
-    startDate: new Date("2024-01-01"),
-    endDate: new Date("2024-01-31"),
-  },
-  {
-    _id: "4",
-    userId: "68f712e4cda4897217a05a1c",
-    categoryKey: "business_freelance",
-    name: "freelance emergency fund",
-    targetAmount: "400",
-    currency: "VND",
-    startDate: new Date("2024-01-01"),
-    endDate: new Date("2024-01-31"),
-  },
-  {
-    _id: "5",
-    userId: "68f712e4cda4897217a05a1c",
-    categoryKey: "investment_passive",
-    name: "2023 dividend reinvestment",
-    targetAmount: "1000000",
-    currency: "VND",
-    startDate: new Date("2023-01-01"),
-    endDate: new Date("2023-12-31"),
-  },
-  {
-    _id: "6",
-    userId: "68f712e4cda4897217a05a1c",
-    categoryKey: "gift_support",
-    name: "holiday gifts fund",
-    targetAmount: "1500000",
-    currency: "VND",
-    startDate: new Date("2024-11-01"),
-    endDate: new Date("2025-01-31"),
   },
 ]
 

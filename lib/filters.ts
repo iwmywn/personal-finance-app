@@ -1,16 +1,11 @@
-import MiniSearch from "minisearch"
-
 import { isDateRangeOverlapping, localDateToUTCMidnight } from "@/lib/date"
 import type {
-  Budget,
   Category,
-  Goal,
   RecurringTransaction,
   Transaction,
   User,
 } from "@/lib/definitions"
-import { isUserBanned } from "@/lib/utils"
-import { FinancialRollupEngine } from "@/lib/valuation-engine"
+import { isUserBanned, searchWithMiniSearch } from "@/lib/utils"
 
 type Filters = {
   searchTerm?: string
@@ -23,42 +18,10 @@ type Filters = {
   filterYear?: string
   filterType?: string
   filterCategoryKey?: string
-  filterProgress?: string
   filterStatus?: string
   filterRole?: string
   todayUTC?: Date
 }
-
-function searchWithMiniSearch<T extends Record<string, unknown>>(
-  documents: T[],
-  searchTerm: string,
-  fields: string[],
-  idField: string = "_id"
-): Set<string> {
-  const normalizedSearchTerm = searchTerm.trim()
-
-  if (!normalizedSearchTerm) {
-    return new Set(documents.map((doc) => String(doc[idField])))
-  }
-
-  const miniSearch = new MiniSearch({
-    idField,
-    fields,
-    storeFields: [idField],
-    searchOptions: {
-      prefix: true,
-      combineWith: "AND",
-    },
-  })
-
-  miniSearch.addAll(documents)
-
-  const results = miniSearch.search(normalizedSearchTerm)
-
-  return new Set(results.map((result) => String(result[idField])))
-}
-
-export { isDateRangeOverlapping } from "@/lib/date"
 
 export function filterTransactions(
   transactions: Transaction[],
@@ -141,59 +104,6 @@ export function filterCustomCategories(
 
     return matchesType && matchesSearch
   })
-}
-
-export function filterBudgets(
-  budgets: Budget[],
-  filters: Filters,
-  transactions: Transaction[],
-  timeZone?: string
-): Budget[] {
-  const engine = new FinancialRollupEngine(transactions, {
-    timeZone,
-    asOfDate: filters.todayUTC,
-  })
-
-  const valuations = engine.evaluateBudgets(budgets, {
-    filterMonth: filters.filterMonth,
-    filterYear: filters.filterYear,
-    filterCategoryKey: filters.filterCategoryKey,
-    filterStatus: filters.filterStatus,
-    filterHealth: filters.filterProgress,
-  })
-
-  return valuations.map((v) => v.budget)
-}
-
-export function filterGoals(
-  goals: Goal[],
-  filters: Filters,
-  transactions: Transaction[],
-  timeZone?: string
-): Goal[] {
-  const { searchTerm = "" } = filters
-  const matchingIds = searchTerm
-    ? searchWithMiniSearch(goals, searchTerm, ["name"])
-    : null
-
-  const searchFilteredGoals = matchingIds
-    ? goals.filter((g) => matchingIds.has(g._id))
-    : goals
-
-  const engine = new FinancialRollupEngine(transactions, {
-    timeZone,
-    asOfDate: filters.todayUTC,
-  })
-
-  const valuations = engine.evaluateGoals(searchFilteredGoals, {
-    filterMonth: filters.filterMonth,
-    filterYear: filters.filterYear,
-    filterCategoryKey: filters.filterCategoryKey,
-    filterStatus: filters.filterStatus,
-    filterHealth: filters.filterProgress,
-  })
-
-  return valuations.map((v) => v.goal)
 }
 
 export function filterRecurringTransactions(

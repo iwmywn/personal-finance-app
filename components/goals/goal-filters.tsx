@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { cn } from "cn"
 import { SearchIcon, XIcon } from "lucide-react"
 import { useExtracted, useTimeZone } from "next-intl"
@@ -27,8 +27,10 @@ import { useGoals } from "@/contexts/goals-context"
 import { useTransactions } from "@/contexts/transactions-context"
 import { useCategory } from "@/hooks/use-category"
 import { useMonths } from "@/hooks/use-months"
+import type { CategoryKey } from "@/lib/category"
 import { getUniqueDateRangeYears } from "@/lib/date"
-import { filterGoals } from "@/lib/filters"
+import { FinancialRollupEngine } from "@/lib/valuation-engine"
+import type { RollupHealth, ScheduleStatus } from "@/lib/valuation-engine"
 
 export function GoalFilters() {
   const { goals } = useGoals()
@@ -36,13 +38,13 @@ export function GoalFilters() {
   const [searchTerm, setSearchTerm] = useState<string>("")
   const [filterMonth, setFilterMonth] = useState<string>("all")
   const [filterYear, setFilterYear] = useState<string>("all")
-  const [filterStatus, setFilterStatus] = useState<
-    "all" | "expired" | "active" | "upcoming"
+  const [filterStatus, setFilterStatus] = useState<"all" | ScheduleStatus>(
+    "all"
+  )
+  const [filterHealth, setFilterHealth] = useState<"all" | RollupHealth>("all")
+  const [filterCategoryKey, setFilterCategoryKey] = useState<
+    "all" | CategoryKey
   >("all")
-  const [filterProgress, setFilterProgress] = useState<
-    "all" | "gray" | "green" | "yellow" | "red"
-  >("all")
-  const [filterCategoryKey, setFilterCategoryKey] = useState<string>("all")
   const t = useExtracted()
   const timeZone = useTimeZone()
   const { getCategoriesByType } = useCategory()
@@ -55,7 +57,7 @@ export function GoalFilters() {
     filterMonth !== "all" ||
     filterYear !== "all" ||
     filterStatus !== "all" ||
-    filterProgress !== "all" ||
+    filterHealth !== "all" ||
     filterCategoryKey !== "all"
 
   const handleResetFilters = () => {
@@ -63,22 +65,35 @@ export function GoalFilters() {
     setFilterMonth("all")
     setFilterYear("all")
     setFilterStatus("all")
-    setFilterProgress("all")
+    setFilterHealth("all")
     setFilterCategoryKey("all")
   }
 
-  const filteredGoals = filterGoals(
-    goals,
-    {
+  const engine = useMemo(
+    () => new FinancialRollupEngine(transactions, { timeZone }),
+    [transactions, timeZone]
+  )
+
+  const valuations = useMemo(
+    () =>
+      engine.evaluateGoals(goals, {
+        searchTerm,
+        filterMonth,
+        filterYear,
+        filterStatus,
+        filterHealth,
+        filterCategoryKey,
+      }),
+    [
+      engine,
+      goals,
       searchTerm,
       filterMonth,
       filterYear,
       filterStatus,
-      filterProgress,
+      filterHealth,
       filterCategoryKey,
-    },
-    transactions,
-    timeZone
+    ]
   )
 
   return (
@@ -186,15 +201,15 @@ export function GoalFilters() {
             </Select>
 
             <Select
-              value={filterProgress}
-              onValueChange={(
-                value: "all" | "gray" | "green" | "yellow" | "red"
-              ) => setFilterProgress(value)}
+              value={filterHealth}
+              onValueChange={(value: "all" | RollupHealth) =>
+                setFilterHealth(value)
+              }
             >
               <SelectTrigger
                 className={cn(
                   "w-full",
-                  filterProgress !== "all" && "border-primary"
+                  filterHealth !== "all" && "border-primary"
                 )}
               >
                 <SelectValue placeholder={t("Progress")} />
@@ -203,19 +218,23 @@ export function GoalFilters() {
                 <SelectGroup>
                   <SelectItem value="all">{t("All Progress")}</SelectItem>
                   <SelectSeparator />
-                  <SelectItem value="gray">{t("No Transactions")}</SelectItem>
-                  <SelectItem value="green">{t("Good (≥ 100%)")}</SelectItem>
-                  <SelectItem value="yellow">{t("Low (75-100%)")}</SelectItem>
-                  <SelectItem value="red">{t("Warning (< 75%)")}</SelectItem>
+                  <SelectItem value="unstarted">
+                    {t("No Transactions")}
+                  </SelectItem>
+                  <SelectItem value="on_track">{t("Good (≥ 100%)")}</SelectItem>
+                  <SelectItem value="warning">{t("Low (75-100%)")}</SelectItem>
+                  <SelectItem value="exceeded">
+                    {t("Warning (< 75%)")}
+                  </SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
 
             <Select
               value={filterStatus}
-              onValueChange={(
-                value: "all" | "expired" | "active" | "upcoming"
-              ) => setFilterStatus(value)}
+              onValueChange={(value: "all" | ScheduleStatus) =>
+                setFilterStatus(value)
+              }
             >
               <SelectTrigger
                 className={cn(
@@ -249,7 +268,7 @@ export function GoalFilters() {
         </CardContent>
       </Card>
 
-      <GoalsTable filteredGoals={filteredGoals} />
+      <GoalsTable valuations={valuations} />
     </>
   )
 }

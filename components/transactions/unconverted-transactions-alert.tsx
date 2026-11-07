@@ -4,22 +4,15 @@ import { AlertCircleIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { useUser } from "@/contexts/user-context"
-import type { Transaction } from "@/lib/definitions"
 
 export function UnconvertedTransactionsAlert({
-  transactions,
+  hasUnconverted,
 }: {
-  transactions?: Transaction[]
+  hasUnconverted: boolean
 }) {
   const t = useExtracted()
-  const { user } = useUser()
 
-  const shouldShow = transactions
-    ? transactions.some((t) => t.currency !== user.currency)
-    : true
-
-  if (!shouldShow) return null
+  if (!hasUnconverted) return null
 
   return (
     <Alert variant="destructive">

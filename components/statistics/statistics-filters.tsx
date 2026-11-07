@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { cn } from "cn"
 import { ChevronDownIcon } from "lucide-react"
-import { useExtracted } from "next-intl"
+import { useExtracted, useTimeZone } from "next-intl"
 
 import { StatisticsSummary } from "@/components/statistics/statistics-summary"
 import { StatisticsTable } from "@/components/statistics/statistics-table"
@@ -25,14 +25,19 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useTransactions } from "@/contexts/transactions-context"
+import { useUser } from "@/contexts/user-context"
 import { useFormatDate } from "@/hooks/use-format-date"
 import { useMonths } from "@/hooks/use-months"
+import type { Currency } from "@/lib/currency"
 import { getUniqueYears } from "@/lib/date"
 import { filterTransactions } from "@/lib/filters"
+import { FinancialRollupEngine } from "@/lib/valuation-engine"
 
 export function StatisticsFilters() {
   const { transactions } = useTransactions()
+  const { user } = useUser()
   const t = useExtracted()
+  const timeZone = useTimeZone()
   const formatDate = useFormatDate()
   const [isDatePickerOpen, setIsDatePickerOpen] = useState<boolean>(false)
   const [isDateRangeOpen, setIsDateRangeOpen] = useState<boolean>(false)
@@ -99,12 +104,28 @@ export function StatisticsFilters() {
     }
   }
 
-  const filteredTransactions = filterTransactions(transactions, {
-    selectedDate,
-    dateRange,
-    filterMonth,
-    filterYear,
-  })
+  const filteredTransactions = useMemo(
+    () =>
+      filterTransactions(transactions, {
+        selectedDate,
+        dateRange,
+        filterMonth,
+        filterYear,
+      }),
+    [transactions, selectedDate, dateRange, filterMonth, filterYear]
+  )
+
+  const engine = useMemo(
+    () =>
+      new FinancialRollupEngine(filteredTransactions, {
+        targetCurrency: user.currency as Currency,
+        timeZone,
+      }),
+    [filteredTransactions, user.currency, timeZone]
+  )
+
+  const summary = useMemo(() => engine.evaluatePeriodSummary(), [engine])
+  const valuations = useMemo(() => engine.evaluateCategoryRollups(), [engine])
 
   return (
     <>
@@ -279,10 +300,11 @@ export function StatisticsFilters() {
         </CardContent>
       </Card>
 
-      <StatisticsSummary filteredTransactions={filteredTransactions} />
+      <StatisticsSummary summary={summary} />
 
       <StatisticsTable
-        filteredTransactions={filteredTransactions}
+        valuations={valuations}
+        hasUnconverted={summary.unconvertedCount > 0}
         filterStates={{
           selectedDate,
           dateRange,

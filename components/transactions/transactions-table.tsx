@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { AlertCircleIcon, MoreVerticalIcon, WalletIcon } from "lucide-react"
 import { useExtracted } from "next-intl"
 
@@ -90,6 +90,14 @@ export function TransactionsTable({
     startIndex + ITEMS_PER_PAGE
   )
 
+  const hasUnconverted = useMemo(
+    () =>
+      filteredTransactions.some(
+        (transaction) => transaction.currency !== user.currency
+      ),
+    [filteredTransactions, user.currency]
+  )
+
   return (
     <>
       <Card>
@@ -106,9 +114,7 @@ export function TransactionsTable({
             />
           ) : (
             <div className="flex h-full flex-col gap-3">
-              <UnconvertedTransactionsAlert
-                transactions={filteredTransactions}
-              />
+              <UnconvertedTransactionsAlert hasUnconverted={hasUnconverted} />
               <Table>
                 <TableHeader>
                   <TableRow className="[&>th]:text-center">

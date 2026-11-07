@@ -11,68 +11,55 @@ import { useExtracted } from "next-intl"
 
 import { SummaryCard } from "@/components/summary-card"
 import { UnconvertedTransactionsAlert } from "@/components/transactions/unconverted-transactions-alert"
-import { useUser } from "@/contexts/user-context"
 import { useFormatCurrency } from "@/hooks/use-format-currency"
-import type { Currency } from "@/lib/currency"
-import type { Transaction } from "@/lib/definitions"
-import { calculateSummaryStats } from "@/lib/statistics"
-import { getBalanceColorClass, toDecimal } from "@/lib/utils"
+import { getBalanceColorClass } from "@/lib/utils"
+import type { PeriodSummaryValuation } from "@/lib/valuation-engine"
 
 interface StatisticsSummaryProps {
-  filteredTransactions: Transaction[]
+  summary: PeriodSummaryValuation
 }
 
-export function StatisticsSummary({
-  filteredTransactions,
-}: StatisticsSummaryProps) {
+export function StatisticsSummary({ summary }: StatisticsSummaryProps) {
   const t = useExtracted()
-  const { user } = useUser()
   const formatCurrency = useFormatCurrency()
-  const {
-    totalInflow,
-    totalOutflow,
-    balance,
-    transactionCount,
-    inflowCount,
-    outflowCount,
-    unconvertedCount,
-  } = calculateSummaryStats(filteredTransactions, user.currency as Currency)
 
   return (
     <div className="space-y-3">
-      <UnconvertedTransactionsAlert transactions={filteredTransactions} />
+      <UnconvertedTransactionsAlert
+        hasUnconverted={summary.unconvertedCount > 0}
+      />
       <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
         <SummaryCard
           title={t("Total Inflow")}
           icon={<ArrowUpIcon className="size-4 text-green" />}
-          value={formatCurrency(totalInflow)}
+          value={formatCurrency(summary.totalInflow.toString())}
           valueClassName="text-green"
-          description={`${inflowCount} ${t("transactions")}`}
+          description={`${summary.inflowCount} ${t("transactions")}`}
         />
 
         <SummaryCard
           title={t("Total Outflow")}
           icon={<ArrowDownIcon className="size-4 text-red" />}
-          value={formatCurrency(totalOutflow)}
+          value={formatCurrency(summary.totalOutflow.toString())}
           valueClassName="text-red"
-          description={`${outflowCount} ${t("transactions")}`}
+          description={`${summary.outflowCount} ${t("transactions")}`}
         />
 
         <SummaryCard
           title={t("Balance")}
           icon={
-            toDecimal(balance).greaterThanOrEqualTo(0) ? (
+            summary.balance.greaterThanOrEqualTo(0) ? (
               <TrendingUpIcon className="size-4 text-green" />
             ) : (
               <TrendingDownIcon className="size-4 text-red" />
             )
           }
-          value={formatCurrency(balance)}
-          valueClassName={getBalanceColorClass(balance)}
+          value={formatCurrency(summary.balance.toString())}
+          valueClassName={getBalanceColorClass(summary.balance)}
           description={`${
-            toDecimal(balance).greaterThan(0)
+            summary.balance.greaterThan(0)
               ? t("Positive")
-              : toDecimal(balance).lessThan(0)
+              : summary.balance.lessThan(0)
                 ? t("Negative")
                 : t("Balanced")
           } ${t("compared to inflow")}`}
@@ -83,11 +70,11 @@ export function StatisticsSummary({
           icon={<ActivityIcon className="size-4 text-blue" />}
           value={
             <>
-              {transactionCount}
-              {unconvertedCount > 0 && (
+              {summary.transactionCount}
+              {summary.unconvertedCount > 0 && (
                 <span className="text-xs font-normal text-secondary">
                   {" "}
-                  (+{unconvertedCount})
+                  (+{summary.unconvertedCount})
                 </span>
               )}
             </>

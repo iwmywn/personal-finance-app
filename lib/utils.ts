@@ -1,26 +1,60 @@
 import type { Route } from "next"
 import Decimal from "decimal.js"
+import MiniSearch from "minisearch"
 
-import type { RollupHealth } from "@/lib/valuation-engine"
+import type { RollupHealth, ScheduleStatus } from "@/lib/valuation-engine"
 import { DEFAULT_SIGNIN_REDIRECT } from "@/routes"
 
-export const progressColorClass = {
-  gray: "progress-gray",
-  green: "progress-green",
-  yellow: "progress-yellow",
-  red: "progress-red",
-} as const
+export function searchWithMiniSearch<T extends Record<string, unknown>>(
+  documents: T[],
+  searchTerm: string,
+  fields: string[],
+  idField: string = "_id"
+): Set<string> {
+  const normalizedSearchTerm = searchTerm.trim()
+
+  if (!normalizedSearchTerm) {
+    return new Set(documents.map((doc) => String(doc[idField])))
+  }
+
+  const miniSearch = new MiniSearch({
+    idField,
+    fields,
+    storeFields: [idField],
+    searchOptions: {
+      prefix: true,
+      combineWith: "AND",
+    },
+  })
+
+  miniSearch.addAll(documents)
+
+  const results = miniSearch.search(normalizedSearchTerm)
+
+  return new Set(results.map((result) => String(result[idField])))
+}
 
 export function getRollupHealthClass(health: RollupHealth): string {
   switch (health) {
     case "unstarted":
-      return progressColorClass.gray
+      return "progress-gray"
     case "on_track":
-      return progressColorClass.green
+      return "progress-green"
     case "warning":
-      return progressColorClass.yellow
+      return "progress-yellow"
     case "exceeded":
-      return progressColorClass.red
+      return "progress-red"
+  }
+}
+
+export function getScheduleStatusClass(status: ScheduleStatus): string {
+  switch (status) {
+    case "expired":
+      return "badge-red"
+    case "active":
+      return "badge-green"
+    case "upcoming":
+      return "badge-yellow"
   }
 }
 
@@ -43,12 +77,6 @@ export function getBalanceColorClass(balance?: Decimal.Value | null): string {
   }
   return ""
 }
-
-export function toDecimal(value: string): Decimal {
-  return new Decimal(value)
-}
-
-export { convertAmountWithRates } from "@/lib/currency"
 
 export function getSafeCallbackUrl(
   url: string | null | undefined,

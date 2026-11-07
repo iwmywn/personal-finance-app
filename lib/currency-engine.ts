@@ -19,7 +19,6 @@ import type {
   RatesMap,
   Transaction,
 } from "@/lib/definitions"
-import { toDecimal } from "@/lib/utils"
 
 export {
   convertAmountWithRates,
@@ -202,9 +201,9 @@ export async function fetchCandidateExchangeRates(
   ).sort((a, b) => a.date.getTime() - b.date.getTime())
 
   return uniqueDocs.map((doc) => {
-    const rates: RatesMap = { USD: toDecimal("1") }
+    const rates: RatesMap = { USD: new Decimal("1") }
     for (const [curr, val] of Object.entries(doc.rates ?? {})) {
-      if (val) rates[curr] = toDecimal(val.toString())
+      if (val) rates[curr] = new Decimal(val.toString())
     }
     return {
       ...doc,
