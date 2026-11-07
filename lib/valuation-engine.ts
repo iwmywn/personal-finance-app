@@ -9,6 +9,7 @@ import {
   normalizeToUTCMidnight,
 } from "@/lib/date"
 import type { Budget, Goal, Transaction } from "@/lib/definitions"
+import { searchWithMiniSearch } from "@/lib/utils"
 
 export type RollupHealth = "unstarted" | "on_track" | "warning" | "exceeded"
 export type ScheduleStatus = "upcoming" | "active" | "expired"
@@ -70,29 +71,100 @@ export interface QuickStatsValuation {
   popularCategory: CategoryKey[]
 }
 
-export interface BudgetFilterCriteria {
+export interface ScheduleFilterCriteria {
   filterMonth?: string
   filterYear?: string
-  filterCategoryKey?: string
-  filterHealth?: "all" | RollupHealth | string
-  filterStatus?: "all" | ScheduleStatus | string
+  filterCategoryKey?: "all" | CategoryKey
+  filterHealth?: "all" | RollupHealth
+  filterStatus?: "all" | ScheduleStatus
 }
 
-export interface GoalFilterCriteria {
-  filterMonth?: string
-  filterYear?: string
-  filterCategoryKey?: string
-  filterHealth?: "all" | RollupHealth | string
-  filterStatus?: "all" | ScheduleStatus | string
+export type BudgetFilterCriteria = ScheduleFilterCriteria
+
+export interface GoalFilterCriteria extends ScheduleFilterCriteria {
+  searchTerm?: string
 }
 
-function normalizeHealthFilter(filter?: string): RollupHealth | "all" {
-  if (!filter || filter === "all") return "all"
-  if (filter === "gray" || filter === "unstarted") return "unstarted"
-  if (filter === "green" || filter === "on_track") return "on_track"
-  if (filter === "yellow" || filter === "warning") return "warning"
-  if (filter === "red" || filter === "exceeded") return "exceeded"
-  return "all"
+interface FinancialSchedule {
+  _id: string
+  categoryKey: CategoryKey
+  startDate: Date | string
+  endDate: Date | string
+  currency: Currency
+}
+
+interface ValuationMatchable {
+  status: ScheduleStatus
+  health: RollupHealth
+}
+
+function parseScheduleFilters(filters?: ScheduleFilterCriteria) {
+  return {
+    parsedMonth:
+      !filters?.filterMonth || filters.filterMonth === "all"
+        ? null
+        : parseInt(filters.filterMonth, 10),
+    parsedYear:
+      !filters?.filterYear || filters.filterYear === "all"
+        ? null
+        : parseInt(filters.filterYear, 10),
+    expectedCategory:
+      !filters?.filterCategoryKey || filters.filterCategoryKey === "all"
+        ? null
+        : filters.filterCategoryKey,
+    expectedStatus:
+      !filters?.filterStatus || filters.filterStatus === "all"
+        ? null
+        : filters.filterStatus,
+    expectedHealth:
+      filters?.filterHealth && filters.filterHealth !== "all"
+        ? filters.filterHealth
+        : null,
+  }
+}
+
+function matchesScheduleCriteria(
+  schedule: FinancialSchedule,
+  criteria: ReturnType<typeof parseScheduleFilters>
+): boolean {
+  if (
+    criteria.expectedCategory &&
+    schedule.categoryKey !== criteria.expectedCategory
+  ) {
+    return false
+  }
+
+  if (criteria.parsedMonth !== null || criteria.parsedYear !== null) {
+    const start = new Date(schedule.startDate)
+    const end = new Date(schedule.endDate)
+    if (
+      !isDateRangeOverlapping(
+        start,
+        end,
+        criteria.parsedMonth,
+        criteria.parsedYear
+      )
+    ) {
+      return false
+    }
+  }
+
+  return true
+}
+
+function matchesScheduleValuation(
+  valuation: ValuationMatchable,
+  criteria: ReturnType<typeof parseScheduleFilters>
+): boolean {
+  if (criteria.expectedStatus && valuation.status !== criteria.expectedStatus) {
+    return false
+  }
+
+  if (criteria.expectedHealth && valuation.health !== criteria.expectedHealth) {
+    return false
+  }
+
+  return true
 }
 
 /**
@@ -114,20 +186,21 @@ export class FinancialRollupEngine {
     this.targetCurrency = options.targetCurrency
   }
 
-  /**
-   * Evaluates a single budget against realized outflow transactions.
-   */
-  evaluateBudget(budget: Budget): BudgetValuation {
-    const startDateOnly = normalizeToUTCMidnight(new Date(budget.startDate))
-    const endDateOnly = normalizeToUTCMidnight(new Date(budget.endDate))
-    const budgetCurrency = budget.currency
+  private evaluateScheduleRollup(
+    schedule: FinancialSchedule,
+    expectedType: "inflow" | "outflow",
+    scheduledAmountInput: string
+  ) {
+    const startDateOnly = normalizeToUTCMidnight(new Date(schedule.startDate))
+    const endDateOnly = normalizeToUTCMidnight(new Date(schedule.endDate))
+    const scheduleCurrency = schedule.currency
 
-    let spent = new Decimal(0)
+    let total = new Decimal(0)
     let unconvertedCount = 0
     const matchingTransactions: Transaction[] = []
 
     for (const t of this.transactions) {
-      if (t.type !== "outflow" || t.categoryKey !== budget.categoryKey) {
+      if (t.type !== expectedType || t.categoryKey !== schedule.categoryKey) {
         continue
       }
 
@@ -140,19 +213,19 @@ export class FinancialRollupEngine {
       }
 
       matchingTransactions.push(t)
-      const amount = resolveTransactionAmount(t, budgetCurrency)
+      const amount = resolveTransactionAmount(t, scheduleCurrency)
       if (amount !== null) {
-        spent = spent.plus(amount)
+        total = total.plus(amount)
       } else {
         unconvertedCount++
       }
     }
 
-    const allocated = new Decimal(budget.allocatedAmount)
-    const remaining = allocated.minus(spent)
-    const percentage = allocated.equals(0)
+    const scheduledAmount = new Decimal(scheduledAmountInput)
+    const remaining = scheduledAmount.minus(total)
+    const percentage = scheduledAmount.equals(0)
       ? 0
-      : spent.dividedBy(allocated).mul(100).toNumber()
+      : total.dividedBy(scheduledAmount).mul(100).toNumber()
 
     let status: ScheduleStatus
     if (endDateOnly.getTime() < this.todayUTC.getTime()) {
@@ -164,6 +237,66 @@ export class FinancialRollupEngine {
     }
 
     const convertedCount = matchingTransactions.length - unconvertedCount
+
+    return {
+      scheduledAmount,
+      total,
+      remaining,
+      percentage,
+      status,
+      unconvertedCount,
+      convertedCount,
+      matchingTransactions,
+    }
+  }
+
+  private evaluateSchedules<
+    TSchedule extends FinancialSchedule,
+    TValuation extends ValuationMatchable,
+  >(
+    schedules: TSchedule[],
+    evaluate: (schedule: TSchedule) => TValuation,
+    filters?: ScheduleFilterCriteria,
+    matchingIds?: Set<string> | null
+  ): TValuation[] {
+    const criteria = parseScheduleFilters(filters)
+    const results: TValuation[] = []
+
+    for (const schedule of schedules) {
+      if (matchingIds && !matchingIds.has(schedule._id)) {
+        continue
+      }
+
+      if (!matchesScheduleCriteria(schedule, criteria)) {
+        continue
+      }
+
+      const valuation = evaluate(schedule)
+
+      if (!matchesScheduleValuation(valuation, criteria)) {
+        continue
+      }
+
+      results.push(valuation)
+    }
+
+    return results
+  }
+
+  /**
+   * Evaluates a single budget against realized outflow transactions.
+   */
+  evaluateBudget(budget: Budget): BudgetValuation {
+    const {
+      scheduledAmount: allocated,
+      total: spent,
+      remaining,
+      percentage,
+      status,
+      unconvertedCount,
+      convertedCount,
+      matchingTransactions,
+    } = this.evaluateScheduleRollup(budget, "outflow", budget.allocatedAmount)
 
     let health: RollupHealth
     if (convertedCount === 0) {
@@ -196,105 +329,27 @@ export class FinancialRollupEngine {
     budgets: Budget[],
     filters?: BudgetFilterCriteria
   ): BudgetValuation[] {
-    const parsedMonth =
-      !filters?.filterMonth || filters.filterMonth === "all"
-        ? null
-        : parseInt(filters.filterMonth, 10)
-    const parsedYear =
-      !filters?.filterYear || filters.filterYear === "all"
-        ? null
-        : parseInt(filters.filterYear, 10)
-    const expectedCategory =
-      !filters?.filterCategoryKey || filters.filterCategoryKey === "all"
-        ? null
-        : filters.filterCategoryKey
-    const expectedStatus =
-      !filters?.filterStatus || filters.filterStatus === "all"
-        ? null
-        : filters.filterStatus
-    const expectedHealth = normalizeHealthFilter(filters?.filterHealth)
-
-    const results: BudgetValuation[] = []
-
-    for (const budget of budgets) {
-      if (expectedCategory && budget.categoryKey !== expectedCategory) {
-        continue
-      }
-
-      if (parsedMonth !== null || parsedYear !== null) {
-        const start = new Date(budget.startDate)
-        const end = new Date(budget.endDate)
-        if (!isDateRangeOverlapping(start, end, parsedMonth, parsedYear)) {
-          continue
-        }
-      }
-
-      const valuation = this.evaluateBudget(budget)
-
-      if (expectedStatus && valuation.status !== expectedStatus) {
-        continue
-      }
-
-      if (expectedHealth !== "all" && valuation.health !== expectedHealth) {
-        continue
-      }
-
-      results.push(valuation)
-    }
-
-    return results
+    return this.evaluateSchedules(
+      budgets,
+      (budget) => this.evaluateBudget(budget),
+      filters
+    )
   }
 
   /**
    * Evaluates a single savings goal against realized inflow transactions.
    */
   evaluateGoal(goal: Goal): GoalValuation {
-    const startDateOnly = normalizeToUTCMidnight(new Date(goal.startDate))
-    const endDateOnly = normalizeToUTCMidnight(new Date(goal.endDate))
-    const goalCurrency = goal.currency
-
-    let accumulated = new Decimal(0)
-    let unconvertedCount = 0
-    const matchingTransactions: Transaction[] = []
-
-    for (const t of this.transactions) {
-      if (t.type !== "inflow" || t.categoryKey !== goal.categoryKey) {
-        continue
-      }
-
-      const txDateOnly = normalizeToUTCMidnight(new Date(t.date))
-      if (
-        txDateOnly.getTime() < startDateOnly.getTime() ||
-        txDateOnly.getTime() > endDateOnly.getTime()
-      ) {
-        continue
-      }
-
-      matchingTransactions.push(t)
-      const amount = resolveTransactionAmount(t, goalCurrency)
-      if (amount !== null) {
-        accumulated = accumulated.plus(amount)
-      } else {
-        unconvertedCount++
-      }
-    }
-
-    const target = new Decimal(goal.targetAmount)
-    const remaining = target.minus(accumulated)
-    const percentage = target.equals(0)
-      ? 0
-      : accumulated.dividedBy(target).mul(100).toNumber()
-
-    let status: ScheduleStatus
-    if (endDateOnly.getTime() < this.todayUTC.getTime()) {
-      status = "expired"
-    } else if (startDateOnly.getTime() <= this.todayUTC.getTime()) {
-      status = "active"
-    } else {
-      status = "upcoming"
-    }
-
-    const convertedCount = matchingTransactions.length - unconvertedCount
+    const {
+      scheduledAmount: target,
+      total: accumulated,
+      remaining,
+      percentage,
+      status,
+      unconvertedCount,
+      convertedCount,
+      matchingTransactions,
+    } = this.evaluateScheduleRollup(goal, "inflow", goal.targetAmount)
 
     let health: RollupHealth
     if (convertedCount === 0) {
@@ -324,78 +379,65 @@ export class FinancialRollupEngine {
    * Evaluates multiple goals in a single pass with optional filtering criteria.
    */
   evaluateGoals(goals: Goal[], filters?: GoalFilterCriteria): GoalValuation[] {
-    const parsedMonth =
-      !filters?.filterMonth || filters.filterMonth === "all"
-        ? null
-        : parseInt(filters.filterMonth, 10)
-    const parsedYear =
-      !filters?.filterYear || filters.filterYear === "all"
-        ? null
-        : parseInt(filters.filterYear, 10)
-    const expectedCategory =
-      !filters?.filterCategoryKey || filters.filterCategoryKey === "all"
-        ? null
-        : filters.filterCategoryKey
-    const expectedStatus =
-      !filters?.filterStatus || filters.filterStatus === "all"
-        ? null
-        : filters.filterStatus
-    const expectedHealth = normalizeHealthFilter(filters?.filterHealth)
+    const matchingGoalIds = filters?.searchTerm
+      ? searchWithMiniSearch(goals, filters.searchTerm, ["name"])
+      : null
 
-    const results: GoalValuation[] = []
-
-    for (const goal of goals) {
-      if (expectedCategory && goal.categoryKey !== expectedCategory) {
-        continue
-      }
-
-      if (parsedMonth !== null || parsedYear !== null) {
-        const start = new Date(goal.startDate)
-        const end = new Date(goal.endDate)
-        if (!isDateRangeOverlapping(start, end, parsedMonth, parsedYear)) {
-          continue
-        }
-      }
-
-      const valuation = this.evaluateGoal(goal)
-
-      if (expectedStatus && valuation.status !== expectedStatus) {
-        continue
-      }
-
-      if (expectedHealth !== "all" && valuation.health !== expectedHealth) {
-        continue
-      }
-
-      results.push(valuation)
-    }
-
-    return results
+    return this.evaluateSchedules(
+      goals,
+      (goal) => this.evaluateGoal(goal),
+      filters,
+      matchingGoalIds
+    )
   }
 
-  /**
-   * Evaluates period summary statistics (total inflow, outflow, balance, counts).
-   */
-  evaluatePeriodSummary(): PeriodSummaryValuation {
+  private resolveTransactions(transactions: Transaction[]): {
+    resolved: { transaction: Transaction; amount: Decimal }[]
+    unconvertedCount: number
+  } {
+    const resolved: { transaction: Transaction; amount: Decimal }[] = []
+    let unconvertedCount = 0
+
+    for (const transaction of transactions) {
+      const amount = resolveTransactionAmount(transaction, this.targetCurrency)
+      if (amount !== null) {
+        resolved.push({ transaction, amount })
+      } else {
+        unconvertedCount++
+      }
+    }
+
+    return { resolved, unconvertedCount }
+  }
+
+  private getCurrentMonthTransactions(): Transaction[] {
+    const currentMonth = this.todayUTC.getUTCMonth()
+    const currentYear = this.todayUTC.getUTCFullYear()
+
+    return this.transactions.filter((t) => {
+      const date = new Date(t.date)
+      return (
+        date.getUTCMonth() === currentMonth &&
+        date.getUTCFullYear() === currentYear
+      )
+    })
+  }
+
+  private computePeriodSummary(resolvedTransactions: {
+    resolved: { transaction: Transaction; amount: Decimal }[]
+    unconvertedCount: number
+  }): PeriodSummaryValuation {
+    const { resolved, unconvertedCount } = resolvedTransactions
     let totalInflow = new Decimal(0)
     let totalOutflow = new Decimal(0)
     let inflowCount = 0
     let outflowCount = 0
-    let unconvertedCount = 0
-    let transactionCount = 0
 
-    for (const t of this.transactions) {
-      const amount = resolveTransactionAmount(t, this.targetCurrency)
-      if (amount === null) {
-        unconvertedCount++
-        continue
-      }
-
-      transactionCount++
-      if (t.type === "inflow") {
+    for (const { transaction, amount } of resolved) {
+      if (transaction.type === "inflow") {
         totalInflow = totalInflow.plus(amount)
         inflowCount++
-      } else if (t.type === "outflow") {
+      } else if (transaction.type === "outflow") {
         totalOutflow = totalOutflow.plus(amount)
         outflowCount++
       }
@@ -405,7 +447,7 @@ export class FinancialRollupEngine {
       totalInflow,
       totalOutflow,
       balance: totalInflow.minus(totalOutflow),
-      transactionCount,
+      transactionCount: resolved.length,
       inflowCount,
       outflowCount,
       unconvertedCount,
@@ -413,27 +455,43 @@ export class FinancialRollupEngine {
   }
 
   /**
-   * Evaluates category-level breakdown totals.
+   * Evaluates period summary statistics (total inflow, outflow, balance, counts).
    */
-  evaluateCategoryBreakdown(): CategoryRollupValuation[] {
+  evaluatePeriodSummary(): PeriodSummaryValuation {
+    return this.computePeriodSummary(
+      this.resolveTransactions(this.transactions)
+    )
+  }
+
+  /**
+   * Evaluates summary statistics for transactions occurring in the current month.
+   */
+  evaluateCurrentMonthSummary(): PeriodSummaryValuation {
+    return this.computePeriodSummary(
+      this.resolveTransactions(this.getCurrentMonthTransactions())
+    )
+  }
+
+  /**
+   * Evaluates category-level rollup totals.
+   */
+  evaluateCategoryRollups(): CategoryRollupValuation[] {
+    const { resolved } = this.resolveTransactions(this.transactions)
     const categoryMap = new Map<
-      string,
+      CategoryKey,
       { total: Decimal; count: number; type: "inflow" | "outflow" }
     >()
 
-    for (const t of this.transactions) {
-      const amount = resolveTransactionAmount(t, this.targetCurrency)
-      if (amount === null) continue
-
-      const existing = categoryMap.get(t.categoryKey)
+    for (const { transaction, amount } of resolved) {
+      const existing = categoryMap.get(transaction.categoryKey)
       if (existing) {
         existing.total = existing.total.plus(amount)
         existing.count++
       } else {
-        categoryMap.set(t.categoryKey, {
+        categoryMap.set(transaction.categoryKey, {
           total: amount,
           count: 1,
-          type: t.type,
+          type: transaction.type,
         })
       }
     }
@@ -459,28 +517,9 @@ export class FinancialRollupEngine {
    * Evaluates month-to-date quick stats (highest, lowest, avg outflow, savings rate, popular categories).
    */
   evaluateQuickStats(): QuickStatsValuation {
-    const currentMonth = this.todayUTC.getUTCMonth()
-    const currentYear = this.todayUTC.getUTCFullYear()
-
-    const currentMonthItems: { t: Transaction; amount: Decimal }[] = []
-    let unconvertedCount = 0
-
-    for (const t of this.transactions) {
-      const date = new Date(t.date)
-      if (
-        date.getUTCMonth() !== currentMonth ||
-        date.getUTCFullYear() !== currentYear
-      ) {
-        continue
-      }
-
-      const amount = resolveTransactionAmount(t, this.targetCurrency)
-      if (amount !== null) {
-        currentMonthItems.push({ t, amount })
-      } else {
-        unconvertedCount++
-      }
-    }
+    const monthTransactions = this.getCurrentMonthTransactions()
+    const resolvedMonth = this.resolveTransactions(monthTransactions)
+    const { resolved: currentMonthItems, unconvertedCount } = resolvedMonth
 
     const currentMonthCount = currentMonthItems.length
     if (currentMonthCount === 0) {
@@ -497,13 +536,10 @@ export class FinancialRollupEngine {
 
     let highestItem = currentMonthItems[0]
     let lowestItem = currentMonthItems[0]
-    let totalInflow = new Decimal(0)
-    let totalOutflow = new Decimal(0)
-    let outflowCount = 0
-    const categorySums: Record<string, Decimal> = {}
+    const categorySums = new Map<CategoryKey, Decimal>()
 
     for (const item of currentMonthItems) {
-      const { t, amount } = item
+      const { transaction, amount } = item
 
       if (amount.greaterThan(highestItem.amount)) {
         highestItem = item
@@ -512,16 +548,15 @@ export class FinancialRollupEngine {
         lowestItem = item
       }
 
-      if (t.type === "inflow") {
-        totalInflow = totalInflow.plus(amount)
-      } else if (t.type === "outflow") {
-        totalOutflow = totalOutflow.plus(amount)
-        outflowCount++
-        categorySums[t.categoryKey] = (
-          categorySums[t.categoryKey] || new Decimal(0)
-        ).plus(amount)
+      if (transaction.type === "outflow") {
+        const currentSum =
+          categorySums.get(transaction.categoryKey) ?? new Decimal(0)
+        categorySums.set(transaction.categoryKey, currentSum.plus(amount))
       }
     }
+
+    const { totalInflow, totalOutflow, outflowCount } =
+      this.computePeriodSummary(resolvedMonth)
 
     const avgOutflow =
       outflowCount > 0 ? totalOutflow.dividedBy(outflowCount) : null
@@ -536,26 +571,27 @@ export class FinancialRollupEngine {
         ? new Decimal(-100)
         : new Decimal(0)
 
-    const maxTotal = Object.values(categorySums).reduce(
-      (max, val) => (val.greaterThan(max) ? val : max),
-      new Decimal(0)
-    )
+    let maxTotal = new Decimal(0)
+    for (const total of categorySums.values()) {
+      if (total.greaterThan(maxTotal)) {
+        maxTotal = total
+      }
+    }
 
-    const popularCategory = maxTotal.greaterThan(0)
-      ? Object.entries(categorySums).reduce<CategoryKey[]>(
-          (acc, [key, total]) => {
-            if (total.equals(maxTotal)) acc.push(key as CategoryKey)
-            return acc
-          },
-          []
-        )
-      : []
+    const popularCategory: CategoryKey[] = []
+    if (maxTotal.greaterThan(0)) {
+      for (const [key, total] of categorySums.entries()) {
+        if (total.equals(maxTotal)) {
+          popularCategory.push(key)
+        }
+      }
+    }
 
     return {
       currentMonthCount,
       unconvertedCount,
-      highestTransaction: highestItem.t,
-      lowestTransaction: lowestItem.t,
+      highestTransaction: highestItem.transaction,
+      lowestTransaction: lowestItem.transaction,
       avgOutflow,
       savingsRate,
       popularCategory,

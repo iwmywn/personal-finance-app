@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react"
 import Link from "next/link"
 import { MoreVerticalIcon, PiggyBankIcon } from "lucide-react"
-import { useExtracted, useTimeZone } from "next-intl"
+import { useExtracted } from "next-intl"
 
 import { BudgetForm } from "@/components/budgets/budget-form"
 import { DeleteBudget } from "@/components/budgets/delete-budget"
@@ -33,22 +33,20 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { useBudgets } from "@/contexts/budgets-context"
-import { useTransactions } from "@/contexts/transactions-context"
 import { useCategory } from "@/hooks/use-category"
 import { useFormatCurrency } from "@/hooks/use-format-currency"
 import { useFormatDate } from "@/hooks/use-format-date"
 import { serializeUTCDate } from "@/lib/date"
 import type { Budget } from "@/lib/definitions"
-import { calculateBudgetsStats } from "@/lib/statistics"
-import { toDecimal } from "@/lib/utils"
+import { getRollupHealthClass, getScheduleStatusClass } from "@/lib/utils"
+import type { BudgetValuation } from "@/lib/valuation-engine"
 
 interface BudgetsTableProps {
-  filteredBudgets: Budget[]
+  valuations: BudgetValuation[]
 }
 
-export function BudgetsTable({ filteredBudgets }: BudgetsTableProps) {
+export function BudgetsTable({ valuations }: BudgetsTableProps) {
   const { budgets } = useBudgets()
-  const { transactions } = useTransactions()
   const [selectedBudget, setSelectedBudget] = useState<Budget | null>(null)
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false)
@@ -56,24 +54,17 @@ export function BudgetsTable({ filteredBudgets }: BudgetsTableProps) {
   const { getCategoryLabel, getCategoryDescription } = useCategory()
   const formatDate = useFormatDate()
   const formatCurrency = useFormatCurrency()
-  const timeZone = useTimeZone()
 
-  const budgetsWithSpent = calculateBudgetsStats(
-    filteredBudgets,
-    transactions,
-    timeZone
-  )
-
-  const outflowTransactions = useMemo(
-    () => transactions.filter((t) => t.type === "outflow"),
-    [transactions]
+  const hasUnconverted = useMemo(
+    () => valuations.some((valuation) => valuation.unconvertedCount > 0),
+    [valuations]
   )
 
   return (
     <>
       <Card>
         <CardContent>
-          {filteredBudgets.length === 0 ? (
+          {valuations.length === 0 ? (
             <EmptyState
               icon={<PiggyBankIcon />}
               title={t("No budgets found")}
@@ -85,9 +76,7 @@ export function BudgetsTable({ filteredBudgets }: BudgetsTableProps) {
             />
           ) : (
             <div className="flex h-full flex-col gap-3">
-              <UnconvertedTransactionsAlert
-                transactions={outflowTransactions}
-              />
+              <UnconvertedTransactionsAlert hasUnconverted={hasUnconverted} />
               <Table>
                 <TableHeader>
                   <TableRow className="[&>th]:text-center">
@@ -103,52 +92,56 @@ export function BudgetsTable({ filteredBudgets }: BudgetsTableProps) {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {budgetsWithSpent.map((budget) => (
-                    <TableRow key={budget._id} className="[&>td]:text-center">
-                      <TableCell>{formatDate(budget.startDate)}</TableCell>
-                      <TableCell>{formatDate(budget.endDate)}</TableCell>
+                  {valuations.map((valuation) => (
+                    <TableRow
+                      key={valuation.budget._id}
+                      className="[&>td]:text-center"
+                    >
+                      <TableCell>
+                        {formatDate(valuation.budget.startDate)}
+                      </TableCell>
+                      <TableCell>
+                        {formatDate(valuation.budget.endDate)}
+                      </TableCell>
                       <TableCell>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Badge variant="outline">
-                              {getCategoryLabel(budget.categoryKey)}
+                              {getCategoryLabel(valuation.budget.categoryKey)}
                             </Badge>
                           </TooltipTrigger>
                           <TooltipContent>
-                            {getCategoryDescription(budget.categoryKey)}
+                            {getCategoryDescription(
+                              valuation.budget.categoryKey
+                            )}
                           </TooltipContent>
                         </Tooltip>
                       </TableCell>
                       <TableCell>
                         {formatCurrency(
-                          budget.allocatedAmount,
-                          budget.currency
+                          valuation.budget.allocatedAmount,
+                          valuation.budget.currency
                         )}
                       </TableCell>
                       <TableCell>
-                        {formatCurrency(budget.spent, budget.currency)}
+                        {formatCurrency(
+                          valuation.spent.toString(),
+                          valuation.budget.currency
+                        )}
                       </TableCell>
                       <TableCell>
                         {formatCurrency(
-                          toDecimal(budget.allocatedAmount)
-                            .minus(toDecimal(budget.spent))
-                            .toString(),
-                          budget.currency
+                          valuation.remaining.toString(),
+                          valuation.budget.currency
                         )}
                       </TableCell>
                       <TableCell>
                         <Badge
-                          className={
-                            budget.status === "expired"
-                              ? "badge-red"
-                              : budget.status === "active"
-                                ? "badge-green"
-                                : "badge-yellow"
-                          }
+                          className={getScheduleStatusClass(valuation.status)}
                         >
-                          {budget.status === "expired"
+                          {valuation.status === "expired"
                             ? t("Expired")
-                            : budget.status === "active"
+                            : valuation.status === "active"
                               ? t("Active")
                               : t("Upcoming")}
                         </Badge>
@@ -157,12 +150,12 @@ export function BudgetsTable({ filteredBudgets }: BudgetsTableProps) {
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Progress
-                              value={Math.min(100, budget.percentage)}
-                              className={`flex-1 ${budget.progressColorClass}`}
+                              value={Math.min(100, valuation.percentage)}
+                              className={`flex-1 ${getRollupHealthClass(valuation.health)}`}
                             />
                           </TooltipTrigger>
                           <TooltipContent>
-                            {budget.percentage.toFixed(1)}%
+                            {valuation.percentage.toFixed(1)}%
                           </TooltipContent>
                         </Tooltip>
                       </TableCell>
@@ -175,16 +168,18 @@ export function BudgetsTable({ filteredBudgets }: BudgetsTableProps) {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent>
-                            <DropdownMenuItem asChild>
-                              <Link
-                                href={`/transactions?from=${serializeUTCDate(budget.startDate)}&to=${serializeUTCDate(budget.endDate)}&type=outflow&category=${budget.categoryKey}`}
-                              >
-                                {t("View")}
-                              </Link>
-                            </DropdownMenuItem>
+                            {valuation.matchingTransactions.length > 0 && (
+                              <DropdownMenuItem asChild>
+                                <Link
+                                  href={`/transactions?from=${serializeUTCDate(valuation.budget.startDate)}&to=${serializeUTCDate(valuation.budget.endDate)}&type=outflow&category=${valuation.budget.categoryKey}`}
+                                >
+                                  {t("View")}
+                                </Link>
+                              </DropdownMenuItem>
+                            )}
                             <DropdownMenuItem
                               onClick={() => {
-                                setSelectedBudget(budget)
+                                setSelectedBudget(valuation.budget)
                                 setIsEditOpen(true)
                               }}
                             >
@@ -193,7 +188,7 @@ export function BudgetsTable({ filteredBudgets }: BudgetsTableProps) {
                             <DropdownMenuItem
                               variant="destructive"
                               onClick={() => {
-                                setSelectedBudget(budget)
+                                setSelectedBudget(valuation.budget)
                                 setIsDeleteOpen(true)
                               }}
                             >

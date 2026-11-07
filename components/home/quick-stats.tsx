@@ -1,8 +1,8 @@
 "use client"
 
-import * as React from "react"
+import type { ReactNode } from "react"
 import { cn } from "cn"
-import { useExtracted, useTimeZone } from "next-intl"
+import { useExtracted } from "next-intl"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
@@ -11,21 +11,19 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { useTransactions } from "@/contexts/transactions-context"
-import { useUser } from "@/contexts/user-context"
 import { useCategory } from "@/hooks/use-category"
 import { useFormatCurrency } from "@/hooks/use-format-currency"
-import type { Currency } from "@/lib/currency"
-import { calculateQuickStats } from "@/lib/statistics"
 import { getBalanceColorClass, getFlowColorClass } from "@/lib/utils"
+import type { QuickStatsValuation } from "@/lib/valuation-engine"
 
-export function QuickStats() {
-  const { transactions } = useTransactions()
-  const { user } = useUser()
+interface QuickStatsProps {
+  stats: QuickStatsValuation
+}
+
+export function QuickStats({ stats }: QuickStatsProps) {
   const t = useExtracted()
   const { getCategoryLabel } = useCategory()
   const formatCurrency = useFormatCurrency()
-  const timeZone = useTimeZone()
 
   const {
     currentMonthCount,
@@ -35,12 +33,7 @@ export function QuickStats() {
     avgOutflow,
     savingsRate,
     popularCategory,
-  } = calculateQuickStats(
-    transactions,
-    undefined,
-    user.currency as Currency,
-    timeZone
-  )
+  } = stats
 
   return (
     <Card>
@@ -131,7 +124,7 @@ export function QuickStats() {
                 title={<>{t("Average Outflow")}:</>}
                 value={
                   avgOutflow !== null
-                    ? formatCurrency(avgOutflow)
+                    ? formatCurrency(avgOutflow.toString())
                     : t("No data")
                 }
               />
@@ -149,7 +142,11 @@ export function QuickStats() {
             <TooltipTrigger asChild>
               <QuickStatsRow
                 title={<>{t("Savings Rate")}:</>}
-                value={savingsRate !== null ? `${savingsRate}%` : t("No data")}
+                value={
+                  savingsRate !== null
+                    ? `${savingsRate.toString()}%`
+                    : t("No data")
+                }
                 valueClassName={
                   savingsRate !== null
                     ? getBalanceColorClass(savingsRate)
@@ -192,8 +189,8 @@ export function QuickStats() {
 }
 
 interface QuickStatsRowProps {
-  title: React.ReactNode
-  value: React.ReactNode
+  title: ReactNode
+  value: ReactNode
   valueClassName?: string
 }
 

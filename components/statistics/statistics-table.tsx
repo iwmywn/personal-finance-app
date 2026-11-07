@@ -29,17 +29,15 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { useTransactions } from "@/contexts/transactions-context"
-import { useUser } from "@/contexts/user-context"
 import { useCategory } from "@/hooks/use-category"
 import { useFormatCurrency } from "@/hooks/use-format-currency"
-import type { Currency } from "@/lib/currency"
 import { serializeLocalDate } from "@/lib/date"
-import type { Transaction } from "@/lib/definitions"
-import { calculateCategoriesStats } from "@/lib/statistics"
 import { getFlowColorClass } from "@/lib/utils"
+import type { CategoryRollupValuation } from "@/lib/valuation-engine"
 
-interface TransactionBreakdownTableProps {
-  filteredTransactions: Transaction[]
+interface StatisticsTableProps {
+  valuations: CategoryRollupValuation[]
+  hasUnconverted?: boolean
   filterStates?: {
     selectedDate?: Date
     dateRange?: { from?: Date; to?: Date }
@@ -49,24 +47,16 @@ interface TransactionBreakdownTableProps {
 }
 
 export function StatisticsTable({
-  filteredTransactions,
+  valuations,
+  hasUnconverted = false,
   filterStates,
-}: TransactionBreakdownTableProps) {
+}: StatisticsTableProps) {
   const { transactions } = useTransactions()
-  const { user } = useUser()
   const t = useExtracted()
   const { getCategoryLabel, getCategoryDescription } = useCategory()
   const formatCurrency = useFormatCurrency()
 
-  const categoryStats = calculateCategoriesStats(
-    filteredTransactions,
-    user.currency as Currency
-  )
-
-  const getTransactionsHref = (stat: {
-    type: string
-    categoryKey: string
-  }): Route => {
+  const getTransactionsHref = (valuation: CategoryRollupValuation): Route => {
     const params = new URLSearchParams()
     if (filterStates?.selectedDate) {
       params.set("date", serializeLocalDate(filterStates.selectedDate))
@@ -83,8 +73,8 @@ export function StatisticsTable({
     if (filterStates?.filterYear && filterStates.filterYear !== "all") {
       params.set("year", filterStates.filterYear)
     }
-    params.set("type", stat.type)
-    params.set("category", stat.categoryKey)
+    params.set("type", valuation.type)
+    params.set("category", valuation.categoryKey)
 
     return `/transactions?${params.toString()}`
   }
@@ -92,14 +82,16 @@ export function StatisticsTable({
   return (
     <Card>
       <CardContent>
-        {filteredTransactions.length === 0 ? (
+        {valuations.length === 0 ? (
           <EmptyState
             icon={<WalletIcon />}
             title={t("No transactions found")}
             description={
               transactions.length === 0
                 ? t("You haven't created any transactions yet.")
-                : t("No transactions found matching your filters.")
+                : hasUnconverted
+                  ? t("Exchange rate pending")
+                  : t("No transactions found matching your filters.")
             }
           />
         ) : (
@@ -114,34 +106,39 @@ export function StatisticsTable({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {categoryStats.map((stat) => (
-                <TableRow key={stat.categoryKey} className="[&>td]:text-center">
+              {valuations.map((valuation) => (
+                <TableRow
+                  key={valuation.categoryKey}
+                  className="[&>td]:text-center"
+                >
                   <TableCell>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Badge variant="outline">
-                          {getCategoryLabel(stat.categoryKey)}
+                          {getCategoryLabel(valuation.categoryKey)}
                         </Badge>
                       </TooltipTrigger>
                       <TooltipContent>
-                        {getCategoryDescription(stat.categoryKey)}
+                        {getCategoryDescription(valuation.categoryKey)}
                       </TooltipContent>
                     </Tooltip>
                   </TableCell>
                   <TableCell>
                     <Badge
                       className={
-                        stat.type === "inflow" ? "badge-green" : "badge-red"
+                        valuation.type === "inflow"
+                          ? "badge-green"
+                          : "badge-red"
                       }
                     >
-                      {stat.type === "inflow" ? t("Inflow") : t("Outflow")}
+                      {valuation.type === "inflow" ? t("Inflow") : t("Outflow")}
                     </Badge>
                   </TableCell>
-                  <TableCell>{stat.count}</TableCell>
+                  <TableCell>{valuation.count}</TableCell>
                   <TableCell>
-                    <span className={getFlowColorClass(stat.type)}>
-                      {stat.type === "inflow" ? "+" : "-"}
-                      {formatCurrency(stat.total)}
+                    <span className={getFlowColorClass(valuation.type)}>
+                      {valuation.type === "inflow" ? "+" : "-"}
+                      {formatCurrency(valuation.total.toString())}
                     </span>
                   </TableCell>
                   <TableCell>
@@ -154,7 +151,7 @@ export function StatisticsTable({
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
                         <DropdownMenuItem asChild>
-                          <Link href={getTransactionsHref(stat)}>
+                          <Link href={getTransactionsHref(valuation)}>
                             {t("View")}
                           </Link>
                         </DropdownMenuItem>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { cn } from "cn"
 import { useExtracted, useTimeZone } from "next-intl"
 
@@ -20,21 +20,23 @@ import { useBudgets } from "@/contexts/budgets-context"
 import { useTransactions } from "@/contexts/transactions-context"
 import { useCategory } from "@/hooks/use-category"
 import { useMonths } from "@/hooks/use-months"
+import type { CategoryKey } from "@/lib/category"
 import { getUniqueDateRangeYears } from "@/lib/date"
-import { filterBudgets } from "@/lib/filters"
+import { FinancialRollupEngine } from "@/lib/valuation-engine"
+import type { RollupHealth, ScheduleStatus } from "@/lib/valuation-engine"
 
 export function BudgetFilters() {
   const { budgets } = useBudgets()
   const { transactions } = useTransactions()
   const [filterMonth, setFilterMonth] = useState<string>("all")
   const [filterYear, setFilterYear] = useState<string>("all")
-  const [filterCategoryKey, setFilterCategoryKey] = useState<string>("all")
-  const [filterProgress, setFilterProgress] = useState<
-    "all" | "gray" | "green" | "yellow" | "red"
+  const [filterCategoryKey, setFilterCategoryKey] = useState<
+    "all" | CategoryKey
   >("all")
-  const [filterStatus, setFilterStatus] = useState<
-    "all" | "expired" | "active" | "upcoming"
-  >("all")
+  const [filterHealth, setFilterHealth] = useState<"all" | RollupHealth>("all")
+  const [filterStatus, setFilterStatus] = useState<"all" | ScheduleStatus>(
+    "all"
+  )
   const t = useExtracted()
   const timeZone = useTimeZone()
   const { getCategoriesByType } = useCategory()
@@ -46,28 +48,40 @@ export function BudgetFilters() {
     filterMonth !== "all" ||
     filterYear !== "all" ||
     filterCategoryKey !== "all" ||
-    filterProgress !== "all" ||
+    filterHealth !== "all" ||
     filterStatus !== "all"
 
   const handleResetFilters = () => {
     setFilterMonth("all")
     setFilterYear("all")
     setFilterCategoryKey("all")
-    setFilterProgress("all")
+    setFilterHealth("all")
     setFilterStatus("all")
   }
 
-  const filteredBudgets = filterBudgets(
-    budgets,
-    {
+  const engine = useMemo(
+    () => new FinancialRollupEngine(transactions, { timeZone }),
+    [transactions, timeZone]
+  )
+
+  const valuations = useMemo(
+    () =>
+      engine.evaluateBudgets(budgets, {
+        filterMonth,
+        filterYear,
+        filterCategoryKey,
+        filterHealth,
+        filterStatus,
+      }),
+    [
+      engine,
+      budgets,
       filterMonth,
       filterYear,
       filterCategoryKey,
-      filterProgress,
+      filterHealth,
       filterStatus,
-    },
-    transactions,
-    timeZone
+    ]
   )
 
   return (
@@ -149,15 +163,15 @@ export function BudgetFilters() {
             </Select>
 
             <Select
-              value={filterProgress}
-              onValueChange={(
-                value: "all" | "gray" | "green" | "yellow" | "red"
-              ) => setFilterProgress(value)}
+              value={filterHealth}
+              onValueChange={(value: "all" | RollupHealth) =>
+                setFilterHealth(value)
+              }
             >
               <SelectTrigger
                 className={cn(
                   "w-full",
-                  filterProgress !== "all" && "border-primary"
+                  filterHealth !== "all" && "border-primary"
                 )}
               >
                 <SelectValue placeholder={t("Progress")} />
@@ -166,21 +180,25 @@ export function BudgetFilters() {
                 <SelectGroup>
                   <SelectItem value="all">{t("All Progress")}</SelectItem>
                   <SelectSeparator />
-                  <SelectItem value="gray">{t("No Transactions")}</SelectItem>
-                  <SelectItem value="green">{t("Good (< 75%)")}</SelectItem>
-                  <SelectItem value="yellow">
+                  <SelectItem value="unstarted">
+                    {t("No Transactions")}
+                  </SelectItem>
+                  <SelectItem value="on_track">{t("Good (< 75%)")}</SelectItem>
+                  <SelectItem value="warning">
                     {t("Warning (75-100%)")}
                   </SelectItem>
-                  <SelectItem value="red">{t("Exceeded (≥ 100%)")}</SelectItem>
+                  <SelectItem value="exceeded">
+                    {t("Exceeded (≥ 100%)")}
+                  </SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
 
             <Select
               value={filterStatus}
-              onValueChange={(
-                value: "all" | "expired" | "active" | "upcoming"
-              ) => setFilterStatus(value)}
+              onValueChange={(value: "all" | ScheduleStatus) =>
+                setFilterStatus(value)
+              }
             >
               <SelectTrigger
                 className={cn(
@@ -214,7 +232,7 @@ export function BudgetFilters() {
         </CardContent>
       </Card>
 
-      <BudgetsTable filteredBudgets={filteredBudgets} />
+      <BudgetsTable valuations={valuations} />
     </>
   )
 }
